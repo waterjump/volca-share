@@ -1,6 +1,5 @@
 source 'https://rubygems.org'
 
-
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
 # Use SCSS for stylesheets
@@ -15,6 +14,10 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'haml-rails'
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'mongoid', '~> 5.1.0'
+gem 'devise', '~> 4.1'
+gem 'rubocop', '~> 0.40.0', require: false
+gem 'factory_girl_rails', '~> 4.0'
+gem 'ffaker'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -48,4 +51,3 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 end
-
