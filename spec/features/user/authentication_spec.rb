@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.feature 'Authentication process', type: :feature do
-  let(:user) { FactoryGirl.create(:user)}
+  let(:user) { FactoryGirl.create(:user) }
   before(:each) { visit root_path }
 
   def fill_in_login_fields
@@ -11,6 +11,7 @@ RSpec.feature 'Authentication process', type: :feature do
   end
 
   scenario 'User can sign up' do
+    click_link 'Log in'
     click_link 'Sign up'
     pw = Devise.friendly_token.first(8)
     within '#new_user' do

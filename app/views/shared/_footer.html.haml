@@ -1,9 +1,4 @@
-%footer
-  %p by Sean Barrett
-  .user-links
-    %ul
-      - if current_user
-        %li= link_to 'Log out', destroy_user_session_path, method: :delete
-      - else
-        %li= link_to 'Log in', new_user_session_path
-        %li= link_to 'Sign up', new_user_registration_path
+%footer.footer
+  .container.text-muted
+    %span.glyphicon.glyphicon-copyright-mark
+    ="#{Time.now.year} Sean Barrett"

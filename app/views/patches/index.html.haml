@@ -1,0 +1,66 @@
+.container
+  %h1 Patches
+
+  .controls
+    =link_to 'Submit a patch', new_patch_path
+  %table.table-resonsive
+    %thead
+      %tr
+        %th Name
+        %th Attack
+        %th Decay release
+        %th Cutoff eg int
+        %th Peak
+        %th Cutoff
+        %th Lfo rate
+        %th Lfo int
+        %th Vco1 pitch
+        %th Vco1 on
+        %th Vco2 pitch
+        %th vco2 on
+        %th Vco3 pitch
+        %th Vco3 on
+        %th Vco group
+        %th Lfo target amp
+        %th Lfo target pitch
+        %th Lfo target cutoff
+        %th Lfo wave
+        %th Vco1 wave
+        %th Vco2 wave
+        %th Vco3 wave
+        %th Sustain on
+        %th Amp eg on
+        %th Tags
+
+    %tbody
+      - @patches.each do |patch|
+        %tr
+          %td= patch.name
+          %td= patch.attack
+          %td= patch.decay_release
+          %td= patch.cutoff_eg_int
+          %td= patch.peak
+          %td= patch.cutoff
+          %td= patch.lfo_rate
+          %td= patch.lfo_int
+          %td= patch.vco1_pitch
+          %td= patch.vco1_active
+          %td= patch.vco2_pitch
+          %td= patch.vco2_active
+          %td= patch.vco3_pitch
+          %td= patch.vco3_active
+          %td= patch.vco_group
+          %td= patch.lfo_target_amp
+          %td= patch.lfo_target_pitch
+          %td= patch.lfo_target_cutoff
+          %td= patch.lfo_wave
+          %td= patch.vco1_wave
+          %td= patch.vco2_wave
+          %td= patch.vco3_wave
+          %td= patch.sustain_on
+          %td= patch.amp_eg_on
+          %td= patch.tags
+          %td= link_to 'Show', patch
+          - if patch.user == current_user
+            %td= link_to 'Edit', edit_patch_path(patch)
+            %td= link_to 'Destroy', patch, :method => :delete, :data => { :confirm => 'Are you sure?' }

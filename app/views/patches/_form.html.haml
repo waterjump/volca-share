@@ -1,0 +1,136 @@
+= form_tag '/patches', method: :post do
+  - if @patch.errors.any?
+    #error_explanation
+      %h2= "#{pluralize(@patch.errors.count, "error")} prohibited this patch from being saved:"
+      %ul
+        - @patch.errors.full_messages.each do |msg|
+          %li= msg
+
+  .field
+    = label_tag :name, 'Name'
+    = text_field_tag :name, @patch.name, class: 'form-control'
+  %fieldset.form-group
+    .fieldset-label
+      EG
+    .field
+      = label_tag :attack, 'Attack'
+      = range_field_tag :attack, (@patch.attack || 0), in: 0..127
+    .field
+      = label_tag :decay_release, 'Decay/Release'
+      = range_field_tag :decay_release, (@patch.decay_release || 0), in: 0..127
+    .field
+      = label_tag :cutoff_eg_int, 'Cutoff EG Int.'
+      = range_field_tag :cutoff_eg_int, (@patch.cutoff_eg_int || 0), in: 0..127
+  %fieldset.form-group
+    .fieldset-label
+      VCF
+    .field
+      = label_tag :peak, 'Peak'
+      = range_field_tag :peak, (@patch.peak || 0), in: 0..127
+    .field
+      = label_tag :cutoff, 'Cutoff'
+      = range_field_tag :cutoff, (@patch.cutoff || 0), in: 0..127
+  %fieldset.form-group
+    .fieldset-label
+      LFO
+    .field
+      = label_tag :lfo_rate, 'LFO Rate'
+      = range_field_tag :lfo_rate, (@patch.lfo_rate || 0), in: 0..127
+    .field
+      = label_tag :lfo_int, 'LFO Int.'
+      = range_field_tag :lfo_int, (@patch.lfo_int || 0), in: 0..127
+  %fieldset.form-group
+    .fieldset-label
+      VCO
+    .field
+      = label_tag :vco1_pitch, 'VCO 1 Pitch'
+      = range_field_tag :vco1_pitch
+    .field
+      = label_tag :vco1_active, 'VCO 1 Active'
+      = check_box_tag :vco1_active, (@patch.vco1_active || true), true
+    .field
+      = label_tag :vco2_pitch, 'VCO 2 Pitch'
+      = range_field_tag :vco2_pitch
+    .field
+      = label_tag :vco2_active, 'VCO 2 Active'
+      = check_box_tag :vco2_active, (@patch.vco2_active || true), true
+    .field
+      = label_tag :vco3_pitch, 'VCO 3 Pitch'
+      = range_field_tag :vco3_pitch
+    .field
+      = label_tag :vco3_active, 'VCO 3 Active'
+      = check_box_tag :vco3_active, (@patch.vco3_active || true), true
+  .field
+    = label_tag :lfo_wave, 'VCO Group'
+    %br
+    = radio_button_tag :vco_group, 'three', checked: (@patch.vco_group == 'three')
+    = label_tag :vco_group_three, '▮▮ ▮▮ ▮▮'
+    = radio_button_tag :vco_group, 'two', checked: (@patch.vco_group == 'two')
+    = label_tag :vco_group_two, '▮▮▮▮ ▮▮'
+    = radio_button_tag :vco_group, 'one', checked: (@patch.vco_group == 'one' || @patch.vco_group.nil?)
+    = label_tag :vco_group_one, '▮▮▮▮▮▮'
+  %fieldset.form-group
+    .fieldset-label
+      LFO Target
+    .field
+      = label_tag :lfo_target_amp, 'LFO Target Amp'
+      = check_box_tag :lfo_target_amp, true
+    .field
+      = label_tag :lfo_target_pitch, 'LFO Target Pitch'
+      = check_box_tag :lfo_target_pitch, true
+    .field
+      = label_tag :lfo_target_cutoff, 'LFO Target Cutoff'
+      = check_box_tag :lfo_target_cutoff, true, true
+  .field
+    = label_tag :lfo_wave, 'LFO Wave'
+    %br
+    = radio_button_tag :lfo_wave, 'triangle', checked: true
+    = label_tag :lfo_wave_triangle, 'Triangle'
+    = radio_button_tag :lfo_wave, 'square'
+    = label_tag :lfo_wave_square, 'Square'
+  .field
+    = label_tag :vco1_wave, 'VCO 1 Wave'
+    %br
+    = radio_button_tag :vco1_wave, 'saw', checked: true
+    = label_tag :vco1_wave_saw, 'Saw'
+    = radio_button_tag :vco1_wave, 'square'
+    = label_tag :vco1_wave_square, 'Square'
+  .field
+    = label_tag :vco2_wave, 'VCO 2 Wave'
+    %br
+    = radio_button_tag :vco2_wave, 'saw', checked: true
+    = label_tag :vco2_wave_saw, 'Saw'
+    = radio_button_tag :vco2_wave, 'square'
+    = label_tag :vco2_wave_square, 'Square'
+  .field
+    = label_tag :vco3_wave, 'VCO 3 Wave'
+    %br
+    = radio_button_tag :vco3_wave, 'saw'
+    = label_tag :vco3_wave_saw, 'Saw'
+    = radio_button_tag :vco3_wave, 'square', checked: true
+    = label_tag :vco3_wave_square, 'Square'
+  .field
+    = label_tag :sustain_on, 'Sustain On'
+    = check_box_tag :sustain_on
+  .field
+    = label_tag :amp_eg_on, 'Amp EG On'
+    = check_box_tag :amp_eg_on
+  %hr
+  .field
+    = label_tag :tags, 'Tags'
+    = text_field_tag :tags, @patch.tags.join(', '), class: 'form-control'
+  .field
+    = label_tag :privacy, 'Privacy'
+    %br
+    = radio_button_tag :privacy, true, @patch.privacy, class: 'radio-inline'
+    = label_tag :privacy_true, 'privacy'
+    = radio_button_tag :privacy, false, !@patch.privacy, class: 'radio-inline'
+    = label_tag :privacy_false, 'Private'
+  .field
+    = label_tag :audio_link, 'Audio Link'
+    = text_field_tag :audio_link, @patch.audio_link, class: 'form-control'
+  .field
+    = label_tag :additional_notes, 'Additional Notes'
+    = text_area_tag :additional_notes, @patch.additional_notes, size: '50x3', class: 'form-control'
+  .actions
+    = submit_tag 'Save'

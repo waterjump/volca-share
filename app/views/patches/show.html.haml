@@ -1,0 +1,81 @@
+%p#notice= notice
+
+%p
+  %b Name:
+  = @patch.name
+%p
+  %b Attack:
+  = @patch.attack
+%p
+  %b Decay release:
+  = @patch.decay_release
+%p
+  %b Cutoff eg int:
+  = @patch.cutoff_eg_int
+%p
+  %b Peak:
+  = @patch.peak
+%p
+  %b Cutoff:
+  = @patch.cutoff
+%p
+  %b Lfo rate:
+  = @patch.lfo_rate
+%p
+  %b Lfo int:
+  = @patch.lfo_int
+%p
+  %b Vco1 pitch:
+  = @patch.vco1_pitch
+%p
+  %b Vco1 on:
+  = @patch.vco1_active
+%p
+  %b Vco2 pitch:
+  = @patch.vco2_pitch
+%p
+  %b vco2 on:
+  = @patch.vco2_active
+%p
+  %b Vco3 pitch:
+  = @patch.vco3_pitch
+%p
+  %b Vco3 on:
+  = @patch.vco3_active
+%p
+  %b Vco group:
+  = @patch.vco_group
+%p
+  %b Lfo target amp:
+  = @patch.lfo_target_amp
+%p
+  %b Lfo target pitch:
+  = @patch.lfo_target_pitch
+%p
+  %b Lfo target cutoff:
+  = @patch.lfo_target_cutoff
+%p
+  %b Lfo wave:
+  = @patch.lfo_wave
+%p
+  %b Vco1 wave:
+  = @patch.vco1_wave
+%p
+  %b Vco2 wave:
+  = @patch.vco2_wave
+%p
+  %b Vco3 wave:
+  = @patch.vco3_wave
+%p
+  %b Sustain on:
+  = @patch.sustain_on
+%p
+  %b Amp eg on:
+  = @patch.amp_eg_on
+%p
+  %b Tags:
+  = @patch.tags
+- if @patch.user == current_user
+  = link_to 'Edit', edit_patch_path(@patch)
+\|
+= link_to 'Back', patches_path

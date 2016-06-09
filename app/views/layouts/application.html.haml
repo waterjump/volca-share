@@ -7,8 +7,12 @@
     = javascript_include_tag 'application', 'data-turbolinks-track' => true
     = csrf_meta_tags
   %body
-    %p.alert= alert
-    %p.notice= notice
+    = render 'shared/navbar'
+    .alert-warning= alert
+    .alert-info= notice
     = render 'shared/header'
     = yield
     = render 'shared/footer'
+    %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
+    :javascript
+      window.jQuery || document.write('<\/script>')
