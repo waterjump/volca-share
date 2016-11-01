@@ -72,9 +72,6 @@
 %p
   %b Amp eg on:
   = @patch.amp_eg_on
-%p
-  %b Tags:
-  = @patch.tags
 - if @patch.user == current_user
   = link_to 'Edit', edit_patch_path(@patch)
 \|

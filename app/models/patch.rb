@@ -26,14 +26,12 @@ class Patch
   field :vco3_wave, type: String
   field :sustain_on, type: Mongoid::Boolean
   field :amp_eg_on, type: Mongoid::Boolean
-
-  field :tags, type: Array, default: []
-  field :privacy, type: Mongoid::Boolean, default: true
-  field :audio_link, type: String
-  field :additional_notes, type: String
+  field :private?, type: Mongoid::Boolean, default: false
+  field :notes, type: String
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
 
+  validates_presence_of :name
   validates_uniqueness_of :name
   validates :vco1_wave, inclusion: { in: %w(saw square) }
   validates :vco2_wave, inclusion: { in: %w(saw square) }

@@ -30,7 +30,6 @@
         %th Vco3 wave
         %th Sustain on
         %th Amp eg on
-        %th Tags
 
     %tbody
       - @patches.each do |patch|
@@ -59,7 +58,6 @@
           %td= patch.vco3_wave
           %td= patch.sustain_on
           %td= patch.amp_eg_on
-          %td= patch.tags
           %td= link_to 'Show', patch
           - if patch.user == current_user
             %td= link_to 'Edit', edit_patch_path(patch)

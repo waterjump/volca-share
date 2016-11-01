@@ -7,8 +7,9 @@ require 'spec_helper'
 require 'rspec/rails'
 require 'capybara/rails'
 require 'capybara/rspec'
-require 'support/factory_girl'
 require 'ffaker'
+require 'devise'
+
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
@@ -25,7 +26,7 @@ require 'ffaker'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 RSpec.configure do |config|
   # RSpec Rails can automatically mix in different behaviours to your tests
@@ -47,4 +48,7 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  config.include Devise::TestHelpers, type: :controller
+  config.include Devise::TestHelpers, type: :view
 end

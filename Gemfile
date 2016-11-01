@@ -14,10 +14,8 @@ gem 'coffee-rails', '~> 4.1.0'
 gem 'haml-rails'
 gem 'bootstrap-sass', '~> 3.3.6'
 gem 'mongoid', '~> 5.1.0'
-gem 'devise', '~> 4.1'
+gem 'devise'
 gem 'rubocop', '~> 0.40.0', require: false
-gem 'factory_girl_rails', '~> 4.0'
-gem 'ffaker'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -43,6 +41,13 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.4'
   gem 'capybara'
   gem 'better_errors'
+  gem 'ffaker'
+  gem 'factory_girl_rails', '~> 4.0'
+end
+
+group :test do
+  gem 'database_cleaner'
+  gem 'mongoid-rspec', '3.0.0'
 end
 
 group :development do

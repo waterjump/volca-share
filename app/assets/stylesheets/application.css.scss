@@ -37,3 +37,24 @@ body {
 .container .text-muted {
   margin: 20px 0;
 }
+
+
+.volca {
+  width: 1800px;
+  height: 1072px;
+  background-image: image_url('VolcaBass-xlarge.jpg');
+  position: relative;
+}
+
+.small-knob {
+  border-radius: 50%;
+  background-color: red;
+  width: 3.5%;
+  height: 6%;
+  position: absolute;
+}
+
+#tempo {
+  top: 14.15%;
+  left: 25.85%;
+}

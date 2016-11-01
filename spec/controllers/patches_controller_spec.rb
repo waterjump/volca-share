@@ -19,15 +19,16 @@ require 'rails_helper'
 # that an instance is receiving a specific message.
 
 RSpec.describe PatchesController, type: :controller do
+  login_user
   # This should return the minimal set of attributes required to create a valid
   # Patch. As you add validations to Patch, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) do
-    skip('Add a hash of attributes valid for your model')
+    attributes_for(:patch)
   end
 
   let(:invalid_attributes) do
-    skip('Add a hash of attributes invalid for your model')
+    attributes_for(:patch, lfo_wave: 'sine')
   end
 
   # This should return the minimal set of values that should be in the session
@@ -60,7 +61,7 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #edit' do
     it 'assigns the requested patch as @patch' do
-      patch = Patch.create! valid_attributes
+      patch = create(:patch)
       get :edit, { id: patch.to_param }, valid_session
       expect(assigns(:patch)).to eq(patch)
     end
@@ -102,14 +103,14 @@ RSpec.describe PatchesController, type: :controller do
   describe 'PUT #update' do
     context 'with valid params' do
       let(:new_attributes) do
-        skip('Add a hash of attributes valid for your model')
+        attributes_for(:patch, name: 'New Weird Patch')
       end
 
       it 'updates the requested patch' do
         patch = Patch.create! valid_attributes
         put :update, { id: patch.to_param, patch: new_attributes }, valid_session
         patch.reload
-        skip('Add assertions for updated state')
+        expect(patch.name).to eq(new_attributes[:name])
       end
 
       it 'assigns the requested patch as @patch' do

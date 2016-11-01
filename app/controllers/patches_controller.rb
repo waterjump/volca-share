@@ -20,16 +20,17 @@ class PatchesController < ApplicationController
 
   # GET /patches/1/edit
   def edit
+    if @patch.user_id != current_user.id
+      flash[:notice] = 'You may not edit that patch.'
+      render :show
+    end
   end
 
   # POST /patches
   # POST /patches.json
   def create
     user = current_user
-    new_params =
-      patch_params
-      .merge(tags: patch_params[:tags].split(',').uniq)
-    @patch = user.patches.build(new_params)
+    @patch = user.patches.build(patch_params)
 
     respond_to do |format|
       if @patch.save
@@ -75,7 +76,7 @@ class PatchesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    params.permit(
+    params[:patch].permit(
       :name,
       :attack,
       :decay_release,
@@ -100,10 +101,8 @@ class PatchesController < ApplicationController
       :vco3_wave,
       :sustain_on,
       :amp_eg_on,
-      :tags,
-      :public,
-      :audio_link,
-      :additional_notes
+      :private?,
+      :notes
     )
   end
 end
