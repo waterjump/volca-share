@@ -1,18 +1,26 @@
 .container
   .stretchy
     .volca
-      .small.knob.eg#tempo
       .small.knob.eg#attack
+        .notch
       .small.knob.eg#decay-release
+        .notch
       .small.knob.eg#eg-cutoff
-      .medium.knob#octave
+        .notch
       .medium.knob#peak
+        .notch
       .large.knob#cutoff
+        .notch
       .medium.knob.lfo#lfo-rate
+        .notch
       .medium.knob.lfo#lfo-int
+        .notch
       .small.knob.vco#vco1
+        .notch
       .small.knob.vco#vco2
+        .notch
       .small.knob.vco#vco3
+        .notch
       .bottom-row
         = radio_button_tag(:vco_group, 'one', true, class: :control)
         = label_tag(:vco_group_one) do
