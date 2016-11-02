@@ -16,6 +16,10 @@
 @import "bootstrap-sprockets";
 @import "bootstrap";
 
+$width: 1800;
+$height: 1072;
+$aspect: 1800 / 1072 / 100;
+
 html {
   position: relative;
   min-height: 100%;
@@ -38,23 +42,127 @@ body {
   margin: 20px 0;
 }
 
-
-.volca {
-  width: 1800px;
-  height: 1072px;
-  background-image: image_url('VolcaBass-xlarge.jpg');
-  position: relative;
+.stretchy {
+  padding-bottom: percentage(1 / $aspect / 100);
+  position: relative
 }
 
-.small-knob {
+.volca {
+  width: 100%;
+  height: 100%;
+  background-image: image_url('VolcaBass-xlarge.jpg');
+  background-size: cover;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.knob {
   border-radius: 50%;
   background-color: red;
-  width: 3.5%;
-  height: 6%;
   position: absolute;
 }
 
-#tempo {
+.small {
+  width: 3.6%;
+  height: percentage(3.6 * $aspect);
+}
+
+.medium {
+  width: 6.2%;
+  height: percentage(6.2 * $aspect);
+}
+
+.large {
+  width: 10.5%;
+  height: percentage(10.5 * $aspect);
+}
+
+.eg {
   top: 14.15%;
+}
+
+#tempo {
   left: 25.85%;
+}
+
+#attack {
+  left: 34.875%;
+}
+
+#decay-release {
+  left: 43.9%;
+}
+
+#eg-cutoff {
+  left: 52.915%;
+}
+
+#octave {
+  top: 35%;
+  left: 4.4%;
+}
+
+#peak {
+  top: 35%;
+  left: 16.25%;
+}
+
+#cutoff {
+  top: 31.5%;
+  left: 26.5%;
+}
+
+.lfo {
+  top: 35%;
+}
+
+#lfo-rate {
+  left:41.25%;
+}
+
+#lfo-int{
+  left: 52.5%;
+}
+
+.vco {
+  top: 37.2%;
+}
+
+#vco1 {
+  left: 62.9%;
+}
+
+#vco2 {
+  left: 71.9%;
+}
+
+#vco3 {
+  left: 80.9%;
+}
+
+.bottom-row {
+  position: absolute;
+  top: 90%;
+  width: 100%;
+  height: 3.187%;
+  padding-left: 5%;
+  input[type="radio"], input[type="checkbox"]  {
+    display:none;
+  }
+  label {
+    float: none;
+    display: inline;
+  }
+  input[type="radio"] + label span, input[type="checkbox"] + label span  {
+      float:left;
+      display:inline-block;
+      width:2%;
+      height:100%;
+      border-radius: 50%;
+      background-color: red;
+      margin: 0 1.97%;
+  }
 }

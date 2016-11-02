@@ -1,3 +1,57 @@
+.container
+  .stretchy
+    .volca
+      .small.knob.eg#tempo
+      .small.knob.eg#attack
+      .small.knob.eg#decay-release
+      .small.knob.eg#eg-cutoff
+      .medium.knob#octave
+      .medium.knob#peak
+      .large.knob#cutoff
+      .medium.knob.lfo#lfo-rate
+      .medium.knob.lfo#lfo-int
+      .small.knob.vco#vco1
+      .small.knob.vco#vco2
+      .small.knob.vco#vco3
+      .bottom-row
+        = radio_button_tag(:vco_group, 'one', true, class: :control)
+        = label_tag(:vco_group_one) do
+          %span.clearfix
+        = radio_button_tag(:vco_group, 'two', false, class: :control)
+        = label_tag(:vco_group_two) do
+          %span.clearfix
+        = radio_button_tag(:vco_group, 'three', false, class: :control)
+        = label_tag(:vco_group_three) do
+          %span.clearfix
+        = check_box_tag(:lfo_target_amp, true, false, class: :control)
+        = label_tag(:lfo_target_amp) do
+          %span.clearfix
+        = check_box_tag(:lfo_target_pitch, true, false, class: :control)
+        = label_tag(:lfo_target_pitch) do
+          %span.clearfix
+        = check_box_tag(:lfo_target_cutoff, true, false, class: :control)
+        = label_tag(:lfo_target_cutoff) do
+          %span.clearfix
+        = check_box_tag(:lfo_wave, 'triangle', false, class: :control)
+        = label_tag(:lfo_wave) do
+          %span.clearfix
+        = check_box_tag(:vco1_wave, 'saw', false, class: :control)
+        = label_tag(:vco1_wave) do
+          %span.clearfix
+        = check_box_tag(:vco2_wave, 'saw', false, class: :control)
+        = label_tag(:vco2_wave) do
+          %span.clearfix
+        = check_box_tag(:vco3_wave, 'saw', false, class: :control)
+        = label_tag(:vco3_wave) do
+          %span.clearfix
+        = check_box_tag(:sustain_on, true, false, class: :control)
+        = label_tag(:sustain_on) do
+          %span.clearfix
+        = check_box_tag(:amp_eg_on, true, false, class: :control)
+        = label_tag(:amp_eg_on) do
+          %span.clearfix
+
+
 = form_tag '/patches', method: :post do
   - if @patch.errors.any?
     #error_explanation
@@ -117,20 +171,14 @@
     = check_box_tag :amp_eg_on
   %hr
   .field
-    = label_tag :tags, 'Tags'
-    = text_field_tag :tags, @patch.tags.join(', '), class: 'form-control'
-  .field
-    = label_tag :privacy, 'Privacy'
+    = label_tag :privacy, 'Private?'
     %br
-    = radio_button_tag :privacy, true, @patch.privacy, class: 'radio-inline'
-    = label_tag :privacy_true, 'privacy'
-    = radio_button_tag :privacy, false, !@patch.privacy, class: 'radio-inline'
-    = label_tag :privacy_false, 'Private'
+    = radio_button_tag :private?, true, @patch.private?, class: 'radio-inline'
+    = label_tag :private_true, 'Private?'
+    = radio_button_tag :privacy, false, !@patch.private?, class: 'radio-inline'
+    = label_tag :private_false, 'Private?'
   .field
-    = label_tag :audio_link, 'Audio Link'
-    = text_field_tag :audio_link, @patch.audio_link, class: 'form-control'
-  .field
-    = label_tag :additional_notes, 'Additional Notes'
-    = text_area_tag :additional_notes, @patch.additional_notes, size: '50x3', class: 'form-control'
+    = label_tag :notes, 'Notes'
+    = text_area_tag :notes, @patch.notes, size: '50x3', class: 'form-control'
   .actions
     = submit_tag 'Save'
