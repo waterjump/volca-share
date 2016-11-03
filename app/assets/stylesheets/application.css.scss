@@ -100,11 +100,11 @@ body {
   left: 34.875%;
 }
 
-#decay-release {
+#decay_release {
   left: 43.9%;
 }
 
-#eg-cutoff {
+#cutoff_eg_int {
   left: 52.915%;
 }
 
@@ -122,11 +122,11 @@ body {
   top: 35%;
 }
 
-#lfo-rate {
+#lfo_rate {
   left:41.25%;
 }
 
-#lfo-int{
+#lfo_int{
   left: 52.5%;
 }
 
@@ -134,16 +134,62 @@ body {
   top: 37.2%;
 }
 
-#vco1 {
+#vco1_pitch {
   left: 62.9%;
 }
 
-#vco2 {
+#vco2_pitch {
   left: 71.9%;
 }
 
-#vco3 {
+#vco3_pitch {
   left: 80.9%;
+}
+
+#led {
+  top: 49%;
+  left: 5.2%;
+  width: 16.5%;
+  height: 13.7%;
+  position: absolute;
+  background-color: #141414;
+}
+
+.digit-stretchy {
+  padding-right: percentage(1 / (108 / 95));
+  position: relative
+}
+
+.digit {
+  background-image: image_url('numbers.jpg');
+  background-repeat: no-repeat;
+  width: 18.5%;
+  height: 100%;
+  display: inline-block;
+  margin: 0;
+  background-size: 1120%;
+  position: absolute;
+  top: 14%;
+}
+
+#thousands {
+  background-position: 100.5% 0;
+  left: 5%;
+}
+
+#hundreds {
+  background-position: 40% 0;
+  left: 30%;
+}
+
+#tens {
+  background-position: 20% 0;
+  left: 53%;
+}
+
+#ones {
+  background-position: 0 0;
+  left: 75%;
 }
 
 .bottom-row {

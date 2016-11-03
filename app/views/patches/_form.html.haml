@@ -3,23 +3,28 @@
     .volca
       .small.knob.eg#attack
         .notch
-      .small.knob.eg#decay-release
+      .small.knob.eg#decay_release
         .notch
-      .small.knob.eg#eg-cutoff
+      .small.knob.eg#cutoff_eg_int
         .notch
+      #led
+        .digit#thousands
+        .digit#hundreds
+        .digit#tens
+        .digit#ones
       .medium.knob#peak
         .notch
       .large.knob#cutoff
         .notch
-      .medium.knob.lfo#lfo-rate
+      .medium.knob.lfo#lfo_rate
         .notch
-      .medium.knob.lfo#lfo-int
+      .medium.knob.lfo#lfo_int
         .notch
-      .small.knob.vco#vco1
+      .small.knob.vco#vco1_pitch
         .notch
-      .small.knob.vco#vco2
+      .small.knob.vco#vco2_pitch
         .notch
-      .small.knob.vco#vco3
+      .small.knob.vco#vco3_pitch
         .notch
       .bottom-row
         = radio_button_tag(:vco_group, 'one', true, class: :control)
