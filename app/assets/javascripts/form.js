@@ -108,7 +108,7 @@ $(function() {
     })
 
   $(document).mouseup(function(e) {
-  	if (!dragging)
+    if (!dragging)
       return false;
     dragging = false;
     var currentPoint = e.pageY;
