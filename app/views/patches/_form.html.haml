@@ -26,6 +26,9 @@
         .notch
       .small.knob.vco#vco3_pitch
         .notch
+      .button#vco1_active
+      .button#vco2_active
+      .button#vco3_active
       .bottom-row
         = radio_button_tag(:vco_group, 'one', true, class: :control)
         = label_tag(:vco_group_one) do
@@ -81,31 +84,31 @@
       EG
     .field
       = label_tag :attack, 'Attack'
-      = range_field_tag :attack, (@patch.attack || 0), in: 0..127
+      = range_field_tag :attack, (@patch.attack || 63), in: 0..127
     .field
       = label_tag :decay_release, 'Decay/Release'
-      = range_field_tag :decay_release, (@patch.decay_release || 0), in: 0..127
+      = range_field_tag :decay_release, (@patch.decay_release || 63), in: 0..127
     .field
       = label_tag :cutoff_eg_int, 'Cutoff EG Int.'
-      = range_field_tag :cutoff_eg_int, (@patch.cutoff_eg_int || 0), in: 0..127
+      = range_field_tag :cutoff_eg_int, (@patch.cutoff_eg_int || 63), in: 0..127
   %fieldset.form-group
     .fieldset-label
       VCF
     .field
       = label_tag :peak, 'Peak'
-      = range_field_tag :peak, (@patch.peak || 0), in: 0..127
+      = range_field_tag :peak, (@patch.peak || 63), in: 0..127
     .field
       = label_tag :cutoff, 'Cutoff'
-      = range_field_tag :cutoff, (@patch.cutoff || 0), in: 0..127
+      = range_field_tag :cutoff, (@patch.cutoff || 63), in: 0..127
   %fieldset.form-group
     .fieldset-label
       LFO
     .field
       = label_tag :lfo_rate, 'LFO Rate'
-      = range_field_tag :lfo_rate, (@patch.lfo_rate || 0), in: 0..127
+      = range_field_tag :lfo_rate, (@patch.lfo_rate || 63), in: 0..127
     .field
       = label_tag :lfo_int, 'LFO Int.'
-      = range_field_tag :lfo_int, (@patch.lfo_int || 0), in: 0..127
+      = range_field_tag :lfo_int, (@patch.lfo_int || 63), in: 0..127
   %fieldset.form-group
     .fieldset-label
       VCO

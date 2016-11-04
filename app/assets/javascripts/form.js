@@ -4,11 +4,33 @@ $(function() {
       $(this).data("midi", 63);
     });
 
+    $(".button").each(function() {
+      $(this).data("active", true);
+    });
+
+    $(".button").click(function(){
+      var vco = $(this).attr("id").split('_')[0];
+      var value = $(this).data("active");
+      var vco_knob = $("#" + vco + "_pitch");
+      var input = $("input#" + vco + "_active" );
+      if (value == true) {
+        $(this).data("active", false);
+        $(this).css("background-color", "#d6d7dc");
+        vco_knob.css("background-color", "#d6d7dc");
+        input.prop("checked", false);
+      } else {
+        $(this).data("active", true);
+        $(this).css("background-color", "#fd9994");
+        vco_knob.css("background-color", "#fd9994");
+        input.prop("checked", true);
+      }
+    });
+
     var calculateClockOffset = function(value, place) {
       var midi_string = '' + value;
       var digit = midi_string[midi_string.length - place];
 
-      return (parseInt(digit,10))*9.98;
+      return (parseInt(digit, 10)) * 9.98;
     };
 
     var setDisplay = function(value) {

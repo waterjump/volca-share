@@ -19,6 +19,7 @@
 $width: 1800;
 $height: 1072;
 $aspect: 1800 / 1072 / 100;
+$pink: #fd9994;
 
 html {
   position: relative;
@@ -79,7 +80,7 @@ body {
 .small {
   width: 3.6%;
   height: percentage(3.6 * $aspect);
-  background-color: #fd9994;
+  background-color: $pink;
 }
 
 .medium {
@@ -190,6 +191,29 @@ body {
 #ones {
   background-position: 0 0;
   left: 75%;
+}
+
+.button {
+  width: 6.4%;
+  height: 6%;
+  position: absolute;
+  top: 54.5%;
+  //background-color: #d6d7dc;
+  background-color: $pink;
+  border: solid black;
+  cursor: pointer;
+}
+
+#vco1_active {
+  left: 61.5%;
+}
+
+#vco2_active {
+  left: 70.6%;
+}
+
+#vco3_active {
+  left: 79.6%;
 }
 
 .bottom-row {
