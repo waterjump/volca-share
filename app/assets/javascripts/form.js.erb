@@ -1,0 +1,230 @@
+$(function() {
+
+  var vcoPitchValues = [
+    -1200,-1100,-1000,-900,-800,-700,-600,-500,-400,-300,-200,-100,-96,-92,-88,
+    -84,-80,-78,-76,-74,-72,-70,-68,-66,-64,-62,-60,-58,-56,-54,-52,-50,-48,-46,
+    -44,-42,-40,-38,-36,-34,-32,-30,-28,-26,-24,-22,-20,-18,-16,-14,-12,-10,-8,
+    -6,-4,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,6,8,10,12,14,16,18,20,22,24,26,
+    28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,
+    78,80,84,88,92,96,100,200,300,400,500,600,700,800,900,1000,1100,1200
+  ];
+
+  var inputForId = function(id){
+    return $('input#' + id);
+  };
+
+  $('.knob').each(function() {
+    $(this).data('midi', 63);
+  });
+
+  $('.button').each(function() {
+    $(this).data('active', true);
+  });
+
+  $('.bottom-row label').click(function(){
+    if ($('input#' + $(this).attr('for')).is(':checkbox')) {
+      $(this).find('span .light').toggleClass('lit');
+    } else {
+      $('.light[data-radio]').each(function() {
+        $(this).removeClass('lit');
+      });
+      $(this).find('span .light').addClass('lit');
+    }
+  });
+
+  $('.button').click(function(){
+    var vco, value, vcoKnob, input;
+    vco = $(this).attr('id').split('_')[0];
+    value = $(this).data('active');
+    vcoKnob = $('.knob#' + vco + '_pitch');
+    input = inputForId($(this).attr('id'));
+    if (value == true) {
+      $(this).data('active', false);
+      $(this).css('background-color', '#d6d7dc');
+      vcoKnob.css('background-color', '#d6d7dc');
+      input.prop('checked', false);
+    } else {
+      $(this).data('active', true);
+      $(this).css('background-color', '#fd9994');
+      vcoKnob.css('background-color', '#fd9994');
+      input.prop('checked', true);
+    }
+  });
+
+  var calculateClockOffset = function(value, place) {
+    var mapping = {}, midiString, digit;
+    midiString = '' + value;
+    digit = midiString[midiString.length - place];
+    mapping = {
+      'dash' : -2.5,
+      'c' : 24,
+      'n' : 48,
+      'o' : 74,
+      'f' : 100,
+      'blank' : 99.2
+    };
+    return mapping[value] || parseInt(digit, 10) * 9.98;
+  };
+
+  var setSprite = function(element, character) {
+    if (character != 'blank' && isNaN(character)) {
+      element.css('background-image', 'url(<%= asset_path('symbols.jpg') %>)');
+      element.css('background-size', '500%');
+    } else {
+      element.css('background-image', 'url(<%= asset_path('numbers.jpg') %>)');
+      element.css('background-size', '1120%');
+    }
+  }
+
+  var setDisplay = function(midiValue, pitch) {
+    var displayValue, letter, thousands, hundreds, tens, ones;
+    if (pitch) {
+      displayValue = vcoPitchValues[midiValue];
+    } else {
+      displayValue = midiValue;
+    }
+    displayString = constructDisplayString(displayValue, pitch);
+
+    setSprite($('#thousands'), displayString[0]);
+    $('#thousands').css('background-position', calculateClockOffset(displayString[0], 1) + '% 0');
+    setSprite($('#hundreds'), displayString[1]);
+    $('#hundreds').css('background-position', calculateClockOffset(displayString[1], 1) + '% 0');
+    setSprite($('#tens'), displayString[2]);
+    $('#tens').css('background-position', calculateClockOffset(displayString[2], 1) + '% 0');
+    setSprite($('#ones'), displayString[3]);
+    $('#ones').css('background-position', calculateClockOffset(displayString[3], 1) + '% 0');
+  }
+
+  var constructDisplayString = function(value, pitch) {
+    var displayString, thousands, hundreds, tens, ones, tensString;
+    tensString = '' + (Math.abs(value) / 100);
+    if (pitch === true) {
+      if (value < 0) {
+        thousands = 'dash';
+      } else {
+        thousands = 'blank';
+      }
+
+      value = Math.abs(value);
+      if (value >= 100 && value < 1000) {
+        ones = 'n';
+        tens = tensString[0];
+        hundreds = '0';
+      } else if (value >= 1000) {
+        ones = 'n';
+        tens = ('' + value)[1];
+        hundreds = ('' + value)[0];
+      } else if (value < 100 && value >= 10) {
+        ones = 'c';
+        tens = ('' + value)[1];
+        hundreds = ('' + value)[0]
+      } else if (value < 10) {
+        ones = 'c';
+        tens = ('' + value)[0];
+        hundreds = '0'
+      }
+      displayString = [thousands, hundreds, tens, ones];
+
+      if (value === 0 ) {
+        displayString = 'blank o f f'.split(' ');
+      }
+    } else {
+      thousands = 'blank';
+      if (value > 99) {
+        hundreds = ('' + value)[0];
+        tens = ('' + value)[1];
+        ones = ('' + value)[2];
+      } else if (value > 9) {
+        hundreds = 'blank';
+        tens = ('' + value)[0];
+        ones = ('' + value)[1];
+      } else {
+        hundreds = 'blank';
+        tens = 'blank';
+        ones = '' + value;
+      }
+      displayString = [thousands, hundreds, tens, ones];
+    }
+
+    return displayString;
+  }
+
+  var dragging = false,
+    knob,
+    clickedPoint, lastAngle, limit = 140, midi;
+
+  $('.knob').mousedown(function(e) {
+    clickedPoint = e.pageY;
+    e.preventDefault();
+    e.stopPropagation();
+    dragging = true;
+    knob = $(e.target).closest('.knob');
+    rangeInput = inputForId('patch_' + $(this).attr('id'))
+    if (!knob.data('origin')) knob.data('origin', {
+      top: knob.offset().top
+    });
+
+    lastAngle = knob.data('lastAngle') || 0;
+  })
+
+  $('.knob').mouseenter(function(){
+    var midi = $(this).data('midi');
+    if (dragging)
+      return false;
+    setDisplay(midi, $(this).attr('id').split('_')[1] === 'pitch');
+  });
+
+  $(document).mousemove(function(e) {
+      if (dragging) {
+        $('body').css('cursor', 'ns-resize');
+        var currentPoint = e.pageY;
+        var degree = lastAngle + (clickedPoint - currentPoint);
+        if (degree > limit) {
+          lastAngle = limit;
+          clickedPoint = currentPoint;
+        }
+        if (degree < -limit) {
+          lastAngle = -limit;
+          clickedPoint = currentPoint;
+        }
+        var degree = lastAngle + (clickedPoint - currentPoint);
+        if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
+          knob.css('-moz-transform', 'rotate(' + degree + 'deg)');
+          knob.css('-moz-transform-origin', '50% 50%');
+          knob.css('-webkit-transform', 'rotate(' + degree + 'deg)');
+          knob.css('-webkit-transform-origin', '50% 50%');
+          knob.css('-o-transform', 'rotate(' + degree + 'deg)');
+          knob.css('-o-transform-origin', '50% 50%');
+          knob.css('-ms-transform', 'rotate(' + degree + 'deg)');
+          knob.css('-ms-transform-origin', '50% 50%');
+          midi = Math.round(((63.5 / limit) * degree) + 63.5);
+          if (knob.attr('id').split('_')[1] === 'pitch') {
+            setDisplay(midi, true);
+          } else {
+            rangeInput.val(midi);
+            setDisplay(midi, false);
+          }
+        }
+      }
+    })
+
+  $(document).mouseup(function(e) {
+    if (!dragging)
+      return false;
+    dragging = false;
+    var currentPoint = e.pageY;
+    $('body').css('cursor', 'default');
+
+    var currentAngle = lastAngle + (clickedPoint - currentPoint);
+    if (lastAngle > limit) {
+      lastAngle = limit;
+      currentPoint = clickedPoint;
+    }
+    if (lastAngle < -limit) {
+      lastAngle = -limit;
+      currentPoint = clickedPoint;
+    }
+    knob.data('lastAngle', currentAngle);
+    knob.data('midi', midi);
+  });
+});

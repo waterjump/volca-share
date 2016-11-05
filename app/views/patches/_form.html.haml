@@ -72,11 +72,11 @@
           = check_box :patch, :vco2_wave, { class: :control, checked: (@patch.vco2_wave || false)}, 'square', 'saw'
           = label_tag('patch[vco2_wave]') do
             %span
-              .light.lit
+              .light
           = check_box :patch, :vco3_wave, { class: :control, checked: (@patch.vco3_wave || true)}, 'square', 'saw'
           = label_tag('patch[vco3_wave]') do
             %span
-              .light
+              .light.lit
           = check_box :patch, :sustain_on, { class: :control, checked: (@patch.sustain_on || false)}, 'true', 'false'
           = label_tag('patch[sustain_on]') do
             %span
