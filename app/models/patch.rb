@@ -37,4 +37,20 @@ class Patch
   validates :vco2_wave, inclusion: { in: %w(saw square) }
   validates :vco3_wave, inclusion: { in: %w(saw square) }
   validates :lfo_wave, inclusion: { in: %w(triangle square) }
+
+  def vco_group_one
+    return true if vco_group == 'one'
+    false
+  end
+
+  def vco_group_two
+    return true if vco_group == 'two'
+    false
+  end
+
+  def vco_group_three
+    return true if vco_group == 'three'
+    false
+  end
+
 end

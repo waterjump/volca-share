@@ -8,83 +8,94 @@
   .container
     .stretchy
       .volca
-        .small.knob.eg#attack
+        .small.knob.eg#attack{ data: { midi: @patch.attack || 63 } }
           .notch
-        .small.knob.eg#decay_release
+        .small.knob.eg#decay_release{ data: { midi: @patch.decay_release || 63 } }
           .notch
-        .small.knob.eg#cutoff_eg_int
+        .small.knob.eg#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63 } }
           .notch
         #led
           .digit#thousands
           .digit#hundreds
           .digit#tens
           .digit#ones
-        .medium.knob#peak
+        .medium.knob#peak{ data: { midi: @patch.peak || 63 } }
           .notch
-        .large.knob#cutoff
+        .large.knob#cutoff{ data: { midi: @patch.cutoff || 63 } }
           .notch
-        .medium.knob.lfo#lfo_rate
+        .medium.knob.lfo#lfo_rate{ data: { midi: @patch.lfo_rate || 63 } }
           .notch
-        .medium.knob.lfo#lfo_int
+        .medium.knob.lfo#lfo_int{ data: { midi: @patch.lfo_int || 63 } }
           .notch
-        .small.knob.vco#vco1_pitch
+        .small.knob.vco#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63 } }
           .notch
-        .small.knob.vco#vco2_pitch
+        .small.knob.vco#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63 } }
           .notch
-        .small.knob.vco#vco3_pitch
+        .small.knob.vco#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63 } }
           .notch
-        .button#vco1_active_button
-        .button#vco2_active_button
-        .button#vco3_active_button
+        .button#vco1_active_button{ data: { active: @patch.vco1_active || true } }
+        .button#vco2_active_button{ data: { active: @patch.vco2_active || true } }
+        .button#vco3_active_button{ data: { active: @patch.vco3_active || true } }
         .bottom-row
           = radio_button_tag 'patch[vco_group]', 'one', true, class: :control
           = label_tag('patch[vco_group_one]') do
             %span
-              .light{ data: { radio: true} }
+              .light{ data: { radio: true, active: @patch.vco_group_one || false } }
+
           = radio_button_tag 'patch[vco_group]', 'two', false, class: :control
           = label_tag('patch[vco_group_two]') do
             %span
-              .light{ data: { radio: true} }
+              .light{ data: { radio: true, active: @patch.vco_group_two || false } }
+
           = radio_button_tag 'patch[vco_group]', 'three', true, class: :control
           = label_tag('patch[vco_group_three]') do
             %span
-              .light.lit{ data: { radio: true} }
+              .light{ data: { radio: true, active: @patch.vco_group_three || true } }
+
           = check_box :patch, :lfo_target_amp, { class: :control, checked: (@patch.lfo_target_amp || false)}, 'true', 'false'
           = label_tag('patch[lfo_target_amp]') do
             %span
-              .light
+              .light{ data: { active: @patch.lfo_target_amp || false } }
+
           = check_box :patch, :lfo_target_pitch, { class: :control, checked: (@patch.lfo_target_pitch || false)}, 'true', 'false'
           = label_tag('patch[lfo_target_pitch]') do
             %span
-              .light
+              .light{ data: { active: @patch.lfo_target_pitch || false } }
+
           = check_box :patch, :lfo_target_cutoff, { class: :control, checked: (@patch.lfo_target_cutoff || true)}, 'true', 'false'
           = label_tag('patch[lfo_target_cutoff]') do
             %span
-              .light.lit
+              .light{ data: { active: @patch.lfo_target_cutoff || true } }
+
           = check_box :patch, :lfo_wave, { class: :control, checked: (@patch.lfo_wave || false)}, 'square', 'triangle'
           = label_tag('patch[lfo_wave]') do
             %span
-              .light
+              .light{ data: { active: @patch.lfo_wave || false } }
+
           = check_box :patch, :vco1_wave, { class: :control, checked: (@patch.vco1_wave || false)}, 'square', 'saw'
           = label_tag('patch[vco1_wave]') do
             %span
-              .light
+              .light{ data: { active: @patch.vco1_wave || false } }
+
           = check_box :patch, :vco2_wave, { class: :control, checked: (@patch.vco2_wave || false)}, 'square', 'saw'
           = label_tag('patch[vco2_wave]') do
             %span
-              .light
+              .light{ data: { active: @patch.vco2_wave || false } }
+
           = check_box :patch, :vco3_wave, { class: :control, checked: (@patch.vco3_wave || true)}, 'square', 'saw'
           = label_tag('patch[vco3_wave]') do
             %span
-              .light.lit
+              .light{ data: { active: @patch.vco3_wave || true } }
+
           = check_box :patch, :sustain_on, { class: :control, checked: (@patch.sustain_on || false)}, 'true', 'false'
           = label_tag('patch[sustain_on]') do
             %span
-              .light
+              .light{ data: { active: @patch.sustain_on || false } }
+
           = check_box :patch, :amp_eg_on, { class: :control, checked: (@patch.amp_eg_on || false)}, 'true', 'false'
           = label_tag('patch[amp_eg_on]') do
             %span
-              .light
+              .light{ data: { active: @patch.amp_eg_on || false } }
 
     = range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
     = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden

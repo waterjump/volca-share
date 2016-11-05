@@ -1,5 +1,29 @@
 $(function() {
 
+  function Knob(element = null) {
+    this.element = element;
+    this.midi = $(this.element).data('midi');
+    this.rotation = $(this.element).data('rotation');
+
+    this.rotate = function(degree) {
+      knob = $(this.element);
+      knob.css('-moz-transform', 'rotate(' + degree + 'deg)');
+      knob.css('-moz-transform-origin', '50% 50%');
+      knob.css('-webkit-transform', 'rotate(' + degree + 'deg)');
+      knob.css('-webkit-transform-origin', '50% 50%');
+      knob.css('-o-transform', 'rotate(' + degree + 'deg)');
+      knob.css('-o-transform-origin', '50% 50%');
+      knob.css('-ms-transform', 'rotate(' + degree + 'deg)');
+      knob.css('-ms-transform-origin', '50% 50%');
+    }
+
+    this.degreeForMidi = function(midi, limit = 140) {
+      return Math.round((midi - 63.5)/(63.5 / limit));
+    }
+  }
+
+  var activeKnob = new Knob;
+
   var vcoPitchValues = [
     -1200,-1100,-1000,-900,-800,-700,-600,-500,-400,-300,-200,-100,-96,-92,-88,
     -84,-80,-78,-76,-74,-72,-70,-68,-66,-64,-62,-60,-58,-56,-54,-52,-50,-48,-46,
@@ -14,11 +38,10 @@ $(function() {
   };
 
   $('.knob').each(function() {
-    $(this).data('midi', 63);
-  });
-
-  $('.button').each(function() {
-    $(this).data('active', true);
+    my_knob = new Knob(this);
+    degree = my_knob.degreeForMidi($(this).data('midi'));
+    $(this).data('rotation', degree);
+    my_knob.rotate(degree);
   });
 
   $('.bottom-row label').click(function(){
@@ -58,7 +81,7 @@ $(function() {
     mapping = {
       'dash' : -2.5,
       'c' : 24,
-      'n' : 48,
+      'n' : 49,
       'o' : 74,
       'f' : 100,
       'blank' : 99.2
@@ -150,53 +173,47 @@ $(function() {
   }
 
   var dragging = false,
-    knob,
-    clickedPoint, lastAngle, limit = 140, midi;
+      clickedPoint,
+      limit = 140, knob;
 
   $('.knob').mousedown(function(e) {
     clickedPoint = e.pageY;
     e.preventDefault();
     e.stopPropagation();
     dragging = true;
-    knob = $(e.target).closest('.knob');
-    rangeInput = inputForId('patch_' + $(this).attr('id'))
+    activeKnob = new Knob($(e.target).closest('.knob'));
+    knob = $(activeKnob.element);
+    rangeInput = inputForId('patch_' + $(this).attr('id'));
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
     });
-
-    lastAngle = knob.data('lastAngle') || 0;
   })
 
   $('.knob').mouseenter(function(){
     var midi = $(this).data('midi');
     if (dragging)
       return false;
+    activeKnob = new Knob(this);
     setDisplay(midi, $(this).attr('id').split('_')[1] === 'pitch');
   });
 
   $(document).mousemove(function(e) {
       if (dragging) {
+        var degree, currentPoint;
         $('body').css('cursor', 'ns-resize');
-        var currentPoint = e.pageY;
-        var degree = lastAngle + (clickedPoint - currentPoint);
+        currentPoint = e.pageY;
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
         if (degree > limit) {
-          lastAngle = limit;
+          activeKnob.rotation = limit;
           clickedPoint = currentPoint;
         }
         if (degree < -limit) {
-          lastAngle = -limit;
+          activeKnob.rotation = -limit;
           clickedPoint = currentPoint;
         }
-        var degree = lastAngle + (clickedPoint - currentPoint);
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
         if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
-          knob.css('-moz-transform', 'rotate(' + degree + 'deg)');
-          knob.css('-moz-transform-origin', '50% 50%');
-          knob.css('-webkit-transform', 'rotate(' + degree + 'deg)');
-          knob.css('-webkit-transform-origin', '50% 50%');
-          knob.css('-o-transform', 'rotate(' + degree + 'deg)');
-          knob.css('-o-transform-origin', '50% 50%');
-          knob.css('-ms-transform', 'rotate(' + degree + 'deg)');
-          knob.css('-ms-transform-origin', '50% 50%');
+          activeKnob.rotate(degree);
           midi = Math.round(((63.5 / limit) * degree) + 63.5);
           if (knob.attr('id').split('_')[1] === 'pitch') {
             setDisplay(midi, true);
@@ -215,16 +232,16 @@ $(function() {
     var currentPoint = e.pageY;
     $('body').css('cursor', 'default');
 
-    var currentAngle = lastAngle + (clickedPoint - currentPoint);
-    if (lastAngle > limit) {
-      lastAngle = limit;
+    var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
+    if (activeKnob.rotation > limit) {
+      activeKnob.rotation = limit;
       currentPoint = clickedPoint;
     }
-    if (lastAngle < -limit) {
-      lastAngle = -limit;
+    if (activeKnob.rotation < -limit) {
+      activeKnob.rotation = -limit;
       currentPoint = clickedPoint;
     }
-    knob.data('lastAngle', currentAngle);
-    knob.data('midi', midi);
+    $(activeKnob.element).data('rotation', currentAngle);
+    $(activeKnob.element).data('midi', midi);
   });
 });
