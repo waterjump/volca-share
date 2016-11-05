@@ -33,9 +33,9 @@
           .notch
         .small.knob.vco#vco3_pitch
           .notch
-        .button#vco1_active
-        .button#vco2_active
-        .button#vco3_active
+        .button#vco1_active_button
+        .button#vco2_active_button
+        .button#vco3_active_button
         .bottom-row
           = radio_button_tag 'patch[vco_group]', 'one', true, class: :control
           = label_tag('patch[vco_group_one]') do
@@ -106,10 +106,7 @@
     .field
       = label_tag :privacy, 'Private?'
       %br
-      = radio_button_tag 'patch[private?]', true, @patch.private?, class: 'radio-inline'
-      = label_tag 'patch[private_true]', 'Public'
-      = radio_button_tag 'patch[private?]', false, !@patch.private?, class: 'radio-inline'
-      = label_tag 'patch[private_false]', 'Private'
+      = check_box :patch, :private?, { checked: !(@patch.private?) || false }, 'false', 'true'
     .field
       = label_tag 'patch[notes]', 'Notes'
       = text_area_tag 'patch[notes]', @patch.notes, size: '50x3', class: 'form-control'
