@@ -12,11 +12,24 @@ $(function() {
       $(this).data('active', true);
     });
 
+    $('.bottom-row label').click(function(){
+      console.log(this);
+      if ($('input#' + $(this).attr('for')).is(':checkbox')) {
+        $(this).find('span .light').toggleClass('lit');
+      } else {
+        $('.light[data-radio]').each(function() {
+          console.log(this);
+          $(this).removeClass('lit');
+        });
+        $(this).find('span .light').addClass('lit');
+      }
+    });
+
     $('.button').click(function(){
       var vco, valie, vcoKnob, input;
       vco = $(this).attr('id').split('_')[0];
       value = $(this).data('active');
-      vcoKnob = $('#' + vco + '_pitch');
+      vcoKnob = $('#patch_' + vco + '_pitch');
       input = inputForId($(this).attr('id'));
       if (value == true) {
         $(this).data('active', false);
@@ -57,13 +70,14 @@ $(function() {
     knob, my_span,
     clickedPoint, lastAngle, limit = 140,
     hundreds, tens, ones, midi;
+
   $('.knob').mousedown(function(e) {
     clickedPoint = e.pageY;
     e.preventDefault();
     e.stopPropagation();
     dragging = true;
     knob = $(e.target).closest('.knob');
-    rangeInput = inputForId($(this).attr('id'))
+    rangeInput = inputForId('patch_' + $(this).attr('id'))
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
     });
@@ -91,7 +105,7 @@ $(function() {
           clickedPoint = currentPoint;
         }
         var degree = lastAngle + (clickedPoint - currentPoint); // relative to the last on
-        if (currentPoint !== clickedPoint) { //start rotate
+        if (currentPoint !== clickedPoint || degree === -limit || degree === limit) { //start rotate
           knob.css('-moz-transform', 'rotate(' + degree + 'deg)');
           knob.css('-moz-transform-origin', '50% 50%');
           knob.css('-webkit-transform', 'rotate(' + degree + 'deg)');
