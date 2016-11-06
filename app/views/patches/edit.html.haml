@@ -1,8 +1,16 @@
 .container
   %h1 Editing patch
 
-  = render 'form'
+  = form_tag :patch, method: :patch, id: :patch_form do
+    - if @patch.errors.any?
+      #error_explanation
+        %h2= "#{pluralize(@patch.errors.count, "error")} prohibited this patch from being saved:"
+        %ul
+          - @patch.errors.full_messages.each do |msg|
+            %li= msg
+
+    = render 'form'
 
   = link_to 'Show', @patch
-  \|
+
   = link_to 'Back', patches_path

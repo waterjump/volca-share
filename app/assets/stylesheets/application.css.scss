@@ -137,6 +137,7 @@ body {
 
 .vco {
   top: 37.2%;
+  background-color: #d6d7dc;
 }
 
 #vco1_pitch {
@@ -158,11 +159,6 @@ body {
   height: 13.7%;
   position: absolute;
   background-color: #141414;
-}
-
-.digit-stretchy {
-  padding-right: percentage(1 / (108 / 95));
-  position: relative
 }
 
 .digit {
@@ -202,8 +198,7 @@ body {
   height: 6%;
   position: absolute;
   top: 54.5%;
-  //background-color: #d6d7dc;
-  background-color: $pink;
+  background-color: #d6d7dc;
   border: solid black;
   cursor: pointer;
 }
@@ -218,6 +213,10 @@ body {
 
 #vco3_active_button {
   left: 79.6%;
+}
+
+.lit {
+  background-color: $pink !important;
 }
 
 .bottom-row {
@@ -248,9 +247,6 @@ body {
         left: 31%;
         border: black solid;
         position: absolute;
-      }
-      .light.lit {
-        background-color: #fd9994
       }
     }
   }

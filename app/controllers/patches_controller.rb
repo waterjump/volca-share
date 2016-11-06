@@ -15,7 +15,7 @@ class PatchesController < ApplicationController
 
   # GET /patches/new
   def new
-    @patch = Patch.new
+    @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
   end
 
   # GET /patches/1/edit
@@ -34,7 +34,7 @@ class PatchesController < ApplicationController
 
     respond_to do |format|
       if @patch.save
-        format.html { redirect_to @patch, notice: 'Patch was successfully created.' }
+        format.html { redirect_to edit_patch_url(@patch), notice: 'Patch was successfully created.' }
         format.json { render :show, status: :created, location: @patch }
       else
         format.html { render :new }
@@ -71,7 +71,7 @@ class PatchesController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_patch
-    @patch = Patch.find(params[:id])
+    @patch = VolcaShare::PatchViewModel.wrap(Patch.find(params[:id]))
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

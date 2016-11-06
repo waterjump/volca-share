@@ -55,7 +55,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #new' do
     it 'assigns a new patch as @patch' do
       get :new, {}, valid_session
-      expect(assigns(:patch)).to be_a_new(Patch)
+      expect(assigns(:patch)).to be_a_new(VolcaShare::PatchViewModel)
     end
   end
 
@@ -83,7 +83,7 @@ RSpec.describe PatchesController, type: :controller do
 
       it 'redirects to the created patch' do
         post :create, { patch: valid_attributes }, valid_session
-        expect(response).to redirect_to(Patch.last)
+        expect(response).to redirect_to(edit_patch_url(Patch.last))
       end
     end
 
