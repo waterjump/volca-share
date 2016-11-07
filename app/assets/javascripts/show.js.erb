@@ -1,7 +1,7 @@
 $(function() {
   if ($('body.show').length === 0 )
     return;
-  function Knob(element = null) {
+  function Knob(element) {
     this.element = element;
     this.midi = $(this.element).data('midi');
     this.rotation = $(this.element).data('rotation');
@@ -20,12 +20,12 @@ $(function() {
       knob.css('-ms-transform-origin', '50% 50%');
     }
 
-    this.degreeForMidi = function(midi, limit = 140) {
+    this.degreeForMidi = function(midi, limit) {
       return Math.round((midi - 63.5)/(63.5 / limit));
     }
   }
 
-  function Display(element = null) {
+  function Display(element) {
     this.element = element;
     this.constructDisplayString = function(value, pitch) {
       var displayString, thousands, hundreds, tens, ones, tensString;
@@ -81,7 +81,7 @@ $(function() {
       return displayString;
     }
 
-    this.update = function(midi, pitch = false){
+    this.update = function(midi, pitch){
       var displayValue, letter, thousands, hundreds, tens, ones;
       if (pitch) {
         displayValue = this.vcoPitchValues[midi];
@@ -100,14 +100,14 @@ $(function() {
       $(this.digit4.element).css('background-position', this.calculateClockOffset(displayString[3], 1) + '% 0');
     }
 
-    function Digit(element = null) {
+    function Digit(element) {
       this.element = element;
       this.setSprite = function(character) {
         if (character != 'blank' && isNaN(character)) {
-          $(this.element).css('background-image', 'url(<%= asset_path('symbols.jpg') %>)');
+          $(this.element).css('background-image', 'url(<%= asset_path("symbols.jpg") %>)');
           $(this.element).css('background-size', '500%');
         } else {
-          $(this.element).css('background-image', 'url(<%= asset_path('numbers.jpg') %>)');
+          $(this.element).css('background-image', 'url(<%= asset_path("numbers.jpg") %>)');
           $(this.element).css('background-size', '1120%');
         }
       }
@@ -143,13 +143,13 @@ $(function() {
     };
   }
 
-  var activeKnob,
-      display = new Display($('#led')),
-      limit = 140, knob;
+  var activeKnob, knob;
+  var display = new Display($('#led'));
+  var limit = 140;
 
   $('.knob').each(function() {
     my_knob = new Knob(this);
-    degree = my_knob.degreeForMidi($(this).data('midi'));
+    degree = my_knob.degreeForMidi($(this).data('midi'), limit);
     $(this).data('rotation', degree);
     my_knob.rotate(degree);
   });
