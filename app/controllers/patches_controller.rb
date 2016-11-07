@@ -5,7 +5,7 @@ class PatchesController < ApplicationController
   # GET /patches
   # GET /patches.json
   def index
-    @patches = Patch.all
+    @patches = Patch.public
   end
 
   # GET /patches/1

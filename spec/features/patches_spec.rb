@@ -75,6 +75,16 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.status_code).to eq(200)
   end
 
+  scenario 'that are private are not show on the index' do
+    patch1 = FactoryGirl.create(:patch, private?: false)
+    patch2 = FactoryGirl.create(:patch, private?: true)
+
+    click_link 'Patches'
+
+    expect(page).to have_content(patch1.name)
+    expect(page).not_to have_content(patch2.name)
+  end
+
   scenario 'header is shown' do
     expect(page).to have_content(/VolcaShare/i)
   end
