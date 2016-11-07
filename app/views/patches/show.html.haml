@@ -1,77 +1,95 @@
 %p#notice= notice
 
-%p
-  %b Name:
-  = @patch.name
-%p
-  %b Attack:
-  = @patch.attack
-%p
-  %b Decay release:
-  = @patch.decay_release
-%p
-  %b Cutoff eg int:
-  = @patch.cutoff_eg_int
-%p
-  %b Peak:
-  = @patch.peak
-%p
-  %b Cutoff:
-  = @patch.cutoff
-%p
-  %b Lfo rate:
-  = @patch.lfo_rate
-%p
-  %b Lfo int:
-  = @patch.lfo_int
-%p
-  %b Vco1 pitch:
-  = @patch.vco1_pitch
-%p
-  %b Vco1 on:
-  = @patch.vco1_active
-%p
-  %b Vco2 pitch:
-  = @patch.vco2_pitch
-%p
-  %b vco2 on:
-  = @patch.vco2_active
-%p
-  %b Vco3 pitch:
-  = @patch.vco3_pitch
-%p
-  %b Vco3 on:
-  = @patch.vco3_active
-%p
-  %b Vco group:
-  = @patch.vco_group
-%p
-  %b Lfo target amp:
-  = @patch.lfo_target_amp
-%p
-  %b Lfo target pitch:
-  = @patch.lfo_target_pitch
-%p
-  %b Lfo target cutoff:
-  = @patch.lfo_target_cutoff
-%p
-  %b Lfo wave:
-  = @patch.lfo_wave
-%p
-  %b Vco1 wave:
-  = @patch.vco1_wave
-%p
-  %b Vco2 wave:
-  = @patch.vco2_wave
-%p
-  %b Vco3 wave:
-  = @patch.vco3_wave
-%p
-  %b Sustain on:
-  = @patch.sustain_on
-%p
-  %b Amp eg on:
-  = @patch.amp_eg_on
+.container
+  .stretchy
+    .volca
+      .small.knob.eg#attack{ data: { midi: @patch.attack || 63 } }
+        .notch
+      .small.knob.eg#decay_release{ data: { midi: @patch.decay_release || 63 } }
+        .notch
+      .small.knob.eg#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63 } }
+        .notch
+      #led
+        .digit#thousands
+        .digit#hundreds
+        .digit#tens
+        .digit#ones
+      .medium.knob#peak{ data: { midi: @patch.peak || 63 } }
+        .notch
+      .large.knob#cutoff{ data: { midi: @patch.cutoff || 63 } }
+        .notch
+      .medium.knob.lfo#lfo_rate{ data: { midi: @patch.lfo_rate || 63 } }
+        .notch
+      .medium.knob.lfo#lfo_int{ data: { midi: @patch.lfo_int || 63 } }
+        .notch
+      .small.knob.vco#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63 } }
+        .notch
+      .small.knob.vco#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63 } }
+        .notch
+      .small.knob.vco#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63 } }
+        .notch
+      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' } }
+      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' } }
+      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' } }
+      .bottom-row
+        = label_tag('patch[vco_group_one]') do
+          %span
+            .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
+
+        = label_tag('patch[vco_group_two]') do
+          %span
+            .light{ data: { radio: true, active: @patch.vco_group_two.to_s } }
+
+        = label_tag('patch[vco_group_three]') do
+          %span
+            .light{ data: { radio: true, active: @patch.vco_group_three.to_s } }
+
+        = label_tag('patch[lfo_target_amp]') do
+          %span
+            .light{ data: { active: @patch.lfo_target_amp.to_s } }
+
+        = label_tag('patch[lfo_target_pitch]') do
+          %span
+            .light{ data: { active: @patch.lfo_target_pitch.to_s } }
+
+        = label_tag('patch[lfo_target_cutoff]') do
+          %span
+            .light{ data: { active: @patch.lfo_target_cutoff.to_s } }
+
+        = label_tag('patch[lfo_wave]') do
+          %span
+            .light{ data: { active: @patch.lfo_wave.to_s } }
+
+        = label_tag('patch[vco1_wave]') do
+          %span
+            .light{ data: { active: @patch.vco1_wave.to_s } }
+
+        = label_tag('patch[vco2_wave]') do
+          %span
+            .light{ data: { active: @patch.vco2_wave.to_s } }
+
+        = label_tag('patch[vco3_wave]') do
+          %span
+            .light{ data: { active: @patch.vco3_wave.to_s } }
+
+        = label_tag('patch[sustain_on]') do
+          %span
+            .light{ data: { active: @patch.sustain_on.to_s } }
+
+        = label_tag('patch[amp_eg_on]') do
+          %span
+            .light{ data: { active: @patch.amp_eg_on.to_s } }
+
+
+  %h1
+    = @patch.name
+  = label_tag 'patch[notes]', 'Notes'
+  %p
+    = @patch.notes
+
+
+
+
 - if @patch.user == current_user
   = link_to 'Edit', edit_patch_path(@patch)
 \|

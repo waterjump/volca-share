@@ -11,15 +11,18 @@ class PatchesController < ApplicationController
   # GET /patches/1
   # GET /patches/1.json
   def show
+    @body_class = :show
   end
 
   # GET /patches/new
   def new
+    @body_class = :form
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
   end
 
   # GET /patches/1/edit
   def edit
+    @body_class = :form
     if @patch.user_id != current_user.id
       flash[:notice] = 'You may not edit that patch.'
       render :show

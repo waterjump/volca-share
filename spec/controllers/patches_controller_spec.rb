@@ -28,7 +28,7 @@ RSpec.describe PatchesController, type: :controller do
   end
 
   let(:invalid_attributes) do
-    attributes_for(:patch, lfo_wave: 'sine')
+    attributes_for(:patch, attack: 'bort' )
   end
 
   # This should return the minimal set of values that should be in the session

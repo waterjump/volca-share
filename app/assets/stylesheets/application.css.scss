@@ -64,14 +64,20 @@ body {
   right: 0;
 }
 
+#patch_form {
+  .knob {
+    cursor: ns-resize;
+  }
+}
+
 .knob {
   border-radius: 50%;
   background-color: #b3b3b5;
   position: absolute;
   border: black solid;
-  cursor: ns-resize;
   overflow: hidden;
 }
+
 
 .notch {
   position: absolute;

@@ -18,10 +18,10 @@ FactoryGirl.define do
     lfo_target_amp { FFaker::Boolean.maybe }
     lfo_target_pitch { FFaker::Boolean.maybe }
     lfo_target_cutoff { FFaker::Boolean.maybe }
-    lfo_wave %w(triangle square).sample
-    vco1_wave %w(saw square).sample
-    vco2_wave %w(saw square).sample
-    vco3_wave %w(saw square).sample
+    lfo_wave { FFaker::Boolean.maybe }
+    vco1_wave { FFaker::Boolean.maybe }
+    vco2_wave { FFaker::Boolean.maybe }
+    vco3_wave { FFaker::Boolean.maybe }
     sustain_on { FFaker::Boolean.maybe }
     amp_eg_on { FFaker::Boolean.maybe }
     private? { FFaker::Boolean.maybe }
