@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :patch do
-    name { FFaker::Lorem.words(2) }
+    name { FFaker::Lorem.word }
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
     cutoff_eg_int (0..127).to_a.sample

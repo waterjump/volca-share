@@ -12,6 +12,8 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require display.js.erb
+//= require knob.js.erb
 //= require_tree .
 //= require jquery
 //= require bootstrap-sprockets

@@ -33,7 +33,6 @@
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
         = label_tag('patch[vco_group_one]') do
           %span
-            - puts @patch.vco_group_one.to_s.class
             .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
 
         = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
