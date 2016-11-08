@@ -16,6 +16,7 @@ gem 'bootstrap-sass', '~> 3.3.6'
 gem 'mongoid', '~> 5.1.0'
 gem 'devise'
 gem 'rubocop', '~> 0.40.0', require: false
+gem 'bundler', '1.13.6'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
@@ -60,4 +61,5 @@ end
 
 group :production do
   gem 'rails_12factor'
+  gem 'bson_ext'
 end

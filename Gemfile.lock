@@ -52,6 +52,7 @@ GEM
       autoprefixer-rails (>= 5.2.1)
       sass (>= 3.3.4)
     bson (4.1.1)
+    bson_ext (1.5.1)
     builder (3.2.2)
     byebug (9.0.6)
     capybara (2.10.1)
@@ -261,6 +262,8 @@ PLATFORMS
 DEPENDENCIES
   better_errors
   bootstrap-sass (~> 3.3.6)
+  bson_ext
+  bundler (= 1.13.6)
   byebug
   capybara
   coffee-rails (~> 4.1.0)
