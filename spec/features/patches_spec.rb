@@ -37,18 +37,20 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active'])
     .not_to eq(nil) #vco3_wave
 
-    range_select 'patch[attack]', 0
-    range_select 'patch[decay_release]', 0
-    range_select 'patch[cutoff_eg_int]', 0
-    range_select 'patch[peak]', 0
-    range_select 'patch[cutoff]', 0
-    range_select 'patch[lfo_rate]', 0
-    range_select 'patch[lfo_int]', 0
-    range_select 'patch[vco1_pitch]', 0
+    dummy_patch = FactoryGirl.create(:patch)
+
+    range_select 'patch[attack]', dummy_patch.attack
+    range_select 'patch[decay_release]', dummy_patch.decay_release
+    range_select 'patch[cutoff_eg_int]', dummy_patch.cutoff_eg_int
+    range_select 'patch[peak]', dummy_patch.peak
+    range_select 'patch[cutoff]', dummy_patch.cutoff
+    range_select 'patch[lfo_rate]', dummy_patch.lfo_rate
+    range_select 'patch[lfo_int]', dummy_patch.lfo_int
+    range_select 'patch[vco1_pitch]', dummy_patch.vco1_pitch
     find('#vco1_active_button').click
-    range_select 'patch[vco2_pitch]', 0
+    range_select 'patch[vco2_pitch]', dummy_patch.vco2_pitch
     find('#vco2_active_button').click
-    range_select 'patch[vco3_pitch]', 0
+    range_select 'patch[vco3_pitch]', dummy_patch.vco3_pitch
     find('#vco3_active_button').click
     find("#{bottom_row} > label:nth-child(4)").click  # vco_group_two
     find("#{bottom_row} > label:nth-child(9)").click  # lfo_target_amp
@@ -64,6 +66,33 @@ RSpec.feature 'patches', type: :feature, js: true do
     check 'patch[private]'
     fill_in 'patch[notes]', with: 'This patch is cool.'
     click_button 'Save'
+
+    expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
+    expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
+    expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
+    expect(page.find('#peak')['data-midi']).to eq(dummy_patch.peak.to_s)
+    expect(page.find('#cutoff')['data-midi']).to eq(dummy_patch.cutoff.to_s)
+    expect(page.find('#lfo_rate')['data-midi']).to eq(dummy_patch.lfo_rate.to_s)
+    expect(page.find('#lfo_int')['data-midi']).to eq(dummy_patch.lfo_int.to_s)
+    expect(page.find('#vco1_pitch')['data-midi']).to eq(dummy_patch.vco1_pitch.to_s)
+    expect(page.find('#vco2_pitch')['data-midi']).to eq(dummy_patch.vco2_pitch.to_s)
+    expect(page.find('#vco3_pitch')['data-midi']).to eq(dummy_patch.vco3_pitch.to_s)
+    expect(page.find('#vco1_active_button')['data-active']).to eq('false')
+    expect(page.find('#vco2_active_button')['data-active']).to eq('false')
+    expect(page.find('#vco2_active_button')['data-active']).to eq('false')
+    expect(page.find('#vco1_active_button')['data-active']).to eq('false')
+    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq ('false')
+    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq ('false')
+    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']).to eq ('false')
+    expect(page.find("#{bottom_row} > label:nth-child(18) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(21) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(24) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']).to eq ('false')
+    expect(page.find("#{bottom_row} > label:nth-child(30) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(33) > span > div")['data-active']).to eq ('true')
 
     expect(page).to have_css('.volca')
   end

@@ -37,7 +37,7 @@ class PatchesController < ApplicationController
 
     respond_to do |format|
       if @patch.save
-        format.html { redirect_to edit_patch_url(@patch), notice: 'Patch was successfully created.' }
+        format.html { redirect_to edit_patch_url(@patch), notice: 'Patch saved successfully.' }
         format.json { render :show, status: :created, location: @patch }
       else
         format.html { render :new }
