@@ -20,4 +20,14 @@ function Knob(element) {
   this.degreeForMidi = function(midi, limit) {
     return Math.round((midi - 63.5)/(63.5 / limit));
   }
+
+  this.autoRotate = function (d, selector){
+    $({deg: 0}).animate({deg: d}, {
+      step: function(now, fx){
+        $(selector).css({
+          transform: "rotate(" + now + "deg)"
+        });
+      }
+    })
+  }
 }

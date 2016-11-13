@@ -11,7 +11,7 @@ $(function() {
     my_knob = new Knob(this);
     degree = my_knob.degreeForMidi($(this).data('midi'), limit);
     $(this).data('rotation', degree);
-    my_knob.rotate(degree);
+    my_knob.autoRotate(degree, '#' + $(this).attr('id'));
   });
 
   $('.bottom-row label').each(function(){
