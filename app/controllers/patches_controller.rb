@@ -5,7 +5,7 @@ class PatchesController < ApplicationController
   # GET /patches
   # GET /patches.json
   def index
-    @patches = Patch.public
+    @patches = VolcaShare::PatchViewModel.wrap(Patch.public)
   end
 
   # GET /patches/1

@@ -257,3 +257,37 @@ body {
     }
   }
 }
+
+.patches {
+  .wrapper {
+    .image, .patch, .info {
+      display: inline-block;
+      vertical-align: top;
+    }
+
+    .image {
+      width: 100px;
+      height: 100px;
+      background-image: image_url('patch-image.png');
+      float: left
+    }
+
+    .patch {
+      width: 330px;
+      float: left;
+      margin: 0 0 0 10px;
+    }
+
+    .info {
+      width: 100px;
+      padding: 1px 1px 1px 5px;
+      float: right;
+      border-left: 1px solid #d6d6d6;
+    }
+
+    width: 540px;
+    min-height: 100px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+  }
+}
