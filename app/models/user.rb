@@ -6,6 +6,7 @@ class User
          :recoverable, :rememberable, :trackable, :validatable
 
   ## Database authenticatable
+  field :username,           type: String
   field :email,              type: String, default: ''
   field :encrypted_password, type: String, default: ''
 
@@ -35,4 +36,11 @@ class User
   # field :failed_attempts, type: Integer, default: 0 # Only if lock strategy is :failed_attempts
   # field :unlock_token,    type: String # Only if unlock strategy is :email or :both
   # field :locked_at,       type: Time
+
+  validates_presence_of :username
+  validates_uniqueness_of :username
+  validates :username, format: {  with: /\A[0-9A-Za-z\-\_\.]+\Z/ }
+  validates :username, length: { minimum: 3, maximum: 20 }
+
+
 end
