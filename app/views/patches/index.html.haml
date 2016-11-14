@@ -11,8 +11,12 @@
         .patch
           =link_to patch.name, patch, { class: :title }
           %br/
-          .description= patch.notes
+          .description= patch.description
         .info
           =link_to patch.username, user_path(patch.user), { class: :username }
           %br/
           .date= patch.created_at.strftime("%B #{patch.created_at.day.ordinalize}, %Y" )
+          .icons
+            - if patch.user == current_user
+              = link_to edit_patch_path(patch) do
+                .edit_glyph

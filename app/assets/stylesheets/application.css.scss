@@ -276,6 +276,8 @@ body {
       width: 330px;
       float: left;
       margin: 0 0 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .info {
@@ -290,4 +292,11 @@ body {
     margin-top: 10px;
     margin-bottom: 15px;
   }
+}
+
+.edit_glyph {
+  background-image: image_url('edit.png');
+  width: 20px;
+  height: 20px;
+  background-size: 100%;
 }

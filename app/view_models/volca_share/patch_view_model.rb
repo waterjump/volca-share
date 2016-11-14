@@ -23,5 +23,11 @@ module VolcaShare
     def username
       model.user.username
     end
+
+    def description
+      return unless model.notes.present?
+      return model.notes.squish if model.notes.squish.length <= 180
+      model.notes[0..80].squish + '...'
+    end
   end
 end
