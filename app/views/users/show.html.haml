@@ -1,0 +1,5 @@
+.container
+  %h1= "Patches by #{@user.username}"
+  %p= pluralize(@patches.count, 'patch')
+  .patches
+    = render 'shared/patches'

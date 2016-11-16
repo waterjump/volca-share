@@ -39,7 +39,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #index' do
     it 'assigns all patches as @patches' do
       patch = Patch.create! valid_attributes
-      get :index, {}, valid_session
+      get :index
       expect(assigns(:patches)).to eq([patch])
     end
   end

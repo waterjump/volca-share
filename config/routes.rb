@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   resources :patches
-  devise_for :users
+  devise_for :users, controllers: { sessions: 'users/sessions' }
   resources :users, only: [ :show ]
   get 'welcome/index'
 

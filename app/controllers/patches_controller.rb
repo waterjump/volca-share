@@ -104,7 +104,7 @@ class PatchesController < ApplicationController
       :vco3_wave,
       :sustain_on,
       :amp_eg_on,
-      :private?,
+      :secret,
       :notes
     )
   end

@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :patch do
-    name { FFaker::Lorem.word }
+    name { FFaker::Lorem.characters(10) }
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
     cutoff_eg_int (0..127).to_a.sample
@@ -24,7 +24,7 @@ FactoryGirl.define do
     vco3_wave { FFaker::Boolean.maybe }
     sustain_on { FFaker::Boolean.maybe }
     amp_eg_on { FFaker::Boolean.maybe }
-    private? { FFaker::Boolean.maybe }
+    secret { FFaker::Boolean.maybe }
     notes { FFaker::Lorem.paragraph }
   end
 

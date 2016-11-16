@@ -8,6 +8,8 @@ RSpec.feature 'patches', type: :feature, js: true do
     page.execute_script(script)
   end
 
+  let(:user) { FactoryGirl.create(:user) }
+
   before(:each) { visit root_path }
 
   scenario 'can be created by users' do
@@ -63,7 +65,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     find("#{bottom_row} > label:nth-child(30)").click # sustain_on
     find("#{bottom_row} > label:nth-child(33)").click # amp_eg_on
     fill_in 'patch[name]', with: 'My Cool Patch'
-    check 'patch[private]'
+    check 'patch[secret]'
     fill_in 'patch[notes]', with: 'This patch is cool.'
     click_button 'Save'
 
@@ -105,8 +107,8 @@ RSpec.feature 'patches', type: :feature, js: true do
   end
 
   scenario 'that are private are not show on the index' do
-    patch1 = FactoryGirl.create(:patch, private?: false)
-    patch2 = FactoryGirl.create(:patch, private?: true)
+    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    patch2 = FactoryGirl.create(:patch, secret: true, user_id: user.id)
 
     click_link 'Patches'
 

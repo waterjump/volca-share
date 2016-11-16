@@ -4,19 +4,4 @@
   .controls
     =link_to 'Submit a patch', new_patch_path
   .patches
-    - @patches.each do |patch|
-      .wrapper
-        =link_to patch do
-          .image
-        .patch
-          =link_to patch.name, patch, { class: :title }
-          %br/
-          .description= patch.description
-        .info
-          =link_to patch.username, user_path(patch.user), { class: :username }
-          %br/
-          .date= patch.created_at.strftime("%B #{patch.created_at.day.ordinalize}, %Y" )
-          .icons
-            - if patch.user == current_user
-              = link_to edit_patch_path(patch) do
-                .edit_glyph
+    = render 'shared/patches'

@@ -108,9 +108,9 @@
     = label_tag :name, 'Patch name'
     = text_field_tag 'patch[name]', @patch.name, class: 'form-control'
   .field
-    = label_tag :privacy, 'Private?'
+    = label_tag :privacy, 'Secret?'
     %br
-    = check_box :patch, :private?, @patch.checked?('private?'), 'true', 'false'
+    = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
   .field
     = label_tag 'patch[notes]', 'Notes'
     = text_area_tag 'patch[notes]', @patch.notes, size: '50x3', class: 'form-control'

@@ -26,7 +26,7 @@ class Patch
   field :vco3_wave, type: Boolean, default: true
   field :sustain_on, type: Mongoid::Boolean
   field :amp_eg_on, type: Mongoid::Boolean
-  field :private?, type: Mongoid::Boolean, default: false
+  field :secret, type: Mongoid::Boolean, default: false
   field :notes, type: String
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
@@ -44,5 +44,5 @@ class Patch
   validates :vco2_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :vco3_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
 
-  scope :public, -> { where(private?: false) }
+  scope :public, -> { where(secret: false) }
 end
