@@ -106,7 +106,7 @@
 
   .field
     = label_tag :name, 'Patch name'
-    = text_field_tag 'patch[name]', @patch.name, class: 'form-control'
+    = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true
   .field
     = label_tag :privacy, 'Secret?'
     %br
