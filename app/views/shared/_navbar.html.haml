@@ -10,9 +10,7 @@
     #navbar.navbar-collapse.collapse
       %ul.nav.navbar-nav
         %li
-          %a{href: '/'} Home
-        %li
-          = link_to 'Patches', patches_path
+          = link_to 'About', welcome_index_path
       %ul.nav.navbar-nav.navbar-right
         %li
           - if current_user.present?

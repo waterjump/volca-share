@@ -21,8 +21,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Log in'
 
     visit root_path
-
-    click_link 'Patches'
     expect(page).to have_link 'Submit a patch'
 
     click_link 'Submit a patch'
@@ -100,7 +98,6 @@ RSpec.feature 'patches', type: :feature, js: true do
   end
 
   scenario 'cannot be created by guests' do
-    click_link 'Patches'
     click_link 'Submit a patch'
     expect(current_path).to eq(new_user_session_path)
     expect(page.status_code).to eq(200)
@@ -110,7 +107,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
     patch2 = FactoryGirl.create(:patch, secret: true, user_id: user.id)
 
-    click_link 'Patches'
+    visit root_path
 
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)

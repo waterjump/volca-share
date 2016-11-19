@@ -8,11 +8,13 @@ RSpec.feature 'the home page', type: :feature do
   end
 
   scenario 'user see relevant information' do
-    expect(page).to have_content(/Hello/i)
+    expect(page).to have_selector('h1', text: "Patches")
   end
 
   scenario 'header is shown' do
     expect(page).to have_content(/VolcaShare/i)
+    expect(page).to have_content(/About/i)
+    expect(page).to have_content(/Submit/i)
   end
 
   scenario 'footer is shown' do
