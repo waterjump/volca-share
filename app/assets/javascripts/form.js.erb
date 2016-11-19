@@ -2,9 +2,10 @@ $(function() {
   if ($('body.form').length === 0 )
     return;
 
-  var activeKnob, knob, clickedPoint;
+  var activeKnob, knob, clickedPoint, midi;
   var display = new Display($('#led'));
   var dragging = false;
+  var clicked = false;
   var limit = 140;
 
   $('.knob').each(function() {
@@ -21,7 +22,7 @@ $(function() {
     }
   });
 
-  $('.bottom-row label').click(function(){
+  $('.bottom-row label').mouseup(function(){
     if ($('input#' + $(this).attr('for')).is(':checkbox')) {
       $(this).find('span .light').toggleClass('lit');
     } else {
@@ -43,7 +44,7 @@ $(function() {
     }
   });
 
-  $('.button').click(function(){
+  $('.button').mouseup(function(){
     var vco, value, vcoKnob, input;
     vco = $(this).attr('id').split('_')[0];
     value = $(this).data('active');
@@ -64,7 +65,7 @@ $(function() {
     clickedPoint = e.pageY;
     e.preventDefault();
     e.stopPropagation();
-    dragging = true;
+    clicked = true;
     activeKnob = new Knob(this);
     knob = $(activeKnob.element);
     if (!knob.data('origin')) knob.data('origin', {
@@ -73,7 +74,7 @@ $(function() {
   })
 
   $('.knob').mouseenter(function(){
-    var midi = $(this).data('midi');
+    midi = $(this).data('midi');
     if (dragging)
       return false;
     activeKnob = new Knob(this);
@@ -81,7 +82,11 @@ $(function() {
   });
 
   $(document).mousemove(function(e) {
+    if (clicked === true) {
+      dragging = true;
+    }
     if (dragging) {
+      e.preventDefault();
       var degree, currentPoint;
       $('body').css('cursor', 'ns-resize');
       currentPoint = e.pageY;
@@ -104,23 +109,63 @@ $(function() {
     }
   });
 
-  $(document).mouseup(function(e) {
-    if (!dragging)
-      return false;
-    dragging = false;
-    var currentPoint = e.pageY;
-    $('body').css('cursor', 'default');
+  $('.knob').mouseup(function(e) {
+    clicked = false;
+    if (dragging) {
+      dragging = false;
+      var currentPoint = e.pageY;
+      $('body').css('cursor', 'default');
 
-    var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
-    if (activeKnob.rotation > limit) {
-      activeKnob.rotation = limit;
-      currentPoint = clickedPoint;
+      var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
+      if (activeKnob.rotation > limit) {
+        activeKnob.rotation = limit;
+        currentPoint = clickedPoint;
+      }
+      if (activeKnob.rotation < -limit) {
+        activeKnob.rotation = -limit;
+        currentPoint = clickedPoint;
+      }
+      $(activeKnob.element).data('rotation', currentAngle);
+      $(activeKnob.element).data('midi', midi);
+    } else {
+      display.update(activeKnob.midi, activeKnob.isPitch);
     }
-    if (activeKnob.rotation < -limit) {
-      activeKnob.rotation = -limit;
-      currentPoint = clickedPoint;
-    }
-    $(activeKnob.element).data('rotation', currentAngle);
-    $(activeKnob.element).data('midi', midi);
   });
+
+  function touchHandler(event)
+    {
+        var touches = event.changedTouches,
+            first = touches[0],
+            type = "";
+        switch(event.type)
+        {
+            case "touchstart": type = "mousedown"; break;
+            case "touchmove":  type = "mousemove"; break;
+            case "touchend":   type = "mouseup";   break;
+            default:           return;
+        }
+
+        // initMouseEvent(type, canBubble, cancelable, view, clickCount,
+        //                screenX, screenY, clientX, clientY, ctrlKey,
+        //                altKey, shiftKey, metaKey, button, relatedTarget);
+
+        var simulatedEvent = document.createEvent("MouseEvent");
+        simulatedEvent.initMouseEvent(type, true, true, window, 1,
+                                      first.screenX, first.screenY,
+                                      first.clientX, first.clientY, false,
+                                      false, false, false, 0/*left*/, null);
+
+        first.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
+    }
+
+  function init()
+    {
+        document.addEventListener("touchstart", touchHandler, true);
+        document.addEventListener("touchmove", touchHandler, true);
+        document.addEventListener("touchend", touchHandler, true);
+        document.addEventListener("touchcancel", touchHandler, true);
+    }
+
+  init();
 });

@@ -235,10 +235,13 @@ body {
     display:none;
   }
   label {
-    float: none;
+    float: left;
+    width: 5.95%;
+    height: 100%;
     display: inline;
+    overflow: hidden;
     span {
-      width: 5.6%;
+      width: 89%;
       height: 89%;
       position: relative;
       display: inline-block;
