@@ -80,18 +80,15 @@
           %span
             .light{ data: { active: @patch.amp_eg_on.to_s } }
 
-
   %h1
     = @patch.name
-  = label_tag 'patch[notes]', 'Notes'
+  = label_tag 'patch[tags]', 'Tags'
   %p
     - @patch.tags.each do |tag|
       = link_to "\##{tag}", tag_path(tag: tag)
+  = label_tag 'patch[notes]', 'Notes'
   %p
     = @patch.notes
-
-
-
 
 - if @patch.user == current_user
   = link_to 'Edit', edit_patch_path(@patch)

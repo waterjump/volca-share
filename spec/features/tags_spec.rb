@@ -17,6 +17,8 @@ RSpec.feature 'tags', type: :feature, js: true do
   end
 
   scenario 'patch detail page shows tags as links' do
+    expect(page.first('.wrapper')).to have_content('#lead')
+
     click_link 'Patch 1'
     expect(page).to have_link('#lead')
 

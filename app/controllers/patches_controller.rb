@@ -82,7 +82,7 @@ class PatchesController < ApplicationController
   def format_tags
     tags = patch_params[:tags]
     return [] unless tags.present?
-    @patch_params.merge!(tags: tags.split(',').map(&:downcase))
+    @patch_params.merge!(tags: tags.split(',').map(&:downcase).map(&:strip))
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

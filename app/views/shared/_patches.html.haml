@@ -8,6 +8,9 @@
       .description= patch.description
       - if patch.secret?
         .secret= "[SECRET]"
+      .tags
+        - patch.tags.each do |tag|
+          ="\##{tag} "
     .info
       =link_to patch.username, user_path(patch.user), { class: :username }
       %br/
