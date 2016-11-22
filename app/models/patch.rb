@@ -1,6 +1,7 @@
 class Patch
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Mongoid::Document::Taggable
 
   field :name, type: String
   field :attack, type: Integer

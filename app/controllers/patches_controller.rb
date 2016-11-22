@@ -33,7 +33,8 @@ class PatchesController < ApplicationController
   # POST /patches.json
   def create
     user = current_user
-    @patch = user.patches.build(patch_params)
+    format_tags
+    @patch = user.patches.build(@patch_params)
 
     respond_to do |format|
       if @patch.save
@@ -50,7 +51,8 @@ class PatchesController < ApplicationController
   # PATCH/PUT /patches/1.json
   def update
     respond_to do |format|
-      if @patch.update(patch_params)
+      format_tags
+      if @patch.update(@patch_params)
         format.html { redirect_to @patch, notice: 'Patch was successfully updated.' }
         format.json { render :show, status: :ok, location: @patch }
       else
@@ -77,9 +79,15 @@ class PatchesController < ApplicationController
     @patch = VolcaShare::PatchViewModel.wrap(Patch.find(params[:id]))
   end
 
+  def format_tags
+    tags = patch_params[:tags]
+    return [] unless tags.present?
+    @patch_params.merge!(tags: tags.split(',').map(&:downcase))
+  end
+
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    params[:patch].permit(
+    @patch_params ||= params[:patch].permit(
       :name,
       :attack,
       :decay_release,
@@ -105,7 +113,8 @@ class PatchesController < ApplicationController
       :sustain_on,
       :amp_eg_on,
       :secret,
-      :notes
+      :notes,
+      :tags
     )
   end
 end

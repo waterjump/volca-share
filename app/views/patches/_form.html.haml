@@ -112,6 +112,9 @@
     %br
     = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
   .field
+    = label_tag 'patch[tags]', 'Tags'
+    = text_area_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control'
+  .field
     = label_tag 'patch[notes]', 'Notes'
     = text_area_tag 'patch[notes]', @patch.notes, size: '50x3', class: 'form-control'
   .actions

@@ -17,6 +17,8 @@ gem 'mongoid', '~> 5.1.0'
 gem 'devise'
 gem 'rubocop', '~> 0.40.0', require: false
 gem 'bundler', '1.13.6'
+gem 'mongoid-simple-tags'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

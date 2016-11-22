@@ -24,8 +24,9 @@ FactoryGirl.define do
     vco3_wave { FFaker::Boolean.maybe }
     sustain_on { FFaker::Boolean.maybe }
     amp_eg_on { FFaker::Boolean.maybe }
-    secret { FFaker::Boolean.maybe }
+    secret false
     notes { FFaker::Lorem.paragraph }
+    tags { FFaker::Lorem.words(3) }
   end
 
   factory :user do

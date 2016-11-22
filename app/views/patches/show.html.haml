@@ -85,6 +85,9 @@
     = @patch.name
   = label_tag 'patch[notes]', 'Notes'
   %p
+    - @patch.tags.each do |tag|
+      = link_to "\##{tag}", tag_path(tag: tag)
+  %p
     = @patch.notes
 
 

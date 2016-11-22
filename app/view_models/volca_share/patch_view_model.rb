@@ -29,5 +29,9 @@ module VolcaShare
       return model.notes.squish if model.notes.squish.length <= 180
       model.notes[0..80].squish + '...'
     end
+
+    def formatted_tags
+      tags.map(&:downcase).join(', ')
+    end
   end
 end
