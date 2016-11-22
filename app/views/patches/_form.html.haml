@@ -104,18 +104,18 @@
   = range_field_tag 'patch[vco3_pitch]', (@patch.vco3_pitch || 63), in: 0..127, class: :hidden
   = check_box :patch, :vco3_active, { class: :hidden }.merge(@patch.checked?('vco3_active')), 'true', 'false'
 
-  .field
-    = label_tag :name, 'Patch name'
-    = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true
-  .field
-    = label_tag :privacy, 'Secret?'
-    %br
-    = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
-  .field
-    = label_tag 'patch[tags]', 'Tags'
-    = text_area_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control'
-  .field
-    = label_tag 'patch[notes]', 'Notes'
-    = text_area_tag 'patch[notes]', @patch.notes, size: '50x3', class: 'form-control'
-  .actions
-    = submit_tag 'Save'
+  .col-md-8
+    .field
+      = label_tag :name, 'Patch name'
+      = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true
+    .field
+      = label_tag :privacy, 'Secret?'
+      = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
+    .field
+      = label_tag 'patch[tags]', 'Tags'
+      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control', data: { role: 'tagsinput' }
+    .field
+      = label_tag 'patch[notes]', 'Notes'
+      = text_area_tag 'patch[notes]', @patch.notes, size: '30x3', class: 'form-control'
+    .actions
+      = submit_tag 'Save', class: 'btn-primary'

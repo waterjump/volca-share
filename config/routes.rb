@@ -3,7 +3,8 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { sessions: 'users/sessions' }
   resources :users, only: [ :show ]
   get 'welcome/index'
-  resources :tags, only: [ :show ]
+  match 'tags/show' => 'tags#show', via: :get
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

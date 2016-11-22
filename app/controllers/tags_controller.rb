@@ -5,7 +5,7 @@ class TagsController < ApplicationController
     @tag = tag_params[:tag]
     @patches =
       VolcaShare::PatchViewModel.wrap(
-        Patch.tagged_with(@tag)
+        Patch.public.tagged_with(@tag)
       )
   end
 

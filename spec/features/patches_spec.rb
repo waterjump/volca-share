@@ -64,7 +64,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     fill_in 'patch[name]', with: 'My Cool Patch'
     check 'patch[secret]'
     fill_in 'patch[notes]', with: 'This patch is cool.'
-    fill_in 'patch[tags]', with: 'bass,Drone,scary,detuned'
+    expect(page).to have_css('.bootstrap-tagsinput')
     click_button 'Save'
 
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
@@ -95,7 +95,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find("#{bottom_row} > label:nth-child(33) > span > div")['data-active']).to eq ('true')
     expect(find_field('patch[name]').value).to eq('My Cool Patch')
     expect(find_field('patch[notes]').value).to eq('This patch is cool.')
-    expect(find_field('patch[tags]').value).to eq('bass, drone, scary, detuned')
 
     expect(page).to have_css('.volca')
   end

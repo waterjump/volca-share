@@ -10,6 +10,7 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require bootstrap-tagsinput
  */
 
 // "bootstrap-sprockets" must be imported before "bootstrap" and "bootstrap/variables"
@@ -294,7 +295,6 @@ body {
       border-left: 1px solid #d6d6d6;
     }
 
-    width: 540px;
     min-height: 100px;
     margin-top: 10px;
     margin-bottom: 15px;

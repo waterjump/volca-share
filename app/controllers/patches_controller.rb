@@ -81,7 +81,7 @@ class PatchesController < ApplicationController
 
   def format_tags
     tags = patch_params[:tags]
-    return [] unless tags.present?
+    return @patch_params.merge!(tags: []) unless tags.present?
     @patch_params.merge!(tags: tags.split(',').map(&:downcase).map(&:strip))
   end
 
