@@ -9,25 +9,6 @@ $(function() {
   var clicked = false;
   var limit = 140;
 
-  if (midiAvailable) {
-    var items = '<option>Midi Device</option>';
-    $(WebMidi.outputs).each(function() {
-      items += '<option value="' + this.name + '">' + this.name + '</option>';
-    });
-    $('#midi-device').html(items);
-  } else {
-    $('#midi-output').hide();
-    $('.knob').removeClass('midi-enabled');
-  }
-
-  $('#midi-device').change(function(){
-    midiOutput = WebMidi.getOutputByName($(this).val());
-  });
-
-  $('#midi-channel').change(function(){
-    midiChannel = $(this).val();
-  });
-
   $('.knob').each(function() {
     my_knob = new Knob(this);
     degree = my_knob.degreeForMidi($(this).data('midi'), limit);

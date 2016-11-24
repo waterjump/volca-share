@@ -1,0 +1,10 @@
+#midi-output
+  .well
+    %h3 Midi output
+    %select.form-control#midi-device
+    %select.form-control#midi-channel
+      %option Midi Channel
+      - (1..16).each do |number|
+        %option{value: number}= "Channel #{number}"
+    * Controls outlined in green can be controlled via the browser.
+    %button.btn.btn-primary#sync.disabled Sync

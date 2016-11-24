@@ -1,14 +1,4 @@
 .container
-  #midi-output
-    .well
-      %h3 Midi output
-      %select.form-control#midi-device
-      %select.form-control#midi-channel
-        %option Midi Channel
-        - (1..16).each do |number|
-          %option{value: number}= "Channel #{number}"
-      * Controls outlined in green can be controlled via the browser.
-
   .stretchy
     .volca
       .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
