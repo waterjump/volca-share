@@ -187,25 +187,22 @@ body {
   background-size: 1120%;
   position: absolute;
   top: 14%;
+  background-position: 99.5% 0;
 }
 
 #thousands {
-  background-position: 99.5% 0;
   left: 5%;
 }
 
 #hundreds {
-  background-position: 40% 0;
   left: 30%;
 }
 
 #tens {
-  background-position: 20% 0;
   left: 53%;
 }
 
 #ones {
-  background-position: 0 0;
   left: 75%;
 }
 
@@ -217,6 +214,7 @@ body {
   background-color: #d6d7dc;
   border: solid black;
   cursor: pointer;
+  border-radius: 5px;
 }
 
 #vco1_active_button {
@@ -305,8 +303,8 @@ body {
     }
 
     min-height: 100px;
-    margin-top: 10px;
-    margin-bottom: 15px;
+    margin: 10px 0 10px 0;
+    height: 120px
   }
 }
 

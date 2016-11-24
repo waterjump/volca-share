@@ -6,7 +6,7 @@ WebMidi.enable(function(err) {
 });
 
 $(function(){
-  if (midiAvailable) {
+  if (midiAvailable && WebMidi.outputs.count > 0) {
     var items = '<option>Midi Device</option>';
     $(WebMidi.outputs).each(function() {
       items += '<option value="' + this.name + '">' + this.name + '</option>';
