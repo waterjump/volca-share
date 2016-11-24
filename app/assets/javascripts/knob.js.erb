@@ -3,6 +3,7 @@ function Knob(element) {
   this.midi = $(this.element).data('midi');
   this.rotation = $(this.element).data('rotation');
   this.isPitch = $(this.element).attr('id').split('_')[1] === 'pitch';
+  this.isOctave = $(this.element).attr('id') === 'octave';
   this.inputElement = $('input#patch_' + $(this.element).attr('id'));
 
   this.rotate = function(degree) {

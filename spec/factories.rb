@@ -4,6 +4,7 @@ FactoryGirl.define do
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
     cutoff_eg_int (0..127).to_a.sample
+    octave (0..127).to_a.sample
     peak (0..127).to_a.sample
     cutoff (0..127).to_a.sample
     lfo_rate (0..127).to_a.sample

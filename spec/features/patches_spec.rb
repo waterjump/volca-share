@@ -41,6 +41,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     range_select 'patch[attack]', dummy_patch.attack
     range_select 'patch[decay_release]', dummy_patch.decay_release
     range_select 'patch[cutoff_eg_int]', dummy_patch.cutoff_eg_int
+    range_select 'patch[octave]', dummy_patch.octave
     range_select 'patch[peak]', dummy_patch.peak
     range_select 'patch[cutoff]', dummy_patch.cutoff
     range_select 'patch[lfo_rate]', dummy_patch.lfo_rate
@@ -70,6 +71,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
     expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
     expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
+    expect(page.find('#octave')['data-midi']).to eq(dummy_patch.octave.to_s)
     expect(page.find('#peak')['data-midi']).to eq(dummy_patch.peak.to_s)
     expect(page.find('#cutoff')['data-midi']).to eq(dummy_patch.cutoff.to_s)
     expect(page.find('#lfo_rate')['data-midi']).to eq(dummy_patch.lfo_rate.to_s)

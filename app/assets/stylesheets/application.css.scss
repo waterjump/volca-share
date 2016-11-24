@@ -79,6 +79,10 @@ body {
   overflow: hidden;
 }
 
+.midi-enabled {
+  border: lightgreen solid;
+}
+
 
 .notch {
   position: absolute;
@@ -118,6 +122,11 @@ body {
 
 #cutoff_eg_int {
   left: 52.915%;
+}
+
+#octave {
+  left: 4.4%;
+  top: 35%;
 }
 
 #peak {
@@ -306,4 +315,11 @@ body {
   width: 20px;
   height: 20px;
   background-size: 100%;
+}
+
+#midi-output {
+  select {
+    display: inline-block;
+    width: 20%;
+  }
 }

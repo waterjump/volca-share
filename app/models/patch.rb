@@ -7,6 +7,7 @@ class Patch
   field :attack, type: Integer
   field :decay_release, type: Integer
   field :cutoff_eg_int, type: Integer
+  field :octave, type: Integer
   field :peak, type: Integer
   field :cutoff, type: Integer
   field :lfo_rate, type: Integer

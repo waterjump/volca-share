@@ -12,9 +12,10 @@
 //
 //= require jquery
 //= require jquery_ujs
+//= require webmidi.min.js
+//= require bootstrap-sprockets
+//= require bootstrap-tagsinput
+//= require midi.js
 //= require display.js.erb
 //= require knob.js.erb
 //= require_tree .
-//= require jquery
-//= require bootstrap-sprockets
-//= require bootstrap-tagsinput

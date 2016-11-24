@@ -1,4 +1,5 @@
 $(function() {
+  // TODO do page specific scripts the right way
   if ($('body.form').length === 0 )
     return;
 
@@ -7,6 +8,25 @@ $(function() {
   var dragging = false;
   var clicked = false;
   var limit = 140;
+
+  if (midiAvailable) {
+    var items = '<option>Midi Device</option>';
+    $(WebMidi.outputs).each(function() {
+      items += '<option value="' + this.name + '">' + this.name + '</option>';
+    });
+    $('#midi-device').html(items);
+  } else {
+    $('#midi-output').hide();
+    $('.knob').removeClass('midi-enabled');
+  }
+
+  $('#midi-device').change(function(){
+    midiOutput = WebMidi.getOutputByName($(this).val());
+  });
+
+  $('#midi-channel').change(function(){
+    midiChannel = $(this).val();
+  });
 
   $('.knob').each(function() {
     my_knob = new Knob(this);
@@ -103,8 +123,15 @@ $(function() {
       if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
         activeKnob.rotate(degree);
         midi = Math.round(((63.5 / limit) * degree) + 63.5);
+        if (typeof midiOutput !== 'undefined' && typeof midiChannel !== 'undefined') {
+            midiOutput.sendControlChange(
+              $(activeKnob.element).data('control-number'),
+              midi,
+              midiChannel
+            )
+        }
         activeKnob.inputElement.val(midi);
-        display.update(midi, activeKnob.isPitch);
+        display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
       }
     }
   });
@@ -128,9 +155,17 @@ $(function() {
       $(activeKnob.element).data('rotation', currentAngle);
       $(activeKnob.element).data('midi', midi);
     } else {
+      if (typeof activeKnob === Knob)
       display.update(activeKnob.midi, activeKnob.isPitch);
     }
   });
+
+
+  // console.log( "69BOT - midiAvailable: " + midiAvailable);
+  // if (midiAvailable === true) {
+  //   $('.collapse').collapse('toggle');
+  // }
+
 
   function touchHandler(event)
     {

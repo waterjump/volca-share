@@ -92,6 +92,7 @@ class PatchesController < ApplicationController
       :attack,
       :decay_release,
       :cutoff_eg_int,
+      :octave,
       :peak,
       :cutoff,
       :lfo_rate,

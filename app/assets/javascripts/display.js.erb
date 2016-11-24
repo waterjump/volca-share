@@ -1,6 +1,6 @@
 function Display(element) {
   this.element = element;
-  this.constructDisplayString = function(value, pitch) {
+  this.constructDisplayString = function(value, pitch, octave) {
     var displayString, thousands, hundreds, tens, ones, tensString;
     tensString = '' + (Math.abs(value) / 100);
     if (pitch === true) {
@@ -33,6 +33,8 @@ function Display(element) {
       if (value === 0 ) {
         displayString = 'blank o f f'.split(' ');
       }
+    } else if (octave) {
+      // TODO show oct1-6 on display
     } else {
       thousands = 'blank';
       if (value > 99) {
@@ -54,14 +56,14 @@ function Display(element) {
     return displayString;
   }
 
-  this.update = function(midi, pitch){
+  this.update = function(midi, pitch, octave){
     var displayValue, letter, thousands, hundreds, tens, ones;
     if (pitch) {
       displayValue = this.vcoPitchValues[midi];
     } else {
       displayValue = midi;
     }
-    displayString = this.constructDisplayString(displayValue, pitch);
+    displayString = this.constructDisplayString(displayValue, pitch, octave);
 
     this.digit1.setSprite(displayString[0]);
     $(this.digit1.element).css('background-position', this.calculateClockOffset(displayString[0], 1) + '% 0');
@@ -92,12 +94,12 @@ function Display(element) {
   this.digit4 = new Digit($('#ones'));
 
   this.vcoPitchValues = [
-    -1200,-1100,-1000,-900,-800,-700,-600,-500,-400,-300,-200,-100,-96,-92,-88,
+    -1200,-1200,-1100,-1000,-900,-800,-700,-600,-500,-400,-300,-200,-100,-96,-92,-88,
     -84,-80,-78,-76,-74,-72,-70,-68,-66,-64,-62,-60,-58,-56,-54,-52,-50,-48,-46,
     -44,-42,-40,-38,-36,-34,-32,-30,-28,-26,-24,-22,-20,-18,-16,-14,-12,-10,-8,
-    -6,-4,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,6,8,10,12,14,16,18,20,22,24,26,
+    -6,-4,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,6,8,10,12,14,16,18,20,22,24,26,
     28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,
-    78,80,84,88,92,96,100,200,300,400,500,600,700,800,900,1000,1100,1200
+    78,80,84,88,92,96,100,200,300,400,500,600,700,800,900,1000,1100,1200,1200
   ];
 
   this.calculateClockOffset = function(value, place) {
