@@ -34,7 +34,30 @@ function Display(element) {
         displayString = 'blank o f f'.split(' ');
       }
     } else if (octave) {
-      // TODO show oct1-6 on display
+      thousands = 'o';
+      hundreds = 'c';
+      tens = 't';
+      switch(true) {
+        case (value < 22):
+          ones = '1';
+          break;
+        case (value >= 22 && value < 44):
+          ones = '2';
+          break;
+        case (value >= 44 && value < 66):
+          ones = '3';
+          break;
+        case (value >= 66 && value < 88):
+          ones = '4';
+          break;
+        case (value >= 88 && value < 110):
+          ones = '5';
+          break;
+        case (value >= 110 && value <= 127):
+          ones = '6';
+          break;
+      }
+      displayString = [thousands, hundreds, tens, ones];
     } else {
       thousands = 'blank';
       if (value > 99) {
@@ -80,7 +103,7 @@ function Display(element) {
     this.setSprite = function(character) {
       if (character != 'blank' && isNaN(character)) {
         $(this.element).css('background-image', 'url(<%= asset_path("symbols.jpg") %>)');
-        $(this.element).css('background-size', '500%');
+        $(this.element).css('background-size', '605%');
       } else {
         $(this.element).css('background-image', 'url(<%= asset_path("numbers.jpg") %>)');
         $(this.element).css('background-size', '1120%');
@@ -107,11 +130,12 @@ function Display(element) {
     midiString = '' + value;
     digit = midiString[midiString.length - place];
     mapping = {
-      'dash' : -2.5,
-      'c' : 24,
-      'n' : 49,
-      'o' : 74,
-      'f' : 100,
+      'dash' : -0.5,
+      'c' : 19,
+      'n' : 38,
+      'o' : 59,
+      'f' : 79,
+      't' : 99.7,
       'blank' : 99.2
     };
     return mapping[value] || parseInt(digit, 10) * 9.98;

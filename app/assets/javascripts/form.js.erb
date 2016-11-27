@@ -79,7 +79,7 @@ $(function() {
     if (dragging)
       return false;
     activeKnob = new Knob(this);
-    display.update(midi, activeKnob.isPitch);
+    display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
   });
 
   $(document).mousemove(function(e) {
