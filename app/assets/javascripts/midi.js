@@ -27,8 +27,8 @@ $(function(){
     $('#midi-device').trigger('change');
     $('#midi-channel option:eq(1)').attr("selected", "selected");
     $('#midi-channel').trigger('change');
+    $('#midi-output').removeClass('hidden');
   } else {
-    $('#midi-output').hide();
     $('.knob').removeClass('midi-enabled');
   }
 
