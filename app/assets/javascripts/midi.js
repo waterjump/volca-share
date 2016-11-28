@@ -9,7 +9,6 @@ function MidiOut() {
   }
 
   this.changeChannel = function(element){
-    console.log($(element).val());
     parent.channel = $(element).val();
   }
 

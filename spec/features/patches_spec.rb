@@ -101,6 +101,71 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_css('.volca')
   end
 
+  scenario 'can be deleted by author' do
+    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    expect(user.patches.count).to eq(1)
+
+    click_link 'Log in'
+    fill_in 'user[email]', with: user.email
+    fill_in 'user[password]', with: user.password
+    click_button 'Log in'
+
+    visit patch_path(patch1)
+    expect(page).to have_button('Delete')
+
+    click_button('Delete')
+    user.reload
+    expect(user.patches.count).to eq(0)
+
+    visit patches_path
+    expect(page).to have_content('No patches to show.')
+  end
+
+  scenario 'cannot be deleted by non-author' do
+    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    user_2 = FactoryGirl.create(:user)
+
+    click_link 'Log in'
+    fill_in 'user[email]', with: user_2.email
+    fill_in 'user[password]', with: user_2.password
+    click_button 'Log in'
+
+    visit patch_path(patch1)
+    expect(page).not_to have_button('Delete')
+  end
+
+  scenario 'can be deleted by author on patch browse page' do
+    FactoryGirl.create(:patch, secret: false, user_id: user.id)
+
+    click_link 'Log in'
+    fill_in 'user[email]', with: user.email
+    fill_in 'user[password]', with: user.password
+    click_button 'Log in'
+
+    visit patches_path
+    expect(page).to have_button('Delete')
+
+    click_button('Delete')
+    user.reload
+    expect(user.patches.count).to eq(0)
+
+    visit patches_path
+    expect(page).to have_content('No patches to show.')
+  end
+
+  scenario 'cannot be deleted by non-author on patch browse page' do
+    FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    user_2 = FactoryGirl.create(:user)
+
+    click_link 'Log in'
+    fill_in 'user[email]', with: user_2.email
+    fill_in 'user[password]', with: user_2.password
+    click_button 'Log in'
+
+    visit patches_path
+    expect(page).not_to have_button('Delete')
+  end
+
   scenario 'cannot be created by guests' do
     click_link 'Submit a patch'
     expect(current_path).to eq(new_user_session_path)

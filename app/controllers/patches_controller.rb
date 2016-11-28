@@ -65,10 +65,14 @@ class PatchesController < ApplicationController
   # DELETE /patches/1
   # DELETE /patches/1.json
   def destroy
-    @patch.destroy
     respond_to do |format|
-      format.html { redirect_to patches_url, notice: 'Patch was successfully destroyed.' }
-      format.json { head :no_content }
+      if current_user == @patch.user && @patch.destroy
+        format.html { redirect_to patches_url, notice: 'Patch was successfully destroyed.' }
+        format.json { head :no_content }
+      else
+        format.html { redirect_to patch_url(@patch), notice: 'You cannot delete that patch.' }
+        format.json { head :no_content }
+      end
     end
   end
 

@@ -142,17 +142,27 @@ RSpec.describe PatchesController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    it 'destroys the requested patch' do
-      patch = Patch.create! valid_attributes
-      expect do
+    context 'user is author' do
+      it 'destroys the requested patch' do
+        patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
+        expect do
+          delete :destroy, { id: patch.to_param }, valid_session
+        end.to change(Patch, :count).by(-1)
+      end
+
+      it 'redirects to the patches list' do
+        patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         delete :destroy, { id: patch.to_param }, valid_session
-      end.to change(Patch, :count).by(-1)
+        expect(response).to redirect_to(patches_url)
+      end
     end
 
-    it 'redirects to the patches list' do
-      patch = Patch.create! valid_attributes
-      delete :destroy, { id: patch.to_param }, valid_session
-      expect(response).to redirect_to(patches_url)
+    context 'user is not author' do
+      it 'disallows non-author to destroy' do
+        patch = Patch.create! valid_attributes.merge(user_id: 'abc123')
+        delete :destroy, { id: patch.to_param }, valid_session
+        expect(response).to redirect_to(patch_url(patch))
+      end
     end
   end
 end

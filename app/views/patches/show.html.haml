@@ -14,7 +14,7 @@
         .digit#hundreds
         .digit#tens
         .digit#ones
-      .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+      .medium.knob#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
         .notch
       .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
         .notch
@@ -95,5 +95,8 @@
   .col-md-12
     - if @patch.user == current_user
       = link_to 'Edit', edit_patch_path(@patch)
+      \|
+      = form_tag patch_path(@patch), method: :delete do
+        = submit_tag 'Delete'
     \|
     = link_to 'Back', patches_path
