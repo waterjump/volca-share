@@ -9,6 +9,30 @@ $(function() {
   var clicked = false;
   var limit = 140;
 
+  var midiOut = new MidiOut;
+
+  $('#midi-device').change(function(){
+    midiOut.changeOutput(this);
+    midiOut.enableSync();
+  });
+
+  $('#midi-channel').change(function(){
+    midiOut.changeChannel(this);
+    midiOut.enableSync();
+  });
+
+  $('#sync').click(function(){
+    $('.knob').each(function(){
+      if (midiOut.ready()) {
+          midiOut.output.sendControlChange(
+            $(this).data('control-number'),
+            $(this).data('midi'),
+            midiOut.channel
+          )
+      }
+    });
+  });
+
   $('.knob').each(function() {
     my_knob = new Knob(this);
     degree = my_knob.degreeForMidi($(this).data('midi'), limit);
@@ -104,11 +128,11 @@ $(function() {
       if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
         activeKnob.rotate(degree);
         midi = Math.round(((63.5 / limit) * degree) + 63.5);
-        if (typeof midiOutput !== 'undefined' && typeof midiChannel !== 'undefined') {
-            midiOutput.sendControlChange(
+        if (midiOut.ready()) {
+            midiOut.output.sendControlChange(
               $(activeKnob.element).data('control-number'),
               midi,
-              midiChannel
+              midiOut.channel
             )
         }
         activeKnob.inputElement.val(midi);

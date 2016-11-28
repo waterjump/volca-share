@@ -1,52 +1,57 @@
-var midiSupported, midiOutput, midiChannel;
+function MidiOut() {
+  var parent = this;
+  this.supported;
+  this.output;
+  this.channel;
 
-WebMidi.enable(function(err) {
-  if (err) console.log("An error occurred", err);
-  midiSupported = true;
-});
-
-$(function(){
-  if (midiSupported && WebMidi.outputs.length > 0) {
-    var items = '<option>Midi Device</option>';
-
-    $('#midi-device').change(function(){
-      midiOutput = WebMidi.getOutputByName($(this).val());
-      enableSync();
-    });
-
-    $('#midi-channel').change(function(){
-      midiChannel = $(this).val();
-      enableSync();
-    });
-
-    $(WebMidi.outputs).each(function() {
-      items += '<option value="' + this.name + '">' + this.name + '</option>';
-    });
-    $('#midi-device').html(items);
-    $('#midi-device option:eq(1)').attr("selected", "selected");
-    $('#midi-device').trigger('change');
-    $('#midi-channel option:eq(1)').attr("selected", "selected");
-    $('#midi-channel').trigger('change');
-    $('#midi-output').removeClass('hidden');
-  } else {
-    $('.knob').removeClass('midi-enabled');
+  this.ready = function(){
+    return (parent.output !== 'undefined' && parent.channel !== 'undefined')
   }
 
-  function enableSync(){
-    if (typeof midiOutput !== 'undefined' && typeof midiChannel !== 'undefined') {
+  this.changeChannel = function(element){
+    console.log($(element).val());
+    parent.channel = $(element).val();
+  }
+
+  this.changeOutput = function(element){
+    parent.output = WebMidi.getOutputByName($(element).val());
+  }
+
+  this.updateForm = function(){
+    if (parent.supported && WebMidi.outputs.length > 0) {
+      var items = '<option>Midi Device</option>';
+
+      $(WebMidi.outputs).each(function() {
+        items += '<option value="' + this.name + '">' + this.name + '</option>';
+      });
+      $('#midi-device').html(items);
+
+      $('#midi-device option:eq(1)').attr("selected", "selected");
+      parent.changeOutput($('#midi-device option:eq(1)'));
+      $('#midi-channel option:eq(1)').attr("selected", "selected");
+      parent.changeChannel($('#midi-channel option:eq(1)'));
+      $('#midi-output').removeClass('hidden');
+    } else {
+      $('.knob').removeClass('midi-enabled');
+    }
+  }
+
+  this.enableSync =  function(){
+    if (parent.ready()) {
       $('#sync').removeClass('disabled')
     }
   }
 
-  $('#sync').click(function(){
-    $('.knob').each(function(){
-      if (typeof midiOutput !== 'undefined' && typeof midiChannel !== 'undefined') {
-          midiOutput.sendControlChange(
-            $(this).data('control-number'),
-            $(this).data('midi'),
-            midiChannel
-          )
+  this.init = function(){
+    WebMidi.enable(function(err) {
+      if (err) {
+        console.log("An error occurred", err);
+      } else {
+        parent.supported = true;
+        parent.updateForm();
       }
     });
-  });
-});
+  }
+
+  this.init();
+}

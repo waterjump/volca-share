@@ -6,6 +6,30 @@ $(function() {
   var display = new Display($('#led'));
   var limit = 140;
 
+  var midiOut = new MidiOut;
+
+  $('#midi-device').change(function(){
+    midiOut.changeOutput(this);
+    midiOut.enableSync();
+  });
+
+  $('#midi-channel').change(function(){
+    midiOut.changeChannel(this);
+    midiOut.enableSync();
+  });
+
+  $('#sync').click(function(){
+    $('.knob').each(function(){
+      if (midiOut.ready()) {
+          midiOut.output.sendControlChange(
+            $(this).data('control-number'),
+            $(this).data('midi'),
+            midiOut.channel
+          )
+      }
+    });
+  });
+
   $('.knob').each(function() {
     my_knob = new Knob(this);
     degree = my_knob.degreeForMidi($(this).data('midi'), limit);
