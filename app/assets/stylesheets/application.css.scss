@@ -345,3 +345,18 @@ body {
     float: right;
   }
 }
+
+.link {
+  background:none!important;
+  border:none;
+  padding:0!important;
+  font: inherit;
+  cursor: pointer;
+  color: #337ab7
+}
+
+.form-detail-actions {
+  form {
+    display: inline-block;
+  }
+}

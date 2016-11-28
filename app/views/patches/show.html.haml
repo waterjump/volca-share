@@ -92,11 +92,11 @@
     .well
       = @patch.notes
 
-  .col-md-12
+  .col-md-12.form-detail-actions
     - if @patch.user == current_user
       = link_to 'Edit', edit_patch_path(@patch)
       \|
       = form_tag patch_path(@patch), method: :delete do
-        = submit_tag 'Delete'
+        = submit_tag 'Delete', class: :link
     \|
     = link_to 'Back', patches_path
