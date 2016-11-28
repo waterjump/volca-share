@@ -5,7 +5,7 @@ function MidiOut() {
   this.channel;
 
   this.ready = function(){
-    return (parent.output !== 'undefined' && parent.channel !== 'undefined')
+    return (parent.output !== undefined && parent.channel !== undefined)
   }
 
   this.changeChannel = function(element){
