@@ -49,6 +49,7 @@ function MidiOut() {
       } else {
         parent.supported = true;
         parent.updateForm();
+        parent.enableSync();
       }
     });
   }
