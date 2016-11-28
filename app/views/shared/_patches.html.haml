@@ -21,7 +21,6 @@
         .icons
           - if patch.user == current_user
             = link_to edit_patch_path(patch) do
-              .edit_glyph
-            \|
-            = form_tag patch_path(patch), method: :delete do
-              = submit_tag 'Delete'
+              .edit.glyph
+            = form_tag patch_path(patch), method: :delete, class: :dekete_form do
+              = submit_tag 'Delete', class: 'delete glyph'

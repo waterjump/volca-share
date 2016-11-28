@@ -308,11 +308,29 @@ body {
   }
 }
 
-.edit_glyph {
+.delete {
+  background-image: url('delete.png');
+}
+
+.delete_form {
+  display: inline-block;
+  float:left;
+}
+
+.edit {
   background-image: image_url('edit.png');
+}
+
+.glyph {
   width: 20px;
   height: 20px;
   background-size: 100%;
+  display:inline-block;
+  border: none;
+  background-color: transparent;
+  text-indent: -9999em;
+  text-transform: uppercase;
+  float:left;
 }
 
 #midi-output {
