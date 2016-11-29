@@ -79,11 +79,6 @@ body {
     overflow: hidden;
   }
 
-  .midi-enabled {
-    border: lightgreen solid;
-  }
-
-
   .notch {
     position: absolute;
     background-color: black;
@@ -365,4 +360,16 @@ body {
 .off-canvas {
   position: absolute;
   left: -9999px;
+}
+
+#enable-web-midi {
+  float:right;
+  margin: 20px auto auto auto
+}
+
+#patch-title {
+  float:left;
+  span, .small {
+    display: inline-block;
+  }
 }

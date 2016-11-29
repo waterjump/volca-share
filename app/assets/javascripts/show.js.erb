@@ -57,6 +57,6 @@ $(function() {
   $('.knob').mouseenter(function(){
     var midi = $(this).data('midi');
     activeKnob = new Knob(this);
-    display.update(midi, activeKnob.isPitch);
+    display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
   });
 });

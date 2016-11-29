@@ -6,5 +6,32 @@
       %option Midi Channel
       - (1..16).each do |number|
         %option{value: number}= "Channel #{number}"
+    %span#channel-tooltip.btn.btn-info{ data: {toggle: 'modal', target: '#channel-modal'}} ?
+    #channel-modal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+      .modal-dialog{:role => "document"}
+        .modal-content
+          .modal-header
+            %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+              %span{"aria-hidden" => "true"}
+            %h4#myModalLabel.modal-title What channel is my Volca on?
+          .modal-body
+            %p To find or set the MIDI channel of your Volca:
+            %ol
+              %li Power off the Volca.
+              %li While holding down the MEMORY button, turn on the Volca Bass.
+              %li Step buttons 1 to 16 correspond to the MIDI channels 1 to 16.  Press the button that corresponds to the desired channel, and the LED below the step button will light up.
+          .modal-footer
+            %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss
     * Controls outlined in green can be controlled via the browser.
-    %button.btn.btn-primary#sync.disabled Sync
+    %button.btn.btn-primary#sync.disabled{ data: {toggle: 'modal', target: '#sync-modal'}} Sync
+    #sync-modal.modal.fade{"aria-labelledby" => "mySyncModalLabel", :role => "dialog", :tabindex => "-1"}
+      .modal-dialog{:role => "document"}
+        .modal-content
+          .modal-header
+            %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+              %span{"aria-hidden" => "true"} ×
+            %h4#mySyncModalLabel.modal-title Patch synced
+          .modal-body
+            %p Controls outlined in green have been sent to your Volca.  Please adjust the non-highlighted parameters manually on the physical Volca machine.
+          .modal-footer
+            %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss

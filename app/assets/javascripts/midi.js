@@ -30,8 +30,8 @@ function MidiOut() {
       $('#midi-channel option:eq(1)').attr("selected", "selected");
       parent.changeChannel($('#midi-channel option:eq(1)'));
       $('#midi-output').removeClass('hidden');
-    } else {
-      $('.knob').removeClass('midi-enabled');
+      $('.midi-enabled').css('border', 'lightgreen solid');
+      $('#enable-web-midi').hide();
     }
   }
 

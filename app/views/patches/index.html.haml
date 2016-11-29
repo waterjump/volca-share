@@ -1,7 +1,6 @@
-.container
-  %h1 Patches
+%h1 Patches
 
-  .controls
-    =link_to 'Submit a patch', new_patch_path
-  .patches
-    = render 'shared/patches'
+.controls
+  =link_to 'Submit a patch', new_patch_path, class: 'btn btn-primary'
+.patches
+  = render 'shared/patches'

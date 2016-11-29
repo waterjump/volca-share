@@ -8,10 +8,16 @@
     = csrf_meta_tags
   %body{ class: @body_class}
     = render 'shared/navbar'
-    .alert-warning= alert
-    .alert-info= notice
-    = render 'shared/header'
-    = yield
+    .container
+      %noscript
+        .alert.alert-warning
+          %strong Warning!
+          %span Please enable JavaScript to make use of this application.  Or else... ¯\_(ツ)_/¯
+
+      .alert-warning= alert
+      .alert-info= notice
+      = render 'shared/header'
+      = yield
     = render 'shared/footer'
     %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
     :javascript
