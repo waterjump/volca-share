@@ -69,201 +69,202 @@ body {
   .knob {
     cursor: ns-resize;
   }
-}
-
-.knob {
-  border-radius: 50%;
-  background-color: #b3b3b5;
-  position: absolute;
-  border: black solid;
-  overflow: hidden;
-}
-
-.midi-enabled {
-  border: lightgreen solid;
-}
 
 
-.notch {
-  position: absolute;
-  background-color: black;
-  width: 8%;
-  height: 25%;
-  left: 46%;
-}
-
-.small {
-  width: 3.6%;
-  height: percentage(3.6 * $aspect);
-  background-color: $pink;
-}
-
-.medium {
-  width: 6.2%;
-  height: percentage(6.2 * $aspect);
-}
-
-.large {
-  width: 10.5%;
-  height: percentage(10.5 * $aspect);
-}
-
-.eg {
-  top: 14.15%;
-}
-
-#attack {
-  left: 34.875%;
-}
-
-#decay_release {
-  left: 43.9%;
-}
-
-#cutoff_eg_int {
-  left: 52.915%;
-}
-
-#octave {
-  left: 4.4%;
-  top: 35%;
-}
-
-#peak {
-  top: 35%;
-  left: 16.25%;
-}
-
-#cutoff {
-  top: 31.5%;
-  left: 26.5%;
-}
-
-.lfo {
-  top: 35%;
-}
-
-#lfo_rate {
-  left:41.25%;
-}
-
-#lfo_int{
-  left: 52.5%;
-}
-
-.vco {
-  top: 37.2%;
-  background-color: #d6d7dc;
-}
-
-#vco1_pitch {
-  left: 62.9%;
-}
-
-#vco2_pitch {
-  left: 71.9%;
-}
-
-#vco3_pitch {
-  left: 80.9%;
-}
-
-#led {
-  top: 49%;
-  left: 5.2%;
-  width: 16.5%;
-  height: 13.7%;
-  position: absolute;
-  background-color: #141414;
-}
-
-.digit {
-  background-image: image_url('numbers.jpg');
-  background-repeat: no-repeat;
-  width: 18.5%;
-  height: 100%;
-  display: inline-block;
-  margin: 0;
-  background-size: 1120%;
-  position: absolute;
-  top: 14%;
-  background-position: 99.5% 0;
-}
-
-#thousands {
-  left: 5%;
-}
-
-#hundreds {
-  left: 30%;
-}
-
-#tens {
-  left: 53%;
-}
-
-#ones {
-  left: 75%;
-}
-
-.button {
-  width: 6.4%;
-  height: 6%;
-  position: absolute;
-  top: 54.5%;
-  background-color: #d6d7dc;
-  border: solid black;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-#vco1_active_button {
-  left: 61.5%;
-}
-
-#vco2_active_button {
-  left: 70.6%;
-}
-
-#vco3_active_button {
-  left: 79.6%;
-}
-
-.lit {
-  background-color: $pink !important;
-}
-
-.bottom-row {
-  position: absolute;
-  top: 83%;
-  width: 100%;
-  height: 13%;
-  padding-left: 5%;
-  input[type="radio"], input[type="checkbox"]  {
-    display:none;
-  }
-  label {
-    float: left;
-    width: 5.95%;
-    height: 100%;
-    display: inline;
+  .knob {
+    border-radius: 50%;
+    background-color: #b3b3b5;
+    position: absolute;
+    border: black solid;
     overflow: hidden;
-    span {
-      width: 89%;
-      height: 89%;
-      position: relative;
-      display: inline-block;
-      cursor: pointer;
+  }
 
-      .light {
-        width: 36%;
-        height: 26%;
-        border-radius: 50%;
-        background-color: gray;
-        top: 57%;
-        left: 31%;
-        border: black solid;
-        position: absolute;
+  .midi-enabled {
+    border: lightgreen solid;
+  }
+
+
+  .notch {
+    position: absolute;
+    background-color: black;
+    width: 8%;
+    height: 25%;
+    left: 46%;
+  }
+
+  .small {
+    width: 3.6%;
+    height: percentage(3.6 * $aspect);
+    background-color: $pink;
+  }
+
+  .medium {
+    width: 6.2%;
+    height: percentage(6.2 * $aspect);
+  }
+
+  .large {
+    width: 10.5%;
+    height: percentage(10.5 * $aspect);
+  }
+
+  .eg {
+    top: 14.15%;
+  }
+
+  #attack {
+    left: 34.875%;
+  }
+
+  #decay_release {
+    left: 43.9%;
+  }
+
+  #cutoff_eg_int {
+    left: 52.915%;
+  }
+
+  #octave {
+    left: 4.4%;
+    top: 35%;
+  }
+
+  #peak {
+    top: 35%;
+    left: 16.25%;
+  }
+
+  #cutoff {
+    top: 31.5%;
+    left: 26.5%;
+  }
+
+  .lfo {
+    top: 35%;
+  }
+
+  #lfo_rate {
+    left:41.25%;
+  }
+
+  #lfo_int{
+    left: 52.5%;
+  }
+
+  .vco {
+    top: 37.2%;
+    background-color: #d6d7dc;
+  }
+
+  #vco1_pitch {
+    left: 62.9%;
+  }
+
+  #vco2_pitch {
+    left: 71.9%;
+  }
+
+  #vco3_pitch {
+    left: 80.9%;
+  }
+
+  #led {
+    top: 49%;
+    left: 5.2%;
+    width: 16.5%;
+    height: 13.7%;
+    position: absolute;
+    background-color: #141414;
+  }
+
+  .digit {
+    background-image: image_url('numbers.jpg');
+    background-repeat: no-repeat;
+    width: 18.5%;
+    height: 100%;
+    display: inline-block;
+    margin: 0;
+    background-size: 1120%;
+    position: absolute;
+    top: 14%;
+    background-position: 99.5% 0;
+  }
+
+  #thousands {
+    left: 5%;
+  }
+
+  #hundreds {
+    left: 30%;
+  }
+
+  #tens {
+    left: 53%;
+  }
+
+  #ones {
+    left: 75%;
+  }
+
+  .button {
+    width: 6.4%;
+    height: 6%;
+    position: absolute;
+    top: 54.5%;
+    background-color: #d6d7dc;
+    border: solid black;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  #vco1_active_button {
+    left: 61.5%;
+  }
+
+  #vco2_active_button {
+    left: 70.6%;
+  }
+
+  #vco3_active_button {
+    left: 79.6%;
+  }
+
+  .lit {
+    background-color: $pink !important;
+  }
+
+  .bottom-row {
+    position: absolute;
+    top: 83%;
+    width: 100%;
+    height: 13%;
+    padding-left: 5%;
+    input[type="radio"], input[type="checkbox"]  {
+      display:none;
+    }
+    label {
+      float: left;
+      width: 5.95%;
+      height: 100%;
+      display: inline;
+      overflow: hidden;
+      span {
+        width: 89%;
+        height: 89%;
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+
+        .light {
+          width: 36%;
+          height: 26%;
+          border-radius: 50%;
+          background-color: gray;
+          top: 57%;
+          left: 31%;
+          border: black solid;
+          position: absolute;
+        }
       }
     }
   }
@@ -359,4 +360,9 @@ body {
   form {
     display: inline-block;
   }
+}
+
+.off-canvas {
+  position: absolute;
+  left: -9999px;
 }
