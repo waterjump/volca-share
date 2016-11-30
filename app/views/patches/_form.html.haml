@@ -1,138 +1,141 @@
-.container
-  .stretchy
-    .volca
-      .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
-        .notch
-      .small.knob.eg.midi-enabled#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
-        .notch
-      .small.knob.eg.midi-enabled#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
-        .notch
-      #led
-        .digit#thousands
-        .digit#hundreds
-        .digit#tens
-        .digit#ones
-      .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
-        .notch
-      .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
-        .notch
-      .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
-        .notch
-      .medium.knob.lfo.midi-enabled#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
-        .notch
-      .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
-        .notch
-      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 } }
-        .notch
-      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 } }
-        .notch
-      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 } }
-        .notch
-      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' } }
-      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' } }
-      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' } }
-      .bottom-row
-        = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
-        = label_tag('patch[vco_group_one]') do
-          %span
-            .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
+.stretchy.col-lg-9
+  .volca
+    .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
+      .notch
+    .small.knob.eg.midi-enabled#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
+      .notch
+    .small.knob.eg.midi-enabled#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
+      .notch
+    #led
+      .digit#thousands
+      .digit#hundreds
+      .digit#tens
+      .digit#ones
+    .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+      .notch
+    .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
+      .notch
+    .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
+      .notch
+    .medium.knob.lfo.midi-enabled#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
+      .notch
+    .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
+      .notch
+    .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 } }
+      .notch
+    .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 } }
+      .notch
+    .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 } }
+      .notch
+    .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' } }
+    .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' } }
+    .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' } }
+    .bottom-row
+      = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
+      = label_tag('patch[vco_group_one]') do
+        %span
+          .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
 
-        = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
-        = label_tag('patch[vco_group_two]') do
-          %span
-            .light{ data: { radio: true, active: @patch.vco_group_two.to_s } }
+      = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
+      = label_tag('patch[vco_group_two]') do
+        %span
+          .light{ data: { radio: true, active: @patch.vco_group_two.to_s } }
 
-        = radio_button_tag 'patch[vco_group]', 'three', @patch.vco_group_three, class: :control
-        = label_tag('patch[vco_group_three]') do
-          %span
-            .light{ data: { radio: true, active: @patch.vco_group_three.to_s } }
+      = radio_button_tag 'patch[vco_group]', 'three', @patch.vco_group_three, class: :control
+      = label_tag('patch[vco_group_three]') do
+        %span
+          .light{ data: { radio: true, active: @patch.vco_group_three.to_s } }
 
-        = check_box :patch, :lfo_target_amp, @patch.checked?('lfo_target_amp'), 'true', 'false'
-        = label_tag('patch[lfo_target_amp]') do
-          %span
-            .light{ data: { active: @patch.lfo_target_amp.to_s } }
+      = check_box :patch, :lfo_target_amp, @patch.checked?('lfo_target_amp'), 'true', 'false'
+      = label_tag('patch[lfo_target_amp]') do
+        %span
+          .light{ data: { active: @patch.lfo_target_amp.to_s } }
 
-        = check_box :patch, :lfo_target_pitch, @patch.checked?('lfo_target_pitch'), 'true', 'false'
-        = label_tag('patch[lfo_target_pitch]') do
-          %span
-            .light{ data: { active: @patch.lfo_target_pitch.to_s } }
+      = check_box :patch, :lfo_target_pitch, @patch.checked?('lfo_target_pitch'), 'true', 'false'
+      = label_tag('patch[lfo_target_pitch]') do
+        %span
+          .light{ data: { active: @patch.lfo_target_pitch.to_s } }
 
-        = check_box :patch, :lfo_target_cutoff, @patch.checked?('lfo_target_cutoff'), 'true', 'false'
-        = label_tag('patch[lfo_target_cutoff]') do
-          %span
-            .light{ data: { active: @patch.lfo_target_cutoff.to_s } }
+      = check_box :patch, :lfo_target_cutoff, @patch.checked?('lfo_target_cutoff'), 'true', 'false'
+      = label_tag('patch[lfo_target_cutoff]') do
+        %span
+          .light{ data: { active: @patch.lfo_target_cutoff.to_s } }
 
-        = check_box :patch, :lfo_wave, @patch.checked?('lfo_wave'), 'true', 'false'
-        = label_tag('patch[lfo_wave]') do
-          %span
-            .light{ data: { active: @patch.lfo_wave.to_s } }
+      = check_box :patch, :lfo_wave, @patch.checked?('lfo_wave'), 'true', 'false'
+      = label_tag('patch[lfo_wave]') do
+        %span
+          .light{ data: { active: @patch.lfo_wave.to_s } }
 
-        = check_box :patch, :vco1_wave, @patch.checked?('vco1_wave'), 'true', 'false'
-        = label_tag('patch[vco1_wave]') do
-          %span
-            .light{ data: { active: @patch.vco1_wave.to_s } }
+      = check_box :patch, :vco1_wave, @patch.checked?('vco1_wave'), 'true', 'false'
+      = label_tag('patch[vco1_wave]') do
+        %span
+          .light{ data: { active: @patch.vco1_wave.to_s } }
 
-        = check_box :patch, :vco2_wave, @patch.checked?('vco2_wave'), 'true', 'false'
-        = label_tag('patch[vco2_wave]') do
-          %span
-            .light{ data: { active: @patch.vco2_wave.to_s } }
+      = check_box :patch, :vco2_wave, @patch.checked?('vco2_wave'), 'true', 'false'
+      = label_tag('patch[vco2_wave]') do
+        %span
+          .light{ data: { active: @patch.vco2_wave.to_s } }
 
-        = check_box :patch, :vco3_wave, @patch.checked?('vco3_wave'), 'true', 'false'
-        = label_tag('patch[vco3_wave]') do
-          %span
-            .light{ data: { active: @patch.vco3_wave.to_s } }
+      = check_box :patch, :vco3_wave, @patch.checked?('vco3_wave'), 'true', 'false'
+      = label_tag('patch[vco3_wave]') do
+        %span
+          .light{ data: { active: @patch.vco3_wave.to_s } }
 
-        = check_box :patch, :sustain_on, @patch.checked?('sustain_on'), 'true', 'false'
-        = label_tag('patch[sustain_on]') do
-          %span
-            .light{ data: { active: @patch.sustain_on.to_s } }
+      = check_box :patch, :sustain_on, @patch.checked?('sustain_on'), 'true', 'false'
+      = label_tag('patch[sustain_on]') do
+        %span
+          .light{ data: { active: @patch.sustain_on.to_s } }
 
-        = check_box :patch, :amp_eg_on, @patch.checked?('amp_eg_on'), 'true', 'false'
-        = label_tag('patch[amp_eg_on]') do
-          %span
-            .light{ data: { active: @patch.amp_eg_on.to_s } }
+      = check_box :patch, :amp_eg_on, @patch.checked?('amp_eg_on'), 'true', 'false'
+      = label_tag('patch[amp_eg_on]') do
+        %span
+          .light{ data: { active: @patch.amp_eg_on.to_s } }
 
-  = range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[cutoff_eg_int]', (@patch.cutoff_eg_int || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[octave]', (@patch.octave || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[peak]', (@patch.peak || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[lfo_int]', (@patch.lfo_int || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[vco1_pitch]', (@patch.vco1_pitch || 63), in: 0..127, class: :hidden
-  = check_box :patch, :vco1_active, { class: :hidden }.merge(@patch.checked?('vco1_active')), 'true', 'false'
-  = range_field_tag 'patch[vco2_pitch]', (@patch.vco2_pitch || 63), in: 0..127, class: :hidden
-  = check_box :patch, :vco2_active, { class: :hidden }.merge(@patch.checked?('vco2_active')), 'true', 'false'
-  = range_field_tag 'patch[vco3_pitch]', (@patch.vco3_pitch || 63), in: 0..127, class: :hidden
-  = check_box :patch, :vco3_active, { class: :hidden }.merge(@patch.checked?('vco3_active')), 'true', 'false'
+= range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[cutoff_eg_int]', (@patch.cutoff_eg_int || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[octave]', (@patch.octave || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[peak]', (@patch.peak || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[lfo_int]', (@patch.lfo_int || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[vco1_pitch]', (@patch.vco1_pitch || 63), in: 0..127, class: :hidden
+= check_box :patch, :vco1_active, { class: :hidden }.merge(@patch.checked?('vco1_active')), 'true', 'false'
+= range_field_tag 'patch[vco2_pitch]', (@patch.vco2_pitch || 63), in: 0..127, class: :hidden
+= check_box :patch, :vco2_active, { class: :hidden }.merge(@patch.checked?('vco2_active')), 'true', 'false'
+= range_field_tag 'patch[vco3_pitch]', (@patch.vco3_pitch || 63), in: 0..127, class: :hidden
+= check_box :patch, :vco3_active, { class: :hidden }.merge(@patch.checked?('vco3_active')), 'true', 'false'
+= range_field_tag 'patch[slide_time]', (@patch.slide_time || 63), in: 0..127, class: :hidden
+= range_field_tag 'patch[expression]', (@patch.expression || 127), in: 0..127, class: :hidden
+= range_field_tag 'patch[gate_time]', (@patch.gate_time || 127), in: 0..127, class: :hidden
 
-  .col-md-8
-    #toggle-midi-only{ data: { toggle: :collapse, target: '#midi-only-panel' } }
-      .h5 Show MIDI-only controls
+.col-lg-3.col-md-9#patch-metedata
+  #midi-only-panel.hidden
+    #midi-only-title
+      .h5 MIDI-only controls
     .stretchy2
-      #midi-only-panel.clearfix.collapse
+      #midi-only-controls.clearfix
         .knob.medium#slide-time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
           .notch
-        .knob.medium#expression{ data: { midi: @patch.expression || 63, control_number: 11 } }
+        .knob.medium#expression{ data: { midi: @patch.expression || 127 , control_number: 11 } }
           .notch
-        .knob.medium#gate-time{ data: { midi: @patch.gate_time || 63, control_number: 49 } }
+        .knob.medium#gate-time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
           .notch
+  %fieldset
     .field
-      = label_tag :name, 'Patch name'
-      = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true
+      = label_tag :name, 'Patch name', class: 'sr-only'
+      = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true, placeholder: 'Patch name'
     .field
       = label_tag :privacy, 'Secret?'
       = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
     .field
-      = label_tag 'patch[tags]', 'Tags'
-      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control', data: { role: 'tagsinput' }
+      = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
+      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'Tags'
     .field
-      = label_tag 'patch[notes]', 'Notes'
-      = text_area_tag 'patch[notes]', @patch.notes, size: '30x3', class: 'form-control'
+      = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
+      = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
     .actions
       = submit_tag 'Save', class: 'btn btn-primary'
-
 .off-canvas
   =image_tag('numbers.jpg')
   =image_tag('symbols.jpg')

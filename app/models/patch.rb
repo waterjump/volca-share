@@ -29,8 +29,8 @@ class Patch
   field :sustain_on, type: Mongoid::Boolean
   field :amp_eg_on, type: Mongoid::Boolean
   field :slide_time, type: Integer, default: 63
-  field :expression, type: Integer, default: 63
-  field :gate_time, type: Integer, default: 63
+  field :expression, type: Integer, default: 127
+  field :gate_time, type: Integer, default: 127
   field :secret, type: Mongoid::Boolean, default: false
   field :notes, type: String
 

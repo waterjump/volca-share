@@ -32,6 +32,7 @@ function MidiOut() {
       $('#midi-output').removeClass('hidden');
       $('.midi-enabled').css('border', 'lightgreen solid');
       $('#enable-web-midi').hide();
+      $('#midi-only-panel').removeClass('hidden');
     }
   }
 
