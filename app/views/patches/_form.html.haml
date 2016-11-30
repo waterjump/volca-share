@@ -108,6 +108,16 @@
   = check_box :patch, :vco3_active, { class: :hidden }.merge(@patch.checked?('vco3_active')), 'true', 'false'
 
   .col-md-8
+    #toggle-midi-only{ data: { toggle: :collapse, target: '#midi-only-panel' } }
+      .h5 Show MIDI-only controls
+    .stretchy2
+      #midi-only-panel.clearfix.collapse
+        .knob.medium#slide-time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
+          .notch
+        .knob.medium#expression{ data: { midi: @patch.expression || 63, control_number: 11 } }
+          .notch
+        .knob.medium#gate-time{ data: { midi: @patch.gate_time || 63, control_number: 49 } }
+          .notch
     .field
       = label_tag :name, 'Patch name'
       = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true

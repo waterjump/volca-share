@@ -65,26 +65,28 @@ body {
   right: 0;
 }
 
+.knob {
+  border-radius: 50%;
+  position: absolute;
+  overflow: hidden;
+  cursor: ns-resize;
+}
+
+.notch {
+  position: absolute;
+  width: 8%;
+  height: 25%;
+  left: 46%;
+}
+
 .volca {
   .knob {
-    cursor: ns-resize;
-  }
-
-
-  .knob {
-    border-radius: 50%;
     background-color: #b3b3b5;
-    position: absolute;
     border: black solid;
-    overflow: hidden;
   }
 
   .notch {
-    position: absolute;
     background-color: black;
-    width: 8%;
-    height: 25%;
-    left: 46%;
   }
 
   .small {
@@ -264,6 +266,63 @@ body {
     }
   }
 }
+
+#toggle-midi-only {
+  width: 100%;
+  background-color: black;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  cursor: pointer;
+  overflow: hidden;
+  .h5 {
+    color: lightgreen;
+    background-color: black;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+.stretchy2 {
+  width: 100%;
+  position: relative;
+  padding-bottom: percentage(0.18);
+
+  #midi-only-panel {
+    background-image: image_url('midi-only-controls.jpg');
+    background-size: cover;
+    width: 100%;
+    background-color: #343436;
+    position: absolute;
+    background-size: cover;
+  	top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    .knob {
+      border-radius: 50%;
+      width: 9.7%;
+      height: 54%;
+      border: lightgreen solid;
+      position: absolute;
+      box-shadow: 0 0 10px lightgreen;
+      top: 20%;
+      .notch {
+        background-color: lightgreen;
+      }
+    }
+    #slide-time {
+      left: 20%;
+    }
+    #expression {
+      left: 40%;
+    }
+    #gate-time {
+      left: 60%;
+    }
+  }
+}
+
+
 
 .patches {
   .wrapper {
