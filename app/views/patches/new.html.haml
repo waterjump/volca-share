@@ -1,6 +1,6 @@
 .clearfix
-  .col-xl-9.col-lg-9.col-md-9.col-sm-9#patch-title
-    %h1 New patch
+  #patch-title
+    %h1.hidden New patch
   = render 'midi_button'
 = render 'midi_control'
 = form_tag '/patches', method: :post, id: :patch_form do
@@ -11,5 +11,5 @@
         - @patch.errors.full_messages.each do |msg|
           %li= msg
   = render 'form'
-
-= link_to 'Back', patches_path
+.col-lg-3
+  = link_to 'Back', patches_path

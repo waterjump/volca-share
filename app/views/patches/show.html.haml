@@ -8,7 +8,7 @@
         = link_to(@patch.user.username, user_path(@patch.user))
   = render 'midi_button', button_text: 'Send this patch to your Volca'
 = render 'midi_control'
-.stretchy
+.stretchy.col-lg-9
   .volca
     .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
       .notch
@@ -88,7 +88,7 @@
       = label_tag('patch[amp_eg_on]') do
         %span
           .light{ data: { active: @patch.amp_eg_on.to_s } }
-.col-md-8
+.col-lg-3
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'
     %p
@@ -99,11 +99,11 @@
     .well
       = @patch.notes
 
-.col-md-12.form-detail-actions
-  - if @patch.user == current_user
-    = link_to 'Edit', edit_patch_path(@patch)
-    \|
-    = form_tag patch_path(@patch), method: :delete do
-      = submit_tag 'Delete', class: :link
-    \|
-  = link_to 'Back', patches_path
+  .form-detail-actions
+    - if @patch.user == current_user
+      = link_to 'Edit', edit_patch_path(@patch)
+      \|
+      = form_tag patch_path(@patch), method: :delete do
+        = submit_tag 'Delete', class: :link
+      \|
+    = link_to 'Back', patches_path
