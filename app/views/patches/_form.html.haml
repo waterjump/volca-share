@@ -115,11 +115,11 @@
       .h5 MIDI-only controls
     .stretchy2
       #midi-only-controls.clearfix
-        .knob.medium#slide-time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
+        .knob.medium#slide_time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
           .notch
         .knob.medium#expression{ data: { midi: @patch.expression || 127 , control_number: 11 } }
           .notch
-        .knob.medium#gate-time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
+        .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
           .notch
   %fieldset
     .field

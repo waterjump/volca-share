@@ -35,7 +35,6 @@ class PatchesController < ApplicationController
     user = current_user
     format_tags
     @patch = user.patches.build(@patch_params)
-
     respond_to do |format|
       if @patch.save
         format.html { redirect_to edit_patch_url(@patch), notice: 'Patch saved successfully.' }
@@ -119,7 +118,10 @@ class PatchesController < ApplicationController
       :amp_eg_on,
       :secret,
       :notes,
-      :tags
+      :tags,
+      :slide_time,
+      :expression,
+      :gate_time
     )
   end
 end

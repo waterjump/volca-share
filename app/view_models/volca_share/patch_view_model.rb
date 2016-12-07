@@ -33,5 +33,11 @@ module VolcaShare
     def formatted_tags
       tags.map(&:downcase).join(', ')
     end
+
+    def show_midi_only_knobs?
+      model.slide_time != 63 ||
+        model.expression != 127 ||
+        model.gate_time != 127
+    end
   end
 end
