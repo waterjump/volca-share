@@ -23,10 +23,10 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Real-time Web MIDI compatibility
 - Taggable patches
 - Private patches
+- MIDI-only parameter control (i.e. - Gate)
 
 ### Todos
 
-- MIDI-only parameter control (i.e. - Gate)
 - Fork patches
 - Patch collections
 - User comments
