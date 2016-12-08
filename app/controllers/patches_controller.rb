@@ -5,7 +5,9 @@ class PatchesController < ApplicationController
   # GET /patches
   # GET /patches.json
   def index
-    @patches = VolcaShare::PatchViewModel.wrap(Patch.public)
+    @patches = VolcaShare::PatchViewModel.wrap(
+      Patch.public.where(:user.ne => nil).order_by(created_at: 'desc')
+    )
   end
 
   # GET /patches/1
