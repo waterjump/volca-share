@@ -24,7 +24,7 @@ RSpec.describe PatchesController, type: :controller do
   # Patch. As you add validations to Patch, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) do
-    attributes_for(:patch)
+    attributes_for(:patch, user_id: 123)
   end
 
   let(:invalid_attributes) do
@@ -83,14 +83,14 @@ RSpec.describe PatchesController, type: :controller do
 
       it 'redirects to the created patch' do
         post :create, { patch: valid_attributes }, valid_session
-        expect(response).to redirect_to(edit_patch_url(Patch.last))
+        expect(response).to redirect_to(patch_url(Patch.last))
       end
     end
 
     context 'with invalid params' do
       it 'assigns a newly created but unsaved patch as @patch' do
         post :create, { patch: invalid_attributes }, valid_session
-        expect(assigns(:patch)).to be_a_new(Patch)
+        expect(assigns(:patch)).to be_a_new(VolcaShare::PatchViewModel)
       end
 
       it "re-renders the 'new' template" do

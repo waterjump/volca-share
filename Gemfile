@@ -19,6 +19,8 @@ gem 'rubocop', '~> 0.40.0', require: false
 gem 'bundler', '1.13.6'
 gem 'mongoid-simple-tags'
 gem 'bootstrap-tagsinput-rails'
+gem 'dotenv-rails', :groups => [:development, :test]
+gem 'recaptcha', require: 'recaptcha/rails'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

@@ -5,7 +5,10 @@
       = @patch.name
       .small
         by
-        = link_to(@patch.user.username, user_path(@patch.user))
+        - if @patch.user.present?
+          = link_to(@patch.user.username, user_path(@patch.user))
+        - else
+          [anonymous]
   = render 'midi_button', button_text: 'Send this patch to your Volca'
 = render 'midi_control'
 .stretchy.col-lg-9
@@ -114,10 +117,15 @@
         = @patch.notes
 
     .form-detail-actions
-      - if @patch.user == current_user
+      - if @patch.user.present? && @patch.user == current_user
         = link_to 'Edit', edit_patch_path(@patch)
         \|
         = form_tag patch_path(@patch), method: :delete do
           = submit_tag 'Delete', class: :link
         \|
+      - else
+        %strong
+          = "To edit, delete, or make your patches browsable, "
+          = link_to 'create an account', new_user_registration_path
+        %br
       = link_to 'Back', patches_path

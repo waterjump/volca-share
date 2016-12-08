@@ -21,7 +21,7 @@ module VolcaShare
     end
 
     def username
-      model.user.username
+      model.user.try(:username)
     end
 
     def description

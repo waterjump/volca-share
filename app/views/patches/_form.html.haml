@@ -125,15 +125,23 @@
     .field
       = label_tag :name, 'Patch name', class: 'sr-only'
       = text_field_tag 'patch[name]', @patch.name, class: 'form-control', required: true, placeholder: 'Patch name'
-    .field
-      = label_tag :privacy, 'Secret?'
-      = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
+    - if current_user.present?
+      .field
+        = label_tag :privacy, 'Secret?'
+        = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
+    - else
+      = hidden_field_tag 'patch[secret]', 'false'
     .field
       = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
       = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'Tags'
     .field
       = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
       = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+    - if current_user.nil? && !Rails.env.test?
+      = recaptcha_tags
+      %strong
+        = "To edit, delete, or make your patches browsable, "
+        = link_to 'create an account', new_user_registration_path
     .actions
       = submit_tag 'Save', class: 'btn btn-primary'
 .off-canvas
