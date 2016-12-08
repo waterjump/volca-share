@@ -28,6 +28,9 @@ FactoryGirl.define do
     secret false
     notes { FFaker::Lorem.paragraph }
     tags { FFaker::Lorem.words(3) }
+    slide_time (0..127).to_a.sample
+    expression (0..127).to_a.sample
+    gate_time (0..127).to_a.sample
   end
 
   factory :user do

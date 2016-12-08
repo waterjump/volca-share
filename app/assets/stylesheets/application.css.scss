@@ -329,39 +329,25 @@ body {
 .stretchy2 {
   width: 100%;
   position: relative;
-  padding-bottom: percentage(0.18);
 
   #midi-only-controls {
-    background-image: image_url('midi-only-controls.jpg');
+    background-image: image_url('midi-only-1200.jpg');
     background-size: cover;
     width: 100%;
     background-color: #343436;
     position: absolute;
-    background-size: cover;
   	top: 0;
     bottom: 0;
     left: 0;
     right: 0;
     .knob {
       border-radius: 50%;
-      width: 9.7%;
-      height: 54%;
       border: lightgreen solid;
       position: absolute;
       box-shadow: 0 0 10px lightgreen;
-      top: 20%;
       .notch {
         background-color: lightgreen;
       }
-    }
-    #slide_time {
-      left: 20%;
-    }
-    #expression {
-      left: 40%;
-    }
-    #gate_time {
-      left: 60%;
     }
   }
 }
@@ -493,6 +479,9 @@ fieldset {
       margin-left: 53px;
     }
   }
+  #patch-metadata {
+    margin-left: 53px;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -504,10 +493,13 @@ fieldset {
     }
   }
 
+  #patch-metadata {
+    margin-left: 0;
+  }
+
   .stretchy2 {
     padding-bottom: 40%;
     #midi-only-controls {
-      background-image: image_url('midi-only-1200.jpg');
       .knob {
         width: 18.7%;
         height: 47%;
@@ -520,9 +512,42 @@ fieldset {
         left: 43%;
       }
       #gate_time {
-        left:73%;
+        left: 73%;
       }
 
     }
+  }
+}
+
+@media (max-width: 1200px) {
+  #midi-only-panel{
+    width: 36.957%;
+  }
+
+  .stretchy2 {
+    padding-bottom: 40%;
+
+    #midi-only-controls {
+      .knob {
+        width: 17.28%;
+        height: 43.2%;
+        top: 36%;
+      }
+      #slide_time {
+        left: 11%;
+      }
+      #expression {
+        left: 43%;
+      }
+      #gate_time {
+        left: 73%;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  #midi-only-panel{
+    width: 255px;
   }
 }

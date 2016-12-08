@@ -20,12 +20,13 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Log in'
 
     visit root_path
-    expect(page).to have_link 'Submit a patch'
+    expect(page).to have_link 'New Patch'
 
-    click_link 'Submit a patch'
+    click_link 'new-patch'
+
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
-    bottom_row = '#patch_form > div > div.stretchy > div > div.bottom-row'
+    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(
       page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
     ).not_to eq(nil) # vco_group 3
@@ -47,6 +48,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     range_select 'patch[lfo_rate]', dummy_patch.lfo_rate
     range_select 'patch[lfo_int]', dummy_patch.lfo_int
     range_select 'patch[vco1_pitch]', dummy_patch.vco1_pitch
+    range_select 'patch[slide_time]', dummy_patch.slide_time
+    range_select 'patch[expression]', dummy_patch.expression
+    range_select 'patch[gate_time]', dummy_patch.gate_time
     find('#vco1_active_button').click
     range_select 'patch[vco2_pitch]', dummy_patch.vco2_pitch
     find('#vco2_active_button').click
@@ -79,6 +83,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco1_pitch')['data-midi']).to eq(dummy_patch.vco1_pitch.to_s)
     expect(page.find('#vco2_pitch')['data-midi']).to eq(dummy_patch.vco2_pitch.to_s)
     expect(page.find('#vco3_pitch')['data-midi']).to eq(dummy_patch.vco3_pitch.to_s)
+    expect(page.find('#slide_time', visible: false)['data-midi']).to eq(dummy_patch.slide_time.to_s)
+    expect(page.find('#expression', visible: false)['data-midi']).to eq(dummy_patch.expression.to_s)
+    expect(page.find('#gate_time', visible: false)['data-midi']).to eq(dummy_patch.gate_time.to_s)
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
@@ -167,7 +174,7 @@ RSpec.feature 'patches', type: :feature, js: true do
   end
 
   scenario 'cannot be created by guests' do
-    click_link 'Submit a patch'
+    click_link 'new-patch'
     expect(current_path).to eq(new_user_session_path)
     expect(page.status_code).to eq(200)
   end
