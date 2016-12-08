@@ -1,11 +1,11 @@
 class PatchesController < ApplicationController
   before_action :set_patch, only: [:show, :edit, :update, :destroy]
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, except: [:index, :show, :new, :create]
 
   # GET /patches
   # GET /patches.json
   def index
-    @patches = VolcaShare::PatchViewModel.wrap(Patch.public)
+    @patches = VolcaShare::PatchViewModel.wrap(Patch.public.where(:user.ne => nil))
   end
 
   # GET /patches/1
@@ -34,13 +34,20 @@ class PatchesController < ApplicationController
   def create
     user = current_user
     format_tags
-    @patch = user.patches.build(@patch_params)
+    @patch =
+      if user.present?
+        user.patches.build(@patch_params)
+      else
+        Patch.new(@patch_params)
+      end
     respond_to do |format|
-      if @patch.save
-        format.html { redirect_to edit_patch_url(@patch), notice: 'Patch saved successfully.' }
+      if (@patch.user.present? || verify_recaptcha(model: @patch)) && @patch.save
+        format.html { redirect_to patch_url(@patch), notice: 'Patch saved successfully.' }
         format.json { render :show, status: :created, location: @patch }
       else
-        format.html { render :new }
+        @patch = VolcaShare::PatchViewModel.wrap(@patch)
+        @body_class = :form
+        format.html { render :new, location: @patch }
         format.json { render json: @patch.errors, status: :unprocessable_entity }
       end
     end
@@ -55,6 +62,7 @@ class PatchesController < ApplicationController
         format.html { redirect_to @patch, notice: 'Patch was successfully updated.' }
         format.json { render :show, status: :ok, location: @patch }
       else
+        @body_class = :form
         format.html { render :edit }
         format.json { render json: @patch.errors, status: :unprocessable_entity }
       end
