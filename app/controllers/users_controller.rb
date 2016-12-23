@@ -5,7 +5,7 @@ class UsersController < ApplicationController
       if current_user == @user
         VolcaShare::PatchViewModel.wrap(@user.patches)
       else
-        VolcaShare::PatchViewModel.wrap(@user.patches.public)
+        VolcaShare::PatchViewModel.wrap(@user.patches.where(secret: false))
       end
   end
 end

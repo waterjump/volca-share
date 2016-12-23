@@ -180,7 +180,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_content('My Cool Patch')
     expect(page).to have_content('This patch is cool.')
     expect(page).to have_css('.volca')
-    expect(page).to have_content('by [anonymous]')
+    expect(page).to have_content('by ¯\_(ツ)_/¯')
     expect(page).not_to have_link('Edit')
     expect(page).not_to have_button('Delete')
   end
@@ -260,7 +260,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).not_to have_content(patch2.name)
   end
 
-  scenario 'that are anonymous are not show on the index' do
+  scenario 'that are anonymous are not shown on the index' do
     patch1 = FactoryGirl.create(:patch, secret: false)
 
     visit root_path
@@ -274,5 +274,21 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'footer is shown' do
     expect(page).to have_content(/Sean Barrett/i)
+  end
+
+  scenario 'are shown on tag pages' do
+    patch1 = FactoryGirl.create(
+      :patch,
+      secret: false,
+      user_id: user.id,
+      tag_list: 'cool'
+    )
+    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
+
+    visit patch_path(patch2)
+
+    click_link('#cool')
+    expect(page).to have_content(patch1.name)
+    expect(page).to have_content(patch2.name)
   end
 end

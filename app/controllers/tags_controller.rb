@@ -5,7 +5,7 @@ class TagsController < ApplicationController
     @tag = tag_params[:tag]
     @patches =
       VolcaShare::PatchViewModel.wrap(
-        Patch.public.tagged_with(@tag)
+        Patch.where(secret: false).tagged_with(@tag).order_by(created_at: 'desc')
       )
   end
 
