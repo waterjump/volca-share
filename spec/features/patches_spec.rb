@@ -302,7 +302,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_content(/Sean Barrett/i)
   end
 
-  scenario 'are shown on tag pages' do
+  scenario 'user patches are shown on tag pages' do
     patch1 = FactoryGirl.create(
       :patch,
       secret: false,
@@ -316,5 +316,18 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_link('#cool')
     expect(page).to have_content(patch1.name)
     expect(page).to have_content(patch2.name)
+  end
+
+  scenario 'anonymous patches are shown on tag pages' do
+    patch1 = FactoryGirl.create(
+      :patch,
+      secret: false,
+      user_id: nil,
+      tag_list: 'cool'
+    )
+
+    visit('/tags/show?tag=cool')
+    expect(page.status_code).to eq(200)
+    expect(page).to have_content(patch1.name)
   end
 end
