@@ -373,11 +373,14 @@ body {
     }
 
     .patch {
-      max-width: 230px;
+      max-width: 490px;
       float: left;
       margin: 0 0 0 10px;
       overflow: hidden;
       text-overflow: ellipsis;
+      .description {
+        height: 57px;
+      }
     }
 
     .info {
@@ -482,6 +485,13 @@ fieldset {
   #patch-metadata {
     margin-left: 53px;
   }
+  .patches{
+    .wrapper {
+      .patch {
+        max-width: 240px;
+      }
+    }
+  }
 }
 
 @media (min-width: 1200px) {
@@ -517,6 +527,13 @@ fieldset {
 
     }
   }
+  .patches{
+    .wrapper {
+      .patch {
+        max-width: 340px;
+      }
+    }
+  }
 }
 
 @media (max-width: 1200px) {
@@ -550,4 +567,34 @@ fieldset {
   #midi-only-panel{
     width: 255px;
   }
+}
+
+.tag{
+  white-space: nowrap;
+  position: relative;
+  margin: 0 5px 0 10px;
+  display: inline-block;
+  height: 20px;
+  border-radius: 0 5px 5px 0;
+  padding: 0 8px 0 9px;
+  background: #cacaca;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+  color: #000;
+  line-height: 18px;
+}
+.tag:before{
+  position: absolute;
+  content: "\25CF";
+  color: white;
+  text-shadow: 0 0 1px #333;
+  font-size: 11px;
+  line-height: 0px;
+  text-indent: 9px;
+  left: -12px;
+  width: 1px;
+  height: 0px;
+  border-right: 12px solid #cacaca;;
+  border-top: 10px solid transparent;
+  border-bottom: 9px solid transparent;
 }

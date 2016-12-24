@@ -15,7 +15,7 @@
           .secret= "[SECRET]"
         .tags
           - patch.tags.first(3).each do |tag|
-            = link_to "\##{tag}", tags_show_path(tag: tag)
+            = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag
       .info
         = link_to patch.username, user_path(patch.user), { class: :username }
         %br/
