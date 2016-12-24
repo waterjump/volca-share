@@ -28,4 +28,16 @@ RSpec.feature 'tags', type: :feature, js: true do
     expect(page).to have_link('Patch 3')
     expect(page).not_to have_link('Patch 2')
   end
+
+  scenario 'patch index page shows tags as links' do
+    expect(page.first('.wrapper')).to have_content('#lead')
+
+    expect(page).to have_link('#lead')
+
+    first(:link, '#lead').click
+    expect(page).to have_content('#lead')
+    expect(page).to have_link('Patch 1')
+    expect(page).to have_link('Patch 3')
+    expect(page).not_to have_link('Patch 2')
+  end
 end
