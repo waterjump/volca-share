@@ -4,9 +4,11 @@ class TagsController < ApplicationController
   def show
     @tag = tag_params[:tag]
     @patches =
-      VolcaShare::PatchViewModel.wrap(
-        Patch.where(secret: false).tagged_with(@tag).order_by(created_at: 'desc')
-      )
+      Kaminari.paginate_array(
+        VolcaShare::PatchViewModel.wrap(
+          Patch.where(secret: false).tagged_with(@tag).order_by(created_at: 'desc')
+        )
+      ).page(params[:page].to_i)
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

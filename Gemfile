@@ -21,6 +21,7 @@ gem 'mongoid-simple-tags'
 gem 'bootstrap-tagsinput-rails'
 gem 'dotenv-rails', :groups => [:development, :test]
 gem 'recaptcha', require: 'recaptcha/rails'
+gem 'kaminari-mongoid'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

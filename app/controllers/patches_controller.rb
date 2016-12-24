@@ -5,9 +5,14 @@ class PatchesController < ApplicationController
   # GET /patches
   # GET /patches.json
   def index
-    @patches = VolcaShare::PatchViewModel.wrap(
-      Patch.browsable.order_by(created_at: 'desc')
-    )
+    @patches =
+      Kaminari.paginate_array(
+        VolcaShare::PatchViewModel.wrap(
+          Patch
+            .browsable
+            .order_by(created_at: 'desc')
+        )
+      ).page(params[:page].to_i)
   end
 
   # GET /patches/1

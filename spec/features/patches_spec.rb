@@ -268,6 +268,32 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).not_to have_content(patch1.name)
   end
 
+  scenario 'patches are paginated on index' do
+    user = FactoryGirl.create(:user)
+    first_patch = FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    30.times do
+      FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    end
+    last_patch = FactoryGirl.create(:patch, secret: false, user_id: user.id)
+
+    visit patches_path
+    expect(page).to have_content(last_patch.name)
+    expect(page).not_to have_content(first_patch.name)
+    expect(page).to have_selector('.pagination')
+    expect(page).to have_selector('.patch-holder', count: 20)
+    within '.pagination' do
+      expect(page).to have_link('2')
+      expect(page).not_to have_link('3')
+    end
+
+    click_link '2'
+    expect(page).not_to have_content(last_patch.name)
+    expect(page).to have_content(first_patch.name)
+    expect(page).to have_selector('.pagination')
+    expect(page).to have_selector('.patch-holder', count: 12)
+    expect(page).to have_link('2')
+  end
+
   scenario 'header is shown' do
     expect(page).to have_content(/VolcaShare/i)
   end

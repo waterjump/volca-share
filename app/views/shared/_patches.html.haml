@@ -1,8 +1,10 @@
 - if @patches.empty?
   .well No patches to show.
 - else
+  .pagination-holder.col-lg-12
+    = paginate @patches
   - @patches.each do |patch|
-    .wrapper.col-md-6.well.well-sm
+    .wrapper.col-md-6.well.well-sm.patch-holder
       =link_to patch do
         .image{ class: patch.secret ? :secret : nil }
       .patch
