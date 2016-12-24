@@ -24,6 +24,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Taggable patches
 - Private patches
 - MIDI-only parameter control (i.e. - Gate)
+- Patch pagination
 
 ### Todos
 
@@ -38,7 +39,6 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - CDN
 - Caching
 - Search (elastic)
-- Patch pagination
 - Sample data
 - Save and share scores
 - Virtual LFO via javascript / Web Midi
