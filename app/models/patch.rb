@@ -33,6 +33,7 @@ class Patch
   field :gate_time, type: Integer, default: 127
   field :secret, type: Mongoid::Boolean, default: false
   field :notes, type: String
+  field :audio_sample, type: String
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
 
@@ -48,6 +49,7 @@ class Patch
   validates :vco1_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :vco2_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :vco3_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
+  validates :audio_sample, format: { with: /https?:\/\/(.*\.)?((soundcloud\.com|snd\.sc)\/[a-z\-\d]+\/[a-z\-\d]+|freesound\.org\/people\/.*\/sounds\/\d{6})\/?#?/ }
 
   scope :browsable, -> { where(secret: false, :user_id.ne => nil) }
 end

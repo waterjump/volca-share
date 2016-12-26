@@ -115,6 +115,10 @@
       = label_tag 'patch[notes]', 'Notes'
       .well
         = @patch.notes
+    - if @patch.audio_sample.present?
+      = label_tag 'patch[audio_sample]', 'Audio sample'
+      .sample
+        = @patch.audio_sample_code.try(:html_safe)
 
     .form-detail-actions
       - if @patch.user.present? && @patch.user == current_user

@@ -31,6 +31,7 @@ FactoryGirl.define do
     slide_time (0..127).to_a.sample
     expression (0..127).to_a.sample
     gate_time (0..127).to_a.sample
+    audio_sample 'https://soundcloud.com/69bot/shallow'
   end
 
   factory :user do

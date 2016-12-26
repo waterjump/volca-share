@@ -10,6 +10,14 @@ require 'capybara/rspec'
 require 'ffaker'
 require 'devise'
 require 'capybara/poltergeist'
+require 'rubygems'
+require 'vcr'
+
+VCR.configure do |config|
+  config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
+  config.hook_into :webmock # or :fakeweb
+  config.ignore_localhost = true
+end
 
 Capybara.register_driver :poltergeist do |app|
   Capybara::Poltergeist::Driver.new(app, timeout: 60, js_errors: false)

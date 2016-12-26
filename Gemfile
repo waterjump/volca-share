@@ -22,6 +22,10 @@ gem 'bootstrap-tagsinput-rails'
 gem 'dotenv-rails', :groups => [:development, :test]
 gem 'recaptcha', require: 'recaptcha/rails'
 gem 'kaminari-mongoid'
+gem 'ruby-oembed'
+gem 'vcr'
+gem 'webmock'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'

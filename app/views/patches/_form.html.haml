@@ -129,6 +129,10 @@
       .field
         = label_tag :privacy, 'Secret?'
         = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
+      .field
+        = label_tag :audio_smaple, 'Audio Sample URL'
+        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: 'https?://(.*\.)?((soundcloud\.com|snd\.sc)/[a-z\-\d]+/[a-z\-\d]+|freesound\.org/people/.*/sounds/\d{6})/?'
+        .small Full support for SoundCloud and freesound.org
     - else
       = hidden_field_tag 'patch[secret]', 'false'
     .field

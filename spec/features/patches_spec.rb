@@ -330,4 +330,26 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.status_code).to eq(200)
     expect(page).to have_content(patch1.name)
   end
+
+  scenario 'audio samples can be provided by registered users' do
+    patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
+    click_link 'Log in'
+    fill_in 'user[email]', with: user.email
+    fill_in 'user[password]', with: user.password
+    click_button 'Log in'
+
+    visit edit_patch_path(patch)
+    expect(current_path).to eq(edit_patch_path(patch))
+    expect(page.status_code).to eq(200)
+
+    fill_in 'patch[audio_sample]', with: 'https://soundcloud.com/69bot/shallow'
+
+    click_button 'Save'
+
+    VCR.use_cassette('oembed') do
+      visit patch_path(patch)
+    end
+
+    expect(page).to have_selector 'iframe'
+  end
 end

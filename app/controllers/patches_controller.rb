@@ -136,7 +136,8 @@ class PatchesController < ApplicationController
       :tags,
       :slide_time,
       :expression,
-      :gate_time
+      :gate_time,
+      :audio_sample
     )
   end
 end
