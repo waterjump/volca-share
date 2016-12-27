@@ -38,8 +38,8 @@ module VolcaShare
 
     def description
       return unless model.notes.present?
-      return model.notes.squish if model.notes.squish.length <= 180
-      model.notes[0..80].squish + '...'
+      return model.notes.squish if model.notes.squish.length <= 100
+      model.notes[0..100].squish + '...'
     end
 
     def formatted_tags
