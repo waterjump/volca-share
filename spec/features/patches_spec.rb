@@ -8,6 +8,16 @@ RSpec.feature 'patches', type: :feature, js: true do
     page.execute_script(script)
   end
 
+  def perform_around
+    VCR.use_cassette('oembed') do
+      yield
+    end
+  end
+
+  around(:each) do |example|
+    perform_around(&example)
+  end
+
   def fill_out_patch_form(dummy_patch, anon = false)
     bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
     range_select 'patch[attack]', dummy_patch.attack
@@ -40,6 +50,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     fill_in 'patch[name]', with: 'My Cool Patch'
     check 'patch[secret]' unless anon
     fill_in 'patch[notes]', with: 'This patch is cool.'
+    fill_in 'patch[audio_sample]', with: dummy_patch.audio_sample unless anon
   end
 
   let(:user) { FactoryGirl.create(:user) }
@@ -346,10 +357,8 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     click_button 'Save'
 
-    VCR.use_cassette('oembed') do
-      visit patch_path(patch)
-    end
-
+    visit patch_path(patch)
+    save_and_open_page
     expect(page).to have_selector 'iframe'
   end
 end

@@ -16,10 +16,21 @@ RSpec.feature 'tags', type: :feature, js: true do
     visit root_path
   end
 
+  def perform_around
+    VCR.use_cassette('oembed') do
+      yield
+    end
+  end
+
+  around(:each) do |example|
+    perform_around(&example)
+  end
+
   scenario 'patch detail page shows tags as links' do
     expect(page.first('.wrapper')).to have_content('#lead')
 
     click_link 'Patch 1'
+    save_and_open_page
     expect(page).to have_link('#lead')
 
     click_link('#lead')
@@ -31,7 +42,6 @@ RSpec.feature 'tags', type: :feature, js: true do
 
   scenario 'patch index page shows tags as links' do
     expect(page.first('.wrapper')).to have_content('#lead')
-
     expect(page).to have_link('#lead')
 
     first(:link, '#lead').click
@@ -43,7 +53,6 @@ RSpec.feature 'tags', type: :feature, js: true do
 
   scenario 'visit a tag page that doesn\'t exist' do
     visit('/tags/show?tag=fake')
-    save_and_open_page
     expect(page.status_code).to eq(200)
     expect(page).to have_content('No patches to show.')
   end

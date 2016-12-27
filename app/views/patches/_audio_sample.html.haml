@@ -1,0 +1,20 @@
+#audio-sample-button{ data: {toggle: 'modal', target: '#audio-sample-modal'}}
+#audio-sample-modal.modal.fade{"aria-labelledby" => "audioSampleModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4#audioSampleModalLabel.modal-title Audio sample
+      .modal-body
+        %p
+          Enter the full URL of the sound on SoundCloud or freesound.org.  The sound will be automatically embedded on the patch page after you submit the form.  Only one audio sample is allowed per patch.
+          %br/
+          %br/
+          Examples:
+          %br/
+          https://soundcloud.com/cdm/korg-volca-bass-as-played-by
+          %br/
+          http://www.freesound.org/people/orangefreesounds/sounds/261094/
+      .modal-footer
+        %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss

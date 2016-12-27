@@ -25,6 +25,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Private patches
 - MIDI-only parameter control (i.e. - Gate)
 - Patch pagination
+- Audio sample link
 
 ### Todos
 
@@ -35,7 +36,6 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Schema.org
 - SMS sharing
 - URL Slugs
-- Audio sample link / upload
 - CDN
 - Caching
 - Search (elastic)

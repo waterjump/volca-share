@@ -613,3 +613,32 @@ fieldset {
   border-top: 10px solid transparent;
   border-bottom: 9px solid transparent;
 }
+
+
+
+#audio-sample-button{
+	text-align: center;
+	background-color: #BCDBEA;
+	border-radius: 50%;
+	width: 16px;
+	height: 16px;
+	font-size: 12px;
+	line-height: 18px;
+	cursor: pointer;
+  display: inline-block;
+}
+
+#audio-sample-button:before{
+	content:'?';
+	font-weight: bold;
+	color:#fff;
+}
+
+#audio-sample-button:hover p{
+	display:block;
+	transform-origin: 100% 0%;
+
+	-webkit-animation: fadeIn 0.3s ease-in-out;
+	animation: fadeIn 0.3s ease-in-out;
+
+}

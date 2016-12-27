@@ -15,8 +15,13 @@ require 'vcr'
 
 VCR.configure do |config|
   config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
-  config.hook_into :webmock # or :fakeweb
+  config.hook_into :webmock
   config.ignore_localhost = true
+  config.default_cassette_options = {
+    record: :none,
+    match_requests_on: [:method, :uri],
+    allow_playback_repeats: true
+  }
 end
 
 Capybara.register_driver :poltergeist do |app|
