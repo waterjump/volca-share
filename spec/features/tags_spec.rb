@@ -30,7 +30,6 @@ RSpec.feature 'tags', type: :feature, js: true do
     expect(page.first('.wrapper')).to have_content('#lead')
 
     click_link 'Patch 1'
-    save_and_open_page
     expect(page).to have_link('#lead')
 
     click_link('#lead')

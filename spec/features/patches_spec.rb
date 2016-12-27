@@ -358,7 +358,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
 
     visit patch_path(patch)
-    save_and_open_page
+
     expect(page).to have_selector 'iframe'
   end
 end
