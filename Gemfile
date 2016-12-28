@@ -25,7 +25,7 @@ gem 'kaminari-mongoid'
 gem 'ruby-oembed'
 gem 'vcr'
 gem 'webmock'
-
+gem 'sendgrid-ruby'
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
