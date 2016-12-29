@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   resources :users, only: [ :show ]
   get 'welcome/index'
   match 'tags/show' => 'tags#show', via: :get
+  match 'oembed' => 'patches#oembed', via: :get
 
 
   # The priority is based upon order of creation: first created -> highest priority.

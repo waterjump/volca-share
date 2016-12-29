@@ -20,6 +20,12 @@ module VolcaShare
       {}
     end
 
+    def index_classes
+      classes = []
+      classes << 'secret' if secret
+      classes << 'has-audio' if audio_sample.present?
+    end
+
     def username
       model.user.try(:username)
     end
@@ -32,7 +38,7 @@ module VolcaShare
         elsif audio_sample.include?('freesound')
           freesound_id = /\d{6}/.match(audio_sample).to_s
           return unless freesound_id.present?
-          "<iframe frameborder='0' scrolling='no' src='https://www.freesound.org/embed/sound/iframe/#{freesound_id}/simple/small/' width='375' height='30'></iframe>"
+          "<iframe frameborder='0' scrolling='no' src='http://www.freesound.org/embed/sound/iframe/#{freesound_id}/simple/small/' width='375' height='30'></iframe>"
         end
     end
 

@@ -10,10 +10,14 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+
+
+
 //= require jquery
 //= require jquery_ujs
 //= require webmidi.min.js
 //= require bootstrap-sprockets
+//= require index.js.erb
 //= require bootstrap-tagsinput
 //= require midi.js
 //= require display.js.erb

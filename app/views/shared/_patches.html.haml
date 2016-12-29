@@ -7,15 +7,17 @@
     .wrapper.col-md-6.well.well-sm.patch-holder
       .image-holder
         = link_to patch do
-          .image{ class: patch.secret ? :secret : nil }
+          .image{ class: patch.index_classes }
       .patch
+        - if patch.audio_sample.present?
+          .speaker{ data: { id: patch.id, toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
         = link_to patch.name, patch, { class: :title }
         %br/
         .description= patch.description
         - if patch.secret?
           .secret= "[SECRET]"
         .tags
-          - patch.tags.first(3).each do |tag|
+          - patch.tags.each do |tag|
             = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag
       .info
         - if patch.user.present?

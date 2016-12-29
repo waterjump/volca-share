@@ -358,7 +358,12 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
 
     visit patch_path(patch)
-
     expect(page).to have_selector 'iframe'
+
+    visit patches_path
+    within '.patch-holder' do
+      # /html/body/div/div[4]/div[3]/div[2]/div[1]
+      expect(page).to have_xpath("/html/body/div/div[4]/div[3]/div[2]/div[1]")
+    end
   end
 end

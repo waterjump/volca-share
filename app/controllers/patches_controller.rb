@@ -1,5 +1,5 @@
 class PatchesController < ApplicationController
-  before_action :set_patch, only: [:show, :edit, :update, :destroy]
+  before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
   before_action :authenticate_user!, except: [:index, :show, :new, :create]
 
   # GET /patches
@@ -86,6 +86,14 @@ class PatchesController < ApplicationController
       else
         format.html { redirect_to patch_url(@patch), notice: 'You cannot delete that patch.' }
         format.json { head :no_content }
+      end
+    end
+  end
+
+  def oembed
+    respond_to do |format|
+      if @patch.present? && @patch.audio_sample.present?
+        format.json { render json: { audio_sample_code: @patch.audio_sample_code } }
       end
     end
   end

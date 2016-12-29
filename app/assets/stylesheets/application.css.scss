@@ -367,14 +367,38 @@ body {
   }
 }
 
-
-
 .patches {
+
+  .loading {
+    position: absolute;
+    left: 45%;
+    top: 35%;
+  }
+
+  .modal-body {
+    width: 100%;
+    height: 111px;
+  }
   .wrapper {
 
-    .image, .patch, .info {
+    .image, .patch, .info, .speaker {
       display: inline-block;
       vertical-align: top;
+    }
+
+    .speaker {
+      background-image: image_url('speaker.png');
+      width: 20px;
+      height: 16px;
+      float: left;
+      margin: 0 5px 0 0;
+      cursor: pointer;
+    }
+
+    .tags {
+      overflow: hidden;
+      max-height: 21px;
+      background-size: cover;
     }
 
     .image-holder {
@@ -387,6 +411,10 @@ body {
         width: 100px;
         height: 100px;
         background-image: image_url('patch-image.png');
+        box-sizing: border-box;
+      }
+      .has-audio {
+        border: 4px solid #00bd2d;
       }
     }
 
