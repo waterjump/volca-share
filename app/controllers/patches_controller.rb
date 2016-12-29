@@ -1,6 +1,12 @@
 class PatchesController < ApplicationController
   before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
-  before_action :authenticate_user!, except: [:index, :show, :new, :create]
+  before_action :authenticate_user!, except: [
+    :index,
+    :show,
+    :new,
+    :create,
+    :oembed
+   ]
 
   # GET /patches
   # GET /patches.json
