@@ -1,7 +1,10 @@
+require 'audio_sample_validator.rb'
+
 class Patch
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Document::Taggable
+  include ActiveModel::Validations
 
   field :name, type: String
   field :attack, type: Integer
@@ -49,9 +52,7 @@ class Patch
   validates :vco1_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :vco2_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :vco3_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :audio_sample,
-    format: { with: /https?:\/\/(.*\.)?((soundcloud\.com|snd\.sc)\/[a-z\-\d]+\/[a-z\-\d]+|freesound\.org\/people\/.*\/sounds\/\d{6})\/?#?/ },
-    allow_nil: true
+  validates :audio_sample, audio_sample: true
 
   scope :browsable, -> { where(secret: false, :user_id.ne => nil) }
 end

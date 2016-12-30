@@ -13,4 +13,5 @@ RSpec.describe Patch, 'validations' do
   it { is_expected.to validate_numericality_of(:vco1_pitch)}
   it { is_expected.to validate_numericality_of(:vco2_pitch) }
   it { is_expected.to validate_numericality_of(:vco3_pitch) }
+  it { is_expected.to custom_validate(:audio_sample).with_validator(AudioSampleValidator) }
 end

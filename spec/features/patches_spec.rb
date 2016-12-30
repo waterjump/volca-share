@@ -366,4 +366,22 @@ RSpec.feature 'patches', type: :feature, js: true do
       expect(page).to have_xpath("/html/body/div/div[4]/div[3]/div[2]/div[1]")
     end
   end
+
+  scenario 'audio samples are limited to soundcloud and freesound' do
+    patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
+    click_link 'Log in'
+    fill_in 'user[email]', with: user.email
+    fill_in 'user[password]', with: user.password
+    click_button 'Log in'
+
+    visit edit_patch_path(patch)
+    expect(current_path).to eq(edit_patch_path(patch))
+    expect(page.status_code).to eq(200)
+
+    fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
+
+    click_button 'Save'
+
+    expect(page).to have_content 'Audio sample needs to be direct soundcloud or freesound link'
+  end
 end
