@@ -31,14 +31,14 @@ http_interactions:
       Content-Type:
       - application/json; charset=utf-8
       Date:
-      - Mon, 26 Dec 2016 23:38:23 GMT
+      - Fri, 30 Dec 2016 19:02:55 GMT
       Etag:
       - '"1edb924656f4a1bc76393a84e300df5e"'
       Server:
       - am/2
       Set-Cookie:
-      - sc_anonymous_id=89234-996961-927106-731207; path=/; expires=Thu, 24 Dec 2026
-        23:38:23 GMT; domain=.soundcloud.com
+      - sc_anonymous_id=87569-461933-648839-238382; path=/; expires=Mon, 28 Dec 2026
+        19:02:55 GMT; domain=.soundcloud.com
       Status:
       - 200 OK
       X-Frame-Options:
@@ -51,5 +51,57 @@ http_interactions:
         by Sixninebot","description":"","thumbnail_url":"http://i1.sndcdn.com/artworks-000157826429-3kquph-t500x500.jpg","html":"\u003Ciframe
         width=\"100%\" height=\"81\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true\u0026url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F258722704\u0026show_artwork=true\u0026maxheight=81\"\u003E\u003C/iframe\u003E","author_name":"Sixninebot","author_url":"https://soundcloud.com/69bot"}'
     http_version: 
-  recorded_at: Mon, 26 Dec 2016 23:39:15 GMT
+  recorded_at: Fri, 30 Dec 2016 19:03:53 GMT
+- request:
+    method: get
+    uri: https://www.youtube.com/oembed?format=json&scheme=https&url=https://youtube.com/watch?v=GF60Iuh643I
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Mozilla/5.0 (compatible; ruby-oembed/0.10.1)
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Strict-Transport-Security:
+      - max-age=31536000
+      X-Xss-Protection:
+      - 1; mode=block; report=https://www.google.com/appserve/security-bugs/log/youtube
+      P3p:
+      - CP="This is not a P3P policy! See http://support.google.com/accounts/answer/151657?hl=en
+        for more info."
+      Expires:
+      - Tue, 27 Apr 1971 19:44:06 EST
+      Cache-Control:
+      - no-cache
+      Content-Type:
+      - application/json
+      X-Content-Type-Options:
+      - nosniff
+      Date:
+      - Fri, 30 Dec 2016 19:03:06 GMT
+      Server:
+      - YouTubeFrontEnd
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="35,34"
+      Accept-Ranges:
+      - none
+      Vary:
+      - Accept-Encoding
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: UTF-8
+      string: '{"html":"\u003ciframe width=\"480\" height=\"270\" src=\"https:\/\/www.youtube.com\/embed\/GF60Iuh643I?feature=oembed\"
+        frameborder=\"0\" allowfullscreen\u003e\u003c\/iframe\u003e","thumbnail_height":360,"thumbnail_width":480,"title":"Funny
+        Dogs - A Funny Dog Videos Compilation 2015","width":480,"height":270,"type":"video","provider_url":"https:\/\/www.youtube.com\/","thumbnail_url":"https:\/\/i.ytimg.com\/vi\/GF60Iuh643I\/hqdefault.jpg","author_name":"MashupZone","author_url":"https:\/\/www.youtube.com\/user\/mashupzone1","version":"1.0","provider_name":"YouTube"}'
+    http_version: 
+  recorded_at: Fri, 30 Dec 2016 19:04:04 GMT
 recorded_with: VCR 2.9.3

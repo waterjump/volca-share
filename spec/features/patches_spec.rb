@@ -364,7 +364,7 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
     click_button 'Save'
-    expect(page).to have_content 'Audio sample needs to be direct soundcloud, freesound or youtube link.'
+    expect(page).to have_content 'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
 
     # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
