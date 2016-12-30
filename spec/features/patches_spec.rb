@@ -57,11 +57,15 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   before(:each) { visit root_path }
 
-  scenario 'can be created by users' do
+  def login
     click_link 'Log in'
     fill_in 'user[email]', with: user.email
     fill_in 'user[password]', with: user.password
     click_button 'Log in'
+  end
+
+  scenario 'can be created by users' do
+    login
 
     visit root_path
     expect(page).to have_link 'New Patch'
@@ -200,10 +204,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
     expect(user.patches.count).to eq(1)
 
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
+    login
 
     visit patch_path(patch1)
     expect(page).to have_button('Delete')
@@ -232,10 +233,7 @@ RSpec.feature 'patches', type: :feature, js: true do
   scenario 'can be deleted by author on patch browse page' do
     FactoryGirl.create(:patch, secret: false, user_id: user.id)
 
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
+    login
 
     visit patches_path
     expect(page).to have_button('Delete')
@@ -344,10 +342,7 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'audio samples can be provided by registered users' do
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
+    login
 
     visit edit_patch_path(patch)
     expect(current_path).to eq(edit_patch_path(patch))
@@ -369,19 +364,18 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'audio samples are limited to soundcloud and freesound' do
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
+    login
 
     visit edit_patch_path(patch)
     expect(current_path).to eq(edit_patch_path(patch))
     expect(page.status_code).to eq(200)
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
-
     click_button 'Save'
-
     expect(page).to have_content 'Audio sample needs to be direct soundcloud or freesound link'
+
+    fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
+    click_button 'Save'
+    expect(page).to have_content 'Patch was successfully updated.'
   end
 end
