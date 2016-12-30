@@ -12,5 +12,6 @@ class UsersController < ApplicationController
         )
       end
     @patches = Kaminari.paginate_array(@patches).page(params[:page].to_i)
+    @title = "Patches by #{@user.try(:username)}"
   end
 end

@@ -9,6 +9,7 @@ class TagsController < ApplicationController
           Patch.where(secret: false).tagged_with(@tag).order_by(created_at: 'desc')
         )
       ).page(params[:page].to_i)
+    @title = "##{@tag} tag"
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

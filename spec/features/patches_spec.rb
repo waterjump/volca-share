@@ -47,10 +47,12 @@ RSpec.feature 'patches', type: :feature, js: true do
     find("#{bottom_row} > label:nth-child(27)").click # vco3_wave
     find("#{bottom_row} > label:nth-child(30)").click # sustain_on
     find("#{bottom_row} > label:nth-child(33)").click # amp_eg_on
-    fill_in 'patch[name]', with: 'My Cool Patch'
-    check 'patch[secret]' unless anon
-    fill_in 'patch[notes]', with: 'This patch is cool.'
-    fill_in 'patch[audio_sample]', with: dummy_patch.audio_sample unless anon
+    fill_in 'patch[name]', with: dummy_patch.name
+    fill_in 'patch[notes]', with: dummy_patch.notes
+    unless anon
+      check 'patch[secret]'
+      fill_in 'patch[audio_sample]', with: dummy_patch.audio_sample
+    end
   end
 
   let(:user) { FactoryGirl.create(:user) }
@@ -71,7 +73,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_link 'New Patch'
 
     click_link 'new-patch'
-
+    expect(page).to have_title('New Patch | VolcaShare')
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
 
@@ -86,12 +88,17 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active'])
     .not_to eq(nil) #vco3_wave
 
-    dummy_patch = FactoryGirl.create(:patch)
+    dummy_patch = FactoryGirl.build(
+      :patch,
+      name: 'My Cool Patch',
+      notes: 'This patch is cool.'
+    )
 
     fill_out_patch_form(dummy_patch)
 
     expect(page).to have_css('.bootstrap-tagsinput')
     click_button 'Save'
+    expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
 
     bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
@@ -124,8 +131,8 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq ('false')
     expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq ('true')
     expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq ('true')
-    expect(page).to have_content('My Cool Patch')
-    expect(page).to have_content('This patch is cool.')
+    expect(page).to have_content(dummy_patch.name)
+    expect(page).to have_content(dummy_patch.notes)
 
     expect(page).to have_css('.volca')
     expect(page).to have_content("by #{user.username}")
@@ -138,7 +145,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_link 'New Patch'
 
     click_link 'new-patch'
-
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
     expect(page).not_to have_content('Secret?')
@@ -153,7 +159,7 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active'])
     .not_to eq(nil) #vco3_wave
 
-    dummy_patch = FactoryGirl.create(:patch)
+    dummy_patch = FactoryGirl.build(:patch)
 
     fill_out_patch_form(dummy_patch, true)
 
@@ -192,8 +198,8 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq ('false')
     expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq ('true')
     expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq ('true')
-    expect(page).to have_content('My Cool Patch')
-    expect(page).to have_content('This patch is cool.')
+    expect(page).to have_content(dummy_patch.name)
+    expect(page).to have_content(dummy_patch.notes)
     expect(page).to have_css('.volca')
     expect(page).to have_content('by ¯\_(ツ)_/¯')
     expect(page).not_to have_link('Edit')
@@ -243,6 +249,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(user.patches.count).to eq(0)
 
     visit patches_path
+    expect(page).to have_title('Browse Patches | VolcaShare')
     expect(page).to have_content('No patches to show.')
   end
 

@@ -19,6 +19,7 @@ class PatchesController < ApplicationController
             .order_by(created_at: 'desc')
         )
       ).page(params[:page].to_i)
+    @title = 'Browse Patches'
   end
 
   # GET /patches/1
@@ -31,6 +32,7 @@ class PatchesController < ApplicationController
   def new
     @body_class = :form
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
+    @title = "New Patch"
   end
 
   # GET /patches/1/edit
@@ -60,6 +62,7 @@ class PatchesController < ApplicationController
       else
         @patch = VolcaShare::PatchViewModel.wrap(@patch)
         @body_class = :form
+        @title = 'New Patch'
         format.html { render :new, location: @patch }
         format.json { render json: @patch.errors, status: :unprocessable_entity }
       end
@@ -109,6 +112,8 @@ class PatchesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_patch
     @patch = VolcaShare::PatchViewModel.wrap(Patch.find(params[:id]))
+    user = " by #{@patch.user.try(:username)}" || ''
+    @title = "#{@patch.name}#{user}"
   end
 
   def format_tags

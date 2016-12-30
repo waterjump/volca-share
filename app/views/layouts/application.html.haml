@@ -2,7 +2,8 @@
 %html
   %head
     %meta{:content => 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type'}/
-    %title VolcaShare
+    %title= [@title, 'VolcaShare'].reject { |c| c.blank? }.join(' | ')
+    %link{:href => asset_path('favicon.ico'), :rel => 'shortcut icon'}/
     = stylesheet_link_tag    'application', media: 'all'
     = javascript_include_tag 'application'
     = csrf_meta_tags

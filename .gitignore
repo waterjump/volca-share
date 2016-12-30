@@ -34,3 +34,5 @@ bower.json
 .powenv
 
 .DS_Store
+.env
+.byebug_history
