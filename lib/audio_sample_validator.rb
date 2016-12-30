@@ -4,7 +4,8 @@ class AudioSampleValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
     return unless record.audio_sample.present?
     unless compare(record.audio_sample)
-      record.errors[:audio_sample] << 'needs to be direct soundcloud or freesound link'
+      record.errors[:audio_sample] <<
+        'needs to be direct SoundCloud, Freesound or YouTube link.'
     end
   end
 
@@ -15,7 +16,7 @@ class AudioSampleValidator < ActiveModel::EachValidator
   end
 
   def regexes
-    youtube_id = '[A-Za-z0-9]{11}'
+    youtube_id = '[A-Za-z\d]{11}'
     [
       '(soundcloud\.com|snd\.sc)/[a-z\-\d]+/[a-z\-\d]+',
       'freesound\.org/people/.*/sounds/\d{6}',

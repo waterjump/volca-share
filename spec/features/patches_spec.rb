@@ -341,28 +341,20 @@ RSpec.feature 'patches', type: :feature, js: true do
   end
 
   scenario 'audio samples can be provided by registered users' do
+    # Soundcloud comes from FactoryGirl
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
-    login
-
-    visit edit_patch_path(patch)
-    expect(current_path).to eq(edit_patch_path(patch))
-    expect(page.status_code).to eq(200)
-
-    fill_in 'patch[audio_sample]', with: 'https://soundcloud.com/69bot/shallow'
-
-    click_button 'Save'
 
     visit patch_path(patch)
     expect(page).to have_selector 'iframe'
 
     visit patches_path
     within '.patch-holder' do
-      # /html/body/div/div[4]/div[3]/div[2]/div[1]
+      # speaker icon
       expect(page).to have_xpath("/html/body/div/div[4]/div[3]/div[2]/div[1]")
     end
   end
 
-  scenario 'audio samples are limited to soundcloud and freesound' do
+  scenario 'audio samples are limited to soundcloud, freesound, and youtube' do
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
     login
 
@@ -372,9 +364,16 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
     click_button 'Save'
-    expect(page).to have_content 'Audio sample needs to be direct soundcloud or freesound link'
+    expect(page).to have_content 'Audio sample needs to be direct soundcloud, freesound or youtube link.'
 
+    # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
+    click_button 'Save'
+    expect(page).to have_content 'Patch was successfully updated.'
+
+    # Freesound
+    visit edit_patch_path(patch)
+    fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
     expect(page).to have_content 'Patch was successfully updated.'
   end

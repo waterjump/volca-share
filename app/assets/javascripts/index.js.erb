@@ -1,5 +1,6 @@
 $("*").on('hide.bs.modal', function () {
     $('.modal-body').html("<img class='loading' src='" + "<%= asset_path('loading.gif') %>" + "' alt='Loading' />");
+    $('.modal-body').height('111px');
 });
 
 $(function() {
@@ -16,6 +17,10 @@ $(function() {
       },
       success: function(data) {
         $('.modal-body').html( data['audio_sample_code'] );
+        if ( /youtu\.?be/.test(data['audio_sample_code']) ) {
+          $('.modal-body').height('270px');
+          $('iframe').css({'margin' : '0 auto 0 42px'});
+        }
       }
     });
   });

@@ -132,7 +132,7 @@
       .field
         = label_tag :audio_smaple, 'Audio Sample URL'
         = render 'audio_sample', button_text: '?'
-        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: 'https?://(.*\.)?((soundcloud\.com|snd\.sc)/[a-z\-\d]+/[a-z\-\d]+|freesound\.org/people/.*/sounds/\d{6})/?'
+        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: 'https?://(.*\.)?((soundcloud\.com|snd\.sc)/[a-z\-\d]+/[a-z\-\d]+|freesound\.org/people/.*/sounds/\d{6}|youtube\.com/watch\?v=[A-Za-z\d]{11}|youtu\.be/[A-Za-z\d]{11})/?#?(&.*)?'
     - else
       = hidden_field_tag 'patch[secret]', 'false'
     .field
