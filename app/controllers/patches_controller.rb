@@ -152,6 +152,6 @@ class PatchesController < ApplicationController
       :expression,
       :gate_time,
       :audio_sample
-    ).delete_if {|k,v| v.blank?}
+    )
   end
 end
