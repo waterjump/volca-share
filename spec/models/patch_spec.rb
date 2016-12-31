@@ -3,6 +3,8 @@ require 'rails_helper'
 RSpec.describe Patch, 'validations' do
   it { is_expected.to validate_presence_of(:name) }
   it { is_expected.to validate_uniqueness_of(:name) }
+  it { is_expected.to validate_presence_of(:slug) }
+  it { is_expected.to validate_uniqueness_of(:slug) }
   it { is_expected.to validate_numericality_of(:attack) }
   it { is_expected.to validate_numericality_of(:decay_release) }
   it { is_expected.to validate_numericality_of(:cutoff_eg_int) }

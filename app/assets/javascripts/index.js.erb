@@ -6,9 +6,9 @@ $("*").on('hide.bs.modal', function () {
 $(function() {
   $('.speaker').click(function(){
     $('.modal-body').html("<img class='loading' src='" + "<%= asset_path('loading.gif') %>" + "' alt='Loading' />");
-    id = $(this).data('id');
+    slug = $(this).data('slug');
     $.ajax({
-      url: "/oembed?id=" + id,
+      url: "/oembed?slug=" + slug,
       data: {
          format: 'json'
       },

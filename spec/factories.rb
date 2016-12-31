@@ -32,11 +32,13 @@ FactoryGirl.define do
     expression (0..127).to_a.sample
     gate_time (0..127).to_a.sample
     audio_sample 'https://soundcloud.com/69bot/shallow'
+    slug { name.parameterize }
   end
 
   factory :user do
     username { FFaker::Internet.user_name[0..19] }
     email { FFaker::Internet.email }
     password { Devise.friendly_token.first(8) }
+    slug { username. parameterize }
   end
 end

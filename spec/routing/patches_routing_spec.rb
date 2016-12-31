@@ -7,31 +7,37 @@ RSpec.describe PatchesController, type: :routing do
     end
 
     it 'routes to #new' do
-      expect(get: '/patches/new').to route_to('patches#new')
+      expect(get: '/patch/new').to route_to('patches#new')
     end
 
     it 'routes to #show' do
-      expect(get: '/patches/1').to route_to('patches#show', id: '1')
+      expect(get: 'user/hotlava69/patch/my-cool-patch')
+        .to route_to(
+          'patches#show',
+          slug: 'my-cool-patch',
+          user_username: 'hotlava69'
+        )
+      expect(get: '/patch/1').to route_to('patches#show', slug: '1')
     end
 
     it 'routes to #edit' do
-      expect(get: '/patches/1/edit').to route_to('patches#edit', id: '1')
+      expect(get: '/patch/1/edit').to route_to('patches#edit', slug: '1')
     end
 
     it 'routes to #create' do
-      expect(post: '/patches').to route_to('patches#create')
+      expect(post: '/patch').to route_to('patches#create')
     end
 
     it 'routes to #update via PUT' do
-      expect(put: '/patches/1').to route_to('patches#update', id: '1')
+      expect(put: '/patch/1').to route_to('patches#update', slug: '1')
     end
 
     it 'routes to #update via PATCH' do
-      expect(patch: '/patches/1').to route_to('patches#update', id: '1')
+      expect(patch: '/patch/1').to route_to('patches#update', slug: '1')
     end
 
     it 'routes to #destroy' do
-      expect(delete: '/patches/1').to route_to('patches#destroy', id: '1')
+      expect(delete: '/patch/1').to route_to('patches#destroy', slug: '1')
     end
   end
 end

@@ -10,7 +10,7 @@ RSpec.feature 'user', type: :feature, js: true do
     patch1 = FactoryGirl.create(:patch, user_id: user.id, secret: false)
     patch2 = FactoryGirl.create(:patch, user_id: user.id, secret: true)
 
-    visit user_path(user)
+    visit user_path(user.slug)
     expect(page).to have_title("Patches by #{user.username} | VolcaShare")
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
@@ -25,7 +25,7 @@ RSpec.feature 'user', type: :feature, js: true do
     fill_in 'user[password]', with: user.password
     click_button 'Log in'
 
-    visit user_path(user)
+    visit user_path(user.slug)
 
     expect(page).to have_content(patch1.name)
     expect(page).to have_content(patch2.name)

@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   def show
-    @user = User.find(params[:id])
+    @user = User.find_by(slug: params[:username])
     @patches =
       if current_user == @user
         VolcaShare::PatchViewModel.wrap(

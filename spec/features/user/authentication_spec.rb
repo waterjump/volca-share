@@ -79,7 +79,7 @@ RSpec.feature 'Authentication process', type: :feature do
     visit(new_user_registration_path)
     pw = Devise.friendly_token.first(8)
     email = FFaker::Internet.email
-    #raise page.body
+
     within '#new_user' do
       fill_in 'user_email', with: email
       fill_in 'user_username', with: FFaker::Internet::user_name

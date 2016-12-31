@@ -25,6 +25,7 @@ class User
   field :last_sign_in_ip,    type: String
 
   has_many :patches, class_name: 'Patch'
+  field :slug, type: String
 
   ## Confirmable
   # field :confirmation_token,   type: String
@@ -37,8 +38,8 @@ class User
   # field :unlock_token,    type: String # Only if unlock strategy is :email or :both
   # field :locked_at,       type: Time
 
-  validates_presence_of :username
-  validates_uniqueness_of :username
+  validates_presence_of :username, :slug
+  validates_uniqueness_of :username, :slug
   validates :username, format: {  with: /\A[0-9A-Za-z\-\_\.]+\Z/ }
   validates :username, length: { minimum: 3, maximum: 20 }
 

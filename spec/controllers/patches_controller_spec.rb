@@ -47,7 +47,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #show' do
     it 'assigns the requested patch as @patch' do
       patch = Patch.create! valid_attributes
-      get :show, { id: patch.to_param }, valid_session
+      get :show, { slug: patch.to_param }, valid_session
       expect(assigns(:patch)).to eq(patch)
     end
   end
@@ -62,7 +62,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #edit' do
     it 'assigns the requested patch as @patch' do
       patch = create(:patch)
-      get :edit, { id: patch.to_param }, valid_session
+      get :edit, { slug: patch.to_param }, valid_session
       expect(assigns(:patch)).to eq(patch)
     end
   end
@@ -83,7 +83,9 @@ RSpec.describe PatchesController, type: :controller do
 
       it 'redirects to the created patch' do
         post :create, { patch: valid_attributes }, valid_session
-        expect(response).to redirect_to(patch_url(Patch.last))
+        expect(response).to redirect_to(
+          user_patch_url(User.first.slug, Patch.last.slug)
+        )
       end
     end
 
@@ -108,20 +110,20 @@ RSpec.describe PatchesController, type: :controller do
 
       it 'updates the requested patch' do
         patch = Patch.create! valid_attributes
-        put :update, { id: patch.to_param, patch: new_attributes }, valid_session
+        put :update, { slug: patch.to_param, patch: new_attributes }, valid_session
         patch.reload
         expect(patch.name).to eq(new_attributes[:name])
       end
 
       it 'assigns the requested patch as @patch' do
         patch = Patch.create! valid_attributes
-        put :update, { id: patch.to_param, patch: valid_attributes }, valid_session
+        put :update, { slug: patch.to_param, patch: valid_attributes }, valid_session
         expect(assigns(:patch)).to eq(patch)
       end
 
       it 'redirects to the patch' do
         patch = Patch.create! valid_attributes
-        put :update, { id: patch.to_param, patch: valid_attributes }, valid_session
+        put :update, { slug: patch.to_param, patch: valid_attributes }, valid_session
         expect(response).to redirect_to(patch)
       end
     end
@@ -129,13 +131,13 @@ RSpec.describe PatchesController, type: :controller do
     context 'with invalid params' do
       it 'assigns the patch as @patch' do
         patch = Patch.create! valid_attributes
-        put :update, { id: patch.to_param, patch: invalid_attributes }, valid_session
+        put :update, { slug: patch.to_param, patch: invalid_attributes }, valid_session
         expect(assigns(:patch)).to eq(patch)
       end
 
       it "re-renders the 'edit' template" do
         patch = Patch.create! valid_attributes
-        put :update, { id: patch.to_param, patch: invalid_attributes }, valid_session
+        put :update, { slug: patch.to_param, patch: invalid_attributes }, valid_session
         expect(response).to render_template('edit')
       end
     end
@@ -146,13 +148,13 @@ RSpec.describe PatchesController, type: :controller do
       it 'destroys the requested patch' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         expect do
-          delete :destroy, { id: patch.to_param }, valid_session
+          delete :destroy, { slug: patch.to_param }, valid_session
         end.to change(Patch, :count).by(-1)
       end
 
       it 'redirects to the patches list' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
-        delete :destroy, { id: patch.to_param }, valid_session
+        delete :destroy, { slug: patch.to_param }, valid_session
         expect(response).to redirect_to(patches_url)
       end
     end
@@ -160,7 +162,7 @@ RSpec.describe PatchesController, type: :controller do
     context 'user is not author' do
       it 'disallows non-author to destroy' do
         patch = Patch.create! valid_attributes.merge(user_id: 'abc123')
-        delete :destroy, { id: patch.to_param }, valid_session
+        delete :destroy, { slug: patch.to_param }, valid_session
         expect(response).to redirect_to(patch_url(patch))
       end
     end

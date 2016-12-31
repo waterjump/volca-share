@@ -1,11 +1,15 @@
 Rails.application.routes.draw do
-  resources :patches
-  devise_for :users, controllers: { sessions: 'users/sessions' }
-  resources :users, only: [ :show ]
+  devise_for :users, controllers: { registrations: 'users/registrations' }
+  resources :user, only: [ :show ], param: :username, controller: 'users' do
+    resources :patch, only: [ :show ], param: :slug, controller: 'patches'
+  end
+
+  resources :patch, param: :slug, controller: 'patches', except: [ :index ]
+  post 'patch' => 'patches#create'
+  resources :patches, only: [ :index ]
   get 'welcome/index'
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get
-
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -98,6 +98,7 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     expect(page).to have_css('.bootstrap-tagsinput')
     click_button 'Save'
+    expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
     expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
 
     bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
@@ -332,6 +333,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_link('#cool')
     expect(page).to have_content(patch1.name)
     expect(page).to have_content(patch2.name)
+
+    click_link(patch2.name)
+    expect(current_path).to eq(patch_path(patch2.id))
   end
 
   scenario 'anonymous patches are shown on tag pages' do
@@ -351,7 +355,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     # Soundcloud comes from FactoryGirl
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
 
-    visit patch_path(patch)
+    visit patch_path(patch.slug)
     expect(page).to have_selector 'iframe'
 
     visit patches_path
@@ -365,8 +369,8 @@ RSpec.feature 'patches', type: :feature, js: true do
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
     login
 
-    visit edit_patch_path(patch)
-    expect(current_path).to eq(edit_patch_path(patch))
+    visit edit_patch_path(patch.slug)
+    expect(current_path).to eq(edit_patch_path(patch.slug))
     expect(page.status_code).to eq(200)
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
@@ -379,7 +383,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_content 'Patch was successfully updated.'
 
     # Freesound
-    visit edit_patch_path(patch)
+    visit edit_patch_path(patch.slug)
     fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
     expect(page).to have_content 'Patch was successfully updated.'

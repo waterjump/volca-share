@@ -37,11 +37,12 @@ class Patch
   field :secret, type: Mongoid::Boolean, default: false
   field :notes, type: String
   field :audio_sample, type: String
+  field :slug, type: String
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
 
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  validates_presence_of :name, :slug
+  validates_uniqueness_of :name, :slug
   validates :attack, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :decay_release, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :cutoff_eg_int, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }

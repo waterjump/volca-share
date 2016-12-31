@@ -49,6 +49,7 @@ class PatchesController < ApplicationController
   def create
     user = current_user
     format_tags
+    @patch_params.merge!(slug: @patch_params[:name].parameterize)
     @patch =
       if user.present?
         user.patches.build(@patch_params)
@@ -56,8 +57,21 @@ class PatchesController < ApplicationController
         Patch.new(@patch_params)
       end
     respond_to do |format|
-      if (@patch.user.present? || verify_recaptcha(model: @patch)) && @patch.save
-        format.html { redirect_to patch_url(@patch), notice: 'Patch saved successfully.' }
+      if @patch.user.present? && @patch.save
+        format.html do
+          redirect_to(
+            user_patch_url(@patch.user.slug, @patch.slug),
+            notice: 'Patch saved successfully.'
+          )
+        end
+        format.json { render :show, status: :created, location: @patch }
+      elsif verify_recaptcha(model: @patch) && @patch.save
+        format.html do
+          redirect_to(
+            patch_url(@patch.id),
+            notice: 'Patch saved successfully.'
+          )
+        end
         format.json { render :show, status: :created, location: @patch }
       else
         @patch = VolcaShare::PatchViewModel.wrap(@patch)
@@ -111,7 +125,13 @@ class PatchesController < ApplicationController
 
   # Use callbacks to share common setup or constraints between actions.
   def set_patch
-    @patch = VolcaShare::PatchViewModel.wrap(Patch.find(params[:id]))
+    patch_model =
+      begin
+        Patch.find_by(slug: params[:slug])
+      rescue
+        Patch.find(params[:slug]) # HACK this is actually the id (-_-,)
+      end
+    @patch = VolcaShare::PatchViewModel.wrap(patch_model)
     user = " by #{@patch.user.try(:username)}" || ''
     @title = "#{@patch.name}#{user}"
   end
