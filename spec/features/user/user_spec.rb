@@ -12,6 +12,7 @@ RSpec.feature 'user', type: :feature, js: true do
       patch2 = FactoryGirl.create(:patch, user_id: user.id, secret: true)
 
       visit user_path(user.slug)
+      expect(page).to have_selector 'h1', text: "Patches by #{user.username}"
       expect(page).to have_title("Patches by #{user.username} | VolcaShare")
       expect(page).to have_content(patch1.name)
       expect(page).not_to have_content(patch2.name)

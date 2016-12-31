@@ -100,6 +100,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
     expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
     expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
+    expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
 
     bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
@@ -167,6 +168,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_css('.bootstrap-tagsinput')
     click_button 'Save'
 
+    expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by ¯\\_(ツ)_/¯", visible: false
     bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
 
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
@@ -250,6 +252,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(user.patches.count).to eq(0)
 
     visit patches_path
+    expect(page).to have_selector 'h1', text: "Patches", visible: false
     expect(page).to have_title('Browse Patches | VolcaShare')
     expect(page).to have_content('No patches to show.')
   end
@@ -331,6 +334,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     visit patch_path(patch2)
 
     click_link('#cool')
+    expect(page).to have_selector 'h1', text: '#cool tags', visible: false
     expect(page).to have_content(patch1.name)
     expect(page).to have_content(patch2.name)
 

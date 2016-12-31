@@ -1,12 +1,12 @@
 .clearfix
   .col-xl-9.col-lg-9.col-md-9.col-sm-9#patch-title
-    %h1.hidden= @patch.name
+    %h1.hidden= "#{@patch.name} by #{@patch.username || '¯\_(ツ)_/¯'}"
     %span.h1
       = @patch.name
       .small
         by
         - if @patch.user.present?
-          = link_to(@patch.user.username, user_path(@patch.user.slug))
+          = link_to(@patch.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
   = render 'midi_button', button_text: 'Send this patch to your Volca'
