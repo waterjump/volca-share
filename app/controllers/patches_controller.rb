@@ -6,7 +6,7 @@ class PatchesController < ApplicationController
     :new,
     :create,
     :oembed
-   ]
+  ]
 
   # GET /patches
   # GET /patches.json
@@ -32,7 +32,7 @@ class PatchesController < ApplicationController
   def new
     @body_class = :form
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
-    @title = "New Patch"
+    @title = 'New Patch'
   end
 
   # GET /patches/1/edit
@@ -49,7 +49,7 @@ class PatchesController < ApplicationController
   def create
     user = current_user
     format_tags
-    @patch_params.merge!(slug: @patch_params[:name].parameterize)
+    @patch_params[:slug] = @patch_params[:name].parameterize
     @patch =
       if user.present?
         user.patches.build(@patch_params)
@@ -88,7 +88,7 @@ class PatchesController < ApplicationController
   def update
     respond_to do |format|
       format_tags
-      @patch_params.merge!(slug: @patch_params[:name].parameterize)
+      @patch_params[:slug] = @patch_params[:name].parameterize
       if @patch.update(@patch_params)
         format.html do
           redirect_to(
@@ -135,7 +135,7 @@ class PatchesController < ApplicationController
       begin
         Patch.find_by(slug: params[:slug])
       rescue
-        Patch.find(params[:slug]) # HACK this is actually the id (-_-,)
+        Patch.find(params[:slug]) # HACK: this is actually the id (-_-,)
       end
     @patch = VolcaShare::PatchViewModel.wrap(patch_model)
     user = " by #{@patch.user.try(:username)}" || ''

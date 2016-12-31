@@ -1,7 +1,9 @@
 class AudioSampleValidator < ActiveModel::EachValidator
-  def self.kind() :custom end
+  def self.kind
+    :custom
+  end
 
-  def validate_each(record, attribute, value)
+  def validate_each(record, _attribute, _value)
     return unless record.audio_sample.present?
     unless compare(record.audio_sample)
       record.errors[:audio_sample] <<

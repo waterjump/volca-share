@@ -8,7 +8,7 @@ RSpec.describe User, 'validations' do
   it do
     is_expected.to validate_format_of(:username)
       .to_allow('hotlava69')
-      .not_to_allow("qq")
+      .not_to_allow('qq')
       .not_to_allow('webr4%^%$E')
   end
   it { is_expected.to validate_length_of(:username).within(3..20) }

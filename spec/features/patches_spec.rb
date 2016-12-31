@@ -1,9 +1,8 @@
 require 'rails_helper'
 
 RSpec.feature 'patches', type: :feature, js: true do
-
   def range_select(name, value)
-    selector = %-input[type=range][name=\\"#{name}\\"]-
+    selector = %(input[type=range][name=\\"#{name}\\"])
     script = %-$("#{selector}").val(#{value})-
     page.execute_script(script)
   end
@@ -85,8 +84,9 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
     ).not_to eq(nil) # lfo_target_cutoff
     expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active'])
-    .not_to eq(nil) #vco3_wave
+      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
+    )
+      .not_to eq(nil) # vco3_wave
 
     dummy_patch = FactoryGirl.build(
       :patch,
@@ -121,18 +121,18 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq 'true'
     expect(page).to have_content(dummy_patch.name)
     expect(page).to have_content(dummy_patch.notes)
 
@@ -158,8 +158,9 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
     ).not_to eq(nil) # lfo_target_cutoff
     expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active'])
-    .not_to eq(nil) #vco3_wave
+      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
+    )
+      .not_to eq(nil) # vco3_wave
 
     dummy_patch = FactoryGirl.build(:patch)
 
@@ -189,18 +190,18 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq ('false')
-    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq ('true')
-    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq ('true')
+    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq 'false'
+    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq 'true'
+    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq 'true'
     expect(page).to have_content(dummy_patch.name)
     expect(page).to have_content(dummy_patch.notes)
     expect(page).to have_css('.volca')
@@ -252,7 +253,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(user.patches.count).to eq(0)
 
     visit patches_path
-    expect(page).to have_selector 'h1', text: "Patches", visible: false
+    expect(page).to have_selector 'h1', text: 'Patches', visible: false
     expect(page).to have_title('Browse Patches | VolcaShare')
     expect(page).to have_content('No patches to show.')
   end
@@ -365,7 +366,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     visit patches_path
     within '.patch-holder' do
       # speaker icon
-      expect(page).to have_xpath("/html/body/div/div[4]/div[3]/div[2]/div[1]")
+      expect(page).to have_xpath('/html/body/div/div[4]/div[3]/div[2]/div[1]')
     end
   end
 

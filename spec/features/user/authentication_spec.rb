@@ -15,7 +15,7 @@ RSpec.feature 'Authentication process', type: :feature do
     pw = Devise.friendly_token.first(8)
     within '#new_user' do
       fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: FFaker::Internet::user_name
+      fill_in 'user_username', with: FFaker::Internet.user_name
       fill_in 'user_password', with: pw
       fill_in 'user_password_confirmation', with: pw
       click_button 'Sign up'
@@ -82,7 +82,7 @@ RSpec.feature 'Authentication process', type: :feature do
 
     within '#new_user' do
       fill_in 'user_email', with: email
-      fill_in 'user_username', with: FFaker::Internet::user_name
+      fill_in 'user_username', with: FFaker::Internet.user_name
       fill_in 'user_password', with: pw
       fill_in 'user_password_confirmation', with: pw
       click_button 'Sign up'
@@ -96,7 +96,7 @@ RSpec.feature 'Authentication process', type: :feature do
     pw = Devise.friendly_token.first(8)
     within '#new_user' do
       fill_in 'user_email', with: email
-      fill_in 'user_username', with: FFaker::Internet::user_name
+      fill_in 'user_username', with: FFaker::Internet.user_name
       fill_in 'user_password', with: pw
       fill_in 'user_password_confirmation', with: pw
       click_button 'Sign up'

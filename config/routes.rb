@@ -1,21 +1,20 @@
 Rails.application.routes.draw do
-
   user_options =
     {
-      only: [ :show ],
+      only: [:show],
       param: :slug,
       controller: 'users',
-      constraints: { :slug => /[A-Za-z0-9\-\_]*/ }
+      constraints: { slug: /[A-Za-z0-9\-\_]*/ }
     }
 
   devise_for :users, controllers: { registrations: 'users/registrations' }
   resources :user, user_options do
-    resources :patch, only: [ :show ], param: :slug, controller: 'patches'
+    resources :patch, only: [:show], param: :slug, controller: 'patches'
   end
 
-  resources :patch, param: :slug, controller: 'patches', except: [ :index ]
+  resources :patch, param: :slug, controller: 'patches', except: [:index]
   post 'patch' => 'patches#create'
-  resources :patches, only: [ :index ]
+  resources :patches, only: [:index]
   get 'welcome/index'
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get

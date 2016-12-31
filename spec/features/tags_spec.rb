@@ -33,7 +33,7 @@ RSpec.feature 'tags', type: :feature, js: true do
     expect(page).to have_link('#lead')
 
     click_link('#lead')
-    expect(page).to have_title("#lead tag | VolcaShare")
+    expect(page).to have_title('#lead tag | VolcaShare')
     expect(page).to have_content('#lead')
     expect(page).to have_link('Patch 1')
     expect(page).to have_link('Patch 3')

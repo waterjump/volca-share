@@ -35,7 +35,7 @@ module VolcaShare
       @audio_sample_code ||=
         if audio_sample.include?('soundcloud')
           ::OEmbed::Providers::SoundCloud.get(audio_sample, maxheight: 81).html
-        elsif !!(audio_sample =~ /youtu\.?be/ )
+        elsif !!(audio_sample =~ /youtu\.?be/)
           ::OEmbed::Providers::Youtube.get(audio_sample).html
         elsif audio_sample.include?('freesound')
           freesound_id = /\d{6}/.match(audio_sample).to_s

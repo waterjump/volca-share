@@ -8,7 +8,7 @@ RSpec.feature 'the home page', type: :feature, js: true do
   end
 
   scenario 'user see relevant information' do
-    expect(page).to have_selector('h1', text: "Patches")
+    expect(page).to have_selector('h1', text: 'Patches')
   end
 
   scenario 'header is shown' do

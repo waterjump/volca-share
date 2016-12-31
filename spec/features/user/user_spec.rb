@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.feature 'user', type: :feature, js: true do
-
   let(:user) { FactoryGirl.create(:user, username: 'arly.lowe') }
 
   before(:each) { visit root_path }
