@@ -26,6 +26,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - MIDI-only parameter control (i.e. - Gate)
 - Patch pagination
 - Audio sample link
+- URL Slugs
 
 ### Todos
 
@@ -35,7 +36,6 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Ratings / upvote-downvote system
 - Schema.org
 - SMS sharing
-- URL Slugs
 - CDN
 - Caching
 - Search (elastic)
