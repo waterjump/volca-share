@@ -1,6 +1,15 @@
 Rails.application.routes.draw do
+
+  user_options =
+    {
+      only: [ :show ],
+      param: :slug,
+      controller: 'users',
+      constraints: { :slug => /[A-Za-z0-9\-\_]*/ }
+    }
+
   devise_for :users, controllers: { registrations: 'users/registrations' }
-  resources :user, only: [ :show ], param: :username, controller: 'users' do
+  resources :user, user_options do
     resources :patch, only: [ :show ], param: :slug, controller: 'patches'
   end
 

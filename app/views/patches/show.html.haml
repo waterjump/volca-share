@@ -6,7 +6,7 @@
       .small
         by
         - if @patch.user.present?
-          = link_to(@patch.user.username, user_path(@patch.user.username))
+          = link_to(@patch.user.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
   = render 'midi_button', button_text: 'Send this patch to your Volca'
@@ -122,7 +122,7 @@
 
     .form-detail-actions
       - if @patch.user.present? && @patch.user == current_user
-        = link_to 'Edit', edit_patch_path(@patch)
+        = link_to 'Edit', edit_patch_path(@patch.slug)
         \|
         = form_tag patch_path(@patch), method: :delete do
           = submit_tag 'Delete', class: :link

@@ -24,7 +24,7 @@
             = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag
       .info
         - if patch.user.present?
-          = link_to patch.username, user_path(patch.user.username), { class: :username }
+          = link_to patch.username, user_path(patch.user.slug), { class: :username }
         - else
           ¯\_(ツ)_/¯
         %br/

@@ -15,7 +15,7 @@ RSpec.describe PatchesController, type: :routing do
         .to route_to(
           'patches#show',
           slug: 'my-cool-patch',
-          user_username: 'hotlava69'
+          user_slug: 'hotlava69'
         )
       expect(get: '/patch/1').to route_to('patches#show', slug: '1')
     end

@@ -380,12 +380,12 @@ RSpec.feature 'patches', type: :feature, js: true do
     # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
     click_button 'Save'
-    expect(page).to have_content 'Patch was successfully updated.'
+    expect(page).to have_content 'Patch saved successfully.'
 
     # Freesound
     visit edit_patch_path(patch.slug)
     fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
-    expect(page).to have_content 'Patch was successfully updated.'
+    expect(page).to have_content 'Patch saved successfully.'
   end
 end

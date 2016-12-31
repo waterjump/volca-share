@@ -104,27 +104,34 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'PUT #update' do
     context 'with valid params' do
+      let!(:user) do
+        FactoryGirl.create(:user)
+      end
+
       let(:new_attributes) do
-        attributes_for(:patch, name: 'New Weird Patch')
+        attributes_for(:patch, name: 'New Weird Patch', user_id: user.id)
       end
 
       it 'updates the requested patch' do
-        patch = Patch.create! valid_attributes
-        put :update, { slug: patch.to_param, patch: new_attributes }, valid_session
+        patch = user.patches.build(valid_attributes)
+        patch.save
+        put :update, { slug: patch.slug, patch: new_attributes }, valid_session
         patch.reload
         expect(patch.name).to eq(new_attributes[:name])
       end
 
       it 'assigns the requested patch as @patch' do
-        patch = Patch.create! valid_attributes
-        put :update, { slug: patch.to_param, patch: valid_attributes }, valid_session
+        patch = user.patches.build(valid_attributes)
+        patch.save
+        put :update, { slug: patch.slug, patch: valid_attributes }, valid_session
         expect(assigns(:patch)).to eq(patch)
       end
 
       it 'redirects to the patch' do
-        patch = Patch.create! valid_attributes
-        put :update, { slug: patch.to_param, patch: valid_attributes }, valid_session
-        expect(response).to redirect_to(patch)
+        patch = user.patches.build(valid_attributes)
+        patch.save
+        put :update, { slug: patch.slug, patch: valid_attributes }, valid_session
+        expect(response).to redirect_to(user_patch_path(user.slug, patch.slug))
       end
     end
 

@@ -88,9 +88,15 @@ class PatchesController < ApplicationController
   def update
     respond_to do |format|
       format_tags
+      @patch_params.merge!(slug: @patch_params[:name].parameterize)
       if @patch.update(@patch_params)
-        format.html { redirect_to @patch, notice: 'Patch was successfully updated.' }
-        format.json { render :show, status: :ok, location: @patch }
+        format.html do
+          redirect_to(
+            user_patch_url(@patch.user.slug, @patch.slug),
+            notice: 'Patch saved successfully.'
+          )
+        end
+        format.json { render :show, status: :created, location: @patch }
       else
         @body_class = :form
         format.html { render :edit }
@@ -176,7 +182,8 @@ class PatchesController < ApplicationController
       :slide_time,
       :expression,
       :gate_time,
-      :audio_sample
+      :audio_sample,
+      :slug
     )
   end
 end
