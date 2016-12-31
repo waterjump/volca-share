@@ -6,7 +6,7 @@
       .small
         by
         - if @patch.user.present?
-          = link_to(@patch.user.username, user_path(@patch.user))
+          = link_to(@patch.user.username, user_path(@patch.user.username))
         - else
           ¯\_(ツ)_/¯
   = render 'midi_button', button_text: 'Send this patch to your Volca'
