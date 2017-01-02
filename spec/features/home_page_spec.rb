@@ -15,6 +15,8 @@ RSpec.feature 'the home page', type: :feature, js: true do
     expect(page).to have_content(/VolcaShare/i)
     expect(page).to have_content(/About/i)
     expect(page).to have_content(/New Patch/i)
+    expect(page).to have_content(/Log in/i)
+    expect(page).to have_content(/Sign Up/i)
   end
 
   scenario 'footer is shown' do
