@@ -380,7 +380,7 @@ body {
     height: 111px;
   }
   .wrapper {
-
+    overflow: hidden;
     .image, .patch, .info, .speaker {
       display: inline-block;
       vertical-align: top;
