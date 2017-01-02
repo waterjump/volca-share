@@ -38,7 +38,7 @@ module VolcaShare
         elsif !!(audio_sample =~ /youtu\.?be/)
           ::OEmbed::Providers::Youtube.get(audio_sample).html
         elsif audio_sample.include?('freesound')
-          freesound_id = /\d{6}/.match(audio_sample).to_s
+          freesound_id = /\d{2,7}/.match(audio_sample).to_s
           return unless freesound_id.present?
           "<iframe frameborder='0' scrolling='no' src='http://www.freesound.org/embed/sound/iframe/#{freesound_id}/simple/small/' width='375' height='30'></iframe>"
         end
