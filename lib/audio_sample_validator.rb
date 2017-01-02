@@ -1,4 +1,5 @@
 class AudioSampleValidator < ActiveModel::EachValidator
+  include AudioRegex
   def self.kind
     :custom
   end
@@ -13,17 +14,7 @@ class AudioSampleValidator < ActiveModel::EachValidator
 
   def compare(audio_sample)
     regexes.any? do |regex|
-      !!(audio_sample =~ Regexp.new("https?://(.*\\.)?#{regex}/?#?(&.*)?"))
+      !!(audio_sample =~ Regexp.new("#{prefix}#{regex}#{suffix}"))
     end
-  end
-
-  def regexes
-    youtube_id = '[A-Za-z\d]{11}'
-    [
-      '(soundcloud\.com|snd\.sc)/[a-z\-\d]+/[a-z\-\d]+',
-      'freesound\.org/people/.*/sounds/\d{2,7}',
-      "youtube\\.com/watch\\?v=#{youtube_id}",
-      "youtu\\.be/#{youtube_id}"
-    ]
   end
 end

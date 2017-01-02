@@ -1,5 +1,6 @@
 module VolcaShare
   class PatchViewModel < ApplicationViewModel
+    include AudioRegex
     def vco_group_one
       return true if vco_group == 'one'
       false
@@ -42,6 +43,14 @@ module VolcaShare
           return unless freesound_id.present?
           "<iframe frameborder='0' scrolling='no' src='http://www.freesound.org/embed/sound/iframe/#{freesound_id}/simple/small/' width='375' height='30'></iframe>"
         end
+    end
+
+    def audio_sample_regex
+      "#{prefix}#{audio_sample_regex_body}#{suffix}"
+    end
+
+    def audio_sample_regex_body
+      "(#{regexes.join('|')})"
     end
 
     def description
