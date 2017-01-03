@@ -27,6 +27,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Patch pagination
 - Audio sample link
 - URL Slugs
+- SMS sharing
 
 ### Todos
 
@@ -35,7 +36,6 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - User comments
 - Ratings / upvote-downvote system
 - Schema.org
-- SMS sharing
 - CDN
 - Caching
 - Search (elastic)
