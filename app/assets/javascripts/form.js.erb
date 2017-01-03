@@ -21,7 +21,7 @@ $(function() {
     midiOut.enableSync();
   });
 
-  $('#sync').click(function(){
+  $('#sync').on('click tap', function(){
     $('.knob').each(function(){
       if (midiOut.ready()) {
           midiOut.output.sendControlChange(
@@ -47,7 +47,7 @@ $(function() {
     }
   });
 
-  $('.bottom-row label').mouseup(function(){
+  $('.bottom-row label').on('click tap', function(){
     if ($('input#' + $(this).attr('for')).is(':checkbox')) {
       $(this).find('span .light').toggleClass('lit');
     } else {
@@ -69,7 +69,7 @@ $(function() {
     }
   });
 
-  $('.button').mouseup(function(){
+  $('.button').on('click tap',function(){
     var vco, value, vcoKnob, input;
     vco = $(this).attr('id').split('_')[0];
     value = $(this).data('active');
@@ -86,8 +86,8 @@ $(function() {
     }
   });
 
-  $('.knob').mousedown(function(e) {
-    clickedPoint = e.pageY;
+  $('.knob').on('mousedown touchstart',function(e) {
+    clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
     e.preventDefault();
     e.stopPropagation();
     clicked = true;
@@ -106,7 +106,7 @@ $(function() {
     display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
   });
 
-  $(document).mousemove(function(e) {
+  $(document).on('mousemove touchmove',function(e) {
     if (clicked === true) {
       dragging = true;
     }
@@ -114,7 +114,7 @@ $(function() {
       e.preventDefault();
       var degree, currentPoint;
       $('body').css('cursor', 'ns-resize');
-      currentPoint = e.pageY;
+      currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
       degree = activeKnob.rotation + (clickedPoint - currentPoint);
       if (degree > limit) {
         activeKnob.rotation = limit;
@@ -141,11 +141,11 @@ $(function() {
     }
   });
 
-  $(document).mouseup(function(e) {
+  $(document).on('mouseup touchend', function(e) {
     clicked = false;
     if (dragging) {
       dragging = false;
-      var currentPoint = e.pageY;
+      var currentPoint = e.pageY || Math.round(e.originalEvent.changedTouches[0].pageY);
       $('body').css('cursor', 'default');
 
       var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
@@ -164,41 +164,4 @@ $(function() {
       display.update(activeKnob.midi, activeKnob.isPitch);
     }
   });
-
-  function touchHandler(event)
-    {
-        var touches = event.changedTouches,
-            first = touches[0],
-            type = "";
-        switch(event.type)
-        {
-            case "touchstart": type = "mousedown"; break;
-            case "touchmove":  type = "mousemove"; break;
-            case "touchend":   type = "mouseup";   break;
-            default:           return;
-        }
-
-        // initMouseEvent(type, canBubble, cancelable, view, clickCount,
-        //                screenX, screenY, clientX, clientY, ctrlKey,
-        //                altKey, shiftKey, metaKey, button, relatedTarget);
-
-        var simulatedEvent = document.createEvent("MouseEvent");
-        simulatedEvent.initMouseEvent(type, true, true, window, 1,
-                                      first.screenX, first.screenY,
-                                      first.clientX, first.clientY, false,
-                                      false, false, false, 0/*left*/, null);
-
-        first.target.dispatchEvent(simulatedEvent);
-        event.preventDefault();
-    }
-
-  function init()
-    {
-        document.addEventListener("touchstart", touchHandler, true);
-        document.addEventListener("touchmove", touchHandler, true);
-        document.addEventListener("touchend", touchHandler, true);
-        document.addEventListener("touchcancel", touchHandler, true);
-    }
-
-  init();
 });
