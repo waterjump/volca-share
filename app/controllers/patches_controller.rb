@@ -122,7 +122,11 @@ class PatchesController < ApplicationController
   def oembed
     respond_to do |format|
       if @patch.present? && @patch.audio_sample.present?
-        format.json { render json: { audio_sample_code: @patch.audio_sample_code } }
+        format.json { render json: {
+          audio_sample_code: @patch.audio_sample_code,
+          name: @patch.name,
+          patch_location: patch_location
+        } }
       end
     end
   end
@@ -146,6 +150,14 @@ class PatchesController < ApplicationController
     tags = patch_params[:tags]
     return @patch_params.merge!(tags: []) unless tags.present?
     @patch_params.merge!(tags: tags.split(',').map(&:downcase).map(&:strip))
+  end
+
+  def patch_location
+    if @patch.user.present?
+      user_patch_path(@patch.user.slug, @patch.slug)
+    else
+      patch_path(@patch.id)
+    end
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

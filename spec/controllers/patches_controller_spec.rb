@@ -67,6 +67,21 @@ RSpec.describe PatchesController, type: :controller do
     end
   end
 
+  describe 'GET #oembed' do
+    it 'assigns the requested patch as @patch' do
+      VCR.use_cassette('oembed') do
+        patch = create(:patch)
+        get :oembed, { slug: patch.to_param, format: :json }, valid_session
+        expect(response.status).to eq(200)
+        expect(JSON.parse(response.body)['name']).to eq(patch.name)
+        expect(JSON.parse(response.body)['audio_sample_code'])
+          .to eq("<iframe width=\"100%\" height=\"81\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F258722704&show_artwork=true&maxheight=81\"></iframe>")
+        expect(JSON.parse(response.body)['patch_location'])
+          .to eq("/patch/#{patch.id}")
+      end
+    end
+  end
+
   describe 'POST #create' do
     context 'with valid params' do
       it 'creates a new Patch' do

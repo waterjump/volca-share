@@ -53,7 +53,7 @@ RSpec.feature 'tags', type: :feature, js: true do
 
   scenario 'visit a tag page that doesn\'t exist' do
     visit('/tags/show?tag=fake')
-    expect(page.status_code).to eq(200)
+    expect(page.status_code).to eq(204)
     expect(page).to have_content('No patches to show.')
   end
 end

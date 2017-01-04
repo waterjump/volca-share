@@ -45,7 +45,7 @@ function MidiOut() {
   this.init = function(){
     WebMidi.enable(function(err) {
       if (err) {
-        console.log("An error occurred", err);
+        // console.log("An error occurred", err);
       } else {
         parent.supported = true;
         parent.updateForm();

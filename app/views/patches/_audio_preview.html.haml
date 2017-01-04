@@ -1,12 +1,12 @@
--# #audio-preview-button{ data: {toggle: 'modal', target: '#audio-preview-modal'}}
 #audio-preview-modal.modal.fade{"aria-labelledby" => "audioPreviewModaLabel", :role => "dialog", :tabindex => "-1"}
   .modal-dialog{:role => "document"}
     .modal-content
       .modal-header
         %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
           %span{"aria-hidden" => "true"} ×
-        %h4#audioPreviewModaLabel.modal-title Audio sample
-      .modal-body
+        %h4#audioPreviewModaLabel.modal-title
+      #preview-modal-body.modal-body
         = image_tag 'loading.gif', class: 'loading'
       .modal-footer
-        %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss
+        %button.btn.btn-default{"data-dismiss" => "modal", type: 'button'} Dismiss
+        =link_to 'Go to Patch', '#', id: 'go-to-patch', class: 'btn btn-primary'
