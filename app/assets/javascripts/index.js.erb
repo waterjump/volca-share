@@ -17,7 +17,7 @@ $(function() {
       },
       success: function(data) {
         $('#preview-modal-body').html( data['audio_sample_code'] );
-        $('#audioPreviewModaLabel').html( "Preview: " + "data['name']");
+        $('#audioPreviewModaLabel').html( "Preview: " + data['name']);
         $('#go-to-patch').attr('href', data['patch_location']);
         if ( /youtu\.?be/.test(data['audio_sample_code']) ) {
           $('#preview-modal-body').height('270px');
