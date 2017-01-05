@@ -271,4 +271,33 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
     expect(page).to have_content 'Patch saved successfully.'
   end
+
+  scenario 'can be randomized' do
+    visit new_patch_path
+    expect(page).to have_link('Randomize')
+
+    click_link 'Randomize'
+    default_patch = {
+      attack: '63',
+      cutoff: '63',
+      gate_time: '127',
+      lfo_target_pitch: '',
+      vco3_active: 'true'
+    }
+
+    fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
+    click_button 'Save'
+
+    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
+
+    random_patch = {
+      attack: page.find('#attack')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      gate_time: page.find('#gate_time', visible: false)['data-midi'],
+      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      vco3_active: page.find('#vco3_active_button')['data-active']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+  end
 end

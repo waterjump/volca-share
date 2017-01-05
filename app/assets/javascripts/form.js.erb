@@ -40,6 +40,65 @@ $(function() {
     my_knob.autoRotate(degree, '#' + $(this).attr('id'));
   });
 
+  // TODO DRY this up.
+  $('#randomize').on('click tap', function(e){
+    e.preventDefault();
+    // KNOBS
+    $('.knob').each(function() {
+      randomValue = Math.floor(Math.random() * (127 - 1));
+      my_knob = new Knob(this);
+      degree = my_knob.degreeForMidi(randomValue, limit);
+      $(this).data('rotation', degree);
+      $(this).data('midi', randomValue);
+      my_knob.autoRotate(degree, '#' + $(this).attr('id'));
+      my_knob.inputElement.val(randomValue);
+    });
+
+    // VCO ACTIVE
+    $('.button').each(function(){
+      var vco, value, vcoKnob, input;
+      vco = $(this).attr('id').split('_')[0];
+      randomValue = Math.random() >= 0.5;
+      input = $('input#patch_' + $(this).attr('id').split('_').slice(0, -1).join('_'));
+      $(this).data('active', randomValue);
+      vcoKnob = $('.knob#' + vco + '_pitch');
+      if (randomValue) {
+        $(this).addClass('lit');
+        vcoKnob.addClass('lit');
+        input.prop('checked', true);
+      } else {
+        $(this).removeClass('lit');
+        vcoKnob.removeClass('lit');
+        input.prop('checked', false);
+      }
+    });
+
+    // CHECKBOXES
+    $('.bottom-row label').each(function(){
+      if ($('input#' + $(this).attr('for')).is(':checkbox')) {
+        var myInput = $('input#' + $(this).attr('for'));
+        randomValue = Math.random() >= 0.5;
+        if (randomValue) {
+          $(this).find('span').find('div').addClass('lit');
+          myInput.prop('checked', true);
+        } else {
+          $(this).find('span').find('div').removeClass('lit');
+          myInput.prop('checked', false);
+        }
+      }
+    });
+
+    // VCO GROUP
+    var items = ['one', 'two', 'three'];
+    var item = items[Math.floor(Math.random()*items.length)];
+    $('.light[data-radio]').each(function() {
+      $(this).removeClass('lit');
+      $(":radio[value=" + item + "]").prop('checked', false);
+    });
+    $(":radio[value=" + item + "]").prop('checked', true);
+    $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
+  });
+
   $('.bottom-row label').each(function(){
     var myInput = $('input#' + $(this).attr('for'));
     if (myInput.prop('checked')) {
@@ -59,7 +118,7 @@ $(function() {
   });
 
   $('.button').each(function(){
-    var vco, value, vcoKnob, input;
+    var vco, value, vcoKnob;
     vco = $(this).attr('id').split('_')[0];
     value = $(this).data('active');
     vcoKnob = $('.knob#' + vco + '_pitch');

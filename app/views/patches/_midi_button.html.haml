@@ -1,6 +1,7 @@
-.col-xl-3.col-lg-3.col-md-3.col-sm-3
+.col-xl-12.col-lg-12.col-md-12.col-sm-12
   - button_text ||= nil
   %button.btn.btn-primary#enable-web-midi{ data: {toggle: 'modal', target: '#web-midi-modal'}}= button_text || 'Enable Web MIDI Out'
+  = link_to 'Randomize', '#', id: :randomize, class: 'btn btn-primary'
   #web-midi-modal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
     .modal-dialog{:role => "document"}
       .modal-content

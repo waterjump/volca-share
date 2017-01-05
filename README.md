@@ -28,6 +28,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Audio sample link
 - URL Slugs
 - SMS sharing
+- Randomize patches
 
 ### Todos
 

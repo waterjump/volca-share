@@ -1,7 +1,7 @@
 function Knob(element) {
   this.element = element;
   this.midi = $(this.element).data('midi');
-  this.rotation = $(this.element).data('rotation');
+  this.rotation = $(this.element).data('rotation') || 0;
   this.isPitch = $(this.element).attr('id').split('_')[1] === 'pitch';
   this.isOctave = $(this.element).attr('id') === 'octave';
   this.inputElement = $('input#patch_' + $(this.element).attr('id'));
@@ -23,7 +23,8 @@ function Knob(element) {
   }
 
   this.autoRotate = function (d, selector){
-    $({deg: 0}).animate({deg: d}, {
+    currentRotation = parseInt(this.rotation);
+    $({deg: currentRotation}).animate({deg: d}, {
       step: function(now, fx){
         $(selector).css({
           transform: "rotate(" + now + "deg)"
