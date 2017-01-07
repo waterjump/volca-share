@@ -4,6 +4,7 @@ class Step
 
   embedded_in :sequence, inverse_of: :steps
 
+  field :index, type: Integer
   field :note, type: Integer
   field :step_mode, type: Boolean
   field :slide, type: Boolean

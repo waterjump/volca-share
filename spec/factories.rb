@@ -41,6 +41,7 @@ FactoryGirl.define do
 
   factory :step do
     association :sequence
+    index (1..16).to_a.sample
     note (0..127).to_a.sample
     step_mode { FFaker::Boolean.maybe }
     slide { FFaker::Boolean.maybe }

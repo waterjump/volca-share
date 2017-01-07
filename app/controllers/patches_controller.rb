@@ -52,10 +52,20 @@ class PatchesController < ApplicationController
     @patch_params[:slug] = @patch_params[:name].parameterize
     @patch =
       if user.present?
-        user.patches.build(@patch_params)
+        user.patches.build(@patch_params.except(:sequences))
       else
-        Patch.new(@patch_params)
+        Patch.new(@patch_params.except(:sequences))
       end
+    if @patch_params[:sequences].present?
+      sequence = @patch.sequences.build
+      @patch_params[:sequences].each do |step|
+        sequence.steps.build(step)
+      end
+    end
+    Rails.logger.info "69BOT - @patch_params: #{@patch_params}"
+    # if @patch_params[:sequences].present?
+    #   @patch.sequences.build(steps: @patch_params[:sequences].first.values)
+    # end
     respond_to do |format|
       if @patch.user.present? && @patch.save
         format.html do
@@ -162,40 +172,52 @@ class PatchesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    @patch_params ||= params[:patch].permit(
-      :name,
-      :attack,
-      :decay_release,
-      :cutoff_eg_int,
-      :octave,
-      :peak,
-      :cutoff,
-      :lfo_rate,
-      :lfo_int,
-      :vco1_pitch,
-      :vco1_active,
-      :vco2_pitch,
-      :vco2_active,
-      :vco3_pitch,
-      :vco3_active,
-      :vco_group,
-      :lfo_target_amp,
-      :lfo_target_pitch,
-      :lfo_target_cutoff,
-      :lfo_wave,
-      :vco1_wave,
-      :vco2_wave,
-      :vco3_wave,
-      :sustain_on,
-      :amp_eg_on,
-      :secret,
-      :notes,
-      :tags,
-      :slide_time,
-      :expression,
-      :gate_time,
-      :audio_sample,
-      :slug
-    )
+    @patch_params ||= params[:patch].permit!.merge!(sequences: sequence_params)
+    # (
+    #   :name,
+    #   :attack,
+    #   :decay_release,
+    #   :cutoff_eg_int,
+    #   :octave,
+    #   :peak,
+    #   :cutoff,
+    #   :lfo_rate,
+    #   :lfo_int,
+    #   :vco1_pitch,
+    #   :vco1_active,
+    #   :vco2_pitch,
+    #   :vco2_active,
+    #   :vco3_pitch,
+    #   :vco3_active,
+    #   :vco_group,
+    #   :lfo_target_amp,
+    #   :lfo_target_pitch,
+    #   :lfo_target_cutoff,
+    #   :lfo_wave,
+    #   :vco1_wave,
+    #   :vco2_wave,
+    #   :vco3_wave,
+    #   :sustain_on,
+    #   :amp_eg_on,
+    #   :secret,
+    #   :notes,
+    #   :tags,
+    #   :slide_time,
+    #   :expression,
+    #   :gate_time,
+    #   :audio_sample,
+    #   :slug
+    # )
+
+  end
+
+  def sequence_params
+    steps = params[:patch][:sequences].first.map { |k,v| v }
+    good_keys = [:index, :note, :step_mode, :slide, :active_step]
+    steps.each do |h|
+      h.reject do |k,v|
+        !good_keys.include?(k)
+      end
+    end
   end
 end

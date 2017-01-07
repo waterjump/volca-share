@@ -8,18 +8,57 @@ $(function() {
   var dragging = false;
   var clicked = false;
   var limit = 140;
+  var activeNote;
 
   var midiOut = new MidiOut;
 
+  var midiMultiples = {
+    0: 'C',
+    1: 'C#',
+    2: 'D',
+    3: 'D#',
+    4: 'E',
+    5: 'F',
+    6: 'F#',
+    7: 'G',
+    8: 'G#',
+    9: 'A',
+    10: 'A#',
+    11: 'B',
+  };
+
+  var midiNoteNumbers = {};
+  for (i = 0; i < 128; i++) {
+    midiNoteNumbers[i] = midiMultiples[i % 12] + Math.floor(i / 12);
+  }
+
   $("#add-sequence").on('click tap', function(e) {
     e.preventDefault();
-    return $('.sequence_holder').append($('#new_choice_form').html());
-  });
+    $('.sequence-holder').append($('#new_choice_form').html());
 
-  $('.sequence-box').on('click tap', '.param label', function(){
-    alert('clicked');
-    var myInput = $('input#' + $(this).attr('for'));
-    $(this).find('span .light').toggleClass('lit');
+    $('.sequence-box').on('click tap', '.param span', function(){
+      var myInput = $('input#' + $(this).attr('for'));
+      $(this).find('.light').toggleClass('lit');
+    });
+
+    $('.sequence-box span').on('mousedown touchstart', function(){
+      console.log( $(this).offset());
+      console.log( "69BOT - $(this).offset().top: " + $(this).offset().top);
+      console.log( "69BOT - $(this).position().top: " + $(this).position().top);
+      clickedPoint = $(this).offset().top + 12; // HACK because it's hard to get pageY of a relatively position'd element that populated on the fly
+      e.preventDefault();
+      e.stopPropagation();
+      clicked = true;
+      activeNote = $(this);
+      activeKnob = null;
+    });
+
+    $('.sequence-box label').each(function(){
+      var myInput = $('input#' + $(this).attr('for'));
+      if (myInput.prop('checked')) {
+        $(this).find('span').find('div').addClass('lit');
+      }
+    });
   });
 
   $('#midi-device').change(function(){
@@ -110,7 +149,7 @@ $(function() {
     $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
   });
 
-  $('.bottom-row label').each(function(){
+  $('.bottom-row label, .sequence-box label').each(function(){
     var myInput = $('input#' + $(this).attr('for'));
     if (myInput.prop('checked')) {
       $(this).find('span').find('div').addClass('lit');
@@ -162,6 +201,7 @@ $(function() {
     e.stopPropagation();
     clicked = true;
     activeKnob = new Knob(this);
+    activeNote = null;
     knob = $(activeKnob.element);
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
@@ -185,29 +225,42 @@ $(function() {
       var degree, currentPoint;
       $('body').css('cursor', 'ns-resize');
       currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
-      degree = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (degree > limit) {
-        activeKnob.rotation = limit;
-        clickedPoint = currentPoint;
-      }
-      if (degree < -limit) {
-        activeKnob.rotation = -limit;
-        clickedPoint = currentPoint;
-      }
-      degree = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
-        activeKnob.rotate(degree);
-        midi = Math.round(((63.5 / limit) * degree) + 63.5);
-        if (midiOut.ready()) {
-            midiOut.output.sendControlChange(
-              $(activeKnob.element).data('control-number'),
-              midi,
-              midiOut.channel
-            )
+      if (activeKnob !== null){
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (degree > limit) {
+          activeKnob.rotation = limit;
+          clickedPoint = currentPoint;
         }
-        activeKnob.inputElement.val(midi);
-        display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+        if (degree < -limit) {
+          activeKnob.rotation = -limit;
+          clickedPoint = currentPoint;
+        }
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
+          activeKnob.rotate(degree);
+          midi = Math.round(((63.5 / limit) * degree) + 63.5);
+          if (midiOut.ready()) {
+              midiOut.output.sendControlChange(
+                $(activeKnob.element).data('control-number'),
+                midi,
+                midiOut.channel
+              )
+          }
+          activeKnob.inputElement.val(midi);
+          display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+        }
+      } else if (activeNote !== null) {
+        var num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint)/4);
+        if (num > 127) {
+          num = 127;
+        }
+        if (num < 0) {
+          num = 0;
+        }
+        activeNote.data('note', num);
+        activeNote.html(midiNoteNumbers[num]);
       }
+
     }
   });
 
@@ -217,19 +270,25 @@ $(function() {
       dragging = false;
       var currentPoint = e.pageY || Math.round(e.originalEvent.changedTouches[0].pageY);
       $('body').css('cursor', 'default');
+      if (activeKnob !== null) {
+        var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (activeKnob.rotation > limit) {
+          activeKnob.rotation = limit;
+          currentPoint = clickedPoint;
+        }
+        if (activeKnob.rotation < -limit) {
+          activeKnob.rotation = -limit;
+          currentPoint = clickedPoint;
+        }
+        $(activeKnob.element).data('rotation', currentAngle);
+        $(activeKnob.element).data('midi', midi);
+      } else if (activeNote !== null) {
+        activeNote.data('starting-note', activeNote.data('note'));
+        var inputId = activeNote["0"].parentNode.attributes["0"].value
+        $('input#' + inputId).val(activeNote.data('note'));
+      }
 
-      var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (activeKnob.rotation > limit) {
-        activeKnob.rotation = limit;
-        currentPoint = clickedPoint;
-      }
-      if (activeKnob.rotation < -limit) {
-        activeKnob.rotation = -limit;
-        currentPoint = clickedPoint;
-      }
-      $(activeKnob.element).data('rotation', currentAngle);
-      $(activeKnob.element).data('midi', midi);
-    } else {
+    } else if (activeKnob !== null) {
       if (typeof activeKnob === Knob)
       display.update(activeKnob.midi, activeKnob.isPitch);
     }

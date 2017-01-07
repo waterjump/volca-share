@@ -34,6 +34,10 @@ $pink: #fd9994;
   left: 46%;
 }
 
+.lit {
+  background-color: $pink !important;
+}
+
 .volca {
   .knob {
     background-color: #b3b3b5;
@@ -179,10 +183,6 @@ $pink: #fd9994;
 
   #vco3_active_button {
     left: 79.6%;
-  }
-
-  .lit {
-    background-color: $pink !important;
   }
 
   .bottom-row {
