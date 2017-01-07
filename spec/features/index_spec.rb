@@ -16,13 +16,6 @@ RSpec.feature 'patch index', type: :feature, js: true do
 
   before(:each) { visit root_path }
 
-  def login
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
-  end
-
   scenario 'can be deleted by author on patch browse page' do
     FactoryGirl.create(:patch, secret: false, user_id: user.id)
 
@@ -45,10 +38,7 @@ RSpec.feature 'patch index', type: :feature, js: true do
     FactoryGirl.create(:patch, secret: false, user_id: user.id)
     user_2 = FactoryGirl.create(:user)
 
-    click_link 'Log in'
-    fill_in 'user[email]', with: user_2.email
-    fill_in 'user[password]', with: user_2.password
-    click_button 'Log in'
+    login(user_2)
 
     visit patches_path
     expect(page).not_to have_button('Delete')

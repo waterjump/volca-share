@@ -34,10 +34,7 @@ RSpec.feature 'user', type: :feature, js: true do
     patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
     patch2 = FactoryGirl.create(:patch, secret: true, user_id: user.id)
 
-    click_link 'Log in'
-    fill_in 'user[email]', with: user.email
-    fill_in 'user[password]', with: user.password
-    click_button 'Log in'
+    login
 
     visit user_path(user.slug)
     expect(page).to have_content(patch1.name)

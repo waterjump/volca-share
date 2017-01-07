@@ -132,3 +132,18 @@ body {
   border-top: 10px solid transparent;
   border-bottom: 9px solid transparent;
 }
+
+#login, #sign-up {
+  max-width: 300px;
+}
+
+@media(min-width: 990px) {
+  #sign-up {
+    border-left: 1px solid #d8d8d8;
+  }
+}
+
+.auth-container {
+  margin: 0 auto;
+  width: 570px;
+}
