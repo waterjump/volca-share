@@ -1,15 +1,13 @@
-.col-xl-12.col-lg-12.col-md-12.col-sm-12
-  - button_text ||= nil
-  %button.btn.btn-primary#enable-web-midi{ data: {toggle: 'modal', target: '#web-midi-modal'}}= button_text || 'Enable Web MIDI Out'
-  = link_to 'Randomize', '#', id: :randomize, class: 'btn btn-primary'
-  #web-midi-modal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
-    .modal-dialog{:role => "document"}
-      .modal-content
-        .modal-header
-          %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
-            %span{"aria-hidden" => "true"} ×
-          %h4#myModalLabel.modal-title Enabling Wed Midi (Chrome 43+ only)
-        .modal-body
-          %p To control your Volca directly from the browser, connect and enable a device capable of MIDI output, such as an audio interface, to your computer or other browsing device.  It will be detected by the browser when you reload.
-        .modal-footer
-          %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss
+- button_text ||= nil
+%button.btn.btn-primary#enable-web-midi{ data: {toggle: 'modal', target: '#web-midi-modal'}}= button_text || 'Enable Web MIDI Out'
+#web-midi-modal.modal.fade{"aria-labelledby" => "myModalLabel", :role => "dialog", :tabindex => "-1"}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h4#myModalLabel.modal-title Enabling Wed Midi (Chrome 43+ only)
+      .modal-body
+        %p To control your Volca directly from the browser, connect and enable a device capable of MIDI output, such as an audio interface, to your computer or other browsing device.  It will be detected by the browser when you reload.
+      .modal-footer
+        %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss

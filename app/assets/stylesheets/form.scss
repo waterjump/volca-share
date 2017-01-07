@@ -278,6 +278,16 @@ $pink: #fd9994;
   margin: 20px auto auto 10px
 }
 
+#randomize {
+  background-image: image_url('randomize.png');
+  background-repeat: no-repeat;
+  background-size: 79%;
+  background-position-x: 3px;
+  background-position-y: 2px;
+  width: 34px;
+  height: 34px;
+}
+
 #patch-title {
   float:left;
   span, .small {

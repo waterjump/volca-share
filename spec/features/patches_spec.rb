@@ -274,9 +274,9 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'can be randomized' do
     visit new_patch_path
-    expect(page).to have_link('Randomize')
+    expect(page).to have_link('randomize')
 
-    click_link 'Randomize'
+    click_link 'randomize'
     default_patch = {
       attack: '63',
       cutoff: '63',
@@ -299,5 +299,11 @@ RSpec.feature 'patches', type: :feature, js: true do
     }
 
     expect(random_patch).not_to eq(default_patch)
+
+    visit patch_path(Patch.first)
+    expect(page).not_to have_selector('#randomize')
+
+    visit edit_patch_path(Patch.first)
+    expect(page).not_to have_selector('#randomize')
   end
 end

@@ -1,5 +1,5 @@
 .clearfix
-  .col-xl-9.col-lg-9.col-md-9.col-sm-9#patch-title
+  .col-xl-9.col-lg-9.col-md-9.col-sm-12#patch-title
     %h1.hidden= "#{@patch.name} by #{@patch.username || '¯\_(ツ)_/¯'}"
     %span.h1
       = @patch.name
@@ -9,7 +9,8 @@
           = link_to(@patch.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
-  = render 'midi_button', button_text: 'Send this patch to your Volca'
+  .col-xl-3.col-lg-3.col-md-3.col-sm-12
+    = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
 = render 'midi_control'
 .stretchy.col-lg-9
   .volca
