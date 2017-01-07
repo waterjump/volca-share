@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :patch do
+  factory :patch do |p|
     name { FFaker::Lorem.characters(10) }
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
@@ -34,6 +34,19 @@ FactoryGirl.define do
     audio_sample 'https://soundcloud.com/69bot/shallow'
     slug { name.parameterize }
   end
+
+  factory :sequence do |s|
+    association :patch
+  end
+
+  factory :step do
+    association :sequence
+    note (0..127).to_a.sample
+    step_mode { FFaker::Boolean.maybe }
+    slide { FFaker::Boolean.maybe }
+    active_step { FFaker::Boolean.maybe }
+  end
+
 
   factory :user do
     username { FFaker::Internet.user_name[0..19] }

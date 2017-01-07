@@ -40,6 +40,7 @@ class Patch
   field :slug, type: String
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
+  embeds_many :sequences, class_name: 'Sequence'
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug

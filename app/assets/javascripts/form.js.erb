@@ -11,6 +11,17 @@ $(function() {
 
   var midiOut = new MidiOut;
 
+  $("#add-sequence").on('click tap', function(e) {
+    e.preventDefault();
+    return $('.sequence_holder').append($('#new_choice_form').html());
+  });
+
+  $('.sequence-box').on('click tap', '.param label', function(){
+    alert('clicked');
+    var myInput = $('input#' + $(this).attr('for'));
+    $(this).find('span .light').toggleClass('lit');
+  });
+
   $('#midi-device').change(function(){
     midiOut.changeOutput(this);
     midiOut.enableSync();

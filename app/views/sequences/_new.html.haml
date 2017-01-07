@@ -1,0 +1,30 @@
+.sequence-form
+  .outer-sequence-box
+    .sequence-box
+      .param-labels
+        .note.param Note
+        .step-mode.param Step Mode
+        .slide.param Slide
+        .active-step.param Active Step
+      - 16.times do |num|
+        .step
+          .note.param
+            = hidden_field_tag "patch[sequence[step_#{num + 1}[note]]]", ''
+            = label_tag("patch[sequence[step_#{num + 1}[note]]]") do
+              %span
+                A
+          .step-mode.param
+            = check_box "patch[sequence[step_#{num + 1}", :step_mode, {}, 'true', 'false'
+            = label_tag("patch[sequence[step_#{num + 1}[step_mode]]]") do
+              %span
+                .light.sequence-light{ data: { active: false } }
+          .slide.param
+            = check_box "patch[sequence[step_#{num + 1}", :slide, {}, 'true', 'false'
+            = label_tag("patch[sequence[step_#{num + 1}[slide]]]") do
+              %span
+                .light.sequence-light{ data: { active: false } }
+          .active-step.param
+            = check_box "patch[sequence[step_#{num + 1}", :active_step, {}, 'true', 'false'
+            = label_tag("patch[sequence[step_#{num + 1}[active_step]]]") do
+              %span
+                .light.sequence-light{ data: { active: false } }
