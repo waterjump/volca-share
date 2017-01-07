@@ -127,8 +127,8 @@ RSpec.feature 'patch index', type: :feature, js: true do
     visit patches_path
     within '.patch-holder' do
       # speaker icon
-      expect(page).to have_xpath('/html/body/div/div[4]/div[3]/div[2]/div[1]')
-      find(:xpath, '/html/body/div/div[4]/div[3]/div[2]/div[1]').click
+      expect(page).to have_xpath('/html/body/div[1]/div[2]/div[3]/div[2]/div[1]')
+      find(:xpath, '/html/body/div[1]/div[2]/div[3]/div[2]/div[1]').click
     end
 
     expect(page).to have_selector('iframe')

@@ -27,8 +27,10 @@
           %strong Warning!
           %span Please enable JavaScript to make use of this application.  Or else... ¯\_(ツ)_/¯
 
-      .alert-warning= alert
-      .alert-info= notice
+      - if alert.present?
+        .alert.alert-warning.fade.in= alert
+      - if notice.present?
+        .alert.alert-info.fade.in= notice
       = render 'shared/header'
       = yield
     = render 'shared/footer'
