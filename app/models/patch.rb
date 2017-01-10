@@ -55,5 +55,5 @@ class Patch
   validates :vco3_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
   validates :audio_sample, audio_sample: true
 
-  scope :browsable, -> { where(secret: false, :user_id.ne => nil) }
+  scope :browsable, -> { where(secret: false) }
 end

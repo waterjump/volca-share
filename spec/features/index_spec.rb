@@ -54,12 +54,12 @@ RSpec.feature 'patch index', type: :feature, js: true do
     expect(page).not_to have_content(patch2.name)
   end
 
-  scenario 'that are anonymous are not shown on the index' do
+  scenario 'shows anonymous patches' do
     patch1 = FactoryGirl.create(:patch, secret: false)
 
     visit root_path
 
-    expect(page).not_to have_content(patch1.name)
+    expect(page).to have_content(patch1.name)
   end
 
   scenario 'patches are paginated on index' do
