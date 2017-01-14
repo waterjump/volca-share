@@ -7,22 +7,22 @@
           .step-mode.param Step Mode
           .slide.param Slide
           .active-step.param Active Step
-          - sequence.steps.each do |step|
-            - num = step.index
-            .step
-              .note.param
-                = label_tag("patch[sequences][seq_num][step_#{num}[note]]]") do
-                  %span.step-note{ data: { note: step.note } }
-                    C5 ?
-              .step-mode.param
-                = label_tag("patch[sequences][seq_num][step_#{num}[step_mode]]]") do
-                  %span
-                    .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_step_mode_light", data: { active: step.step_mode.to_s } }
-              .slide.param
-                = label_tag("patch[sequences][seq_num][step_#{num}[slide]]]") do
-                  %span
-                    .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_slide_light", data: { active: step.slide.to_s } }
-              .active-step.param
-                = label_tag("patch[sequences[seq_num][step_#{num}[active_step]]]") do
-                  %span
-                    .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_active_step_light", data: { active: step.active_step.to_s } }
+        - sequence.steps.each do |step|
+          - num = step.index
+          .step
+            .note.param
+              = label_tag("patch[sequences][seq_num][step_#{num}[note]]]") do
+                %span.step-note{ data: { note: step.note } }
+                  C5 ?
+            .step-mode.param
+              = label_tag("patch[sequences][seq_num][step_#{num}[step_mode]]]") do
+                %span
+                  .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_step_mode_light", data: { active: step.step_mode.to_s } }
+            .slide.param
+              = label_tag("patch[sequences][seq_num][step_#{num}[slide]]]") do
+                %span
+                  .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_slide_light", data: { active: step.slide.to_s } }
+            .active-step.param
+              = label_tag("patch[sequences[seq_num][step_#{num}[active_step]]]") do
+                %span
+                  .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_active_step_light", data: { active: step.active_step.to_s } }

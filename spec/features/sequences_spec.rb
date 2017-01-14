@@ -136,7 +136,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row} > label:nth-child(6)").click  # vco_group_two
+    find("#{bottom_row} > label:nth-child(6)").click  # vco_group_three
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 1)
@@ -166,5 +166,37 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page.find('#patch_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
     expect(page.find('#patch_sequences_0_step_2_slide_light')['data-active']).to eq('true')
     expect(page.find('#patch_sequences_0_step_3_active_step_light')).not_to have_css('lit')
+  end
+
+  scenario 'can be edited' do
+    login
+
+    visit root_path
+    expect(page).to have_link 'New Patch'
+
+    click_link 'new-patch'
+
+    dummy_patch = FactoryGirl.build(
+      :patch,
+      name: 'My Cool Patch',
+      notes: 'This patch is cool.'
+    )
+
+    fill_out_patch_form(dummy_patch)
+    find("#{bottom_row} > label:nth-child(4)").click  # vco_group_two
+    expect(page).to have_link('Add sequences')
+
+    click_link 'Add sequences'
+    expect(page).to have_selector('.sequence-form')
+    page.find('label[for=patch_sequences_0_step_1_step_mode]').trigger('click')
+    page.find('label[for=patch_sequences_1_step_2_slide]').trigger('click')
+
+    click_button 'Save'
+    expect(page).to have_link('Edit')
+
+    click_link 'Edit'
+    expect(page).to have_selector('.sequence-form')
+    expect(page.find('#patch_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
+    expect(page.find('#patch_sequences_1_step_2_step_mode_light')).not_to have_css('lit')
   end
 end

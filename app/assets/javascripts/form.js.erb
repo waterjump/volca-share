@@ -49,10 +49,10 @@ $(function() {
       $(this).find('.light').toggleClass('lit');
     });
 
-    $('.sequence-box span').on('mousedown touchstart', function(){
-      clickedPoint = $(this).offset().top + 12; // HACK because it's hard to get pageY of a relatively position'd element that populated on the fly
-      e.preventDefault();
-      e.stopPropagation();
+    $('.sequence-box span').on('mousedown touchstart', function(f){
+      clickedPoint = f.pageY || Math.round(f.originalEvent.touches[0].pageY);
+      f.preventDefault();
+      f.stopPropagation();
       clicked = true;
       activeNote = $(this);
       activeKnob = null;
@@ -64,6 +64,31 @@ $(function() {
         $(this).find('span').find('div').addClass('lit');
       }
     });
+  });
+
+  $('.sequence-box').on('click tap', '.param span', function(){
+    var myInput = $('input#' + $(this).attr('for'));
+    $(this).find('.light').toggleClass('lit');
+  });
+
+  $('.sequence-box span').on('mousedown touchstart', function(e){
+    clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
+    e.preventDefault();
+    e.stopPropagation();
+    clicked = true;
+    activeNote = $(this);
+    activeKnob = null;
+  });
+
+  $('.sequence-box label').each(function(){
+    var myInput = $('input#' + $(this).attr('for'));
+    if (myInput.prop('checked')) {
+      $(this).find('span').find('div').addClass('lit');
+    }
+  });
+
+  $('.note-display').each(function(){
+      $(this).html(midiNoteNumbers[$(this).data('starting-note')]);
   });
 
   $('#midi-device').change(function(){
