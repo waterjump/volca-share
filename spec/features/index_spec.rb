@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 RSpec.feature 'patch index', type: :feature, js: true do
-
   def perform_around
     VCR.use_cassette('oembed') do
       yield

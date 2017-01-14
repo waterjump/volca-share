@@ -12,10 +12,10 @@ module AudioRegex
   end
 
   def prefix
-    "https?://(.*\\.)?"
+    'https?://(.*\\.)?'
   end
 
   def suffix
-    "/?#?(&.*)?"
+    '/?#?(&.*)?'
   end
 end

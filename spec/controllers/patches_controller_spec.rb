@@ -79,7 +79,7 @@ RSpec.describe PatchesController, type: :controller do
         expect(response.status).to eq(200)
         expect(JSON.parse(response.body)['name']).to eq(patch.name)
         expect(JSON.parse(response.body)['audio_sample_code'])
-          .to eq("<iframe width=\"100%\" height=\"81\" scrolling=\"no\" frameborder=\"no\" src=\"https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F258722704&show_artwork=true&maxheight=81\"></iframe>")
+          .to eq('<iframe width="100%" height="81" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks%2F258722704&show_artwork=true&maxheight=81"></iframe>')
         expect(JSON.parse(response.body)['patch_location'])
           .to eq("/patch/#{patch.id}")
       end

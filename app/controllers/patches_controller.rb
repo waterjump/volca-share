@@ -66,7 +66,7 @@ class PatchesController < ApplicationController
     end
 
     respond_to do |format|
-      if @patch.user.present? && @patch.save!
+      if @patch.user.present? && @patch.save
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),
@@ -74,7 +74,7 @@ class PatchesController < ApplicationController
           )
         end
         format.json { render :show, status: :created, location: @patch }
-      elsif verify_recaptcha(model: @patch) && @patch.save!
+      elsif verify_recaptcha(model: @patch) && @patch.save
         format.html do
           redirect_to(
             patch_url(@patch.id),
@@ -131,11 +131,13 @@ class PatchesController < ApplicationController
   def oembed
     respond_to do |format|
       if @patch.present? && @patch.audio_sample.present?
-        format.json { render json: {
-          audio_sample_code: @patch.audio_sample_code,
-          name: @patch.name,
-          patch_location: patch_location
-        } }
+        format.json do
+          render json: {
+            audio_sample_code: @patch.audio_sample_code,
+            name: @patch.name,
+            patch_location: patch_location
+          }
+        end
       end
     end
   end
@@ -180,14 +182,11 @@ class PatchesController < ApplicationController
     good_keys = [:index, :note, :step_mode, :slide, :active_step]
     params[:patch][:sequences].values.each do |seq|
       sequence = {}
-      sequence.merge!(
-        steps:
-          seq.each do |step|
-            step.reject do |k, v|
-              !good_keys.include?(k)
-            end
-          end.values
-      )
+      sequence[:steps] = seq.each do |step|
+        step.reject do |k, _v|
+          !good_keys.include?(k)
+        end
+      end.values
       paramz << sequence
     end
     paramz

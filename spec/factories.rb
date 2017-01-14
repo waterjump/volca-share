@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :patch do |p|
+  factory :patch do |_p|
     name { FFaker::Lorem.characters(10) }
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
@@ -35,7 +35,7 @@ FactoryGirl.define do
     slug { name.parameterize }
   end
 
-  factory :sequence do |s|
+  factory :sequence do |_s|
     association :patch
   end
 
@@ -47,7 +47,6 @@ FactoryGirl.define do
     slide { FFaker::Boolean.maybe }
     active_step { FFaker::Boolean.maybe }
   end
-
 
   factory :user do
     username { FFaker::Internet.user_name[0..19] }
