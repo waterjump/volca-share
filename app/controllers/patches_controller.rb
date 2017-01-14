@@ -212,6 +212,7 @@ class PatchesController < ApplicationController
   end
 
   def sequence_params
+    return {} unless params[:patch][:sequences].present?
     steps = params[:patch][:sequences].first.map { |k,v| v }
     good_keys = [:index, :note, :step_mode, :slide, :active_step]
     steps.each do |h|

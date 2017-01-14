@@ -6,6 +6,27 @@ $(function() {
   var display = new Display($('#led'));
   var limit = 140;
 
+  // TODO DRY this up
+  var midiMultiples = {
+    0: 'C',
+    1: 'C#',
+    2: 'D',
+    3: 'D#',
+    4: 'E',
+    5: 'F',
+    6: 'F#',
+    7: 'G',
+    8: 'G#',
+    9: 'A',
+    10: 'A#',
+    11: 'B',
+  };
+
+  var midiNoteNumbers = {};
+  for (i = 0; i < 128; i++) {
+    midiNoteNumbers[i] = midiMultiples[i % 12] + Math.floor(i / 12);
+  }
+
   var midiOut = new MidiOut;
 
   $('#midi-device').change(function(){
@@ -41,6 +62,16 @@ $(function() {
     if ($(this).find('span').find('div').data('active')) {
       $(this).find('span').find('div').addClass('lit');
     }
+  });
+
+  $('.sequence-light').each(function(){
+    if ($(this).data('active')) {
+      $(this).addClass('lit');
+    }
+  });
+
+  $('.step-note').each(function(){
+    $(this).html(midiNoteNumbers[parseInt($(this).data('note'))]);
   });
 
   $('.button').each(function(){

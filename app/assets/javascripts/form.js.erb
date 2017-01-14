@@ -9,6 +9,7 @@ $(function() {
   var clicked = false;
   var limit = 140;
   var activeNote;
+  var sequencesActive = false;
 
   var midiOut = new MidiOut;
 
@@ -32,9 +33,35 @@ $(function() {
     midiNoteNumbers[i] = midiMultiples[i % 12] + Math.floor(i / 12);
   }
 
-  $("#add-sequence").on('click tap', function(e) {
+  $("#toggle-sequences").on('click tap', function(e) {
+    var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
+    var sequenceCount;
+    switch(vcoGroup) {
+      case 'one':
+        sequenceCount = 3;
+        break;
+      case 'two':
+        sequenceCount = 2;
+        break;
+      case 'three':
+        sequenceCount = 1;
+        break;
+      default:
+        sequenceCount = 1;
+    }
     e.preventDefault();
-    $('.sequence-holder').append($('#new_choice_form').html());
+
+    if (sequencesActive === false) {
+      for (i = 0; i < sequenceCount; i++) {
+        $('.sequence-holder').append($('#new_choice_form').html());
+      }
+      $("#toggle-sequences").text('Remove sequences');
+      sequencesActive = true;
+    } else {
+      $('.sequence-holder').html('');
+      $("#toggle-sequences").text('Add sequences');
+      sequencesActive = false;
+    }
 
     $('.sequence-box').on('click tap', '.param span', function(){
       var myInput = $('input#' + $(this).attr('for'));

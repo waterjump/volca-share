@@ -120,17 +120,20 @@
       = label_tag 'patch[audio_sample]', 'Audio sample'
       .sample
         = @patch.audio_sample_code.try(:html_safe)
-
-    .form-detail-actions
-      - if @patch.user.present? && @patch.user == current_user
-        = link_to 'Edit', edit_patch_path(@patch.slug)
-        \|
-        = form_tag patch_path(@patch), method: :delete do
-          = submit_tag 'Delete', class: :link
-        \|
-      - else
-        %strong
-          = "To edit, delete, or make your patches browsable, "
-          = link_to 'create an account', new_user_registration_path
-        %br
-      = link_to 'Back', patch_path
+  .col-sm-12
+    .field.sequence-area
+      - if @patch.sequences.present?
+        = render 'sequences/show'
+      .form-detail-actions
+        - if @patch.user.present? && @patch.user == current_user
+          = link_to 'Edit', edit_patch_path(@patch.slug)
+          \|
+          = form_tag patch_path(@patch), method: :delete do
+            = submit_tag 'Delete', class: :link
+          \|
+        - else
+          %strong
+            = "To edit, delete, or make your patches browsable, "
+            = link_to 'create an account', new_user_registration_path
+          %br
+        = link_to 'Back', patch_path

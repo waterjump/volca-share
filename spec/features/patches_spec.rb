@@ -58,17 +58,8 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   before(:each) { visit root_path }
 
-  scenario 'can be created by users' do
-    login
-
-    visit root_path
-    expect(page).to have_link 'New Patch'
-
+  scenario 'have initialized values' do
     click_link 'new-patch'
-    expect(page).to have_title('New Patch | VolcaShare')
-    expect(current_path).to eq(new_patch_path)
-    expect(page.status_code).to eq(200)
-
     bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(
       page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
@@ -80,6 +71,18 @@ RSpec.feature 'patches', type: :feature, js: true do
       page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
     )
       .not_to eq(nil) # vco3_wave
+  end
+
+  scenario 'can be created by users' do
+    login
+
+    visit root_path
+    expect(page).to have_link 'New Patch'
+
+    click_link 'new-patch'
+    expect(page).to have_title('New Patch | VolcaShare')
+    expect(current_path).to eq(new_patch_path)
+    expect(page.status_code).to eq(200)
 
     dummy_patch = FactoryGirl.build(
       :patch,
@@ -143,17 +146,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
     expect(page).not_to have_content('Secret?')
-    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
-    expect(
-      page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
-    ).not_to eq(nil) # vco_group 3
-    expect(
-      page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
-    ).not_to eq(nil) # lfo_target_cutoff
-    expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
-    )
-      .not_to eq(nil) # vco3_wave
 
     dummy_patch = FactoryGirl.build(:patch)
 

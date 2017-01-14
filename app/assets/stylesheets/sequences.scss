@@ -1,0 +1,81 @@
+
+.sequence-form, .sequence-show{
+  padding-bottom: 10.4%;
+  padding-left: 2.1%;
+  padding-right: 3.2%;
+  position: relative;
+  max-width: 830px;
+  width: 100%;
+  margin: 3% 0;
+  input[type="radio"], input[type="checkbox"]  {
+    display:none;
+  }
+  .outer-sequence-box {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+  .sequence-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .param-labels {
+    float: left;
+    display: inline;
+    height: 100%;
+    width: 9.6%;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-weight: 800;
+    font-stretch: condensed;
+    font-size: smaller;
+  }
+  .note {
+    margin-bottom: 15%;
+  }
+  .param {
+    height: 25%;
+  }
+  .step {
+    float: left;
+    display: inline;
+    height: 100%;
+    width: 5.6%;
+    .note{
+      text-align: center;
+      font-size: 18px;
+      position: relative;
+      top: -3px;
+      span {
+        cursor: ns-resize;
+      }
+
+    }
+    label {
+      width: 100%;
+      height: 100%;
+    }
+    .step-mode, .slide, .active-step {
+      span {
+         cursor: pointer;
+      }
+    }
+    span {
+      width: 89%;
+      height: 89%;
+      position: relative;
+      display: inline-block;
+
+      .light {
+        width: 36.3%;
+        height: 59%;
+        border-radius: 50%;
+        background-color: gray;
+        left: 37%;
+        border: black solid;
+        position: absolute;
+      }
+    }
+  }
+}
