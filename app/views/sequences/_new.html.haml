@@ -9,23 +9,23 @@
       - 16.times do |num|
         .step
           .note.param
-            = hidden_field_tag "patch[sequences][][step_#{num + 1}[index]]]", num + 1
-            = hidden_field_tag "patch[sequences][][step_#{num + 1}[note]]]", 60
-            = label_tag("patch[sequences][][step_#{num + 1}[note]]]") do
+            = hidden_field_tag "patch[sequences][QQQ][step_#{num + 1}[index]]]", num + 1
+            = hidden_field_tag "patch[sequences][QQQ][step_#{num + 1}[note]]]", 60
+            = label_tag("patch[sequences][QQQ][step_#{num + 1}[note]]]") do
               %span{ data: { starting_note: 60 } }
                 C5
           .step-mode.param
-            = check_box "patch[sequences][][step_#{num + 1}", :step_mode, { checked: true }, 'true', 'false'
-            = label_tag("patch[sequences][][step_#{num + 1}[step_mode]]]") do
+            = check_box "patch[sequences][QQQ][step_#{num + 1}", :step_mode, { checked: true }, 'true', 'false'
+            = label_tag("patch[sequences][QQQ][step_#{num + 1}[step_mode]]]") do
               %span
                 .light.sequence-light{ data: { active: true } }
           .slide.param
-            = check_box "patch[sequences][][step_#{num + 1}", :slide, {}, 'true', 'false'
-            = label_tag("patch[sequences][][step_#{num + 1}[slide]]]") do
+            = check_box "patch[sequences][QQQ][step_#{num + 1}", :slide, {}, 'true', 'false'
+            = label_tag("patch[sequences][QQQ][step_#{num + 1}[slide]]]") do
               %span
                 .light.sequence-light{ data: { active: false } }
           .active-step.param
-            = check_box "patch[sequences][][step_#{num + 1}", :active_step, { checked: true }, 'true', 'false'
-            = label_tag("patch[sequences[][step_#{num + 1}[active_step]]]") do
+            = check_box "patch[sequences][QQQ][step_#{num + 1}", :active_step, { checked: true }, 'true', 'false'
+            = label_tag("patch[sequences[QQQ][step_#{num + 1}[active_step]]]") do
               %span
                 .light.sequence-light{ data: { active: true } }

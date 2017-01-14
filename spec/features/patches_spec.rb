@@ -240,18 +240,18 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
     click_button 'Save'
-    expect(page).to have_content 'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
+    expect(page).to have_content('Audio sample needs to be direct SoundCloud, Freesound or YouTube link.')
 
     # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
     click_button 'Save'
-    expect(page).to have_content 'Patch saved successfully.'
+    expect(page).to have_content('Patch saved successfully.')
 
     # Freesound
     visit edit_patch_path(patch.slug)
     fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
-    expect(page).to have_content 'Patch saved successfully.'
+    expect(page).to have_content('Patch saved successfully.')
   end
 
   scenario 'can be randomized' do

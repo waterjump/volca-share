@@ -57,17 +57,16 @@ class PatchesController < ApplicationController
         Patch.new(@patch_params.except(:sequences))
       end
     if @patch_params[:sequences].present?
-      sequence = @patch.sequences.build
-      @patch_params[:sequences].each do |step|
-        sequence.steps.build(step)
+      @patch_params[:sequences].each do |seq|
+        sequence = @patch.sequences.build
+        seq[:steps].each do |step|
+          sequence.steps.build(step)
+        end
       end
     end
-    Rails.logger.info "69BOT - @patch_params: #{@patch_params}"
-    # if @patch_params[:sequences].present?
-    #   @patch.sequences.build(steps: @patch_params[:sequences].first.values)
-    # end
+
     respond_to do |format|
-      if @patch.user.present? && @patch.save
+      if @patch.user.present? && @patch.save!
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),
@@ -75,7 +74,7 @@ class PatchesController < ApplicationController
           )
         end
         format.json { render :show, status: :created, location: @patch }
-      elsif verify_recaptcha(model: @patch) && @patch.save
+      elsif verify_recaptcha(model: @patch) && @patch.save!
         format.html do
           redirect_to(
             patch_url(@patch.id),
@@ -173,52 +172,24 @@ class PatchesController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
     @patch_params ||= params[:patch].permit!.merge!(sequences: sequence_params)
-    # (
-    #   :name,
-    #   :attack,
-    #   :decay_release,
-    #   :cutoff_eg_int,
-    #   :octave,
-    #   :peak,
-    #   :cutoff,
-    #   :lfo_rate,
-    #   :lfo_int,
-    #   :vco1_pitch,
-    #   :vco1_active,
-    #   :vco2_pitch,
-    #   :vco2_active,
-    #   :vco3_pitch,
-    #   :vco3_active,
-    #   :vco_group,
-    #   :lfo_target_amp,
-    #   :lfo_target_pitch,
-    #   :lfo_target_cutoff,
-    #   :lfo_wave,
-    #   :vco1_wave,
-    #   :vco2_wave,
-    #   :vco3_wave,
-    #   :sustain_on,
-    #   :amp_eg_on,
-    #   :secret,
-    #   :notes,
-    #   :tags,
-    #   :slide_time,
-    #   :expression,
-    #   :gate_time,
-    #   :audio_sample,
-    #   :slug
-    # )
-
   end
 
   def sequence_params
     return {} unless params[:patch][:sequences].present?
-    steps = params[:patch][:sequences].first.map { |k,v| v }
+    paramz = []
     good_keys = [:index, :note, :step_mode, :slide, :active_step]
-    steps.each do |h|
-      h.reject do |k,v|
-        !good_keys.include?(k)
-      end
+    params[:patch][:sequences].values.each do |seq|
+      sequence = {}
+      sequence.merge!(
+        steps:
+          seq.each do |step|
+            step.reject do |k, v|
+              !good_keys.include?(k)
+            end
+          end.values
+      )
+      paramz << sequence
     end
+    paramz
   end
 end
