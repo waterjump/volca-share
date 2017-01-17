@@ -149,9 +149,8 @@ class PatchesController < ApplicationController
     return true unless sequence_params[:new_sequences].present?
     sequence_params[:new_sequences].each do |seq|
       sequence = @patch.sequences.build
-      seq[:steps].each do |step|
-        sequence.steps.build(step)
-      end
+      sequence.steps_attributes = seq[:steps_attributes]
+      sequence.save
     end
     @patch.save
   end
@@ -159,8 +158,9 @@ class PatchesController < ApplicationController
   def existing_sequences
     return true unless sequence_params[:existing_sequences].present?
     sequence_params[:existing_sequences].each do |sequence|
-      seq_to_update = @patch.sequences.detect { |seq| seq._id.to_s == sequence[:id] }
-      seq_to_update.update(sequence)
+      seq_to_update = @patch.sequences.find(sequence[:id])
+      seq_to_update.steps_attributes = sequence[:steps_attributes]
+      seq_to_update.save
     end.all?
   end
 
@@ -168,7 +168,8 @@ class PatchesController < ApplicationController
     return true unless sequence_params[:sequences_to_delete].present?
     sequence_params[:sequences_to_delete].each do |k, value|
       next unless value == 'true'
-      @patch.sequences.detect { |seq| k == seq.id.to_s }.destroy
+      byebug
+      @patch.sequences.destroy_all(_id: BSON::ObjectId(k))
     end
     @patch.save
   end
@@ -227,10 +228,10 @@ class PatchesController < ApplicationController
   end
 
   def format_sequence(seq)
-    good_keys = [:index, :note, :step_mode, :slide, :active_step]
+    good_keys = [:id, :index, :note, :step_mode, :slide, :active_step]
     sequence = {}
     sequence[:id] = seq[:id] if seq[:id].present?
-    sequence[:steps] = seq.except(:id).each do |step|
+    sequence[:steps_attributes] = seq.except(:id).each do |step|
       step.reject do |k, _v|
         !good_keys.include?(k)
       end

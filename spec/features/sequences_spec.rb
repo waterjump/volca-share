@@ -199,9 +199,10 @@ RSpec.feature 'sequences', type: :feature, js: true do
   scenario 'can be deleted' do
     steps_1 = []
     steps_2 = []
-    16.times do
-      steps_1 << create(:step)
-      steps_2 << create(:step)
+
+    16.times do |index|
+      steps_1 << create(:step, index: index + 1)
+      steps_2 << create(:step, index: index + 1)
     end
 
     sequence_1 = create(:sequence, steps: steps_1)
@@ -209,6 +210,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     patch = FactoryGirl.create(
       :patch,
+      name: '666',
       user_id: user.id,
       sequences: [sequence_1, sequence_2]
     )
@@ -223,6 +225,9 @@ RSpec.feature 'sequences', type: :feature, js: true do
     page.first('.remove-sequence').trigger('click')
 
     click_button 'Save'
+    patch = Patch.find_by(name: '666')
+    expect(patch.sequences.count).to eq(1)
+    expect(patch.sequences.first.steps.count).to eq(16)
     expect(page).to have_selector('.sequence-box', count: 1)
   end
 end

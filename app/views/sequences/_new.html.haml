@@ -13,6 +13,8 @@
         = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][id]", sequence.id
       - 16.times do |num|
         - step = VolcaShare::StepViewModel.wrap(sequence.steps[num]) if sequence.present?
+        - if step.present?
+          = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[id]]]", step.id
         .step{ class: (num + 1) % 4 == 0 ? 'line' : '' }
           .note.param
             = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[index]]]", num + 1
