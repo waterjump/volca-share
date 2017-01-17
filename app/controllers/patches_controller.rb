@@ -52,17 +52,12 @@ class PatchesController < ApplicationController
     @patch_params[:slug] = @patch_params[:name].parameterize
     @patch =
       if user.present?
-        user.patches.build(@patch_params.except(:sequences))
+        user.patches.build(@patch_params)
       else
-        Patch.new(@patch_params.except(:sequences))
+        Patch.new(@patch_params)
       end
-    if @patch_params[:sequences].present?
-      @patch_params[:sequences].each do |seq|
-        sequence = @patch.sequences.build
-        seq[:steps].each do |step|
-          sequence.steps.build(step)
-        end
-      end
+    if sequence_params.present?
+      update_sequences
     end
 
     respond_to do |format|
@@ -98,7 +93,7 @@ class PatchesController < ApplicationController
     respond_to do |format|
       format_tags
       @patch_params[:slug] = @patch_params[:name].parameterize
-      if @patch.update(@patch_params)
+      if @patch.update(@patch_params) && update_sequences
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),
@@ -144,6 +139,40 @@ class PatchesController < ApplicationController
 
   private
 
+  def update_sequences
+    new_sequences &&
+      existing_sequences &&
+      remove_sequences
+  end
+
+  def new_sequences
+    return true unless sequence_params[:new_sequences].present?
+    sequence_params[:new_sequences].each do |seq|
+      sequence = @patch.sequences.build
+      seq[:steps].each do |step|
+        sequence.steps.build(step)
+      end
+    end
+    @patch.save
+  end
+
+  def existing_sequences
+    return true unless sequence_params[:existing_sequences].present?
+    sequence_params[:existing_sequences].each do |sequence|
+      seq_to_update = @patch.sequences.detect { |seq| seq._id.to_s == sequence[:id] }
+      seq_to_update.update(sequence)
+    end.all?
+  end
+
+  def remove_sequences
+    return true unless sequence_params[:sequences_to_delete].present?
+    sequence_params[:sequences_to_delete].each do |k, value|
+      next unless value == 'true'
+      @patch.sequences.detect { |seq| k == seq.id.to_s }.destroy
+    end
+    @patch.save
+  end
+
   # Use callbacks to share common setup or constraints between actions.
   def set_patch
     patch_model =
@@ -173,22 +202,39 @@ class PatchesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    @patch_params ||= params[:patch].permit!.merge!(sequences: sequence_params)
+    @patch_params ||= params[:patch].permit!
   end
 
   def sequence_params
-    return {} unless params[:patch][:sequences].present?
+    return {} unless params[:patch].slice(:new_sequences, :existing_sequences, :sequences_to_delete).present?
+    return @sequence_params if @sequence_params.present?
+
+    final_return = {}
+    final_return[:new_sequences] = cycle_sequences(params[:patch][:new_sequences])
+    final_return[:existing_sequences] = cycle_sequences(params[:patch][:existing_sequences])
+    final_return[:sequences_to_delete] = (params[:patch][:sequences_to_delete] || {})
+
+    @sequence_params ||= final_return
+  end
+
+  def cycle_sequences(hash)
+    return {} unless hash.present?
     paramz = []
-    good_keys = [:index, :note, :step_mode, :slide, :active_step]
-    params[:patch][:sequences].values.each do |seq|
-      sequence = {}
-      sequence[:steps] = seq.each do |step|
-        step.reject do |k, _v|
-          !good_keys.include?(k)
-        end
-      end.values
-      paramz << sequence
+    hash.values.each do |seq|
+      paramz << format_sequence(seq)
     end
     paramz
+  end
+
+  def format_sequence(seq)
+    good_keys = [:index, :note, :step_mode, :slide, :active_step]
+    sequence = {}
+    sequence[:id] = seq[:id] if seq[:id].present?
+    sequence[:steps] = seq.except(:id).each do |step|
+      step.reject do |k, _v|
+        !good_keys.include?(k)
+      end
+    end.values
+    sequence
   end
 end

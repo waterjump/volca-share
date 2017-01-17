@@ -100,9 +100,9 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 3)
     expect(page).not_to have_link 'Add sequences'
     expect(page).to have_link 'Remove sequences'
-    page.find('label[for=patch_sequences_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_1_step_2_slide]').trigger('click')
-    page.find('label[for=patch_sequences_2_step_3_active_step]').trigger('click')
+    page.find('label[for=patch_new_sequences_0_step_1_step_mode]').trigger('click')
+    page.find('label[for=patch_new_sequences_1_step_2_slide]').trigger('click')
+    page.find('label[for=patch_new_sequences_2_step_3_active_step]').trigger('click')
 
     click_button 'Save'
     expect(Patch.first.sequences.count).to eq(3)
@@ -157,9 +157,9 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    page.find('label[for=patch_sequences_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_0_step_2_slide]').trigger('click')
-    page.find('label[for=patch_sequences_0_step_3_active_step]').trigger('click')
+    page.find('label[for=patch_new_sequences_0_step_1_step_mode]').trigger('click')
+    page.find('label[for=patch_new_sequences_0_step_2_slide]').trigger('click')
+    page.find('label[for=patch_new_sequences_0_step_3_active_step]').trigger('click')
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
@@ -176,11 +176,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'new-patch'
 
-    dummy_patch = FactoryGirl.build(
-      :patch,
-      name: 'My Cool Patch',
-      notes: 'This patch is cool.'
-    )
+    dummy_patch = FactoryGirl.build(:patch)
 
     fill_out_patch_form(dummy_patch)
     find("#{bottom_row} > label:nth-child(4)").click  # vco_group_two
@@ -188,15 +184,45 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-form')
-    page.find('label[for=patch_sequences_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_1_step_2_slide]').trigger('click')
+    page.find('label[for=patch_new_sequences_0_step_1_step_mode]').trigger('click')
+    page.find('label[for=patch_new_sequences_1_step_2_slide]').trigger('click')
 
     click_button 'Save'
     expect(page).to have_link('Edit')
 
     click_link 'Edit'
     expect(page).to have_selector('.sequence-form')
-    expect(page.find('#patch_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
-    expect(page.find('#patch_sequences_1_step_2_step_mode_light')).not_to have_css('lit')
+    expect(page.find('#patch_existing_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
+    expect(page.find('#patch_existing_sequences_1_step_2_step_mode_light')).not_to have_css('lit')
+  end
+
+  scenario 'can be deleted' do
+    steps_1 = []
+    steps_2 = []
+    16.times do
+      steps_1 << create(:step)
+      steps_2 << create(:step)
+    end
+
+    sequence_1 = create(:sequence, steps: steps_1)
+    sequence_2 = create(:sequence, steps: steps_2)
+
+    patch = FactoryGirl.create(
+      :patch,
+      user_id: user.id,
+      sequences: [sequence_1, sequence_2]
+    )
+
+    login
+    visit patch_path(patch)
+    expect(page).to have_link('Edit')
+
+    click_link 'Edit'
+    expect(page).to have_selector('.sequence-box', count: 2)
+    expect(page).to have_selector('.remove-sequence', count: 2)
+    page.first('.remove-sequence').trigger('click')
+
+    click_button 'Save'
+    expect(page).to have_selector('.sequence-box', count: 1)
   end
 end

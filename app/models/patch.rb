@@ -6,6 +6,10 @@ class Patch
   include Mongoid::Document::Taggable
   include ActiveModel::Validations
 
+  attr_accessor :new_sequences
+  attr_accessor :existing_sequences
+  attr_accessor :sequences_to_delete
+
   field :name, type: String
   field :attack, type: Integer
   field :decay_release, type: Integer
