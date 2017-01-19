@@ -1,6 +1,5 @@
 - seq_num ||= 'QQQ'
 - sequence ||= nil
-- parameter_name = sequence.present? ? 'existing_sequences' : 'new_sequences'
 .sequence-form
   .outer-sequence-box
     .sequence-box
@@ -10,34 +9,33 @@
         .step-mode.param Step Mode
         .active-step.param Active Step
       - if sequence.present?
-        = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][id]", sequence.id
+        = hidden_field_tag "patch[sequences_attributes][#{seq_num}][id]", sequence.id
       - 16.times do |num|
         - step = VolcaShare::StepViewModel.wrap(sequence.steps[num]) if sequence.present?
         - if step.present?
-          = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[id]]]", step.id
+          = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[id]]]", step.id
         .step{ class: (num + 1) % 4 == 0 ? 'line' : '' }
           .note.param
-            = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[index]]]", num + 1
-            = hidden_field_tag "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[note]]]", step.try(:note) || 60
-            = label_tag("patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[note]]]") do
+            = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[index]]]", num + 1
+            = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]", step.try(:note) || 60
+            = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]") do
               %span.note-display{ data: { 'starting-note' => step.try(:note) || 60 } }
                 C5
           .slide.param
-            = check_box "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}", :slide, step.try(:slide_checked) || {}, 'true', 'false'
-            = label_tag("patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[slide]]]") do
+            = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :slide, step.try(:slide_checked) || {}, 'true', 'false'
+            = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[slide]]]") do
               %span
-                .light.sequence-light{ id: "patch_#{parameter_name}_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: step.try(:slide) || false } }
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: step.try(:slide) || false } }
           .step-mode.param
-            = check_box "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}", :step_mode, step.try(:step_mode_checked) || { checked: true }, 'true', 'false'
-            = label_tag("patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[step_mode]]]") do
+            = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :step_mode, step.try(:step_mode_checked) || { checked: true }, 'true', 'false'
+            = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[step_mode]]]") do
               %span
-                .light.sequence-light{ id: "patch_#{parameter_name}_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: step.try(:step_mode) || true } }
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: step.try(:step_mode) || true } }
           .active-step.param
-            = check_box "patch[#{parameter_name}][#{seq_num}][step_#{num + 1}", :active_step, step.try(:active_step_checked) || { checked: true }, 'true', 'false'
-            = label_tag("patch[#{parameter_name}][#{seq_num}][step_#{num + 1}[active_step]]]") do
+            = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :active_step, step.try(:active_step_checked) || { checked: true }, 'true', 'false'
+            = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
               %span
-                .light.sequence-light{ id: "patch_#{parameter_name}_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || true } }
-      - if sequence.present?
-        .remove-area
-          %span Remove
-          = check_box "patch[sequences_to_delete]", sequence.id, { data: { sequence_id: sequence.id }, class: 'remove-sequence' }, 'true', 'false'
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || true } }
+      .remove-area
+        %span Remove
+        = check_box "patch[sequences_attributes][#{seq_num}]", :destroy, { data: { sequence_id: sequence.try(:id) }, class: 'remove-sequence' }, '1', '0'

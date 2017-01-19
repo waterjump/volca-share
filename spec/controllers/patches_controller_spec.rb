@@ -24,7 +24,7 @@ RSpec.describe PatchesController, type: :controller do
   # Patch. As you add validations to Patch, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) do
-    attributes_for(:patch, user_id: 123)
+    attributes_for(:patch, secret: false)
   end
 
   let(:invalid_attributes) do
@@ -42,7 +42,7 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #index' do
     it 'assigns all patches as @patches' do
-      patch = Patch.create! valid_attributes
+      patch = Patch.create! valid_attributes.merge(user_id: '123')
       get :index
       expect(assigns(:patches)).to eq([patch])
     end

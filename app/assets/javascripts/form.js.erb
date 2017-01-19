@@ -10,12 +10,12 @@ $(function() {
   var limit = 140;
   var activeNote;
   var sequencesActive = false;
+  var sequenceCount = 0;
 
   var midiOut = new MidiOut;
 
   $("#toggle-sequences").on('click tap', function(e) {
     var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
-    var sequenceCount;
     switch(vcoGroup) {
       case 'one':
         sequenceCount = 3;
@@ -193,6 +193,62 @@ $(function() {
       $('.light[data-radio]').each(function() {
         $(this).removeClass('lit');
       });
+      if (sequencesActive) {
+        var vcoGroup = $('input#' + $(this).attr('for')).val();
+        var mySequenceCount, sequenceCount;
+        switch(vcoGroup) {
+          case 'one':
+            mySequenceCount = 3;
+            break;
+          case 'two':
+            mySequenceCount = 2;
+            break;
+          case 'three':
+            mySequenceCount = 1;
+            break;
+          default:
+            mySequenceCount = 1;
+        }
+        var checkboxes = $('.remove-sequence').toArray();
+        var difference;
+        var sequenceCount = checkboxes.length - 1;
+        var activeSequenceCount = $(".remove-sequence[type='checkbox']:not(:checked)").toArray().length - 1;
+        var containers = $('.sequence-form').toArray();
+
+        if (mySequenceCount > activeSequenceCount) {
+          if (mySequenceCount > sequenceCount) {
+            // uncheck all boxes
+            $('.remove-sequence').each(function(){
+              $(this).prop('checked', false);
+              $(this).removeAttr('disabled');
+            });
+            $('.sequence-form').each(function(){
+              $(this).css('opacity', '1.0')
+            });
+            //add sequences
+            difference = mySequenceCount - sequenceCount;
+            for (i = activeSequenceCount; i < activeSequenceCount + difference; i++ ) {
+              var content = $('#new_choice_form').html().replace(/QQQ/g, i);
+              $('.sequence-holder').append(content);
+            }
+          } else {
+            //uncheck boxes
+            for (i = 0; i < mySequenceCount; i++ ) {
+              $(checkboxes[i]).prop('checked', false);
+              $(checkboxes[i]).removeAttr('disabled');
+              $(containers[i]).css('opacity', '1.0');
+            }
+          }
+        } else if (activeSequenceCount > mySequenceCount) {
+          //check boxes
+          difference = activeSequenceCount - mySequenceCount;
+          for (i = checkboxes.length - 2; i > (activeSequenceCount - 1 - difference); i--) {
+            $(checkboxes[i]).prop('checked', true);
+            $(checkboxes[i]).attr('disabled', true);
+            $(containers[i]).css('opacity', '0.5');
+          }
+        }
+      }
       $(this).find('span .light').addClass('lit');
     }
   });

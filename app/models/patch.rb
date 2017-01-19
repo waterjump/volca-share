@@ -6,10 +6,6 @@ class Patch
   include Mongoid::Document::Taggable
   include ActiveModel::Validations
 
-  attr_accessor :new_sequences
-  attr_accessor :existing_sequences
-  attr_accessor :sequences_to_delete
-
   field :name, type: String
   field :attack, type: Integer
   field :decay_release, type: Integer
@@ -45,6 +41,7 @@ class Patch
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
   embeds_many :sequences, class_name: 'Sequence'
+  accepts_nested_attributes_for :sequences, limit: 3, allow_destroy: true
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug

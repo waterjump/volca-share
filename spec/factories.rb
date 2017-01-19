@@ -52,6 +52,6 @@ FactoryGirl.define do
     username { FFaker::Internet.user_name[0..19] }
     email { FFaker::Internet.email }
     password { Devise.friendly_token.first(8) }
-    slug { username. parameterize }
+    slug { username.parameterize }
   end
 end

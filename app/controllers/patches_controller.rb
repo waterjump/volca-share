@@ -1,5 +1,6 @@
 class PatchesController < ApplicationController
   before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
+  before_action :format_tags, only: [:create, :update]
   before_action :authenticate_user!, except: [
     :index,
     :show,
@@ -48,23 +49,21 @@ class PatchesController < ApplicationController
   # POST /patches.json
   def create
     user = current_user
-    format_tags
     @patch_params[:slug] = @patch_params[:name].parameterize
     @patch =
       if user.present?
-        user.patches.build(@patch_params)
+        user.patches.new
       else
-        Patch.new(@patch_params)
+        Patch.new
       end
-    if sequence_params.present?
-      update_sequences
-    end
+
+    @patch.attributes = all_attributes
 
     respond_to do |format|
       if @patch.user.present? && @patch.save
         format.html do
           redirect_to(
-            user_patch_url(@patch.user.slug, @patch.slug),
+            patch_location,
             notice: 'Patch saved successfully.'
           )
         end
@@ -72,7 +71,7 @@ class PatchesController < ApplicationController
       elsif verify_recaptcha(model: @patch) && @patch.save
         format.html do
           redirect_to(
-            patch_url(@patch.id),
+            patch_location,
             notice: 'Patch saved successfully.'
           )
         end
@@ -91,9 +90,8 @@ class PatchesController < ApplicationController
   # PATCH/PUT /patches/1.json
   def update
     respond_to do |format|
-      format_tags
       @patch_params[:slug] = @patch_params[:name].parameterize
-      if @patch.update(@patch_params) && update_sequences
+      if @patch.update_attributes(all_attributes) # && update_sequences
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),
@@ -139,41 +137,6 @@ class PatchesController < ApplicationController
 
   private
 
-  def update_sequences
-    new_sequences &&
-      existing_sequences &&
-      remove_sequences
-  end
-
-  def new_sequences
-    return true unless sequence_params[:new_sequences].present?
-    sequence_params[:new_sequences].each do |seq|
-      sequence = @patch.sequences.build
-      sequence.steps_attributes = seq[:steps_attributes]
-      sequence.save
-    end
-    @patch.save
-  end
-
-  def existing_sequences
-    return true unless sequence_params[:existing_sequences].present?
-    sequence_params[:existing_sequences].each do |sequence|
-      seq_to_update = @patch.sequences.find(sequence[:id])
-      seq_to_update.steps_attributes = sequence[:steps_attributes]
-      seq_to_update.save
-    end.all?
-  end
-
-  def remove_sequences
-    return true unless sequence_params[:sequences_to_delete].present?
-    sequence_params[:sequences_to_delete].each do |k, value|
-      next unless value == 'true'
-      byebug
-      @patch.sequences.destroy_all(_id: BSON::ObjectId(k))
-    end
-    @patch.save
-  end
-
   # Use callbacks to share common setup or constraints between actions.
   def set_patch
     patch_model =
@@ -203,17 +166,20 @@ class PatchesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    @patch_params ||= params[:patch].permit!
+    @patch_params ||= params.require(:patch).permit!.merge!(sequence_params)
+  end
+
+  def all_attributes
+    @all_attributes ||= params[:patch].except(:sequences_attributes).merge!(sequence_params)
   end
 
   def sequence_params
-    return {} unless params[:patch].slice(:new_sequences, :existing_sequences, :sequences_to_delete).present?
+    return {} unless params[:patch].slice(:sequences_attributes).present?
     return @sequence_params if @sequence_params.present?
 
     final_return = {}
-    final_return[:new_sequences] = cycle_sequences(params[:patch][:new_sequences])
-    final_return[:existing_sequences] = cycle_sequences(params[:patch][:existing_sequences])
-    final_return[:sequences_to_delete] = (params[:patch][:sequences_to_delete] || {})
+    final_return[:sequences_attributes] =
+      cycle_sequences(params[:patch][:sequences_attributes])
 
     @sequence_params ||= final_return
   end
@@ -228,10 +194,11 @@ class PatchesController < ApplicationController
   end
 
   def format_sequence(seq)
-    good_keys = [:id, :index, :note, :step_mode, :slide, :active_step]
+    good_keys = [:id, :index, :note, :step_mode, :slide, :active_step, :_destroy]
     sequence = {}
     sequence[:id] = seq[:id] if seq[:id].present?
-    sequence[:steps_attributes] = seq.except(:id).each do |step|
+    sequence[:_destroy] = seq[:destroy] if seq[:destroy].present?
+    sequence[:steps_attributes] = seq.except(:id, :destroy).each do |step|
       step.reject do |k, _v|
         !good_keys.include?(k)
       end
