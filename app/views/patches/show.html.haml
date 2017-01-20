@@ -118,8 +118,7 @@
         = @patch.notes
     - if @patch.audio_sample.present?
       = label_tag 'patch[audio_sample]', 'Audio sample'
-      .sample
-        = @patch.audio_sample_code.try(:html_safe)
+      .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
   .col-sm-12
     .field.sequence-area
       - if @patch.sequences.present?

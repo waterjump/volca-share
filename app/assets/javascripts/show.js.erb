@@ -5,8 +5,14 @@ $(function() {
   var activeKnob, knob;
   var display = new Display($('#led'));
   var limit = 140;
-
   var midiOut = new MidiOut;
+
+  var loadAudioSample = function(){
+    var element = $('.sample');
+    if (element.data('embed-code') !== undefined){
+      element.html(element.data('embed-code'));
+    }
+  }
 
   $('#midi-device').change(function(){
     midiOut.changeOutput(this);
@@ -63,6 +69,8 @@ $(function() {
       vcoKnob.addClass('lit');
     }
   });
+
+  loadAudioSample();
 
   $('.knob').mouseenter(function(){
     var midi = $(this).data('midi');
