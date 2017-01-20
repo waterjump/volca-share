@@ -106,10 +106,10 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_button 'Save'
     expect(Patch.first.sequences.count).to eq(3)
-    expect(page).to have_selector('.sequence-box', count: 3)
-    expect(page.find('#patch_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
-    expect(page.find('#patch_sequences_1_step_2_slide_light')['data-active']).to eq('true')
-    expect(page.find('#patch_sequences_2_step_3_active_step_light')).not_to have_css('lit')
+    expect(page).to       have_selector('.sequence-box', count: 3)
+    expect(page).not_to   have_css('#patch_sequences_0_step_1_step_mode_light.lit')
+    expect(page).to       have_css('#patch_sequences_1_step_2_slide_light.lit')
+    expect(page).not_to   have_css('#patch_sequences_2_step_3_active_step_light.lit')
   end
 
   scenario 'are limited to two when VCO group two is selected' do
@@ -157,15 +157,54 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_attributes_0_step_2_slide]').trigger('click')
-    page.find('label[for=patch_sequences_attributes_0_step_3_active_step]').trigger('click')
+    page.find('#patch_sequences_attributes_0_step_1_note_display')
+      .drag_to(seq_form_light(0, 1, 'slide'))
+    seq_form_light(0, 1, 'slide').trigger('click')
+    seq_form_light(0, 5, 'slide').trigger('click')
+    seq_form_light(0, 6, 'slide').trigger('click')
+    seq_form_light(0, 9, 'slide').trigger('click')
+    seq_form_light(0, 10, 'slide').trigger('click')
+    seq_form_light(0, 11, 'slide').trigger('click')
+    seq_form_light(0, 13, 'slide').trigger('click')
+    seq_form_light(0, 14, 'slide').trigger('click')
+    seq_form_light(0, 15, 'slide').trigger('click')
+    seq_form_light(0, 16, 'slide').trigger('click')
+
+    seq_form_light(0, 3, 'step_mode').trigger('click')
+    seq_form_light(0, 7, 'step_mode').trigger('click')
+    seq_form_light(0, 11, 'step_mode').trigger('click')
+    seq_form_light(0, 15, 'step_mode').trigger('click')
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
-    expect(page.find('#patch_sequences_0_step_1_step_mode_light')).not_to have_css('lit')
-    expect(page.find('#patch_sequences_0_step_2_slide_light')['data-active']).to eq('true')
-    expect(page.find('#patch_sequences_0_step_3_active_step_light')).not_to have_css('lit')
+    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('D#4')
+    expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_6_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_9_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_10_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_11_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_14_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_15_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_16_slide_light.lit')
+
+    expect(page).to have_css('#patch_sequences_0_step_1_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_2_step_mode_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_3_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_4_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_5_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_6_step_mode_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_8_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_9_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_10_step_mode_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_11_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_12_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_13_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_14_step_mode_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_15_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
   end
 
   scenario 'can be edited' do

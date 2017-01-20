@@ -19,7 +19,7 @@
             = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[index]]]", num + 1
             = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]", step.try(:note) || 60
             = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]") do
-              %span.note-display{ data: { 'starting-note' => step.try(:note) || 60 } }
+              %span.note-display{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_note_display", data: { 'starting-note' => step.try(:note) || 60 } }
                 C5
           .slide.param
             = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :slide, step.try(:slide_checked) || {}, 'true', 'false'

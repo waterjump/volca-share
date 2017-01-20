@@ -49,3 +49,9 @@ def range_select(name, value)
   script = %-$("#{selector}").val(#{value})-
   page.execute_script(script)
 end
+
+def seq_form_light(seq, step, param)
+  page.find(
+    "label[for=patch_sequences_attributes_#{seq}_step_#{step}_#{param}]"
+  )
+end

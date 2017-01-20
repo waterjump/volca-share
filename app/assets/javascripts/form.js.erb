@@ -45,11 +45,10 @@ $(function() {
     }
 
     $('.sequence-box').on('click tap', '.param span', function(){
-      var myInput = $('input#' + $(this).attr('for'));
       $(this).find('.light').toggleClass('lit');
     });
 
-    $('.sequence-box span').on('mousedown touchstart', function(f){
+    $('span.note-display').on('mousedown touchstart', function(f){
       clickedPoint = f.pageY || Math.round(f.originalEvent.touches[0].pageY);
       f.preventDefault();
       f.stopPropagation();
@@ -67,7 +66,6 @@ $(function() {
   });
 
   $('.sequence-box').on('click tap', '.param span', function(){
-    var myInput = $('input#' + $(this).attr('for'));
     $(this).find('.light').toggleClass('lit');
   });
 
@@ -80,7 +78,7 @@ $(function() {
     activeKnob = null;
   });
 
-  $('.sequence-box label').each(function(){
+  $('.sequence-box label').on('click tap', function(){
     var myInput = $('input#' + $(this).attr('for'));
     if (myInput.prop('checked')) {
       $(this).find('span').find('div').addClass('lit');
@@ -368,10 +366,12 @@ $(function() {
         }
         $(activeKnob.element).data('rotation', currentAngle);
         $(activeKnob.element).data('midi', midi);
+        activeKnob = null;
       } else if (activeNote !== null) {
         activeNote.data('starting-note', activeNote.data('note'));
         var inputId = activeNote["0"].parentNode.attributes["0"].value
         $('input#' + inputId).val(activeNote.data('note'));
+        activeNote = null;
       }
 
     } else if (activeKnob !== null) {
