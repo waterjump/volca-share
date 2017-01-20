@@ -223,16 +223,16 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-form')
-    page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_attributes_1_step_2_slide]').trigger('click')
+    seq_form_light(0, 1, 'step_mode').trigger('click')
+    seq_form_light(1, 2, 'slide').trigger('click')
 
     click_button 'Save'
     expect(page).to have_link('Edit')
 
     click_link 'Edit'
     expect(page).to have_selector('.sequence-form')
-    expect(page.find('#patch_sequences_attributes_0_step_1_step_mode_light')).not_to have_css('lit')
-    expect(page.find('#patch_sequences_attributes_1_step_2_step_mode_light')).not_to have_css('lit')
+    expect(page).not_to have_selector('#patch_sequences_attributes_0_step_1_step_mode_light.lit')
+    expect(page).to have_selector('#patch_sequences_attributes_1_step_2_slide_light.lit')
   end
 
   scenario 'can be deleted' do
@@ -287,5 +287,54 @@ RSpec.feature 'sequences', type: :feature, js: true do
     patch = Patch.where(name: dummy_patch.name).first
     expect(patch.sequences.count).to eq(1)
     expect(page).to have_selector('.sequence-box', count: 1)
+  end
+
+  scenario 'can be added on edit' do
+    login
+    click_link 'new-patch'
+    expect(current_path).to eq(new_patch_path)
+
+    dummy_patch = FactoryGirl.build(:patch)
+    fill_out_patch_form(dummy_patch, true)
+
+    click_button 'Save'
+    visit edit_patch_path(Patch.last)
+    expect(page).not_to have_selector('.sequence-box')
+    expect(page).to have_link('Add sequences')
+    click_link('Add sequences')
+
+    expect(page).not_to have_selector('.sequence-box', count: 1)
+    page.find('#patch_sequences_attributes_0_step_1_note_display')
+      .drag_to(seq_form_light(0, 1, 'slide'))
+    seq_form_light(0, 1, 'slide').trigger('click')
+    seq_form_light(0, 5, 'slide').trigger('click')
+    seq_form_light(0, 13, 'slide').trigger('click')
+    seq_form_light(0, 16, 'slide').trigger('click')
+    seq_form_light(0, 7, 'step_mode').trigger('click')
+
+    click_button 'Save'
+    expect(page).to have_selector('.sequence-show')
+    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('D#4')
+    expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_16_slide_light.lit')
+
+    expect(page).to have_css('#patch_sequences_0_step_1_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_2_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_3_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_4_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_5_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_6_step_mode_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_8_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_9_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_10_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_11_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_12_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_13_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_14_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_15_step_mode_light.lit')
+    expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
   end
 end
