@@ -40,6 +40,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-form')
+    expect(page).to have_content('Use the VCO Group selector to change the number of sequences.')
 
     click_button 'Save'
     expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
@@ -260,8 +261,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'Edit'
     expect(page).to have_selector('.sequence-box', count: 2)
-    expect(page).to have_selector('.remove-sequence', count: 2)
-    page.first('.remove-sequence').trigger('click')
+    find("#{bottom_row} > label:nth-child(6)").click
 
     click_button 'Save'
     patch = Patch.find_by(name: '666')
@@ -280,8 +280,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
     click_link 'Add sequences'
 
     expect(page).to have_selector('.sequence-box', count: 2)
-    expect(page).to have_selector('.remove-sequence', count: 2)
-    page.first('.remove-sequence').trigger('click')
+    find("#{bottom_row} > label:nth-child(6)").click
 
     click_button 'Save'
     patch = Patch.where(name: dummy_patch.name).first

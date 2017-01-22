@@ -37,5 +37,4 @@
               %span
                 .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || 'true' } }
       .remove-area
-        %span Remove
-        = check_box "patch[sequences_attributes][#{seq_num}]", :destroy, { data: { sequence_id: sequence.try(:id) }, class: 'remove-sequence' }, '1', '0'
+        = hidden_field_tag "patch[sequences_attributes][#{seq_num}][destroy]", false, class: 'remove-sequence'

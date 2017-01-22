@@ -9,7 +9,7 @@ $(function() {
   var clicked = false;
   var limit = 140;
   var activeNote;
-  var sequencesActive = false;
+  var sequencesActive = $('.sequence-form').toArray().length > 1;
   var sequenceCount = 0;
   var midiOut = new MidiOut;
 
@@ -31,6 +31,7 @@ $(function() {
     e.preventDefault();
 
     if (sequencesActive === false) {
+      $('.sequence-holder').append('<p>Use the VCO Group selector to change the number of sequences.</p>');
       for (var i = 0; i < sequenceCount; i++) {
         var content = $('#new_choice_form').html().replace(/QQQ/g, i);
         $('.sequence-holder').append(content);
@@ -193,24 +194,25 @@ $(function() {
           default:
             mySequenceCount = 1;
         }
-        var checkboxes = $('.remove-sequence').toArray();
+        var removeFields = $('.remove-sequence').toArray();
         var difference;
-        var sequenceCount = checkboxes.length - 1;
-        var activeSequenceCount = $(".remove-sequence[type='checkbox']:not(:checked)").toArray().length - 1;
+        var sequenceCount = removeFields.length - 1;
+        var activeSequenceCount = $(".remove-sequence[value='false']").toArray().length - 1;
         var containers = $('.sequence-form').toArray();
 
         if (mySequenceCount > activeSequenceCount) {
           if (mySequenceCount > sequenceCount) {
             // uncheck all boxes
             $('.remove-sequence').each(function(){
-              $(this).prop('checked', false);
+              $(this).val('false');
               $(this).removeAttr('disabled');
             });
             $('.sequence-form').each(function(){
-              $(this).css('opacity', '1.0')
+              $(this).css('opacity', '1.0');
             });
             //add sequences
             difference = mySequenceCount - sequenceCount;
+            var activeSequenceCount = $(".remove-sequence[value='false']").toArray().length - 1;
             for (i = activeSequenceCount; i < activeSequenceCount + difference; i++ ) {
               var content = $('#new_choice_form').html().replace(/QQQ/g, i);
               $('.sequence-holder').append(content);
@@ -218,17 +220,15 @@ $(function() {
           } else {
             //uncheck boxes
             for (i = 0; i < mySequenceCount; i++ ) {
-              $(checkboxes[i]).prop('checked', false);
-              $(checkboxes[i]).removeAttr('disabled');
+              $(removeFields[i]).val('false');
               $(containers[i]).css('opacity', '1.0');
             }
           }
         } else if (activeSequenceCount > mySequenceCount) {
           //check boxes
           difference = activeSequenceCount - mySequenceCount;
-          for (i = checkboxes.length - 2; i > (activeSequenceCount - 1 - difference); i--) {
-            $(checkboxes[i]).prop('checked', true);
-            $(checkboxes[i]).attr('disabled', true);
+          for (i = removeFields.length - 2; i > (activeSequenceCount - 1 - difference); i--) {
+            $(removeFields[i]).val('true');
             $(containers[i]).css('opacity', '0.5');
           }
         }

@@ -150,15 +150,14 @@
         = "To edit, delete, or make your patches browsable, "
         = link_to 'create an account', new_user_registration_path
 .col-sm-12
-  - if @patch.sequences.present?
-    - @patch.sequences.each_with_index do |sequence, seq_num|
-      .field.sequence-area
-        .sequence-holder
-          = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
-  - else
-    .field.sequence-area
+  .field.sequence-area
+    - if @patch.sequences.present?
       .sequence-holder
-        = link_to 'Add sequences', '#', id: 'toggle-sequences'
+        - @patch.sequences.each_with_index do |sequence, seq_num|
+          = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
+    - else
+      = link_to 'Add sequences', '#', id: 'toggle-sequences'
+      .sequence-holder
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
     = link_to 'Cancel', patches_path
