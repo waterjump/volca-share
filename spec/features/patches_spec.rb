@@ -74,9 +74,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq('false')
+    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq('true')
+    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq('false')
     expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
@@ -132,9 +132,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq 'true'
+    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq 'false'
     expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
@@ -202,13 +202,13 @@ RSpec.feature 'patches', type: :feature, js: true do
     # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
     click_button 'Save'
-    expect(page).to have_content('Patch saved successfully.')
+    expect(page.body).to have_content('Patch saved successfully.')
 
     # Freesound
     visit edit_patch_path(patch.slug)
     fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
-    expect(page).to have_content('Patch saved successfully.')
+    expect(page.body).to have_content('Patch saved successfully.')
   end
 
   scenario 'can be randomized' do
@@ -244,5 +244,43 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     visit edit_patch_path(Patch.first)
     expect(page).not_to have_selector('#randomize')
+  end
+
+  scenario 'that have sequences do not randomize vco groups' do
+    visit new_patch_path
+    expect(page).to have_link('randomize')
+    click_link 'Add sequences'
+
+    click_link 'randomize'
+    default_patch = {
+      attack: '63',
+      cutoff: '63',
+      gate_time: '127',
+      lfo_target_pitch: '',
+      vco_group_3: 'true',
+      vco_group_2: 'false',
+      vco_group_1: 'false'
+    }
+
+    fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
+    click_button 'Save'
+
+    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
+
+    random_patch = {
+      attack: page.find('#attack')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      gate_time: page.find('#gate_time', visible: false)['data-midi'],
+      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      vco_group_3: page.find('#patch_vco_group_three_light')['data-active'],
+      vco_group_2: page.find('#patch_vco_group_two_light')['data-active'],
+      vco_group_1: page.find('#patch_vco_group_one_light')['data-active']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+    expect(random_patch[:vco_group_3]).to eq(default_patch[:vco_group_3])
+    expect(random_patch[:vco2_active]).to eq(default_patch[:vco2_active])
+    expect(random_patch[:vco1_active]).to eq(default_patch[:vco1_active])
+    expect(page).to have_selector('.sequence-show', count: 1)
   end
 end

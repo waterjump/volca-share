@@ -11,7 +11,6 @@ $(function() {
   var activeNote;
   var sequencesActive = false;
   var sequenceCount = 0;
-
   var midiOut = new MidiOut;
 
   $("#toggle-sequences").on('click tap', function(e) {
@@ -152,15 +151,16 @@ $(function() {
     });
 
     // VCO GROUP
-    // TODO make sure this affects number of sequences shown after the fact
-    var items = ['one', 'two', 'three'];
-    var item = items[Math.floor(Math.random()*items.length)];
-    $('.light[data-radio]').each(function() {
-      $(this).removeClass('lit');
-      $(":radio[value=" + item + "]").prop('checked', false);
-    });
-    $(":radio[value=" + item + "]").prop('checked', true);
-    $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
+    if (!sequencesActive){
+      var items = ['one', 'two', 'three'];
+      var item = items[Math.floor(Math.random()*items.length)];
+      $('.light[data-radio]').each(function() {
+        $(this).removeClass('lit');
+        $(":radio[value=" + item + "]").prop('checked', false);
+      });
+      $(":radio[value=" + item + "]").prop('checked', true);
+      $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
+    }
   });
 
   $('.bottom-row label, .sequence-box label').each(function(){

@@ -47,15 +47,15 @@
     .bottom-row
       = label_tag('patch[vco_group_one]') do
         %span
-          .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
+          .light{ id: 'patch_vco_group_one_light', data: { active: @patch.vco_group_one.to_s } }
 
       = label_tag('patch[vco_group_two]') do
         %span
-          .light{ data: { radio: true, active: @patch.vco_group_two.to_s } }
+          .light{ id: 'patch_vco_group_two_light', data: { active: @patch.vco_group_two.to_s } }
 
       = label_tag('patch[vco_group_three]') do
         %span
-          .light{ data: { radio: true, active: @patch.vco_group_three.to_s } }
+          .light{ id: 'patch_vco_group_three_light', data: { active: @patch.vco_group_three.to_s } }
 
       = label_tag('patch[lfo_target_amp]') do
         %span
