@@ -44,19 +44,6 @@ $(function() {
       sequencesActive = false;
     }
 
-    $('.sequence-box').on('click tap', '.param span', function(){
-      $(this).find('.light').toggleClass('lit');
-    });
-
-    $('span.note-display').on('mousedown touchstart', function(f){
-      clickedPoint = f.pageY || Math.round(f.originalEvent.touches[0].pageY);
-      f.preventDefault();
-      f.stopPropagation();
-      clicked = true;
-      activeNote = $(this);
-      activeKnob = null;
-    });
-
     $('.sequence-box label').each(function(){
       var myInput = $('input#' + $(this).attr('for'));
       if (myInput.prop('checked')) {
@@ -65,11 +52,7 @@ $(function() {
     });
   });
 
-  $('.sequence-box').on('click tap', '.param span', function(){
-    $(this).find('.light').toggleClass('lit');
-  });
-
-  $('.sequence-box span').on('mousedown touchstart', function(e){
+  $('.sequence-holder').on('mousedown touchstart', '.note-display', function(e){
     clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
     e.preventDefault();
     e.stopPropagation();
@@ -78,10 +61,12 @@ $(function() {
     activeKnob = null;
   });
 
-  $('.sequence-box label').on('click tap', function(){
+  $('.sequence-holder').on('click tap', '.sequence-box label', function(){
     var myInput = $('input#' + $(this).attr('for'));
-    if (myInput.prop('checked')) {
+    if (!myInput.prop('checked')) {
       $(this).find('span').find('div').addClass('lit');
+    } else {
+      $(this).find('span').find('div').removeClass('lit');
     }
   });
 

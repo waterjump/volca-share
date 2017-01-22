@@ -25,17 +25,17 @@
             = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :slide, step.try(:slide_checked) || {}, 'true', 'false'
             = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[slide]]]") do
               %span
-                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: step.try(:slide) || false } }
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: step.try(:slide) || 'false' } }
           .step-mode.param
             = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :step_mode, step.try(:step_mode_checked) || { checked: true }, 'true', 'false'
             = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[step_mode]]]") do
               %span
-                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: step.try(:step_mode) || true } }
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: step.try(:step_mode) || 'true' } }
           .active-step.param
             = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :active_step, step.try(:active_step_checked) || { checked: true }, 'true', 'false'
             = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
               %span
-                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || true } }
+                .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || 'true' } }
       .remove-area
         %span Remove
         = check_box "patch[sequences_attributes][#{seq_num}]", :destroy, { data: { sequence_id: sequence.try(:id) }, class: 'remove-sequence' }, '1', '0'
