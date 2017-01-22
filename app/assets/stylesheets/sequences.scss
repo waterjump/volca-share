@@ -54,9 +54,6 @@
     font-stretch: condensed;
     font-size: smaller;
   }
-  .note {
-    margin-bottom: 15%;
-  }
   .param {
     height: 25%;
   }
@@ -68,11 +65,29 @@
     display: inline;
     height: 100%;
     width: 5.15%;
+    .arrow {
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      margin-left: 41%;
+    }
+    .up {
+      border-bottom: 5px solid black;
+    }
+    .down {
+      border-top: 5px solid black;
+      position: relative;
+      top: -7%;
+    }
     .note{
       text-align: center;
       font-size: 18px;
       position: relative;
       top: -3px;
+      label {
+        margin: 0
+      }
       span {
         cursor: ns-resize;
       }

@@ -152,6 +152,7 @@
 .col-sm-12
   .field.sequence-area
     - if @patch.sequences.present?
+      = link_to 'Remove sequences', '#', id: 'toggle-sequences'
       .sequence-holder
         - @patch.sequences.each_with_index do |sequence, seq_num|
           = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
