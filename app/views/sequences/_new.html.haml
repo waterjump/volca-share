@@ -4,10 +4,11 @@
   .outer-sequence-box
     .sequence-box
       .param-labels.line
-        .note.param Note
-        .slide.param Slide
-        .step-mode.param Step Mode
-        .active-step.param Active Step
+        .spacer
+        .note Note
+        .slide Slide
+        .step-mode Step Mode
+        .active-step Active Step
       - if sequence.present?
         = hidden_field_tag "patch[sequences_attributes][#{seq_num}][id]", sequence.id
       - 16.times do |num|
