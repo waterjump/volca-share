@@ -154,11 +154,13 @@
     - if @patch.sequences.present?
       = link_to 'Remove sequences', '#', id: 'toggle-sequences'
       .sequence-holder
+        .sequence-message Use the VCO Group selector to change the number of sequences.
         - @patch.sequences.each_with_index do |sequence, seq_num|
           = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
     - else
       = link_to 'Add sequences', '#', id: 'toggle-sequences'
       .sequence-holder
+        .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
     = link_to 'Cancel', patches_path

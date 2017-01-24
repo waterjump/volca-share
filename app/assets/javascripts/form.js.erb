@@ -31,7 +31,7 @@ $(function() {
     e.preventDefault();
 
     if (sequencesActive === false) {
-      $('.sequence-holder').append('<p>Use the VCO Group selector to change the number of sequences.</p>');
+      $('.sequence-message').removeClass('hidden');
       for (var i = 0; i < sequenceCount; i++) {
         var totalSequenceCount = $('.sequence-area .sequence-form').toArray().length;
         var content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount);
@@ -42,6 +42,7 @@ $(function() {
     } else {
       $('.sequence-area .remove-sequence').val('true');
       $('.sequence-area .sequence-form').addClass('hidden');
+      $('.sequence-message').addClass('hidden');
       $("#toggle-sequences").text('Add sequences');
       sequencesActive = false;
     }
