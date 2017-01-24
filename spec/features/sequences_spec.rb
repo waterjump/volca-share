@@ -153,11 +153,12 @@ RSpec.feature 'sequences', type: :feature, js: true do
     click_link 'new-patch'
     expect(current_path).to eq(new_patch_path)
 
+    dummy_patch = FactoryGirl.build(:patch)
+    fill_out_patch_form(dummy_patch, true)
+    find("#{bottom_row} > label:nth-child(6)").click
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 1)
 
-    dummy_patch = FactoryGirl.build(:patch)
-    fill_out_patch_form(dummy_patch, true)
     page.find('#patch_sequences_attributes_0_step_1_note_display')
       .drag_to(seq_form_light(0, 1, 'slide'))
     seq_form_light(0, 1, 'slide').trigger('click')
@@ -236,7 +237,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_selector('#patch_sequences_attributes_1_step_2_slide_light.lit')
   end
 
-  scenario 'can be deleted' do
+  scenario 'can be decremented' do
     steps_1 = []
     steps_2 = []
 
@@ -335,5 +336,109 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_css('#patch_sequences_0_step_14_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_15_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
+  end
+
+  scenario 'can be deleted' do
+    steps_1 = []
+    steps_2 = []
+
+    16.times do |index|
+      steps_1 << create(:step, index: index + 1)
+      steps_2 << create(:step, index: index + 1)
+    end
+
+    sequence_1 = create(:sequence, steps: steps_1)
+    sequence_2 = create(:sequence, steps: steps_2)
+
+    patch = FactoryGirl.create(
+      :patch,
+      name: '666',
+      user_id: user.id,
+      sequences: [sequence_1, sequence_2]
+    )
+
+    login
+    visit patch_path(patch)
+    expect(page).to have_link('Edit')
+
+    click_link 'Edit'
+    expect(page).to have_selector('.sequence-box', count: 2)
+    click_link 'Remove sequences'
+
+    click_button 'Save'
+    patch = Patch.find_by(name: '666')
+    expect(patch.sequences.count).to eq(0)
+    expect(page).not_to have_selector('.sequence-box')
+  end
+
+  scenario 'count changes accurately 1' do
+    steps_1 = []
+
+    16.times do |index|
+      steps_1 << create(:step, index: index + 1)
+    end
+
+    sequence_1 = create(:sequence, steps: steps_1)
+
+    patch = FactoryGirl.create(
+      :patch,
+      name: '666',
+      user_id: user.id,
+      sequences: [sequence_1]
+    )
+
+    login
+    visit patch_path(patch)
+    expect(page).to have_link('Edit')
+
+    click_link 'Edit'
+    expect(page).to have_selector('.sequence-box', count: 1)
+    click_link 'Remove sequences'
+
+    find("#{bottom_row} > label:nth-child(2)").click  # vco_group_one
+    click_link 'Add sequences'
+    expect(page).to have_selector('.sequence-box', count: 3)
+
+    click_button 'Save'
+    patch = Patch.find_by(name: '666')
+    expect(patch.sequences.count).to eq(3)
+    expect(page).to have_selector('.sequence-box', count: 3)
+  end
+
+  scenario 'count changes accurately 2' do
+    steps_1 = []
+
+    16.times do |index|
+      steps_1 << create(:step, index: index + 1)
+    end
+
+    sequence_1 = create(:sequence, steps: steps_1)
+
+    patch = FactoryGirl.create(
+      :patch,
+      name: '666',
+      user_id: user.id,
+      sequences: [sequence_1]
+    )
+
+    login
+    visit patch_path(patch)
+    expect(page).to have_link('Edit')
+
+    click_link 'Edit'
+    expect(page).to have_selector('.sequence-box', count: 1)
+
+    click_link 'Remove sequences'
+    find("#{bottom_row} > label:nth-child(2)").click  # vco_group_one
+    click_link 'Add sequences'
+    expect(page).to have_selector('.sequence-box', count: 3)
+    find("#{bottom_row} > label:nth-child(4)").click  # vco_group_two
+    expect(page).to have_selector('.sequence-form', count: 3)
+    expect(page.all('.sequence-area .remove-sequence', visible: false).last.value).to eq('true')
+
+    click_button 'Save'
+    patch = Patch.find_by(name: '666')
+    expect(patch.sequences.count).to eq(2)
+    expect(page).to have_selector('.sequence-box', count: 2)
   end
 end

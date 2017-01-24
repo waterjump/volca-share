@@ -91,7 +91,7 @@ class PatchesController < ApplicationController
   def update
     respond_to do |format|
       @patch_params[:slug] = @patch_params[:name].parameterize
-      if @patch.update_attributes(all_attributes) # && update_sequences
+      if @patch.update_attributes(all_attributes)
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),

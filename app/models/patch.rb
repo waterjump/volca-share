@@ -41,7 +41,7 @@ class Patch
 
   belongs_to :user, class_name: 'User', inverse_of: :patches
   embeds_many :sequences, class_name: 'Sequence'
-  accepts_nested_attributes_for :sequences, limit: 3, allow_destroy: true
+  accepts_nested_attributes_for :sequences, allow_destroy: true
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug
