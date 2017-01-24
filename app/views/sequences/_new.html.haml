@@ -39,5 +39,4 @@
             = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
               %span
                 .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step.try(:active_step) || 'true' } }
-      .remove-area
-        = hidden_field_tag "patch[sequences_attributes][#{seq_num}][destroy]", false, class: 'remove-sequence'
+      = hidden_field_tag "patch[sequences_attributes][#{seq_num}][destroy]", false, class: 'remove-sequence'

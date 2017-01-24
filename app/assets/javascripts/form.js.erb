@@ -13,6 +13,18 @@ $(function() {
   var sequenceCount = 0;
   var midiOut = new MidiOut;
 
+  var syncMidi = function(){
+    $('.knob').each(function(){
+      if (midiOut.ready()) {
+          midiOut.output.sendControlChange(
+            $(this).data('control-number'),
+            $(this).data('midi'),
+            midiOut.channel
+          )
+      }
+    });
+  }
+
   $("#toggle-sequences").on('click tap', function(e) {
     var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
     switch(vcoGroup) {
@@ -88,15 +100,7 @@ $(function() {
   });
 
   $('#sync').on('click tap', function(){
-    $('.knob').each(function(){
-      if (midiOut.ready()) {
-          midiOut.output.sendControlChange(
-            $(this).data('control-number'),
-            $(this).data('midi'),
-            midiOut.channel
-          )
-      }
-    });
+    syncMidi();
   });
 
   $('.knob').each(function() {
@@ -109,16 +113,26 @@ $(function() {
   // TODO DRY this up.
   $('#randomize').on('click tap', function(e){
     e.preventDefault();
-    // KNOBS
-    $('.knob').each(function() {
+    var assignKnobValue = function(knob) {
       randomValue = Math.floor(Math.random() * (127 - 1));
-      my_knob = new Knob(this);
+      my_knob = new Knob(knob);
       degree = my_knob.degreeForMidi(randomValue, limit);
-      $(this).data('rotation', degree);
-      $(this).data('midi', randomValue);
-      my_knob.autoRotate(degree, '#' + $(this).attr('id'));
+      knob.data('rotation', degree);
+      knob.data('midi', randomValue);
+      my_knob.autoRotate(degree, '#' + knob.attr('id'));
       my_knob.inputElement.val(randomValue);
+    }
+
+    // KNOBS
+    $('.volca .knob').each(function() {
+      assignKnobValue($(this));
     });
+
+    if (midiOut.ready()) {
+      $('.#midi-only-controls .knob').each(function() {
+        assignKnobValue($(this));
+      });
+    }
 
     // VCO ACTIVE
     $('.button').each(function(){
@@ -165,6 +179,8 @@ $(function() {
       $(":radio[value=" + item + "]").prop('checked', true);
       $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
     }
+
+    syncMidi();
   });
 
   $('.bottom-row label, .sequence-box label').each(function(){

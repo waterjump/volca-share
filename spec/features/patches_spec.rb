@@ -17,15 +17,14 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'have initialized values' do
     click_link 'new-patch'
-    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(
-      page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
+      page.find("#{bottom_row_form} > label:nth-child(6) > span > div")['data-active']
     ).not_to eq(nil) # vco_group 3
     expect(
-      page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
+      page.find("#{bottom_row_form} > label:nth-child(15) > span > div")['data-active']
     ).not_to eq(nil) # lfo_target_cutoff
     expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
+      page.find("#{bottom_row_form} > label:nth-child(27) > span > div")['data-active']
     )
       .not_to eq(nil) # vco3_wave
   end
@@ -55,7 +54,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
     expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
 
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
     expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
     expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
@@ -112,8 +110,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
 
     expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by ¯\\_(ツ)_/¯", visible: false
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
-
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
     expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
     expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
@@ -227,8 +223,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
     click_button 'Save'
 
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
-
     random_patch = {
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
@@ -244,6 +238,39 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     visit edit_patch_path(Patch.first)
     expect(page).not_to have_selector('#randomize')
+  end
+
+  scenario 'do not randomize midi-only-controls if midi not available' do
+    visit new_patch_path
+    expect(page).to have_link('randomize')
+
+    click_link 'randomize'
+    default_patch = {
+      attack: '63',
+      cutoff: '63',
+      lfo_target_pitch: '',
+      vco3_active: 'true',
+      slide_time: '63',
+      expression: '127',
+      gate_time: '127'
+    }
+
+    fill_in 'patch[name]', with: 'Schnackenpfefferhausen'
+    click_button 'Save'
+
+    random_patch = {
+      attack: page.find('#attack')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      vco3_active: page.find('#vco3_active_button')['data-active'],
+      slide_time: page.find('#slide_time', visible: false)['data-midi'],
+      expression: page.find('#expression', visible: false)['data-midi'],
+      gate_time: page.find('#gate_time', visible: false)['data-midi']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+    expect(random_patch.slice(:slide_time, :expression, :gate_time))
+      .to eq default_patch.slice(:slide_time, :expression, :gate_time)
   end
 
   scenario 'that have sequences do not randomize vco groups' do
@@ -264,8 +291,6 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
     click_button 'Save'
-
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
 
     random_patch = {
       attack: page.find('#attack')['data-midi'],

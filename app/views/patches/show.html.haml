@@ -93,19 +93,19 @@
         %span
           .light{ data: { active: @patch.amp_eg_on.to_s } }
 #patch-metadata
-  - if @patch.show_midi_only_knobs?
-    .col-lg-3
-      #midi-only-panel
-        #midi-only-title
-          .h5 MIDI-only controls
-        .stretchy2
-          #midi-only-controls.clearfix
-            .knob.medium#slide_time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
-              .notch
-            .knob.medium#expression{ data: { midi: @patch.expression || 127 , control_number: 11 } }
-              .notch
-            .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
-              .notch
+  - show_class = @patch.show_midi_only_knobs? ? '' : :hidden
+  .col-lg-3{ class: show_class }
+    #midi-only-panel
+      #midi-only-title
+        .h5 MIDI-only controls
+      .stretchy2
+        #midi-only-controls.clearfix
+          .knob.medium#slide_time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
+            .notch
+          .knob.medium#expression{ data: { midi: @patch.expression || 127 , control_number: 11 } }
+            .notch
+          .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
+            .notch
   .col-lg-3
     - if @patch.tags.any?
       = label_tag 'patch[tags]', 'Tags'
