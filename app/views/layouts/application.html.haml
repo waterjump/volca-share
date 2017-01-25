@@ -7,8 +7,8 @@
     %meta{:content => "Browse, create, and share patches for the Korg Volca Bass synthesizer.  Sync and control parameters from the browser in real-time via Web MIDI", :name => "Description"}/
     %title= [@title, 'VolcaShare'].reject { |c| c.blank? }.join(' | ')
     %link{:href => asset_path('favicon.ico'), :rel => 'shortcut icon'}/
-    = stylesheet_link_tag    'application', media: 'all'
-    = javascript_include_tag 'application'
+    = stylesheet_link_tag    'application', media: 'all', async: Rails.env.production?
+    = javascript_include_tag 'application', async: Rails.env.production?
     = csrf_meta_tags
   %body{ class: @body_class}
     - if Rails.env.production?
