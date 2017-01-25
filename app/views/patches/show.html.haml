@@ -12,7 +12,7 @@
   .col-xl-3.col-lg-3.col-md-3.col-sm-12
     = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
 = render 'midi_control'
-#interface.col-lg-9
+#interface.col-lg-9.show
   .stretchy
     .volca
       .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }

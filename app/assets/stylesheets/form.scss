@@ -1,6 +1,22 @@
 $aspect: 1800 / 1072 / 100;
 $pink: #fd9994;
 
+
+.form {
+  .button {
+    cursor: pointer;
+  }
+  .bottom-row {
+    label {
+      span {
+        cursor: pointer;
+      }
+    }
+  }
+  .knob {
+    cursor: ns-resize;
+  }
+}
 .stretchy {
   padding-bottom: percentage(1 / $aspect / 100);
   position: relative;
@@ -146,7 +162,6 @@ $pink: #fd9994;
       top: 54.5%;
       background-color: #d6d7dc;
       border: solid black;
-      cursor: pointer;
       border-radius: 5px;
     }
 
@@ -182,8 +197,6 @@ $pink: #fd9994;
           height: 89%;
           position: relative;
           display: inline-block;
-          cursor: pointer;
-
           .light {
             width: 73%;
             height: 53%;
@@ -205,7 +218,6 @@ $pink: #fd9994;
   border-radius: 50%;
   position: absolute;
   overflow: hidden;
-  cursor: ns-resize;
   .notch {
     position: absolute;
     width: 8%;
