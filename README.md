@@ -29,6 +29,7 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - URL Slugs
 - SMS sharing
 - Randomize patches
+- Save and share scores (sequences)
 
 ### Todos
 
@@ -41,7 +42,6 @@ Developed by Sean Barrett.  To contribute, submit a PR.
 - Caching
 - Search (elastic)
 - Sample data
-- Save and share scores
 - Virtual LFO via javascript / Web Midi
 - Log in with facebook
 
