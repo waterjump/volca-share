@@ -8,8 +8,86 @@ $(function() {
   var dragging = false;
   var clicked = false;
   var limit = 140;
-
+  var activeNote;
+  var sequencesActive = $(".remove-sequence[value='false']").toArray().length > 1;
+  var sequenceCount = 0;
   var midiOut = new MidiOut;
+
+  var syncMidi = function(){
+    $('.knob').each(function(){
+      if (midiOut.ready()) {
+          midiOut.output.sendControlChange(
+            $(this).data('control-number'),
+            $(this).data('midi'),
+            midiOut.channel
+          )
+      }
+    });
+  }
+
+  $("#toggle-sequences").on('click tap', function(e) {
+    var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
+    switch(vcoGroup) {
+      case 'one':
+        sequenceCount = 3;
+        break;
+      case 'two':
+        sequenceCount = 2;
+        break;
+      case 'three':
+        sequenceCount = 1;
+        break;
+      default:
+        sequenceCount = 1;
+    }
+    e.preventDefault();
+
+    if (sequencesActive === false) {
+      $('.sequence-message').removeClass('hidden');
+      for (var i = 0; i < sequenceCount; i++) {
+        var totalSequenceCount = $('.sequence-area .sequence-form').toArray().length;
+        var content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount);
+        $('.sequence-holder').append(content);
+      }
+      $("#toggle-sequences").text('Remove sequences');
+      sequencesActive = true;
+    } else {
+      $('.sequence-area .remove-sequence').val('true');
+      $('.sequence-area .sequence-form').addClass('hidden');
+      $('.sequence-message').addClass('hidden');
+      $("#toggle-sequences").text('Add sequences');
+      sequencesActive = false;
+    }
+
+    $('.sequence-box .multi').each(function(){
+      var myInput = $('input#' + $(this).parent().attr('for'));
+      if (myInput.prop('checked')) {
+        $(this).find('div').addClass('lit');
+      }
+    });
+  });
+
+  $('.sequence-holder').on('mousedown touchstart', '.note-display', function(e){
+    clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
+    e.preventDefault();
+    e.stopPropagation();
+    clicked = true;
+    activeNote = $(this);
+    activeKnob = null;
+  });
+
+  $('.sequence-holder').on('click tap', '.sequence-box label', function(){
+    var myInput = $('input#' + $(this).attr('for'));
+    if (!myInput.prop('checked')) {
+      $(this).find('span').find('div').addClass('lit');
+    } else {
+      $(this).find('span').find('div').removeClass('lit');
+    }
+  });
+
+  $('.note-display').each(function(){
+      $(this).html(midiNoteNumbers[$(this).data('starting-note')]);
+  });
 
   $('#midi-device').change(function(){
     midiOut.changeOutput(this);
@@ -22,15 +100,7 @@ $(function() {
   });
 
   $('#sync').on('click tap', function(){
-    $('.knob').each(function(){
-      if (midiOut.ready()) {
-          midiOut.output.sendControlChange(
-            $(this).data('control-number'),
-            $(this).data('midi'),
-            midiOut.channel
-          )
-      }
-    });
+    syncMidi();
   });
 
   $('.knob').each(function() {
@@ -43,16 +113,26 @@ $(function() {
   // TODO DRY this up.
   $('#randomize').on('click tap', function(e){
     e.preventDefault();
-    // KNOBS
-    $('.knob').each(function() {
+    var assignKnobValue = function(knob) {
       randomValue = Math.floor(Math.random() * (127 - 1));
-      my_knob = new Knob(this);
+      my_knob = new Knob(knob);
       degree = my_knob.degreeForMidi(randomValue, limit);
-      $(this).data('rotation', degree);
-      $(this).data('midi', randomValue);
-      my_knob.autoRotate(degree, '#' + $(this).attr('id'));
+      knob.data('rotation', degree);
+      knob.data('midi', randomValue);
+      my_knob.autoRotate(degree, '#' + knob.attr('id'));
       my_knob.inputElement.val(randomValue);
+    }
+
+    // KNOBS
+    $('.volca .knob').each(function() {
+      assignKnobValue($(this));
     });
+
+    if (midiOut.ready()) {
+      $('.#midi-only-controls .knob').each(function() {
+        assignKnobValue($(this));
+      });
+    }
 
     // VCO ACTIVE
     $('.button').each(function(){
@@ -89,32 +169,93 @@ $(function() {
     });
 
     // VCO GROUP
-    var items = ['one', 'two', 'three'];
-    var item = items[Math.floor(Math.random()*items.length)];
-    $('.light[data-radio]').each(function() {
-      $(this).removeClass('lit');
-      $(":radio[value=" + item + "]").prop('checked', false);
-    });
-    $(":radio[value=" + item + "]").prop('checked', true);
-    $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
+    if (!sequencesActive){
+      var items = ['one', 'two', 'three'];
+      var item = items[Math.floor(Math.random()*items.length)];
+      $('.light[data-radio]').each(function() {
+        $(this).removeClass('lit');
+        $(":radio[value=" + item + "]").prop('checked', false);
+      });
+      $(":radio[value=" + item + "]").prop('checked', true);
+      $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit');
+    }
+
+    syncMidi();
   });
 
-  $('.bottom-row label').each(function(){
+  $('.bottom-row label, .sequence-box label').each(function(){
     var myInput = $('input#' + $(this).attr('for'));
     if (myInput.prop('checked')) {
       $(this).find('span').find('div').addClass('lit');
     }
   });
 
-  $('.bottom-row label').on('click tap', function(){
-    if ($('input#' + $(this).attr('for')).is(':checkbox')) {
-      $(this).find('span .light').toggleClass('lit');
-    } else {
-      $('.light[data-radio]').each(function() {
-        $(this).removeClass('lit');
-      });
-      $(this).find('span .light').addClass('lit');
+  $('.bottom-row .on-off').on('click tap', function(){
+      $(this).find('.light').toggleClass('lit');
+  });
+
+  $('.bottom-row .multi').on('click tap', function(){
+    $('.light[data-radio]').each(function() {
+      $(this).removeClass('lit');
+    });
+    if (sequencesActive) {
+      var vcoGroup = $('input#' + $(this).parent().attr('for')).val();
+      var mySequenceCount, sequenceCount, difference, hiddenSequences,
+      shownSequences, disabledSequences,totalSequenceCount, activeSequences;
+      switch(vcoGroup) {
+        case 'one':
+          mySequenceCount = 3;
+          break;
+        case 'two':
+          mySequenceCount = 2;
+          break;
+        case 'three':
+          mySequenceCount = 1;
+          break;
+        default:
+          mySequenceCount = 1;
+      }
+      hiddenSequences = $('.sequence-area .sequence-form.hidden').toArray();
+      shownSequences = $('.sequence-area .sequence-form').not('.hidden').toArray();
+      disabledSequences = $(".sequence-area .sequence-form:not('.hidden') .remove-sequence[value='true']").toArray();
+      totalSequenceCount = $('.sequence-area .sequence-form').toArray().length;
+      activeSequences = $(".sequence-area .remove-sequence[value='false']").toArray();
+
+      if (mySequenceCount > activeSequences.length) {
+        if (mySequenceCount > shownSequences.length) {
+          // uncheck all boxes
+          $(disabledSequences).each(function(){
+            $(this).val('false');
+            $(this).removeAttr('disabled');
+          });
+          $('.sequence-area .sequence-form').each(function(){
+            $(this).css('opacity', '1.0');
+          });
+          activeSequences = $(".sequence-area .remove-sequence[value='false']").toArray();
+          //add sequences
+          difference = mySequenceCount - activeSequences.length;
+          for (i = activeSequences.length; i < activeSequences.length + difference; i++ ) {
+
+            var content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount - 1);
+            $('.sequence-holder').append(content);
+          }
+        } else {
+          //uncheck boxes
+          for (i = 0; i < mySequenceCount; i++ ) {
+            $(disabledSequences[i]).val('false');
+            $(shownSequences[i]).css('opacity', '1.0');
+          }
+        }
+      } else if (activeSequences.length > mySequenceCount) {
+        //check boxes
+        difference = activeSequences.length - mySequenceCount;
+        for (i = activeSequences.length - 1; i > (activeSequences.length - 1 - difference); i--) {
+          $(activeSequences[i]).val('true');
+          $(shownSequences[i]).css('opacity', '0.5');
+        }
+      }
     }
+    $(this).find('.light').addClass('lit');
   });
 
   $('.button').each(function(){
@@ -151,6 +292,7 @@ $(function() {
     e.stopPropagation();
     clicked = true;
     activeKnob = new Knob(this);
+    activeNote = null;
     knob = $(activeKnob.element);
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
@@ -174,29 +316,42 @@ $(function() {
       var degree, currentPoint;
       $('body').css('cursor', 'ns-resize');
       currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
-      degree = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (degree > limit) {
-        activeKnob.rotation = limit;
-        clickedPoint = currentPoint;
-      }
-      if (degree < -limit) {
-        activeKnob.rotation = -limit;
-        clickedPoint = currentPoint;
-      }
-      degree = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
-        activeKnob.rotate(degree);
-        midi = Math.round(((63.5 / limit) * degree) + 63.5);
-        if (midiOut.ready()) {
-            midiOut.output.sendControlChange(
-              $(activeKnob.element).data('control-number'),
-              midi,
-              midiOut.channel
-            )
+      if (activeKnob !== null){
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (degree > limit) {
+          activeKnob.rotation = limit;
+          clickedPoint = currentPoint;
         }
-        activeKnob.inputElement.val(midi);
-        display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+        if (degree < -limit) {
+          activeKnob.rotation = -limit;
+          clickedPoint = currentPoint;
+        }
+        degree = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (currentPoint !== clickedPoint || degree === -limit || degree === limit) {
+          activeKnob.rotate(degree);
+          midi = Math.round(((63.5 / limit) * degree) + 63.5);
+          if (midiOut.ready()) {
+              midiOut.output.sendControlChange(
+                $(activeKnob.element).data('control-number'),
+                midi,
+                midiOut.channel
+              )
+          }
+          activeKnob.inputElement.val(midi);
+          display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+        }
+      } else if (activeNote !== null) {
+        var num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint)/4);
+        if (num > 127) {
+          num = 127;
+        }
+        if (num < 0) {
+          num = 0;
+        }
+        activeNote.data('note', num);
+        activeNote.html(midiNoteNumbers[num]);
       }
+
     }
   });
 
@@ -206,19 +361,27 @@ $(function() {
       dragging = false;
       var currentPoint = e.pageY || Math.round(e.originalEvent.changedTouches[0].pageY);
       $('body').css('cursor', 'default');
+      if (activeKnob !== null) {
+        var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
+        if (activeKnob.rotation > limit) {
+          activeKnob.rotation = limit;
+          currentPoint = clickedPoint;
+        }
+        if (activeKnob.rotation < -limit) {
+          activeKnob.rotation = -limit;
+          currentPoint = clickedPoint;
+        }
+        $(activeKnob.element).data('rotation', currentAngle);
+        $(activeKnob.element).data('midi', midi);
+        activeKnob = null;
+      } else if (activeNote !== null) {
+        activeNote.data('starting-note', activeNote.data('note'));
+        var inputId = activeNote["0"].parentNode.attributes["0"].value
+        $('input#' + inputId).val(activeNote.data('note'));
+        activeNote = null;
+      }
 
-      var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
-      if (activeKnob.rotation > limit) {
-        activeKnob.rotation = limit;
-        currentPoint = clickedPoint;
-      }
-      if (activeKnob.rotation < -limit) {
-        activeKnob.rotation = -limit;
-        currentPoint = clickedPoint;
-      }
-      $(activeKnob.element).data('rotation', currentAngle);
-      $(activeKnob.element).data('midi', midi);
-    } else {
+    } else if (activeKnob !== null) {
       if (typeof activeKnob === Knob)
       display.update(activeKnob.midi, activeKnob.isPitch);
     }

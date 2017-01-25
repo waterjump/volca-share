@@ -1,5 +1,6 @@
 class PatchesController < ApplicationController
   before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
+  before_action :format_tags, only: [:create, :update]
   before_action :authenticate_user!, except: [
     :index,
     :show,
@@ -48,19 +49,21 @@ class PatchesController < ApplicationController
   # POST /patches.json
   def create
     user = current_user
-    format_tags
     @patch_params[:slug] = @patch_params[:name].parameterize
     @patch =
       if user.present?
-        user.patches.build(@patch_params)
+        user.patches.new
       else
-        Patch.new(@patch_params)
+        Patch.new
       end
+
+    @patch.attributes = all_attributes
+
     respond_to do |format|
       if @patch.user.present? && @patch.save
         format.html do
           redirect_to(
-            user_patch_url(@patch.user.slug, @patch.slug),
+            patch_location,
             notice: 'Patch saved successfully.'
           )
         end
@@ -68,7 +71,7 @@ class PatchesController < ApplicationController
       elsif verify_recaptcha(model: @patch) && @patch.save
         format.html do
           redirect_to(
-            patch_url(@patch.id),
+            patch_location,
             notice: 'Patch saved successfully.'
           )
         end
@@ -87,9 +90,8 @@ class PatchesController < ApplicationController
   # PATCH/PUT /patches/1.json
   def update
     respond_to do |format|
-      format_tags
       @patch_params[:slug] = @patch_params[:name].parameterize
-      if @patch.update(@patch_params)
+      if @patch.update_attributes(all_attributes)
         format.html do
           redirect_to(
             user_patch_url(@patch.user.slug, @patch.slug),
@@ -122,11 +124,13 @@ class PatchesController < ApplicationController
   def oembed
     respond_to do |format|
       if @patch.present? && @patch.audio_sample.present?
-        format.json { render json: {
-          audio_sample_code: @patch.audio_sample_code,
-          name: @patch.name,
-          patch_location: patch_location
-        } }
+        format.json do
+          render json: {
+            audio_sample_code: @patch.audio_sample_code,
+            name: @patch.name,
+            patch_location: patch_location
+          }
+        end
       end
     end
   end
@@ -162,40 +166,43 @@ class PatchesController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def patch_params
-    @patch_params ||= params[:patch].permit(
-      :name,
-      :attack,
-      :decay_release,
-      :cutoff_eg_int,
-      :octave,
-      :peak,
-      :cutoff,
-      :lfo_rate,
-      :lfo_int,
-      :vco1_pitch,
-      :vco1_active,
-      :vco2_pitch,
-      :vco2_active,
-      :vco3_pitch,
-      :vco3_active,
-      :vco_group,
-      :lfo_target_amp,
-      :lfo_target_pitch,
-      :lfo_target_cutoff,
-      :lfo_wave,
-      :vco1_wave,
-      :vco2_wave,
-      :vco3_wave,
-      :sustain_on,
-      :amp_eg_on,
-      :secret,
-      :notes,
-      :tags,
-      :slide_time,
-      :expression,
-      :gate_time,
-      :audio_sample,
-      :slug
-    )
+    @patch_params ||= params.require(:patch).permit!.merge!(sequence_params)
+  end
+
+  def all_attributes
+    @all_attributes ||= params[:patch].except(:sequences_attributes).merge!(sequence_params)
+  end
+
+  def sequence_params
+    return {} unless params[:patch].slice(:sequences_attributes).present?
+    return @sequence_params if @sequence_params.present?
+
+    final_return = {}
+    final_return[:sequences_attributes] =
+      cycle_sequences(params[:patch][:sequences_attributes])
+
+    @sequence_params ||= final_return
+  end
+
+  def cycle_sequences(hash)
+    return {} unless hash.present?
+    paramz = []
+    hash.values.each do |seq|
+      paramz << format_sequence(seq)
+    end
+    paramz
+  end
+
+  def format_sequence(seq)
+    good_keys = [:id, :index, :note, :step_mode, :slide, :active_step, :_destroy]
+    sequence = {}
+    sequence[:id] = seq[:id] if seq[:id].present?
+    sequence[:_destroy] = seq[:destroy] if seq[:destroy].present?
+    sequence[:steps_attributes] = seq.except(:id, :destroy).each do |step|
+      step.reject do |k, _v|
+        !good_keys.include?(k)
+      end
+    end.values
+    sequence
   end
 end

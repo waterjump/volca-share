@@ -1,0 +1,30 @@
+- @patch.sequences.each_with_index do |sequence, seq_num|
+  .sequence-show
+    .outer-sequence-box
+      .sequence-box
+        .param-labels.line
+          .note.param Note
+          .slide.param Slide
+          .step-mode.param Step Mode
+          .active-step.param Active Step
+        .scrolly
+          .steps.clearfix
+            - sequence.steps.each do |step|
+              - num = step.index
+              .step{ class: num % 4 == 0 ? 'line' : '' }
+                .note.param
+                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[note]]]", id: "patch_sequences_attributes_#{seq_num}_step_#{num}_note_display") do
+                    %span.step-note{ data: { note: step.note } }
+                      C5
+                .slide.param
+                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[slide]]]") do
+                    %span
+                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_slide_light", data: { active: step.slide.to_s } }
+                .step-mode.param
+                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[step_mode]]]") do
+                    %span
+                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_step_mode_light", data: { active: step.step_mode.to_s } }
+                .active-step.param
+                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[active_step]]]") do
+                    %span
+                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_active_step_light", data: { active: step.active_step.to_s } }

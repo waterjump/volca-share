@@ -1,5 +1,5 @@
 FactoryGirl.define do
-  factory :patch do
+  factory :patch do |_p|
     name { FFaker::Lorem.characters(10) }
     attack (0..127).to_a.sample
     decay_release (0..127).to_a.sample
@@ -35,10 +35,23 @@ FactoryGirl.define do
     slug { name.parameterize }
   end
 
+  factory :sequence do |_s|
+    association :patch
+  end
+
+  factory :step do
+    association :sequence
+    index (1..16).to_a.sample
+    note (0..127).to_a.sample
+    step_mode { FFaker::Boolean.maybe }
+    slide { FFaker::Boolean.maybe }
+    active_step { FFaker::Boolean.maybe }
+  end
+
   factory :user do
     username { FFaker::Internet.user_name[0..19] }
     email { FFaker::Internet.email }
     password { Devise.friendly_token.first(8) }
-    slug { username. parameterize }
+    slug { username.parameterize }
   end
 end

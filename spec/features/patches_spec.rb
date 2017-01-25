@@ -1,12 +1,6 @@
 require 'rails_helper'
 
 RSpec.feature 'patches', type: :feature, js: true do
-  def range_select(name, value)
-    selector = %(input[type=range][name=\\"#{name}\\"])
-    script = %-$("#{selector}").val(#{value})-
-    page.execute_script(script)
-  end
-
   def perform_around
     VCR.use_cassette('oembed') do
       yield
@@ -17,46 +11,23 @@ RSpec.feature 'patches', type: :feature, js: true do
     perform_around(&example)
   end
 
-  def fill_out_patch_form(dummy_patch, anon = false)
-    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
-    range_select 'patch[attack]', dummy_patch.attack
-    range_select 'patch[decay_release]', dummy_patch.decay_release
-    range_select 'patch[cutoff_eg_int]', dummy_patch.cutoff_eg_int
-    range_select 'patch[octave]', dummy_patch.octave
-    range_select 'patch[peak]', dummy_patch.peak
-    range_select 'patch[cutoff]', dummy_patch.cutoff
-    range_select 'patch[lfo_rate]', dummy_patch.lfo_rate
-    range_select 'patch[lfo_int]', dummy_patch.lfo_int
-    range_select 'patch[vco1_pitch]', dummy_patch.vco1_pitch
-    range_select 'patch[slide_time]', dummy_patch.slide_time
-    range_select 'patch[expression]', dummy_patch.expression
-    range_select 'patch[gate_time]', dummy_patch.gate_time
-    find('#vco1_active_button').click
-    range_select 'patch[vco2_pitch]', dummy_patch.vco2_pitch
-    find('#vco2_active_button').click
-    range_select 'patch[vco3_pitch]', dummy_patch.vco3_pitch
-    find('#vco3_active_button').click
-    find("#{bottom_row} > label:nth-child(4)").click  # vco_group_two
-    find("#{bottom_row} > label:nth-child(9)").click  # lfo_target_amp
-    find("#{bottom_row} > label:nth-child(12)").click # lfo_target_pitch
-    find("#{bottom_row} > label:nth-child(15)").click # lfo_target_cutoff
-    find("#{bottom_row} > label:nth-child(18)").click # lfo_wave
-    find("#{bottom_row} > label:nth-child(21)").click # vco1_wave
-    find("#{bottom_row} > label:nth-child(24)").click # vco2_wave
-    find("#{bottom_row} > label:nth-child(27)").click # vco3_wave
-    find("#{bottom_row} > label:nth-child(30)").click # sustain_on
-    find("#{bottom_row} > label:nth-child(33)").click # amp_eg_on
-    fill_in 'patch[name]', with: dummy_patch.name
-    fill_in 'patch[notes]', with: dummy_patch.notes
-    unless anon
-      check 'patch[secret]'
-      fill_in 'patch[audio_sample]', with: dummy_patch.audio_sample
-    end
-  end
-
   let(:user) { FactoryGirl.create(:user) }
 
   before(:each) { visit root_path }
+
+  scenario 'have initialized values' do
+    click_link 'new-patch'
+    expect(
+      page.find("#{bottom_row_form} > label:nth-child(6) > span > div")['data-active']
+    ).not_to eq(nil) # vco_group 3
+    expect(
+      page.find("#{bottom_row_form} > label:nth-child(15) > span > div")['data-active']
+    ).not_to eq(nil) # lfo_target_cutoff
+    expect(
+      page.find("#{bottom_row_form} > label:nth-child(27) > span > div")['data-active']
+    )
+      .not_to eq(nil) # vco3_wave
+  end
 
   scenario 'can be created by users' do
     login
@@ -68,18 +39,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_title('New Patch | VolcaShare')
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
-
-    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
-    expect(
-      page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
-    ).not_to eq(nil) # vco_group 3
-    expect(
-      page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
-    ).not_to eq(nil) # lfo_target_cutoff
-    expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
-    )
-      .not_to eq(nil) # vco3_wave
 
     dummy_patch = FactoryGirl.build(
       :patch,
@@ -95,7 +54,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
     expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
 
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
     expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
     expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
@@ -114,9 +72,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq('false')
+    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq('true')
+    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq('false')
     expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
@@ -143,17 +101,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(current_path).to eq(new_patch_path)
     expect(page.status_code).to eq(200)
     expect(page).not_to have_content('Secret?')
-    bottom_row = '#patch_form > div.stretchy.col-lg-9 > div > div.bottom-row'
-    expect(
-      page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']
-    ).not_to eq(nil) # vco_group 3
-    expect(
-      page.find("#{bottom_row} > label:nth-child(15) > span > div")['data-active']
-    ).not_to eq(nil) # lfo_target_cutoff
-    expect(
-      page.find("#{bottom_row} > label:nth-child(27) > span > div")['data-active']
-    )
-      .not_to eq(nil) # vco3_wave
 
     dummy_patch = FactoryGirl.build(:patch)
 
@@ -163,8 +110,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     click_button 'Save'
 
     expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by ¯\\_(ツ)_/¯", visible: false
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
-
     expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
     expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
     expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
@@ -183,9 +128,9 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq 'false'
+    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq 'true'
+    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq 'false'
     expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
     expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
@@ -248,18 +193,18 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
     click_button 'Save'
-    expect(page).to have_content 'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
+    expect(page).to have_content('Audio sample needs to be direct SoundCloud, Freesound or YouTube link.')
 
     # YouTube
     fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
     click_button 'Save'
-    expect(page.body).to have_content 'Patch saved successfully.'
+    expect(page.body).to have_content('Patch saved successfully.')
 
     # Freesound
     visit edit_patch_path(patch.slug)
     fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
     click_button 'Save'
-    expect(page.body).to have_content 'Patch saved successfully.'
+    expect(page.body).to have_content('Patch saved successfully.')
   end
 
   scenario 'can be randomized' do
@@ -278,8 +223,6 @@ RSpec.feature 'patches', type: :feature, js: true do
     fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
     click_button 'Save'
 
-    bottom_row = 'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
-
     random_patch = {
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
@@ -295,5 +238,74 @@ RSpec.feature 'patches', type: :feature, js: true do
 
     visit edit_patch_path(Patch.first)
     expect(page).not_to have_selector('#randomize')
+  end
+
+  scenario 'do not randomize midi-only-controls if midi not available' do
+    visit new_patch_path
+    expect(page).to have_link('randomize')
+
+    click_link 'randomize'
+    default_patch = {
+      attack: '63',
+      cutoff: '63',
+      lfo_target_pitch: '',
+      vco3_active: 'true',
+      slide_time: '63',
+      expression: '127',
+      gate_time: '127'
+    }
+
+    fill_in 'patch[name]', with: 'Schnackenpfefferhausen'
+    click_button 'Save'
+
+    random_patch = {
+      attack: page.find('#attack')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      vco3_active: page.find('#vco3_active_button')['data-active'],
+      slide_time: page.find('#slide_time', visible: false)['data-midi'],
+      expression: page.find('#expression', visible: false)['data-midi'],
+      gate_time: page.find('#gate_time', visible: false)['data-midi']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+    expect(random_patch.slice(:slide_time, :expression, :gate_time))
+      .to eq default_patch.slice(:slide_time, :expression, :gate_time)
+  end
+
+  scenario 'that have sequences do not randomize vco groups' do
+    visit new_patch_path
+    expect(page).to have_link('randomize')
+    click_link 'Add sequences'
+
+    click_link 'randomize'
+    default_patch = {
+      attack: '63',
+      cutoff: '63',
+      gate_time: '127',
+      lfo_target_pitch: '',
+      vco_group_3: 'true',
+      vco_group_2: 'false',
+      vco_group_1: 'false'
+    }
+
+    fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
+    click_button 'Save'
+
+    random_patch = {
+      attack: page.find('#attack')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      gate_time: page.find('#gate_time', visible: false)['data-midi'],
+      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      vco_group_3: page.find('#patch_vco_group_three_light')['data-active'],
+      vco_group_2: page.find('#patch_vco_group_two_light')['data-active'],
+      vco_group_1: page.find('#patch_vco_group_one_light')['data-active']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+    expect(random_patch[:vco_group_3]).to eq(default_patch[:vco_group_3])
+    expect(random_patch[:vco2_active]).to eq(default_patch[:vco2_active])
+    expect(random_patch[:vco1_active]).to eq(default_patch[:vco1_active])
+    expect(page).to have_selector('.sequence-show', count: 1)
   end
 end

@@ -1,225 +1,233 @@
 $aspect: 1800 / 1072 / 100;
 $pink: #fd9994;
 
+
+.form {
+  .button {
+    cursor: pointer;
+  }
+  .bottom-row {
+    label {
+      span {
+        cursor: pointer;
+      }
+    }
+  }
+  .knob {
+    cursor: ns-resize;
+  }
+}
 .stretchy {
   padding-bottom: percentage(1 / $aspect / 100);
   position: relative;
   max-width: 830px;
+  .volca {
+    width: 100%;
+    height: 100%;
+    background-image: image_url('VolcaBass-medium.jpg');
+    background-size: cover;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-width:830px;
+    .knob {
+      background-color: #b3b3b5;
+      border: black solid;
+    }
+
+    .notch {
+      background-color: black;
+    }
+
+    .small {
+      width: 7%;
+      height: percentage(7 * $aspect);
+      background-color: $pink;
+    }
+
+    .medium {
+      width: 9.5%;
+      height: percentage(9.5 * $aspect);
+    }
+
+    .large {
+      width: 13.5%;
+      height: percentage(13.5 * $aspect);
+    }
+
+    .eg {
+      top: 11.15%
+    }
+
+    #attack {
+      left: 33.3%;
+    }
+
+    #decay_release {
+      left: 42.2%;
+    }
+
+    #cutoff_eg_int {
+      left: 51.2%;
+    }
+
+    #octave {
+      left: 2.8%;
+      top: 32.5%;
+    }
+
+    #peak {
+      top: 32.45%;
+      left: 14.6%;
+    }
+
+    #cutoff {
+      top: 28.8%;
+      left: 25%;
+    }
+
+    .lfo {
+      top: 32.4%;
+    }
+
+    #lfo_rate {
+      left:39.6%;
+    }
+
+    #lfo_int{
+      left: 50.9%;
+    }
+
+    .vco {
+      top: 35.2%;
+      background-color: #d6d7dc;
+    }
+
+    #vco1_pitch {
+      left: 61.3%;
+    }
+
+    #vco2_pitch {
+      left: 70.3%;
+    }
+
+    #vco3_pitch {
+      left: 79.3%;
+    }
+
+    #led {
+      top: 49%;
+      left: 5.2%;
+      width: 16.5%;
+      height: 13.7%;
+      position: absolute;
+      background-color: #141414;
+    }
+
+    .digit {
+      background-image: image_url('numbers.jpg');
+      background-repeat: no-repeat;
+      width: 18.5%;
+      height: 100%;
+      display: inline-block;
+      margin: 0;
+      background-size: 1120%;
+      position: absolute;
+      top: 14%;
+      background-position: 99.5% 0;
+    }
+
+    #thousands {
+      left: 5%;
+    }
+
+    #hundreds {
+      left: 30%;
+    }
+
+    #tens {
+      left: 53%;
+    }
+
+    #ones {
+      left: 75%;
+    }
+
+    .button {
+      width: 6.4%;
+      height: 6%;
+      position: absolute;
+      top: 54.5%;
+      background-color: #d6d7dc;
+      border: solid black;
+      border-radius: 5px;
+    }
+
+    #vco1_active_button {
+      left: 61.5%;
+    }
+
+    #vco2_active_button {
+      left: 70.6%;
+    }
+
+    #vco3_active_button {
+      left: 79.6%;
+    }
+
+    .bottom-row {
+      position: absolute;
+      top: 83%;
+      width: 100%;
+      height: 13%;
+      padding-left: 5%;
+      input[type="radio"], input[type="checkbox"]  {
+        display:none;
+      }
+      label {
+        float: left;
+        width: 5.95%;
+        height: 100%;
+        display: inline;
+        overflow: hidden;
+        span {
+          width: 89%;
+          height: 89%;
+          position: relative;
+          display: inline-block;
+          .light {
+            width: 73%;
+            height: 53%;
+            border-radius: 50%;
+            background-color: gray;
+            top: 53%;
+            left: 16%;
+            border: 1px black solid;
+            position: absolute;
+          }
+        }
+      }
+    }
+  }
 }
 
-.volca {
-  width: 100%;
-  height: 100%;
-  background-image: image_url('VolcaBass-medium.jpg');
-  background-size: cover;
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  max-width:830px;
-}
 
 .knob {
   border-radius: 50%;
   position: absolute;
   overflow: hidden;
-  cursor: ns-resize;
-}
-
-.notch {
-  position: absolute;
-  width: 8%;
-  height: 25%;
-  left: 46%;
-}
-
-.volca {
-  .knob {
-    background-color: #b3b3b5;
-    border: black solid;
-  }
-
   .notch {
-    background-color: black;
-  }
-
-  .small {
-    width: 3.6%;
-    height: percentage(3.6 * $aspect);
-    background-color: $pink;
-  }
-
-  .medium {
-    width: 6.2%;
-    height: percentage(6.2 * $aspect);
-  }
-
-  .large {
-    width: 10.5%;
-    height: percentage(10.5 * $aspect);
-  }
-
-  .eg {
-    top: 14.15%;
-  }
-
-  #attack {
-    left: 34.875%;
-  }
-
-  #decay_release {
-    left: 43.9%;
-  }
-
-  #cutoff_eg_int {
-    left: 52.915%;
-  }
-
-  #octave {
-    left: 4.4%;
-    top: 35%;
-  }
-
-  #peak {
-    top: 35%;
-    left: 16.25%;
-  }
-
-  #cutoff {
-    top: 31.5%;
-    left: 26.5%;
-  }
-
-  .lfo {
-    top: 35%;
-  }
-
-  #lfo_rate {
-    left:41.25%;
-  }
-
-  #lfo_int{
-    left: 52.5%;
-  }
-
-  .vco {
-    top: 37.2%;
-    background-color: #d6d7dc;
-  }
-
-  #vco1_pitch {
-    left: 62.9%;
-  }
-
-  #vco2_pitch {
-    left: 71.9%;
-  }
-
-  #vco3_pitch {
-    left: 80.9%;
-  }
-
-  #led {
-    top: 49%;
-    left: 5.2%;
-    width: 16.5%;
-    height: 13.7%;
     position: absolute;
-    background-color: #141414;
+    width: 8%;
+    height: 25%;
+    left: 46%;
   }
+}
 
-  .digit {
-    background-image: image_url('numbers.jpg');
-    background-repeat: no-repeat;
-    width: 18.5%;
-    height: 100%;
-    display: inline-block;
-    margin: 0;
-    background-size: 1120%;
-    position: absolute;
-    top: 14%;
-    background-position: 99.5% 0;
-  }
-
-  #thousands {
-    left: 5%;
-  }
-
-  #hundreds {
-    left: 30%;
-  }
-
-  #tens {
-    left: 53%;
-  }
-
-  #ones {
-    left: 75%;
-  }
-
-  .button {
-    width: 6.4%;
-    height: 6%;
-    position: absolute;
-    top: 54.5%;
-    background-color: #d6d7dc;
-    border: solid black;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-
-  #vco1_active_button {
-    left: 61.5%;
-  }
-
-  #vco2_active_button {
-    left: 70.6%;
-  }
-
-  #vco3_active_button {
-    left: 79.6%;
-  }
-
-  .lit {
-    background-color: $pink !important;
-  }
-
-  .bottom-row {
-    position: absolute;
-    top: 83%;
-    width: 100%;
-    height: 13%;
-    padding-left: 5%;
-    input[type="radio"], input[type="checkbox"]  {
-      display:none;
-    }
-    label {
-      float: left;
-      width: 5.95%;
-      height: 100%;
-      display: inline;
-      overflow: hidden;
-      span {
-        width: 89%;
-        height: 89%;
-        position: relative;
-        display: inline-block;
-        cursor: pointer;
-
-        .light {
-          width: 36%;
-          height: 26%;
-          border-radius: 50%;
-          background-color: gray;
-          top: 57%;
-          left: 31%;
-          border: black solid;
-          position: absolute;
-        }
-      }
-    }
-  }
+.lit {
+  background-color: $pink !important;
 }
 
 .form-control-lg {
@@ -248,6 +256,7 @@ $pink: #fd9994;
 #midi-only-panel{
   border-radius: 8px;
   overflow: hidden;
+  width: 255px;
   #midi-only-title {
     width: 100%;
     background-color: black;
@@ -295,11 +304,13 @@ $pink: #fd9994;
   }
 }
 
-
+#interface {
+  padding: 0;
+}
 .stretchy2 {
   width: 100%;
   position: relative;
-
+  padding-bottom: 40%;
   #midi-only-controls {
     background-image: image_url('midi-only-1200.jpg');
     background-size: cover;
@@ -315,9 +326,21 @@ $pink: #fd9994;
       border: lightgreen solid;
       position: absolute;
       box-shadow: 0 0 10px lightgreen;
+      width: 17.28%;
+      height: 43.2%;
+      top: 36%;
       .notch {
         background-color: lightgreen;
       }
+    }
+    #slide_time {
+      left: 11%;
+    }
+    #expression {
+      left: 43%;
+    }
+    #gate_time {
+      left: 73%;
     }
   }
 }
@@ -329,9 +352,109 @@ fieldset {
   }
 }
 
+@media (min-width: 440px) {
+  .stretchy {
+    .volca {
+      .bottom-row {
+        label {
+          span {
+            .light {
+              border: 2px black solid;
+              // width: 47%;
+              // height: 34%;
+              // top: 55%;
+              // left: 30%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .stretchy {
+    .volca {
+      .small {
+        width: 3.6%;
+        height: percentage(3.6 * $aspect);
+      }
+      .medium {
+        width: 6.2%;
+        height: percentage(6.2 * $aspect);
+      }
+      .large {
+        width: 10.5%;
+        height: percentage(10.5 * $aspect);
+      }
+      .eg {
+        top: 14.15%;
+      }
+      #attack {
+        left: 34.875%;
+      }
+      #decay_release {
+        left: 43.9%;
+      }
+      #cutoff_eg_int {
+        left: 52.915%;
+      }
+      #octave {
+        left: 4.4%;
+        top: 35%;
+      }
+      #peak {
+        top: 35%;
+        left: 16.25%;
+      }
+      #cutoff {
+        top: 31.5%;
+        left: 26.5%;
+      }
+      .lfo {
+        top: 35%;
+      }
+
+      #lfo_rate {
+        left:41.25%;
+      }
+
+      #lfo_int{
+        left: 52.5%;
+      }
+      .vco {
+        top: 37.2%;
+      }
+      #vco1_pitch {
+        left: 62.9%;
+      }
+      #vco2_pitch {
+        left: 71.9%;
+      }
+
+      #vco3_pitch {
+        left: 80.9%;
+      }
+      .bottom-row {
+        label {
+          span {
+            .light {
+              border: black solid;
+              width: 47%;
+              height: 34%;
+              top: 55%;
+              left: 30%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 @media (min-width: 990px) {
   .stretchy {
-    padding-bottom: 52.4%;
+    padding-bottom: 52.685%;
     position: relative;
     max-width: 830px;
     .volca {
@@ -345,11 +468,15 @@ fieldset {
 
 @media (min-width: 1200px) {
   .stretchy {
-    padding-bottom: 43.4%;
+    width: 100%;
+    padding-bottom: 57.923%;
     max-width: 830px;
     .volca {
       margin: 0;
     }
+  }
+  #midi-only-panel{
+    width: 100%;
   }
 
   #patch-metadata {
@@ -370,56 +497,12 @@ fieldset {
   }
 
   .stretchy2 {
-    padding-bottom: 40%;
     #midi-only-controls {
       .knob {
         width: 18.7%;
         height: 47%;
         top: 34%;
       }
-      #slide_time {
-        left: 11%;
-      }
-      #expression {
-        left: 43%;
-      }
-      #gate_time {
-        left: 73%;
-      }
-
     }
-  }
-}
-
-@media (max-width: 1200px) {
-  #midi-only-panel{
-    width: 36.957%;
-  }
-
-  .stretchy2 {
-    padding-bottom: 40%;
-
-    #midi-only-controls {
-      .knob {
-        width: 17.28%;
-        height: 43.2%;
-        top: 36%;
-      }
-      #slide_time {
-        left: 11%;
-      }
-      #expression {
-        left: 43%;
-      }
-      #gate_time {
-        left: 73%;
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  #midi-only-panel{
-    width: 255px;
   }
 }

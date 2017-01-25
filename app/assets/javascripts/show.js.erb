@@ -5,8 +5,14 @@ $(function() {
   var activeKnob, knob;
   var display = new Display($('#led'));
   var limit = 140;
-
   var midiOut = new MidiOut;
+
+  var loadAudioSample = function(){
+    var element = $('.sample');
+    if (element.data('embed-code') !== undefined){
+      element.html(element.data('embed-code'));
+    }
+  }
 
   $('#midi-device').change(function(){
     midiOut.changeOutput(this);
@@ -43,6 +49,16 @@ $(function() {
     }
   });
 
+  $('.sequence-light').each(function(){
+    if ($(this).data('active')) {
+      $(this).addClass('lit');
+    }
+  });
+
+  $('.step-note').each(function(){
+    $(this).html(midiNoteNumbers[parseInt($(this).data('note'))]);
+  });
+
   $('.button').each(function(){
     var vco, value, vcoKnob, input;
     vco = $(this).attr('id').split('_')[0];
@@ -53,6 +69,8 @@ $(function() {
       vcoKnob.addClass('lit');
     }
   });
+
+  loadAudioSample();
 
   $('.knob').mouseenter(function(){
     var midi = $(this).data('midi');

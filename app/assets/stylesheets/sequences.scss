@@ -1,0 +1,168 @@
+
+.form {
+  .note {
+    span {
+      cursor: ns-resize;
+    }
+  }
+  .step-mode, .slide, .active-step {
+    span {
+       cursor: pointer;
+    }
+  }
+}
+.sequence-form, .sequence-show {
+  padding-bottom: 18.5%;
+  padding-left: 2.1%;
+  padding-right: 3.2%;
+  position: relative;
+  min-height: 128px;
+  left: -1.7%;
+  max-width: 913px;
+  width: 100%;
+  margin: 3% 0;
+  input[type="radio"], input[type="checkbox"]  {
+    display:none;
+  }
+
+  .outer-sequence-box {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+  }
+  .sequence-box {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  .param-labels {
+    float: left;
+    display: inline;
+    height: 100%;
+    width: 9.6%;
+    font-family: sans-serif;
+    text-transform: uppercase;
+    font-stretch: condensed;
+    font-weight: 800;
+    font-size: x-small;
+    div {
+      height: 25%
+    }
+    .spacer {
+      height: 10%;
+    }
+  }
+  .param {
+    height: 25%;
+  }
+  .line {
+    border-right: 1px solid black;
+  }
+  .scrolly {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    float: left;
+    height: 100%;
+    width: 90%;
+    .steps {
+      min-width: 648px;
+      height: 100%;
+      position: relative;
+      .step {
+        float: left;
+        display: inline;
+        height: 100%;
+        width: 6.25%;
+        .arrow {
+          width: 0;
+          height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          margin-left: 41%;
+        }
+        .up {
+          border-bottom: 5px solid black;
+        }
+        .down {
+          border-top: 5px solid black;
+          position: relative;
+          top: -7%;
+        }
+        .note{
+          text-align: center;
+          font-size: 18px;
+          position: relative;
+          top: -3px;
+          label {
+            margin: 0
+          }
+        }
+        label {
+          width: 100%;
+          height: 100%;
+        }
+        span {
+          width: 89%;
+          height: 89%;
+          position: relative;
+          display: inline-block;
+
+          .light {
+            height: 62%;
+            width: 52%;
+            border-radius: 50%;
+            background-color: gray;
+            left: 37%;
+            border: black solid;
+            position: absolute;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .sequence-form, .sequence-show {
+    .param-labels {
+      font-size: smaller;
+    }
+  }
+}
+
+@media (min-width: 990px) {
+  .sequence-form, .sequence-show {
+    padding-bottom: 14%;
+    padding-left: 2.1%;
+    padding-right: 3.2%;
+    max-width: 913px;
+    min-height: 128px;
+    width: 110%;
+    left: -1.7%;
+    margin: 3% 0;
+    .scrolly {
+      .steps {
+        .step {
+          width: 5.7%;
+          span {
+            .light {
+              height: 62%;
+              width: 44%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  .sequence-form, .sequence-show {
+    left: -66px;
+    .step {
+      .light {
+        height: 57.6%;
+      }
+    }
+  }
+}
