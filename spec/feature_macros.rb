@@ -56,9 +56,9 @@ def seq_form_light(seq, step, param)
 end
 
 def bottom_row
-  'body > div > div.stretchy.col-lg-9 > div > div.bottom-row'
+  '#interface > div.stretchy > div > div.bottom-row'
 end
 
 def bottom_row_form
-  '#patch_form > div.interface.col-lg-9 > div.stretchy > div > div.bottom-row'
+  '#patch_form > div#interface.col-lg-9 > div.stretchy > div > div.bottom-row'
 end

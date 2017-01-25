@@ -175,7 +175,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
-    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('G4')
+    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('D4')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_6_slide_light.lit')
@@ -310,7 +310,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
-    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('C#4')
+    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('D4')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
