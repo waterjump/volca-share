@@ -48,51 +48,51 @@
       .bottom-row
         = label_tag('patch[vco_group_one]') do
           %span
-            .light{ id: 'patch_vco_group_one_light', data: { active: @patch.vco_group_one.to_s } }
+            .light{ id: 'vco_group_one_light', data: { active: @patch.vco_group_one.to_s } }
 
         = label_tag('patch[vco_group_two]') do
           %span
-            .light{ id: 'patch_vco_group_two_light', data: { active: @patch.vco_group_two.to_s } }
+            .light{ id: 'vco_group_two_light', data: { active: @patch.vco_group_two.to_s } }
 
         = label_tag('patch[vco_group_three]') do
           %span
-            .light{ id: 'patch_vco_group_three_light', data: { active: @patch.vco_group_three.to_s } }
+            .light{ id: 'vco_group_three_light', data: { active: @patch.vco_group_three.to_s } }
 
         = label_tag('patch[lfo_target_amp]') do
           %span
-            .light{ data: { active: @patch.lfo_target_amp.to_s } }
+            .light{ id: 'lfo_target_amp_light', data: { active: @patch.lfo_target_amp.to_s } }
 
         = label_tag('patch[lfo_target_pitch]') do
           %span
-            .light{ data: { active: @patch.lfo_target_pitch.to_s } }
+            .light{ id: 'lfo_target_pitch_light', data: { active: @patch.lfo_target_pitch.to_s } }
 
         = label_tag('patch[lfo_target_cutoff]') do
           %span
-            .light{ data: { active: @patch.lfo_target_cutoff.to_s } }
+            .light{ id: 'lfo_target_cutoff_light', data: { active: @patch.lfo_target_cutoff.to_s } }
 
         = label_tag('patch[lfo_wave]') do
           %span
-            .light{ data: { active: @patch.lfo_wave.to_s } }
+            .light{ id: 'lfo_wave_light', data: { active: @patch.lfo_wave.to_s } }
 
         = label_tag('patch[vco1_wave]') do
           %span
-            .light{ data: { active: @patch.vco1_wave.to_s } }
+            .light{ id: 'vco1_wave_light', data: { active: @patch.vco1_wave.to_s } }
 
         = label_tag('patch[vco2_wave]') do
           %span
-            .light{ data: { active: @patch.vco2_wave.to_s } }
+            .light{ id: 'vco2_wave_light', data: { active: @patch.vco2_wave.to_s } }
 
         = label_tag('patch[vco3_wave]') do
           %span
-            .light{ data: { active: @patch.vco3_wave.to_s } }
+            .light{ id: 'vco3_wave_light', data: { active: @patch.vco3_wave.to_s } }
 
         = label_tag('patch[sustain_on]') do
           %span
-            .light{ data: { active: @patch.sustain_on.to_s } }
+            .light{ id: 'sustain_on_light', data: { active: @patch.sustain_on.to_s } }
 
         = label_tag('patch[amp_eg_on]') do
           %span
-            .light{ data: { active: @patch.amp_eg_on.to_s } }
+            .light{ id: 'amp_eg_on_light', data: { active: @patch.amp_eg_on.to_s } }
   .field.sequence-area
     - if @patch.sequences.present?
       = render 'sequences/show'

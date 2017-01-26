@@ -39,62 +39,62 @@
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
         = label_tag('patch[vco_group_one]') do
           %span.multi
-            .light{ data: { radio: true, active: @patch.vco_group_one.to_s } }
+            .light{ id: 'vco_group_one_light', data: { radio: true, active: @patch.vco_group_one.to_s } }
 
         = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
         = label_tag('patch[vco_group_two]') do
           %span.multi
-            .light{ data: { radio: true, active: @patch.vco_group_two.to_s } }
+            .light{ id: 'vco_group_two_light', data: { radio: true, active: @patch.vco_group_two.to_s } }
 
         = radio_button_tag 'patch[vco_group]', 'three', @patch.vco_group_three, class: :control
         = label_tag('patch[vco_group_three]') do
           %span.multi
-            .light{ data: { radio: true, active: @patch.vco_group_three.to_s } }
+            .light{ id: 'vco_group_three_light', data: { radio: true, active: @patch.vco_group_three.to_s } }
 
         = check_box :patch, :lfo_target_amp, @patch.checked?('lfo_target_amp'), 'true', 'false'
         = label_tag('patch[lfo_target_amp]') do
           %span.on-off
-            .light{ data: { active: @patch.lfo_target_amp.to_s } }
+            .light{ id: 'lfo_target_amp_light', data: { active: @patch.lfo_target_amp.to_s } }
 
         = check_box :patch, :lfo_target_pitch, @patch.checked?('lfo_target_pitch'), 'true', 'false'
         = label_tag('patch[lfo_target_pitch]') do
           %span.on-off
-            .light{ data: { active: @patch.lfo_target_pitch.to_s } }
+            .light{ id: 'lfo_target_pitch_light', data: { active: @patch.lfo_target_pitch.to_s } }
 
         = check_box :patch, :lfo_target_cutoff, @patch.checked?('lfo_target_cutoff'), 'true', 'false'
         = label_tag('patch[lfo_target_cutoff]') do
           %span.on-off
-            .light{ data: { active: @patch.lfo_target_cutoff.to_s } }
+            .light{ id: 'lfo_target_cutoff_light', data: { active: @patch.lfo_target_cutoff.to_s } }
 
         = check_box :patch, :lfo_wave, @patch.checked?('lfo_wave'), 'true', 'false'
         = label_tag('patch[lfo_wave]') do
           %span.on-off
-            .light{ data: { active: @patch.lfo_wave.to_s } }
+            .light{ id: 'lfo_wave_light', data: { active: @patch.lfo_wave.to_s } }
 
         = check_box :patch, :vco1_wave, @patch.checked?('vco1_wave'), 'true', 'false'
         = label_tag('patch[vco1_wave]') do
           %span.on-off
-            .light{ data: { active: @patch.vco1_wave.to_s } }
+            .light{ id: 'vco1_wave_light', data: { active: @patch.vco1_wave.to_s } }
 
         = check_box :patch, :vco2_wave, @patch.checked?('vco2_wave'), 'true', 'false'
         = label_tag('patch[vco2_wave]') do
           %span.on-off
-            .light{ data: { active: @patch.vco2_wave.to_s } }
+            .light{ id: 'vco2_wave_light', data: { active: @patch.vco2_wave.to_s } }
 
         = check_box :patch, :vco3_wave, @patch.checked?('vco3_wave'), 'true', 'false'
         = label_tag('patch[vco3_wave]') do
           %span.on-off
-            .light{ data: { active: @patch.vco3_wave.to_s } }
+            .light{ id: 'vco3_wave_light', data: { active: @patch.vco3_wave.to_s } }
 
         = check_box :patch, :sustain_on, @patch.checked?('sustain_on'), 'true', 'false'
         = label_tag('patch[sustain_on]') do
           %span.on-off
-            .light{ data: { active: @patch.sustain_on.to_s } }
+            .light{ id: 'sustain_on_light', data: { active: @patch.sustain_on.to_s } }
 
         = check_box :patch, :amp_eg_on, @patch.checked?('amp_eg_on'), 'true', 'false'
         = label_tag('patch[amp_eg_on]') do
           %span.on-off
-            .light{ data: { active: @patch.amp_eg_on.to_s } }
+            .light{ id: 'amp_eg_on_light', data: { active: @patch.amp_eg_on.to_s } }
 
   = range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
   = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden

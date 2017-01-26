@@ -17,16 +17,9 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'have initialized values' do
     click_link 'new-patch'
-    expect(
-      page.find("#{bottom_row_form} > label:nth-child(6) > span > div")['data-active']
-    ).not_to eq(nil) # vco_group 3
-    expect(
-      page.find("#{bottom_row_form} > label:nth-child(15) > span > div")['data-active']
-    ).not_to eq(nil) # lfo_target_cutoff
-    expect(
-      page.find("#{bottom_row_form} > label:nth-child(27) > span > div")['data-active']
-    )
-      .not_to eq(nil) # vco3_wave
+    expect(page.find('#vco_group_three_light')['data-active']).not_to eq(nil)
+    expect(page.find('#lfo_target_cutoff_light')['data-active']).not_to eq(nil)
+    expect(page.find('#vco3_wave_light')['data-active']).not_to eq(nil)
   end
 
   scenario 'can be created by users' do
@@ -72,18 +65,18 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq('false')
-    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq('true')
-    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq 'true'
+    expect(page.find('#vco_group_one_light')['data-active']).to eq('false')
+    expect(page.find('#vco_group_two_light')['data-active']).to eq('true')
+    expect(page.find('#vco_group_three_light')['data-active']).to eq('false')
+    expect(page.find('#lfo_target_amp_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_pitch_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq 'false'
+    expect(page.find('#lfo_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco1_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco2_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco3_wave_light')['data-active']).to eq 'false'
+    expect(page.find('#sustain_on_light')['data-active']).to eq 'true'
+    expect(page.find('#amp_eg_on_light ')['data-active']).to eq 'true'
     expect(page).to have_content(dummy_patch.name)
     expect(page).to have_content(dummy_patch.notes)
 
@@ -128,18 +121,18 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find('#patch_vco_group_one_light')['data-active']).to eq 'false'
-    expect(page.find('#patch_vco_group_two_light')['data-active']).to eq 'true'
-    expect(page.find('#patch_vco_group_three_light')['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq 'true'
+    expect(page.find('#vco_group_one_light')['data-active']).to eq 'false'
+    expect(page.find('#vco_group_two_light')['data-active']).to eq 'true'
+    expect(page.find('#vco_group_three_light')['data-active']).to eq 'false'
+    expect(page.find('#lfo_target_amp_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_pitch_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq 'false'
+    expect(page.find('#lfo_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco1_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco2_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco3_wave_light')['data-active']).to eq 'false'
+    expect(page.find('#sustain_on_light')['data-active']).to eq 'true'
+    expect(page.find('#amp_eg_on_light')['data-active']).to eq 'true'
     expect(page).to have_content(dummy_patch.name)
     expect(page).to have_content(dummy_patch.notes)
     expect(page).to have_css('.volca')
@@ -227,7 +220,7 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
       gate_time: page.find('#gate_time', visible: false)['data-midi'],
-      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
       vco3_active: page.find('#vco3_active_button')['data-active']
     }
 
@@ -261,7 +254,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     random_patch = {
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
-      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
+      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
       vco3_active: page.find('#vco3_active_button')['data-active'],
       slide_time: page.find('#slide_time', visible: false)['data-midi'],
       expression: page.find('#expression', visible: false)['data-midi'],
@@ -296,10 +289,10 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
       gate_time: page.find('#gate_time', visible: false)['data-midi'],
-      lfo_target_pitch: page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active'],
-      vco_group_3: page.find('#patch_vco_group_three_light')['data-active'],
-      vco_group_2: page.find('#patch_vco_group_two_light')['data-active'],
-      vco_group_1: page.find('#patch_vco_group_one_light')['data-active']
+      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
+      vco_group_3: page.find('#vco_group_three_light')['data-active'],
+      vco_group_2: page.find('#vco_group_two_light')['data-active'],
+      vco_group_1: page.find('#vco_group_one_light')['data-active']
     }
 
     expect(random_patch).not_to eq(default_patch)

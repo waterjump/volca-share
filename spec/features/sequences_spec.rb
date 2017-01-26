@@ -62,18 +62,19 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco2_active_button')['data-active']).to eq('false')
     expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find("#{bottom_row} > label:nth-child(1) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(2) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(3) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(4) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(5) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(6) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(7) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(8) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(9) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(10) > span > div")['data-active']).to eq 'false'
-    expect(page.find("#{bottom_row} > label:nth-child(11) > span > div")['data-active']).to eq 'true'
-    expect(page.find("#{bottom_row} > label:nth-child(12) > span > div")['data-active']).to eq 'true'
+    expect(page.find('#vco_group_one_light')['data-active']).to eq 'false'
+    expect(page.find('#vco_group_two_light')['data-active']).to eq 'true'
+    expect(page.find('#vco_group_three_light')['data-active']).to eq 'false'
+    expect(page.find('#lfo_target_amp_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_pitch_light')['data-active']).to eq 'true'
+    expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq 'false'
+    expect(page.find('#lfo_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco1_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco2_wave_light')['data-active']).to eq 'true'
+    expect(page.find('#vco3_wave_light')['data-active']).to eq 'false'
+    expect(page.find('#sustain_on_light')['data-active']).to eq 'true'
+    expect(page.find('#amp_eg_on_light')['data-active']).to eq 'true'
+
     expect(page).to have_content(dummy_patch.name)
     expect(page).to have_content(dummy_patch.notes)
 
@@ -91,7 +92,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row_form} > label:nth-child(2)").click  # vco_group_one
+    find('#vco_group_one_light').click
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 3)
@@ -115,7 +116,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row_form} > label:nth-child(4)").click  # vco_group_two
+    find('#vco_group_two_light').click
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 2)
@@ -133,7 +134,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row_form} > label:nth-child(6)").click  # vco_group_three
+    find('#vco_group_three_light').click
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 1)
@@ -151,7 +152,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row_form} > label:nth-child(6)").click
+    find('#vco_group_three_light').click
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 1)
 
@@ -216,7 +217,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
     dummy_patch = FactoryGirl.build(:patch)
 
     fill_out_patch_form(dummy_patch)
-    find("#{bottom_row_form} > label:nth-child(4)").click  # vco_group_two
+    find('#vco_group_two_light').click
     expect(page).to have_link('Add sequences')
 
     click_link 'Add sequences'
@@ -258,7 +259,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     click_link 'Edit'
     expect(page).to have_selector('.sequence-box', count: 2)
-    find("#{bottom_row_form} > label:nth-child(6)").click
+    find('#vco_group_three_light').click
 
     click_button 'Save'
     patch = Patch.find_by(name: '666')
@@ -273,11 +274,11 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
-    find("#{bottom_row_form} > label:nth-child(4)").click  # vco_group_two
+    find('#vco_group_two_light').click
     click_link 'Add sequences'
 
     expect(page).to have_selector('.sequence-box', count: 2)
-    find("#{bottom_row_form} > label:nth-child(6)").click
+    find('#vco_group_three_light').click
 
     click_button 'Save'
     patch = Patch.where(name: dummy_patch.name).first
@@ -391,7 +392,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 1)
     click_link 'Remove sequences'
 
-    find("#{bottom_row_form} > label:nth-child(2)").click  # vco_group_one
+    find('#vco_group_one_light').click
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 3)
 
@@ -425,10 +426,10 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 1)
 
     click_link 'Remove sequences'
-    find("#{bottom_row_form} > label:nth-child(2)").click  # vco_group_one
+    find('#vco_group_one_light').click
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 3)
-    find("#{bottom_row_form} > label:nth-child(4)").click  # vco_group_two
+    find('#vco_group_two_light').click
     expect(page).to have_selector('.sequence-form', count: 3)
     expect(page.all('.sequence-area .remove-sequence', visible: false).last.value).to eq('true')
 

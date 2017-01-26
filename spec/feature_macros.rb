@@ -25,16 +25,16 @@ def fill_out_patch_form(dummy_patch, anon = false)
   find('#vco2_active_button').click
   range_select 'patch[vco3_pitch]', dummy_patch.vco3_pitch
   find('#vco3_active_button').click
-  find("#{bottom_row_form} > label:nth-child(4)").click  # vco_group_two
-  find("#{bottom_row_form} > label:nth-child(9)").click  # lfo_target_amp
-  find("#{bottom_row_form} > label:nth-child(12)").click # lfo_target_pitch
-  find("#{bottom_row_form} > label:nth-child(15)").click # lfo_target_cutoff
-  find("#{bottom_row_form} > label:nth-child(18)").click # lfo_wave
-  find("#{bottom_row_form} > label:nth-child(21)").click # vco1_wave
-  find("#{bottom_row_form} > label:nth-child(24)").click # vco2_wave
-  find("#{bottom_row_form} > label:nth-child(27)").click # vco3_wave
-  find("#{bottom_row_form} > label:nth-child(30)").click # sustain_on
-  find("#{bottom_row_form} > label:nth-child(33)").click # amp_eg_on
+  find('#vco_group_two_light').click
+  find('#lfo_target_amp_light').click
+  find('#lfo_target_pitch_light').click
+  find('#lfo_target_cutoff_light').click
+  find('#lfo_wave_light').click
+  find('#vco1_wave_light').click
+  find('#vco2_wave_light').click
+  find('#vco3_wave_light').click
+  find('#sustain_on_light').click
+  find('#amp_eg_on_light').click
   fill_in 'patch[name]', with: dummy_patch.name
   fill_in 'patch[notes]', with: dummy_patch.notes
   unless anon
@@ -53,12 +53,4 @@ def seq_form_light(seq, step, param)
   page.find(
     "label[for=patch_sequences_attributes_#{seq}_step_#{step}_#{param}]"
   )
-end
-
-def bottom_row
-  '#interface > div.stretchy > div > div.bottom-row'
-end
-
-def bottom_row_form
-  '#patch_form > div#interface.col-lg-9 > div.stretchy > div > div.bottom-row'
 end
