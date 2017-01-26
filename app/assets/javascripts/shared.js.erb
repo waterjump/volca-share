@@ -15,7 +15,7 @@ var midiMultiples = {
 
 var midiNoteNumbers = {};
 for (i = 0; i < 128; i++) {
-  midiNoteNumbers[i] = midiMultiples[i % 12] + Math.floor(i / 12);
+  midiNoteNumbers[i] = midiMultiples[i % 12] + (Math.floor(i / 12) - 2);
 }
 
 $(function() {

@@ -1,92 +1,157 @@
 function Display(element) {
   this.element = element;
-  this.constructDisplayString = function(value, pitch, octave) {
+
+  this.constructDisplayString = function(value, pitch, octave, note) {
+    if (pitch === true) {
+      return this.pitchString(value);
+    } else if (octave) {
+      return this.octaveString(value);
+    } else if (note) {
+      return this.noteString(value);
+    } else {
+      return this.midiString(value);
+    }
+  }
+
+  this.pitchString = function(value) {
     var displayString, thousands, hundreds, tens, ones, tensString;
     tensString = '' + (Math.abs(value) / 100);
-    if (pitch === true) {
-      if (value < 0) {
-        thousands = 'dash';
-      } else {
-        thousands = 'blank';
-      }
-
-      value = Math.abs(value);
-      if (value >= 100 && value < 1000) {
-        ones = 'n';
-        tens = tensString[0];
-        hundreds = '0';
-      } else if (value >= 1000) {
-        ones = 'n';
-        tens = ('' + value)[1];
-        hundreds = ('' + value)[0];
-      } else if (value < 100 && value >= 10) {
-        ones = 'c';
-        tens = ('' + value)[1];
-        hundreds = ('' + value)[0]
-      } else if (value < 10) {
-        ones = 'c';
-        tens = ('' + value)[0];
-        hundreds = '0'
-      }
-      displayString = [thousands, hundreds, tens, ones];
-
-      if (value === 0 ) {
-        displayString = 'blank o f f'.split(' ');
-      }
-    } else if (octave) {
-      thousands = 'o';
-      hundreds = 'c';
-      tens = 't';
-      switch(true) {
-        case (value < 22):
-          ones = '1';
-          break;
-        case (value >= 22 && value < 44):
-          ones = '2';
-          break;
-        case (value >= 44 && value < 66):
-          ones = '3';
-          break;
-        case (value >= 66 && value < 88):
-          ones = '4';
-          break;
-        case (value >= 88 && value < 110):
-          ones = '5';
-          break;
-        case (value >= 110 && value <= 127):
-          ones = '6';
-          break;
-      }
-      displayString = [thousands, hundreds, tens, ones];
+    if (value < 0) {
+      thousands = 'dash';
     } else {
       thousands = 'blank';
-      if (value > 99) {
-        hundreds = ('' + value)[0];
-        tens = ('' + value)[1];
-        ones = ('' + value)[2];
-      } else if (value > 9) {
-        hundreds = 'blank';
-        tens = ('' + value)[0];
-        ones = ('' + value)[1];
-      } else {
-        hundreds = 'blank';
-        tens = 'blank';
-        ones = '' + value;
-      }
-      displayString = [thousands, hundreds, tens, ones];
+    }
+
+    value = Math.abs(value);
+    if (value >= 100 && value < 1000) {
+      ones = 'n';
+      tens = tensString[0];
+      hundreds = '0';
+    } else if (value >= 1000) {
+      ones = 'n';
+      tens = ('' + value)[1];
+      hundreds = ('' + value)[0];
+    } else if (value < 100 && value >= 10) {
+      ones = 'c';
+      tens = ('' + value)[1];
+      hundreds = ('' + value)[0]
+    } else if (value < 10) {
+      ones = 'c';
+      tens = ('' + value)[0];
+      hundreds = '0'
+    }
+    displayString = [thousands, hundreds, tens, ones];
+
+    if (value === 0 ) {
+      displayString = 'blank o f f'.split(' ');
     }
 
     return displayString;
   }
 
-  this.update = function(midi, pitch, octave){
+  this.octaveString = function(value) {
+    var thousands, hundreds, tens, ones;
+    thousands = 'o';
+    hundreds = 'c';
+    tens = 't';
+    switch(true) {
+      case (value < 22):
+        ones = '1';
+        break;
+      case (value >= 22 && value < 44):
+        ones = '2';
+        break;
+      case (value >= 44 && value < 66):
+        ones = '3';
+        break;
+      case (value >= 66 && value < 88):
+        ones = '4';
+        break;
+      case (value >= 88 && value < 110):
+        ones = '5';
+        break;
+      case (value >= 110 && value <= 127):
+        ones = '6';
+        break;
+    }
+    displayString = [thousands, hundreds, tens, ones];
+  }
+
+  this.noteString = function(value) {
+    console.log( "69BOT - value: " + value);
+    var thousands, hundreds, tens, ones;
+    thousands = 'o';
+    hundreds = 'c';
+    tens = 't';
+    switch(true) {
+      case (value < 9):
+        tens = 'dash'
+        ones = '1';
+        break;
+      case (value >= 9 && value < 21):
+        ones = '0';
+        break;
+      case (value >= 21 && value < 33):
+        ones = '1';
+        break;
+      case (value >= 33 && value < 45):
+        ones = '2';
+        break;
+      case (value >= 45 && value < 57):
+        ones = '3';
+        break;
+      case (value >= 57 && value < 69):
+        ones = '4';
+        break;
+      case (value >= 69 && value < 71):
+        ones = '5';
+        break;
+      case (value >= 71 && value < 83):
+        ones = '6';
+        break;
+      case (value >= 83 && value < 95):
+        ones = '7';
+        break;
+      case (value >= 95  && value < 107):
+        ones = '8';
+        break;
+      case (value >= 107  && value < 119):
+        ones = '9';
+        break;
+      case (value >= 119):
+        ones = 'blank';
+        break;
+    }
+    return [thousands, hundreds, tens, ones];
+  }
+
+  this.midiString = function(value) {
+    var thousands, hundreds, tens, ones;
+    thousands = 'blank';
+    if (value > 99) {
+      hundreds = ('' + value)[0];
+      tens = ('' + value)[1];
+      ones = ('' + value)[2];
+    } else if (value > 9) {
+      hundreds = 'blank';
+      tens = ('' + value)[0];
+      ones = ('' + value)[1];
+    } else {
+      hundreds = 'blank';
+      tens = 'blank';
+      ones = '' + value;
+    }
+    return [thousands, hundreds, tens, ones];
+  }
+
+  this.update = function(midi, pitch, octave, note){
     var displayValue, letter, thousands, hundreds, tens, ones;
     if (pitch) {
       displayValue = this.vcoPitchValues[midi];
     } else {
       displayValue = midi;
     }
-    displayString = this.constructDisplayString(displayValue, pitch, octave);
+    displayString = this.constructDisplayString(displayValue, pitch, octave, note);
 
     this.digit1.setSprite(displayString[0]);
     $(this.digit1.element).css('background-position', this.calculateClockOffset(displayString[0], 1) + '% 0');

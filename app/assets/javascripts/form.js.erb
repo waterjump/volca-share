@@ -12,6 +12,7 @@ $(function() {
   var sequencesActive = $(".remove-sequence[value='false']").toArray().length > 1;
   var sequenceCount = 0;
   var midiOut = new MidiOut;
+  var playingNote;
 
   var syncMidi = function(){
     $('.knob').each(function(){
@@ -25,6 +26,63 @@ $(function() {
     });
   }
 
+  var playNote = function(note) {
+    if (midiOut.ready()) {
+      if (playingNote !== note) {
+        if (playingNote !== undefined){
+          midiOut.output.stopNote(playingNote);
+        }
+        midiOut.output.playNote(note);
+        playingNote = note;
+      }
+    }
+  }
+
+  var stopNote = function() {
+    if (midiOut.ready() && playingNote !== undefined) {
+        midiOut.output.stopNote(playingNote);
+        playingNote = undefined;
+    }
+  }
+
+  //
+  // run immediately
+  //
+
+  $('.button').each(function(){
+    var vco, value, vcoKnob;
+    vco = $(this).attr('id').split('_')[0];
+    value = $(this).data('active');
+    vcoKnob = $('.knob#' + vco + '_pitch');
+    if (value === true) {
+      $(this).addClass('lit');
+      vcoKnob.addClass('lit');
+    }
+  });
+
+  $('.knob').each(function() {
+    my_knob = new Knob(this);
+    degree = my_knob.degreeForMidi($(this).data('midi'), limit);
+    $(this).data('rotation', degree);
+    my_knob.autoRotate(degree, '#' + $(this).attr('id'));
+  });
+
+  $('.bottom-row label, .sequence-box label').each(function(){
+    var myInput = $('input#' + $(this).attr('for'));
+    if (myInput.prop('checked')) {
+      $(this).find('span').find('div').addClass('lit');
+    }
+  });
+
+  $('.note-display').each(function(){
+      $(this).html(midiNoteNumbers[$(this).data('starting-note')]);
+  });
+
+
+
+  //
+  // user actions
+  //
   $("#toggle-sequences").on('click tap', function(e) {
     var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
     switch(vcoGroup) {
@@ -85,10 +143,6 @@ $(function() {
     }
   });
 
-  $('.note-display').each(function(){
-      $(this).html(midiNoteNumbers[$(this).data('starting-note')]);
-  });
-
   $('#midi-device').change(function(){
     midiOut.changeOutput(this);
     midiOut.enableSync();
@@ -101,13 +155,6 @@ $(function() {
 
   $('#sync').on('click tap', function(){
     syncMidi();
-  });
-
-  $('.knob').each(function() {
-    my_knob = new Knob(this);
-    degree = my_knob.degreeForMidi($(this).data('midi'), limit);
-    $(this).data('rotation', degree);
-    my_knob.autoRotate(degree, '#' + $(this).attr('id'));
   });
 
   // TODO DRY this up.
@@ -129,7 +176,7 @@ $(function() {
     });
 
     if (midiOut.ready()) {
-      $('.#midi-only-controls .knob').each(function() {
+      $('#midi-only-controls .knob').each(function() {
         assignKnobValue($(this));
       });
     }
@@ -181,13 +228,6 @@ $(function() {
     }
 
     syncMidi();
-  });
-
-  $('.bottom-row label, .sequence-box label').each(function(){
-    var myInput = $('input#' + $(this).attr('for'));
-    if (myInput.prop('checked')) {
-      $(this).find('span').find('div').addClass('lit');
-    }
   });
 
   $('.bottom-row .on-off').on('click tap', function(){
@@ -258,17 +298,6 @@ $(function() {
     $(this).find('.light').addClass('lit');
   });
 
-  $('.button').each(function(){
-    var vco, value, vcoKnob;
-    vco = $(this).attr('id').split('_')[0];
-    value = $(this).data('active');
-    vcoKnob = $('.knob#' + vco + '_pitch');
-    if (value === true) {
-      $(this).addClass('lit');
-      vcoKnob.addClass('lit');
-    }
-  });
-
   $('.button').on('click tap',function(){
     var vco, value, vcoKnob, input;
     vco = $(this).attr('id').split('_')[0];
@@ -304,7 +333,24 @@ $(function() {
     if (dragging)
       return false;
     activeKnob = new Knob(this);
-    display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+    display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false);
+  });
+
+  $('.sequence-holder').on('mouseenter', '.note-display', function(){
+    console.log( "69BOT - mouseenter");
+    var value;
+    value = $(this).data('starting-note');
+    if (dragging)
+      return false;
+    display.update(value, false, false, true);
+    console.log( "69BOT - $(this).html(): " + $(this).html());
+    playNote($(this).html());
+  });
+
+  $('.sequence-holder').on('mouseleave', '.note-display', function(){
+    if (dragging)
+      return false;
+    stopNote();
   });
 
   $(document).on('mousemove touchmove',function(e) {
@@ -338,7 +384,7 @@ $(function() {
               )
           }
           activeKnob.inputElement.val(midi);
-          display.update(midi, activeKnob.isPitch, activeKnob.isOctave);
+          display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false);
         }
       } else if (activeNote !== null) {
         var num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint)/4);
@@ -348,10 +394,11 @@ $(function() {
         if (num < 0) {
           num = 0;
         }
+        display.update(num, false, false, true);
         activeNote.data('note', num);
         activeNote.html(midiNoteNumbers[num]);
+        playNote(midiNoteNumbers[num]);
       }
-
     }
   });
 
@@ -375,7 +422,9 @@ $(function() {
         $(activeKnob.element).data('midi', midi);
         activeKnob = null;
       } else if (activeNote !== null) {
+        console.log( "69BOT - activeNote.html(): " + activeNote.html());
         activeNote.data('starting-note', activeNote.data('note'));
+        stopNote();
         var inputId = activeNote["0"].parentNode.attributes["0"].value
         $('input#' + inputId).val(activeNote.data('note'));
         activeNote = null;
@@ -383,7 +432,7 @@ $(function() {
 
     } else if (activeKnob !== null) {
       if (typeof activeKnob === Knob)
-      display.update(activeKnob.midi, activeKnob.isPitch);
+      display.update(activeKnob.midi, activeKnob.isPitch, false);
     }
   });
 });
