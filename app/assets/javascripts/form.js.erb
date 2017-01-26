@@ -1,7 +1,8 @@
 $(function() {
   // TODO do page specific scripts the right way
-  if ($('body.form').length === 0 )
+  if ($('body.form').length === 0 ) {
     return;
+  }
 
   var activeKnob, knob, clickedPoint, midi;
   var display = new Display($('#led'));
@@ -11,7 +12,7 @@ $(function() {
   var activeNote;
   var sequencesActive = $(".remove-sequence[value='false']").toArray().length > 1;
   var sequenceCount = 0;
-  var midiOut = new MidiOut;
+  var midiOut = new MidiOut();
   var playingNote;
 
   var syncMidi = function(){
@@ -21,10 +22,10 @@ $(function() {
             $(this).data('control-number'),
             $(this).data('midi'),
             midiOut.channel
-          )
+          );
       }
     });
-  }
+  };
 
   var playNote = function(note) {
     if (midiOut.ready()) {
@@ -36,35 +37,35 @@ $(function() {
         playingNote = note;
       }
     }
-  }
+  };
 
   var stopNote = function() {
     if (midiOut.ready() && playingNote !== undefined) {
         midiOut.output.stopNote(playingNote);
         playingNote = undefined;
     }
-  }
+  };
 
   //
   // run immediately
   //
 
   $('.button').each(function(){
-    var vco, value, vcoKnob;
+    var vco, vcoKnob;
     vco = $(this).attr('id').split('_')[0];
-    value = $(this).data('active');
     vcoKnob = $('.knob#' + vco + '_pitch');
-    if (value === true) {
+    if ($(this).data('active') === true) {
       $(this).addClass('lit');
       vcoKnob.addClass('lit');
     }
   });
 
   $('.knob').each(function() {
-    my_knob = new Knob(this);
-    degree = my_knob.degreeForMidi($(this).data('midi'), limit);
+    var myKnob, degree;
+    myKnob = new Knob(this);
+    degree = myKnob.degreeForMidi($(this).data('midi'), limit);
     $(this).data('rotation', degree);
-    my_knob.autoRotate(degree, '#' + $(this).attr('id'));
+    myKnob.autoRotate(degree, '#' + $(this).attr('id'));
   });
 
   $('.bottom-row label, .sequence-box label').each(function(){
@@ -161,14 +162,15 @@ $(function() {
   $('#randomize').on('click tap', function(e){
     e.preventDefault();
     var assignKnobValue = function(knob) {
+      var randomValue, myKnob, degree;
       randomValue = Math.floor(Math.random() * (127 - 1));
-      my_knob = new Knob(knob);
-      degree = my_knob.degreeForMidi(randomValue, limit);
+      myKnob = new Knob(knob);
+      degree = myKnob.degreeForMidi(randomValue, limit);
       knob.data('rotation', degree);
       knob.data('midi', randomValue);
-      my_knob.autoRotate(degree, '#' + knob.attr('id'));
-      my_knob.inputElement.val(randomValue);
-    }
+      myKnob.autoRotate(degree, '#' + knob.attr('id'));
+      myKnob.inputElement.val(randomValue);
+    };
 
     // KNOBS
     $('.volca .knob').each(function() {
@@ -183,7 +185,7 @@ $(function() {
 
     // VCO ACTIVE
     $('.button').each(function(){
-      var vco, value, vcoKnob, input;
+      var vco, randomValue, vcoKnob, input;
       vco = $(this).attr('id').split('_')[0];
       randomValue = Math.random() >= 0.5;
       input = $('input#patch_' + $(this).attr('id').split('_').slice(0, -1).join('_'));
@@ -203,7 +205,8 @@ $(function() {
     // CHECKBOXES
     $('.bottom-row label').each(function(){
       if ($('input#' + $(this).attr('for')).is(':checkbox')) {
-        var myInput = $('input#' + $(this).attr('for'));
+        var myInput, randomValue;
+        myInput = $('input#' + $(this).attr('for'));
         randomValue = Math.random() >= 0.5;
         if (randomValue) {
           $(this).find('span').find('div').addClass('lit');
@@ -240,7 +243,7 @@ $(function() {
     });
     if (sequencesActive) {
       var vcoGroup = $('input#' + $(this).parent().attr('for')).val();
-      var mySequenceCount, sequenceCount, difference, hiddenSequences,
+      var mySequenceCount, difference, hiddenSequences,
       shownSequences, disabledSequences,totalSequenceCount, activeSequences;
       switch(vcoGroup) {
         case 'one':
@@ -326,7 +329,7 @@ $(function() {
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
     });
-  })
+  });
 
   $('.knob').mouseenter(function(){
     midi = $(this).data('midi');
@@ -337,13 +340,11 @@ $(function() {
   });
 
   $('.sequence-holder').on('mouseenter', '.note-display', function(){
-    console.log( "69BOT - mouseenter");
     var value;
     value = $(this).data('starting-note');
     if (dragging)
       return false;
     display.update(value, false, false, true);
-    console.log( "69BOT - $(this).html(): " + $(this).html());
     playNote($(this).html());
   });
 
@@ -381,7 +382,7 @@ $(function() {
                 $(activeKnob.element).data('control-number'),
                 midi,
                 midiOut.channel
-              )
+              );
           }
           activeKnob.inputElement.val(midi);
           display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false);
@@ -422,10 +423,9 @@ $(function() {
         $(activeKnob.element).data('midi', midi);
         activeKnob = null;
       } else if (activeNote !== null) {
-        console.log( "69BOT - activeNote.html(): " + activeNote.html());
         activeNote.data('starting-note', activeNote.data('note'));
         stopNote();
-        var inputId = activeNote["0"].parentNode.attributes["0"].value
+        var inputId = activeNote["0"].parentNode.attributes["0"].value;
         $('input#' + inputId).val(activeNote.data('note'));
         activeNote = null;
       }
