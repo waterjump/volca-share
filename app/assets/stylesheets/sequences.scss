@@ -59,7 +59,7 @@
     border-right: 1px solid black;
   }
   .scrolly {
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
     float: left;
     height: 100%;
@@ -108,7 +108,7 @@
           display: inline-block;
 
           .light {
-            height: 62%;
+            height: 72%;
             width: 52%;
             border-radius: 50%;
             background-color: gray;
@@ -126,6 +126,17 @@
   .sequence-form, .sequence-show {
     .param-labels {
       font-size: smaller;
+    }
+    .scrolly {
+      .steps {
+        .step {
+          span {
+            .light {
+              height: 62%;
+            }
+          }
+        }
+      }
     }
   }
 }

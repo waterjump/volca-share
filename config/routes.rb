@@ -15,7 +15,7 @@ Rails.application.routes.draw do
   resources :patch, param: :slug, controller: 'patches', except: [:index]
   post 'patch' => 'patches#create'
   resources :patches, only: [:index]
-  get 'welcome/index'
+  get 'about' => 'welcome#index'
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get
 

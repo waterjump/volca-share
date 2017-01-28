@@ -137,30 +137,60 @@ body {
   max-width: 300px;
 }
 
-@media(min-width: 990px) {
-  #sign-up {
-    border-left: 1px solid #d8d8d8;
-  }
-}
-
 .auth-container {
   margin: 0 auto;
   width: 570px;
 }
 
 .jumbotron {
+  overflow: hidden;
   background: none;
   position: relative;
   iframe {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    left: -161px;
+    width: 181%;
     z-index: -1;
   }
   h1, p {
     color: white;
   }
+}
 
+@media(min-width: 768px) {
+  .jumbotron {
+    iframe {
+      width: 138%;
+    }
+  }
+}
+
+
+@media(min-width: 768px) {
+  .jumbotron {
+    iframe {
+      width: 138%;
+    }
+  }
+}
+
+
+@media(min-width: 990px) {
+  #sign-up {
+    border-left: 1px solid #d8d8d8;
+  }
+  .jumbotron {
+    iframe {
+      width: 129%;
+    }
+  }
+}
+
+@media(min-width: 1200px) {
+  .jumbotron {
+    iframe {
+      width: 124%;
+    }
+  }
 }
