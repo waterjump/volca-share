@@ -9,13 +9,14 @@ $(function() {
   var dragging = false;
   var clicked = false;
   var limit = 140;
-  var activeNote;
+  var activeNote, activeLight, activeLightType;
   var sequencesActive = $(".remove-sequence[value='false']").toArray().length > 1;
   var sequenceCount = 0;
   var midiOut = new MidiOut();
   var playingNote;
 
   var syncMidi = function(){
+    console.log( "69BOT - 1");
     $('.knob').each(function(){
       if (midiOut.ready()) {
           midiOut.output.sendControlChange(
@@ -28,9 +29,10 @@ $(function() {
   };
 
   var playNote = function(note) {
+    console.log( "69BOT - 2");
     if (midiOut.ready()) {
       if (playingNote !== note) {
-        if (playingNote !== undefined){
+        if (playingNote){
           midiOut.output.stopNote(playingNote);
         }
         midiOut.output.playNote(note);
@@ -40,11 +42,30 @@ $(function() {
   };
 
   var stopNote = function() {
-    if (midiOut.ready() && playingNote !== undefined) {
+    console.log( "69BOT - 3");
+    if (midiOut.ready() && playingNote) {
         midiOut.output.stopNote(playingNote);
         playingNote = undefined;
     }
   };
+
+  var toggleLight = function(element){
+    console.log( "69BOT - 4 OK");
+    var myInput = $("input[id='" + element.attr('for') + "']");
+    console.log(myInput);
+    myInput.prop('checked', !myInput.prop('checked'));
+    element.find('.light').toggleClass('lit');
+  }
+
+  var getLightType = function(id) {
+    console.log( "69BOT - 5 OK");
+    types = ['slide', 'step_mode', 'active_step']
+    for (var i = 0; i < types.length; i++) {
+      if (id.indexOf(types[i]) >= 0) {
+        activeLightType = types[i];
+      }
+    }
+  }
 
   //
   // run immediately
@@ -79,12 +100,11 @@ $(function() {
       $(this).html(midiNoteNumbers[$(this).data('starting-note')]);
   });
 
-
-
   //
   // user actions
   //
   $("#toggle-sequences").on('click tap', function(e) {
+    console.log( "69BOT - 6");
     var vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
     switch(vcoGroup) {
       case 'one':
@@ -127,39 +147,54 @@ $(function() {
   });
 
   $('.sequence-holder').on('mousedown touchstart', '.note-display', function(e){
+    console.log( "69BOT - 7");
     clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
     e.preventDefault();
     e.stopPropagation();
     clicked = true;
     activeNote = $(this);
-    activeKnob = null;
+    activeKnob = undefined;
   });
 
-  $('.sequence-holder').on('click tap', '.sequence-box label', function(){
-    var myInput = $('input#' + $(this).attr('for'));
-    if (!myInput.prop('checked')) {
-      $(this).find('span').find('div').addClass('lit');
-    } else {
-      $(this).find('span').find('div').removeClass('lit');
+
+  // CURT these following two methods are what is fucked up I think
+  $('.sequence-holder').on('mousedown touchstart', '.on-off label', function(e){
+    console.log( "69BOT - 8 OK");
+    e.preventDefault();
+    e.stopPropagation();
+    clicked =  true;
+    activeLight = $(this);
+    getLightType(activeLight.attr('for'));
+    toggleLight(activeLight);
+  });
+
+  $('.sequence-holder').on('mouseenter touchenter', '.on-off label', function(){
+    console.log( "69BOT - 21 OK");
+    if (dragging && activeLight && $(this).attr('for').indexOf(activeLightType) >= 0) {
+      toggleLight($(this));
     }
   });
 
   $('#midi-device').change(function(){
+    console.log( "69BOT - 9");
     midiOut.changeOutput(this);
     midiOut.enableSync();
   });
 
   $('#midi-channel').change(function(){
+    console.log( "69BOT - 10");
     midiOut.changeChannel(this);
     midiOut.enableSync();
   });
 
   $('#sync').on('click tap', function(){
+    console.log( "69BOT - 11");
     syncMidi();
   });
 
   // TODO DRY this up.
   $('#randomize').on('click tap', function(e){
+    console.log( "69BOT - 12");
     e.preventDefault();
     var assignKnobValue = function(knob) {
       var randomValue, myKnob, degree;
@@ -234,10 +269,12 @@ $(function() {
   });
 
   $('.bottom-row .on-off').on('click tap', function(){
+      console.log( "69BOT - 13");
       $(this).find('.light').toggleClass('lit');
   });
 
   $('.bottom-row .multi').on('click tap', function(){
+    console.log( "69BOT - 14");
     $('.light[data-radio]').each(function() {
       $(this).removeClass('lit');
     });
@@ -302,6 +339,7 @@ $(function() {
   });
 
   $('.button').on('click tap',function(){
+    console.log( "69BOT - 15");
     var vco, value, vcoKnob, input;
     vco = $(this).attr('id').split('_')[0];
     value = $(this).data('active');
@@ -309,22 +347,18 @@ $(function() {
     input = $('input#patch_' + $(this).attr('id').split('_').slice(0, -1).join('_'));
     $(this).toggleClass('lit');
     vcoKnob.toggleClass('lit');
-    if (value === true) {
-      $(this).data('active', false);
-      input.prop('checked', false);
-    } else {
-      $(this).data('active', true);
-      input.prop('checked', true);
-    }
+    $(this).data('active', !value);
+    input.prop('checked', !value);
   });
 
   $('.knob').on('mousedown touchstart',function(e) {
+    console.log( "69BOT - 16");
     clickedPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
     e.preventDefault();
     e.stopPropagation();
     clicked = true;
     activeKnob = new Knob(this);
-    activeNote = null;
+    activeNote = undefined;
     knob = $(activeKnob.element);
     if (!knob.data('origin')) knob.data('origin', {
       top: knob.offset().top
@@ -332,6 +366,7 @@ $(function() {
   });
 
   $('.knob').mouseenter(function(){
+    console.log( "69BOT - 17");
     midi = $(this).data('midi');
     if (dragging)
       return false;
@@ -339,9 +374,16 @@ $(function() {
     display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false);
   });
 
+  $('.knob').mouseleave(function(){
+    console.log( "69BOT - 18");
+    if (!dragging) {
+      activeKnob = undefined;
+    }
+  });
+
   $('.sequence-holder').on('mouseenter', '.note-display', function(){
-    var value;
-    value = $(this).data('starting-note');
+    console.log( "69BOT - 19");
+    var value = $(this).data('starting-note');
     if (dragging)
       return false;
     display.update(value, false, false, true);
@@ -349,12 +391,14 @@ $(function() {
   });
 
   $('.sequence-holder').on('mouseleave', '.note-display', function(){
+    console.log( "69BOT - 20");
     if (dragging)
       return false;
     stopNote();
   });
 
   $(document).on('mousemove touchmove',function(e) {
+    console.log( "69BOT - 22 OK");
     if (clicked === true) {
       dragging = true;
     }
@@ -363,7 +407,7 @@ $(function() {
       var degree, currentPoint;
       $('body').css('cursor', 'ns-resize');
       currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
-      if (activeKnob !== null){
+      if (activeKnob){
         degree = activeKnob.rotation + (clickedPoint - currentPoint);
         if (degree > limit) {
           activeKnob.rotation = limit;
@@ -387,7 +431,7 @@ $(function() {
           activeKnob.inputElement.val(midi);
           display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false);
         }
-      } else if (activeNote !== null) {
+      } else if (activeNote) {
         var num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint)/4);
         if (num > 127) {
           num = 127;
@@ -404,12 +448,13 @@ $(function() {
   });
 
   $(document).on('mouseup touchend', function(e) {
+    console.log( "69BOT - 23");
     clicked = false;
     if (dragging) {
       dragging = false;
       var currentPoint = e.pageY || Math.round(e.originalEvent.changedTouches[0].pageY);
       $('body').css('cursor', 'default');
-      if (activeKnob !== null) {
+      if (activeKnob) {
         var currentAngle = activeKnob.rotation + (clickedPoint - currentPoint);
         if (activeKnob.rotation > limit) {
           activeKnob.rotation = limit;
@@ -421,18 +466,24 @@ $(function() {
         }
         $(activeKnob.element).data('rotation', currentAngle);
         $(activeKnob.element).data('midi', midi);
-        activeKnob = null;
-      } else if (activeNote !== null) {
+        activeKnob = undefined;
+      } else if (activeNote) {
         activeNote.data('starting-note', activeNote.data('note'));
         stopNote();
         var inputId = activeNote["0"].parentNode.attributes["0"].value;
         $('input#' + inputId).val(activeNote.data('note'));
-        activeNote = null;
+        activeNote = undefined;
+      } else if (activeLight) {
+        e.preventDefault();
+        activeLight = undefined;
+        activeLightType = undefined;
       }
-
-    } else if (activeKnob !== null) {
-      if (typeof activeKnob === Knob)
-      display.update(activeKnob.midi, activeKnob.isPitch, false);
+    } else if (activeKnob) {
+      // so touch devices can tap knob for value
+      if (typeof activeKnob === Knob) {
+        display.update(activeKnob.midi, activeKnob.isPitch, false);
+        activeKnob = undefined;
+      }
     }
   });
 });
