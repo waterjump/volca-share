@@ -157,9 +157,10 @@ $(function() {
   });
 
 
-  // CURT these following two methods are what is fucked up I think
   $('.sequence-holder').on('mousedown touchstart', '.on-off label', function(e){
     console.log( "69BOT - 8 OK");
+    e.preventDefault();
+    e.stopPropagation();
     clicked =  true;
     activeLight = $(this);
     activeLight.find('.light').toggleClass('lit');
