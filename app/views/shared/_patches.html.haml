@@ -30,7 +30,7 @@
         %br/
         .date= patch.created_at.strftime("%B #{patch.created_at.day.ordinalize}, %Y" )
         .icons
-          - if patch.user == current_user
+          - if current_user.present? && patch.user == current_user
             = link_to edit_patch_path(patch.slug) do
               .edit.glyph
             = form_tag patch_path(patch.slug), method: :delete, class: :dekete_form do

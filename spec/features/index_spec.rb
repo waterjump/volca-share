@@ -43,7 +43,7 @@ RSpec.feature 'patch index', type: :feature, js: true do
     expect(page).not_to have_button('Delete')
   end
 
-  scenario 'that are private are not show on the index' do
+  scenario 'that are private are not shown on the index' do
     patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
     patch2 = FactoryGirl.create(:patch, secret: true, user_id: user.id)
 
@@ -51,6 +51,15 @@ RSpec.feature 'patch index', type: :feature, js: true do
 
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
+  end
+
+  scenario 'anonymous users do not see controls to edit or delete anonymous patches' do
+    patch1 = FactoryGirl.create(:patch, secret: false)
+
+    visit root_path
+
+    expect(page).not_to have_button('Delete')
+    expect(page).not_to have_selector('.edit.glyph')
   end
 
   scenario 'shows anonymous patches' do
