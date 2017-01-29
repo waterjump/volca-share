@@ -160,12 +160,10 @@ $(function() {
   // CURT these following two methods are what is fucked up I think
   $('.sequence-holder').on('mousedown touchstart', '.on-off label', function(e){
     console.log( "69BOT - 8 OK");
-    e.preventDefault();
-    e.stopPropagation();
     clicked =  true;
     activeLight = $(this);
+    activeLight.find('.light').toggleClass('lit');
     getLightType(activeLight.attr('for'));
-    toggleLight(activeLight);
   });
 
   $('.sequence-holder').on('mouseenter touchenter', '.on-off label', function(){
@@ -474,7 +472,8 @@ $(function() {
         $('input#' + inputId).val(activeNote.data('note'));
         activeNote = undefined;
       } else if (activeLight) {
-        e.preventDefault();
+        var myInput = $("input[id='" + activeLight.attr('for') + "']");
+        myInput.prop('checked', !myInput.prop('checked'));
         activeLight = undefined;
         activeLightType = undefined;
       }
