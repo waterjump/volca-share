@@ -26,9 +26,60 @@ RSpec.feature 'tags', type: :feature, js: true do
     perform_around(&example)
   end
 
-  scenario 'patch detail page shows tags as links' do
-    expect(page.first('.wrapper')).to have_content('#lead')
+  scenario 'user patches are shown on tag pages' do
+    patch1 = FactoryGirl.create(
+      :patch,
+      secret: false,
+      user_id: user.id,
+      tag_list: 'cool'
+    )
+    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
 
+    visit patch_path(patch2)
+
+    click_link('#cool')
+    expect(page).to have_selector 'h1', text: '#cool tags', visible: false
+    expect(page).to have_content(patch1.name)
+    expect(page).to have_content(patch2.name)
+
+    click_link(patch2.name)
+    expect(current_path).to eq(patch_path(patch2.id))
+  end
+
+  scenario 'anonymous patches are shown on tag pages' do
+    patch1 = FactoryGirl.create(
+      :patch,
+      secret: false,
+      user_id: nil,
+      tag_list: 'cool'
+    )
+
+    visit('/tags/show?tag=cool')
+    expect(page).to have_content(patch1.name)
+  end
+
+  scenario 'have audio previews' do
+    patch1 = FactoryGirl.create(
+      :patch,
+      secret: false,
+      user_id: user.id,
+      tag_list: 'cool'
+    )
+    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
+
+    visit patch_path(patch2)
+
+    click_link('#cool')
+    expect(page).to have_selector 'h1', text: '#cool tags', visible: false
+    expect(page).to have_content(patch1.name)
+    expect(page).to have_content(patch2.name)
+    expect(page).to have_selector('.speaker')
+    page.find('.speaker', match: :first).trigger('click')
+
+    expect(page).to have_selector('#preview-modal-body')
+  end
+
+  scenario 'patch detail page shows tags as links' do
     click_link 'Patch 1'
     expect(page).to have_link('#lead')
 
@@ -41,7 +92,6 @@ RSpec.feature 'tags', type: :feature, js: true do
   end
 
   scenario 'patch index page shows tags as links' do
-    expect(page.first('.wrapper')).to have_content('#lead')
     expect(page).to have_link('#lead')
 
     first(:link, '#lead').click
