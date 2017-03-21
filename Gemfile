@@ -18,11 +18,11 @@ gem 'bootstrap-sass', '~> 3.3.6'
 gem 'mongoid', '~> 5.1.0'
 gem 'devise'
 gem 'rubocop', '~> 0.40.0', require: false
-gem 'bundler', '1.13.6'
+gem 'bundler', '1.14.6'
 gem 'mongoid-simple-tags'
 gem 'bootstrap-tagsinput-rails'
-gem 'dotenv-rails', groups: [:development, :test]
-gem 'recaptcha', require: 'recaptcha/rails'
+gem 'dotenv-rails',  groups: [:development, :test]
+gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'kaminari-mongoid'
 gem 'ruby-oembed'
 gem 'sendgrid-ruby'
