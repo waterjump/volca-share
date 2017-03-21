@@ -157,11 +157,9 @@
       = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
     - if current_user.nil? && !Rails.env.test?
       = recaptcha_tags
-    .field
-      = link_to '#', 'Add a sequence'
-      %strong
-        = "To edit, delete, or make your patches browsable, "
-        = link_to 'create an account', new_user_registration_path
+    %strong
+      = "To edit, delete, or make your patches browsable, "
+      = link_to 'create an account', new_user_registration_path
 .col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
