@@ -2,18 +2,15 @@ module VolcaShare
   class PatchViewModel < ApplicationViewModel
     include AudioRegex
     def vco_group_one
-      return true if vco_group == 'one'
-      false
+      vco_group == 'one'
     end
 
     def vco_group_two
-      return true if vco_group == 'two'
-      false
+      vco_group == 'two'
     end
 
     def vco_group_three
-      return true if vco_group == 'three'
-      false
+      vco_group == 'three'
     end
 
     def checked?(field)
