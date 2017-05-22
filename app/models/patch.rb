@@ -45,16 +45,16 @@ class Patch
 
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug
-  validates :attack, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :decay_release, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :cutoff_eg_int, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :peak, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :cutoff, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :lfo_rate, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :lfo_int, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :vco1_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :vco2_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
-  validates :vco3_pitch, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
+  validates :attack, numericality: { greater_than: -1, less_than: 128 }
+  validates :decay_release, numericality: { greater_than: -1, less_than: 128 }
+  validates :cutoff_eg_int, numericality: { greater_than: -1, less_than: 128 }
+  validates :peak, numericality: { greater_than: -1, less_than: 128 }
+  validates :cutoff, numericality: { greater_than: -1, less_than: 128 }
+  validates :lfo_rate, numericality: { greater_than: -1, less_than: 128 }
+  validates :lfo_int, numericality: { greater_than: -1, less_than: 128 }
+  validates :vco1_pitch, numericality: { greater_than: -1, less_than: 128 }
+  validates :vco2_pitch, numericality: { greater_than: -1, less_than: 128 }
+  validates :vco3_pitch, numericality: { greater_than: -1, less_than: 128 }
   validates :audio_sample, audio_sample: true
 
   scope :browsable, -> { where(secret: false) }
