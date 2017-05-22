@@ -25,11 +25,11 @@ module VolcaShare
     end
 
     def username
-      model.user.try(:username)
+      user.try(:username)
     end
 
     def audio_sample_code
-      return unless model.audio_sample.present?
+      return unless audio_sample.present?
       @audio_sample_code ||=
         if audio_sample.include?('soundcloud')
           ::OEmbed::Providers::SoundCloud.get(audio_sample, maxheight: 81).html
@@ -51,9 +51,9 @@ module VolcaShare
     end
 
     def description
-      return unless model.notes.present?
-      return model.notes.squish if model.notes.squish.length <= 100
-      model.notes[0..100].squish + '...'
+      return unless notes.present?
+      return notes.squish if notes.squish.length <= 100
+      notes[0..100].squish + '...'
     end
 
     def formatted_tags
@@ -61,9 +61,7 @@ module VolcaShare
     end
 
     def show_midi_only_knobs?
-      model.slide_time != 63 ||
-        model.expression != 127 ||
-        model.gate_time != 127
+      slide_time != 63 || expression != 127 || gate_time != 127
     end
   end
 end
