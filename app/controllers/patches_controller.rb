@@ -48,27 +48,12 @@ class PatchesController < ApplicationController
   # POST /patches
   # POST /patches.json
   def create
-    user = current_user
     @patch_params[:slug] = @patch_params[:name].parameterize
-    @patch =
-      if user.present?
-        user.patches.new
-      else
-        Patch.new
-      end
-
+    @patch = current_user.present? ? current_user.patches.new : Patch.new
     @patch.attributes = all_attributes
 
     respond_to do |format|
-      if @patch.user.present? && @patch.save
-        format.html do
-          redirect_to(
-            patch_location,
-            notice: 'Patch saved successfully.'
-          )
-        end
-        format.json { render :show, status: :created, location: @patch }
-      elsif verify_recaptcha(model: @patch) && @patch.save
+      if patch_created?
         format.html do
           redirect_to(
             patch_location,
@@ -81,7 +66,9 @@ class PatchesController < ApplicationController
         @body_class = :form
         @title = 'New Patch'
         format.html { render :new, location: @patch }
-        format.json { render json: @patch.errors, status: :unprocessable_entity }
+        format.json do
+          render json: @patch.errors, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -102,7 +89,9 @@ class PatchesController < ApplicationController
       else
         @body_class = :form
         format.html { render :edit }
-        format.json { render json: @patch.errors, status: :unprocessable_entity }
+        format.json do
+          render json: @patch.errors, status: :unprocessable_entity
+        end
       end
     end
   end
@@ -112,25 +101,27 @@ class PatchesController < ApplicationController
   def destroy
     respond_to do |format|
       if current_user == @patch.user && @patch.destroy
-        format.html { redirect_to patches_url, notice: 'Patch was successfully destroyed.' }
-        format.json { head :no_content }
+        format.html do
+          redirect_to patches_url, notice: 'Patch was successfully destroyed.'
+        end
       else
-        format.html { redirect_to patch_url(@patch), notice: 'You cannot delete that patch.' }
-        format.json { head :no_content }
+        format.html do
+          redirect_to patch_url(@patch), notice: 'You cannot delete that patch.'
+        end
       end
+      format.json { head :no_content }
     end
   end
 
   def oembed
     respond_to do |format|
-      if @patch.present? && @patch.audio_sample.present?
-        format.json do
-          render json: {
-            audio_sample_code: @patch.audio_sample_code,
-            name: @patch.name,
-            patch_location: patch_location
-          }
-        end
+      return unless @patch.present? && @patch.audio_sample.present?
+      format.json do
+        render json: {
+          audio_sample_code: @patch.audio_sample_code,
+          name: @patch.name,
+          patch_location: patch_location
+        }
       end
     end
   end
@@ -150,6 +141,10 @@ class PatchesController < ApplicationController
     @title = "#{@patch.name}#{user}"
   end
 
+  def patch_created?
+    (@patch.user.present? || verify_recaptcha(model: @patch)) && @patch.save
+  end
+
   def format_tags
     tags = patch_params[:tags]
     return @patch_params.merge!(tags: []) unless tags.present?
@@ -164,13 +159,15 @@ class PatchesController < ApplicationController
     end
   end
 
-  # Never trust parameters from the scary internet, only allow the white list through.
+  # White list parameters
   def patch_params
     @patch_params ||= params.require(:patch).permit!.merge!(sequence_params)
   end
 
   def all_attributes
-    @all_attributes ||= params[:patch].except(:sequences_attributes).merge!(sequence_params)
+    @all_attributes ||=
+      params[:patch].except(:sequences_attributes)
+                    .merge!(sequence_params)
   end
 
   def sequence_params
@@ -194,13 +191,13 @@ class PatchesController < ApplicationController
   end
 
   def format_sequence(seq)
-    good_keys = [:id, :index, :note, :step_mode, :slide, :active_step, :_destroy]
+    ok_keys = [:id, :index, :note, :step_mode, :slide, :active_step, :_destroy]
     sequence = {}
     sequence[:id] = seq[:id] if seq[:id].present?
     sequence[:_destroy] = seq[:destroy] if seq[:destroy].present?
     sequence[:steps_attributes] = seq.except(:id, :destroy).each do |step|
       step.reject do |k, _v|
-        !good_keys.include?(k)
+        !ok_keys.include?(k)
       end
     end.values
     sequence
