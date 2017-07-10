@@ -12,14 +12,14 @@
 //
 
 
-
+//= require _init.coffee.erb
 //= require jquery
 //= require jquery_ujs
 //= require webmidi.min.js
 //= require bootstrap-sprockets
-//= require index.js.erb
+//= require index.coffee.erb
 //= require bootstrap-tagsinput
-//= require midi.js
-//= require display.js.erb
-//= require knob.js.erb
+//= require midi.coffee
+//= require display.coffee.erb
+//= require knob.coffee.erb
 //= require_tree .

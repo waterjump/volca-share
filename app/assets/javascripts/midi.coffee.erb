@@ -1,0 +1,52 @@
+VolcaShare.MidiOut = ->
+  parent = this
+  @supported
+  @output
+  @channel
+
+  @ready = ->
+    parent.output != undefined and parent.channel != undefined
+
+  @changeChannel = (element) ->
+    parent.channel = $(element).val()
+    return
+
+  @changeOutput = (element) ->
+    parent.output = WebMidi.getOutputByName($(element).val())
+    return
+
+  @updateForm = ->
+    return unless parent.supported and WebMidi.outputs.length > 0
+    items = '<option>Midi Device</option>'
+    $(WebMidi.outputs).each ->
+      items += '<option value="' + @name + '">' + @name + '</option>'
+      return
+    $('#midi-device').html(items)
+    $('#midi-device option:eq(1)').attr('selected', 'selected')
+    parent.changeOutput($('#midi-device option:eq(1)'))
+    $('#midi-channel option:eq(1)').attr('selected', 'selected')
+    parent.changeChannel($('#midi-channel option:eq(1)'))
+    $('#midi-output').removeClass('hidden')
+    $('.midi-enabled').css('border', 'lightgreen solid')
+    $('#enable-web-midi').hide()
+    $('#midi-only-panel').removeClass('hidden')
+    return
+
+  @enableSync = ->
+    return unless parent.ready()
+    $('#sync').removeClass('disabled')
+    return
+
+  @init = ->
+    WebMidi.enable (err) ->
+      if err
+        # console.log("An error occurred", err);
+      else
+        parent.supported = true
+        parent.updateForm()
+        parent.enableSync()
+      return
+    return
+
+  @init()
+  return

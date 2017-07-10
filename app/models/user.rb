@@ -42,5 +42,5 @@ class User
   validates_presence_of :username, :slug
   validates_uniqueness_of :username, :slug
   validates :username, format: { with: /\A[0-9A-Za-z\-\_\.]+\Z/ }
-  validates :username, length: { minimum: 3, maximum: 20 }
+  validates :username, length: { minimum: 2, maximum: 20 }
 end

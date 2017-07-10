@@ -1,0 +1,30 @@
+VolcaShare.Knob = (element) ->
+  @element = element
+  @midi = $(@element).data('midi')
+  @rotation = $(@element).data('rotation') or 0
+  @isPitch = $(@element).attr('id').split('_')[1] == 'pitch'
+  @isOctave = $(@element).attr('id') == 'octave'
+  @inputElement = $('input#patch_' + $(@element).attr('id'))
+
+  @rotate = (degree) ->
+    knob = $(@element)
+    knob.css '-moz-transform', 'rotate(' + degree + 'deg)'
+    knob.css '-moz-transform-origin', '50% 50%'
+    knob.css '-webkit-transform', 'rotate(' + degree + 'deg)'
+    knob.css '-webkit-transform-origin', '50% 50%'
+    knob.css '-o-transform', 'rotate(' + degree + 'deg)'
+    knob.css '-o-transform-origin', '50% 50%'
+    knob.css '-ms-transform', 'rotate(' + degree + 'deg)'
+    knob.css '-ms-transform-origin', '50% 50%'
+    return
+
+  @degreeForMidi = (midi, limit) ->
+    Math.round (midi - 63.5) / (63.5 / limit)
+
+  @autoRotate = (d, selector) ->
+    currentRotation = parseInt(@rotation)
+    $(deg: currentRotation).animate { deg: d }, step: (now, fx) ->
+      $(selector).css transform: 'rotate(' + now + 'deg)'
+      return
+    return
+  return

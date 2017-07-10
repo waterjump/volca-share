@@ -1,0 +1,377 @@
+$ ->
+  # TODO do page specific scripts the right way
+  return if $('body.form').length == 0
+  activeKnob = undefined
+  clickedPoint = undefined
+  midi = undefined
+  display = new VolcaShare.Display($('#led'))
+  dragging = false
+  clicked = false
+  limit = 140
+  activeNote = undefined
+  sequencesActive = $('.remove-sequence[value=\'false\']').toArray().length > 1
+  sequenceCount = 0
+  midiOut = new VolcaShare.MidiOut
+  playingNote = undefined
+  vcoGroupCounts = {one: 3, two: 2, three: 1}
+
+  syncMidi = ->
+    return unless midiOut.ready()
+    $('.knob').each ->
+      midiOut.output.sendControlChange(
+        $(this).data('control-number'),
+        $(this).data('midi'),
+        midiOut.channel
+      )
+      return
+    return
+
+  playNote = (note) ->
+    return unless midiOut.ready() && playingNote != note
+    midiOut.output.stopNote(playingNote) if playingNote != undefined
+    midiOut.output.playNote(note)
+    playingNote = note
+    return
+
+  stopNote = ->
+    return unless midiOut.ready() && playingNote != undefined
+    midiOut.output.stopNote(playingNote)
+    playingNote = undefined
+    return
+
+  #
+  # initialize
+  #
+  lightButtons = ->
+    $('.button').each ->
+      if $(this).data('active')
+        vco = $(this).attr('id').split('_')[0]
+        vcoKnob = $('.knob#' + vco + '_pitch')
+        $(this).addClass('lit')
+        vcoKnob.addClass('lit')
+      return
+    return
+
+  rotateKnobs = ->
+    $('.knob').each ->
+      myKnob = new VolcaShare.Knob(this)
+      degree = myKnob.degreeForMidi($(this).data('midi'), limit)
+      $(this).data('rotation', degree)
+      myKnob.autoRotate degree, '#' + $(this).attr('id')
+      return
+    return
+
+  lightSequences = ->
+    $('.bottom-row label, .sequence-box label').each ->
+      myInput = $('input#' + $(this).attr('for'))
+      $(this).find('span').find('div').addClass('lit') if myInput.prop('checked')
+      return
+    return
+
+  setSequenceNotes = ->
+    $('.note-display').each ->
+      $(this).html VolcaShare.midiNoteNumbers[$(this).data('starting-note')]
+      return
+    return
+
+  init = ->
+    lightButtons()
+    rotateKnobs()
+    lightSequences()
+    setSequenceNotes()
+    return
+
+  init()
+
+  #
+  # user actions
+  #
+  $('#toggle-sequences').on 'click tap', (e) ->
+    e.preventDefault()
+    setSequenceCount()
+    if sequencesActive then hideSequences() else showSequences()
+    $('.sequence-box .multi').each ->
+      myInput = $('input#' + $(this).parent().attr('for'))
+      $(this).find('div').addClass('lit') if myInput.prop('checked')
+      return
+    return
+
+  showSequences = ->
+    $('.sequence-message').removeClass('hidden')
+    i = 0
+    while i < sequenceCount
+      totalSequenceCount = $('.sequence-area .sequence-form').toArray().length
+      content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount)
+      $('.sequence-holder').append content
+      i++
+    $('#toggle-sequences').text 'Remove sequences'
+    sequencesActive = true
+    return
+
+  hideSequences = ->
+    $('.sequence-area .remove-sequence').val('true')
+    $('.sequence-area .sequence-form').addClass('hidden')
+    $('.sequence-message').addClass('hidden')
+    $('#toggle-sequences').text('Add sequences')
+    sequencesActive = false
+    return
+
+  setSequenceCount = ->
+    vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val()
+    sequenceCount = vcoGroupCounts[vcoGroup]
+    return
+
+
+  $('.sequence-holder').on 'mousedown touchstart', '.note-display', (e) ->
+    clickedPoint = e.pageY or Math.round(e.originalEvent.touches[0].pageY)
+    e.preventDefault()
+    e.stopPropagation()
+    clicked = true
+    activeNote = $(this)
+    activeKnob = null
+    return
+
+  $('.sequence-holder').on 'click tap', '.sequence-box label', ->
+    $(this).find('span').find('div').toggleClass('lit')
+    return
+
+
+  # TODO: Abstract for use with show view also.
+  $('#midi-device').change ->
+    midiOut.changeOutput(this)
+    midiOut.enableSync()
+    return
+
+  # TODO: Abstract for use with show view also.
+  $('#midi-channel').change ->
+    midiOut.changeChannel(this)
+    midiOut.enableSync()
+    return
+
+  # TODO: Abstract for use with show view also.
+  $('#sync').on 'click tap', ->
+    syncMidi()
+    return
+
+  # TODO DRY this up.
+  $('#randomize').on 'click tap', (e) ->
+    e.preventDefault()
+
+    assignKnobValue = (knob) ->
+      randomValue = Math.floor(Math.random() * (127 - 1))
+      myKnob = new VolcaShare.Knob(knob)
+      degree = myKnob.degreeForMidi(randomValue, limit)
+      knob.data 'rotation', degree
+      knob.data 'midi', randomValue
+      myKnob.autoRotate degree, '#' + knob.attr('id')
+      myKnob.inputElement.val randomValue
+      return
+
+    randomizeKnobs = ->
+      $('.volca .knob').each ->
+        assignKnobValue($(this))
+        return
+      return unless midiOut.ready()
+      $('#midi-only-controls .knob').each ->
+        assignKnobValue($(this))
+        return
+      return
+
+    randomizeVcoActive = ->
+      $('.button').each ->
+        vco = $(this).attr('id').split('_')[0]
+        randomBoolean = Math.random() >= 0.5
+        input = $('input#patch_' + $(this).attr('id').split('_').slice(0, -1).join('_'))
+        $(this).data 'active', randomBoolean
+        vcoKnob = $('.knob#' + vco + '_pitch')
+        if randomBoolean != $(this).hasClass('lit')
+          $(this).toggleClass('lit')
+          vcoKnob.toggleClass('lit')
+        input.prop 'checked', randomBoolean
+        return
+      return
+
+    randomizeCheckboxes = ->
+      $('.bottom-row label').each ->
+        return unless $('input#' + $(this).attr('for')).is(':checkbox')
+        myInput = $('input#' + $(this).attr('for'))
+        randomBoolean = Math.random() >= 0.5
+        light = $(this).find('span').find('div')
+        if randomBoolean then light.addClass('lit') else light.removeClass('lit')
+        myInput.prop('checked', randomBoolean)
+        return
+      return
+
+    randomizeVcoGroup = ->
+      return unless !sequencesActive
+      items = ['one', 'two', 'three']
+      item = items[Math.floor(Math.random() * items.length)]
+      $('.light[data-radio]').each ->
+        $(this).removeClass('lit')
+        $(':radio[value=' + item + ']').prop('checked', false)
+        return
+      $(':radio[value=' + item + ']').prop('checked', true)
+      $('label[for="patch_vco_group_' + item + '"]').find('span .light').addClass('lit')
+      return
+
+    randomizeKnobs()
+    randomizeVcoActive()
+    randomizeCheckboxes()
+    randomizeVcoGroup()
+    syncMidi()
+    return
+
+  $('.bottom-row .on-off').on 'click tap', ->
+    $(this).find('.light').toggleClass('lit')
+    return
+
+  $('.bottom-row .multi').on 'click tap', ->
+    $('.light[data-radio]').each ->
+      $(this).removeClass('lit')
+      return
+    if sequencesActive
+      vcoGroup = $('input#' + $(this).parent().attr('for')).val()
+      mySequenceCount = vcoGroupCounts[vcoGroup]
+      hiddenSequences = $('.sequence-area .sequence-form.hidden').toArray()
+      shownSequences = $('.sequence-area .sequence-form').not('.hidden').toArray()
+      disabledSequences = $('.sequence-area .sequence-form:not(\'.hidden\') .remove-sequence[value=\'true\']').toArray()
+      totalSequenceCount = $('.sequence-area .sequence-form').toArray().length
+      activeSequences = $('.sequence-area .remove-sequence[value=\'false\']').toArray()
+      if mySequenceCount > activeSequences.length
+        if mySequenceCount > shownSequences.length
+          # uncheck all boxes
+          $(disabledSequences).each ->
+            $(this).val('false')
+            $(this).removeAttr('disabled')
+            return
+          $('.sequence-area .sequence-form').each ->
+            $(this).css('opacity', '1.0')
+            return
+          activeSequences = $('.sequence-area .remove-sequence[value=\'false\']').toArray()
+          #add sequences
+          difference = mySequenceCount - (activeSequences.length)
+          i = activeSequences.length
+          while i < activeSequences.length + difference
+            content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount - 1)
+            $('.sequence-holder').append(content)
+            i++
+        else
+          #uncheck boxes
+          i = 0
+          while i < mySequenceCount
+            $(disabledSequences[i]).val 'false'
+            $(shownSequences[i]).css 'opacity', '1.0'
+            i++
+      else if activeSequences.length > mySequenceCount
+        #check boxes
+        difference = activeSequences.length - mySequenceCount
+        i = activeSequences.length - 1
+        while i > activeSequences.length - 1 - difference
+          $(activeSequences[i]).val('true')
+          $(shownSequences[i]).css('opacity', '0.5')
+          i--
+    $(this).find('.light').addClass('lit')
+    return
+
+  $('.button').on 'click tap', ->
+    vco = $(this).attr('id').split('_')[0]
+    value = $(this).data('active')
+    vcoKnob = $('.knob#' + vco + '_pitch')
+    input = $('input#patch_' + $(this).attr('id').split('_').slice(0, -1).join('_'))
+    $(this).toggleClass('lit')
+    vcoKnob.toggleClass('lit')
+    $(this).data('active', !value)
+    input.prop('checked', !value)
+    return
+
+  $('.knob').on 'mousedown touchstart', (e) ->
+    clickedPoint = e.pageY or Math.round(e.originalEvent.touches[0].pageY)
+    e.preventDefault()
+    e.stopPropagation()
+    clicked = true
+    activeKnob = new VolcaShare.Knob(this)
+    activeNote = null
+    knob = $(activeKnob.element)
+    knob.data('origin', top: knob.offset().top) if !knob.data('origin')
+    return
+
+  $('.knob').mouseenter ->
+    midi = $(this).data('midi')
+    return false if dragging
+    activeKnob = new VolcaShare.Knob(this)
+    display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false)
+    return
+
+  $('.sequence-holder').on 'mouseenter', '.note-display', ->
+    value = $(this).data('starting-note')
+    return false if dragging
+    display.update(value, false, false, true)
+    playNote $(this).html()
+    return
+
+  $('.sequence-holder').on 'mouseleave', '.note-display', ->
+    return false if dragging
+    stopNote()
+    return
+
+  $(document).on 'mousemove touchmove', (e) ->
+    dragging = true if clicked
+    return unless dragging
+    e.preventDefault()
+    degree = undefined
+    $('body').css 'cursor', 'ns-resize'
+    currentPoint = e.pageY or Math.round(e.originalEvent.touches[0].pageY)
+    if activeKnob != null
+      degree = activeKnob.rotation + clickedPoint - currentPoint
+      if degree > limit
+        activeKnob.rotation = limit
+        clickedPoint = currentPoint
+      if degree < -limit
+        activeKnob.rotation = -limit
+        clickedPoint = currentPoint
+      degree = activeKnob.rotation + clickedPoint - currentPoint
+      if currentPoint != clickedPoint or degree == -limit or degree == limit
+        activeKnob.rotate degree
+        midi = Math.round(63.5 / limit * degree + 63.5)
+        if midiOut.ready()
+          midiOut.output.sendControlChange $(activeKnob.element).data('control-number'), midi, midiOut.channel
+        activeKnob.inputElement.val midi
+        display.update midi, activeKnob.isPitch, activeKnob.isOctave, false
+    else if activeNote != null
+      num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint) / 4)
+      num = 127 if num > 127
+      num = 0 if num < 0
+      display.update(num, false, false, true)
+      activeNote.data('note', num)
+      activeNote.html(VolcaShare.midiNoteNumbers[num])
+      playNote(VolcaShare.midiNoteNumbers[num])
+    return
+
+  $(document).on 'mouseup touchend', (e) ->
+    clicked = false
+    if dragging
+      dragging = false
+      currentPoint = e.pageY or Math.round(e.originalEvent.changedTouches[0].pageY)
+      $('body').css 'cursor', 'default'
+      if activeKnob != null
+        currentAngle = activeKnob.rotation + clickedPoint - currentPoint
+        if activeKnob.rotation > limit
+          activeKnob.rotation = limit
+          currentPoint = clickedPoint
+        if activeKnob.rotation < -limit
+          activeKnob.rotation = -limit
+          currentPoint = clickedPoint
+        $(activeKnob.element).data('rotation', currentAngle)
+        $(activeKnob.element).data('midi', midi)
+        activeKnob = null
+      else if activeNote != null
+        activeNote.data('starting-note', activeNote.data('note'))
+        stopNote()
+        inputId = activeNote['0'].parentNode.attributes['0'].value
+        $('input#' + inputId).val(activeNote.data('note'))
+        activeNote = null
+    else if activeKnob != null
+      if typeof activeKnob == VolcaShare.Knob
+        display.update(activeKnob.midi, activeKnob.isPitch, false)
+    return
+  return

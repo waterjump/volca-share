@@ -1,0 +1,29 @@
+# TODO: don't use global scope.
+$('*').on 'hide.bs.modal', ->
+  $('#preview-modal-body').html("<img class='loading' src='<%= asset_path('loading.gif') %>' alt='Loading' />")
+  $('#preview-modal-body').height('111px')
+  return
+
+$ ->
+  $('.speaker').on 'click tap', ->
+    $('#preview-modal-body').html("<img class='loading' src='" + "<%= asset_path('loading.gif') %>" + "' alt='Loading' />")
+    slug = $(this).data('slug')
+    $.ajax
+      url: '/oembed?slug=' + slug
+      data: format: 'json'
+      error: (jqXHR, textStatus, errorThrown) ->
+        # alert(errorThrown);
+        return
+      success: (data) ->
+        $('#preview-modal-body').html(data['audio_sample_code'])
+        $('#audioPreviewModaLabel').html('Preview: ' + data['name'])
+        $('#go-to-patch').attr('href', data['patch_location'])
+        if /youtu\.?be/.test(data['audio_sample_code'])
+          $('#preview-modal-body').height('270px')
+          $('iframe').css('margin': '0 auto 0 42px')
+        if /freesound/.test(data['audio_sample_code'])
+          $('#preview-modal-body').height('30px')
+          $('iframe').css('margin': '0 auto 0 87px')
+        return
+    return
+  return

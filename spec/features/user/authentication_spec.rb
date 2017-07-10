@@ -45,12 +45,12 @@ RSpec.feature 'Authentication process', type: :feature do
     expect(current_path).to eq(new_user_session_path)
   end
 
-  scenario 'User enters 2 character username' do
+  scenario 'User enters 1 character username' do
     visit(new_user_registration_path)
     pw = Devise.friendly_token.first(8)
     within '#new_user' do
       fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: 'qq'
+      fill_in 'user_username', with: 'Q'
       fill_in 'user_password', with: pw
       fill_in 'user_password_confirmation', with: pw
       click_button 'Sign up'

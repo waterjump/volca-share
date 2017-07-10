@@ -17,10 +17,8 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
   scenario 'can be created by users' do
     login
-
     visit root_path
     expect(page).to have_link 'New Patch'
-
     click_link 'new-patch'
     expect(page).to have_title('New Patch | VolcaShare')
     expect(current_path).to eq(new_patch_path)
@@ -157,7 +155,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 1)
 
     page.find('#patch_sequences_attributes_0_step_1_note_display')
-      .drag_to(seq_form_light(0, 1, 'slide'))
+        .drag_to(seq_form_light(0, 1, 'slide'))
     seq_form_light(0, 1, 'slide').trigger('click')
     seq_form_light(0, 5, 'slide').trigger('click')
     seq_form_light(0, 6, 'slide').trigger('click')
@@ -302,7 +300,7 @@ RSpec.feature 'sequences', type: :feature, js: true do
 
     expect(page).not_to have_selector('.sequence-box', count: 1)
     page.find('#patch_sequences_attributes_0_step_1_note_display')
-      .drag_to(seq_form_light(0, 1, 'slide'))
+        .drag_to(seq_form_light(0, 1, 'slide'))
     seq_form_light(0, 1, 'slide').trigger('click')
     seq_form_light(0, 5, 'slide').trigger('click')
     seq_form_light(0, 13, 'slide').trigger('click')

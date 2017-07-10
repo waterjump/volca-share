@@ -11,5 +11,5 @@ RSpec.describe User, 'validations' do
       .not_to_allow('qq')
       .not_to_allow('webr4%^%$E')
   end
-  it { is_expected.to validate_length_of(:username).within(3..20) }
+  it { is_expected.to validate_length_of(:username).within(2..20) }
 end
