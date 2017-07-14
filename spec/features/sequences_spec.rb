@@ -39,45 +39,12 @@ RSpec.feature 'sequences', type: :feature, js: true do
     expect(page).to have_content('Use the VCO Group selector to change the number of sequences.')
 
     click_button 'Save'
+
+    reflects_patch(dummy_patch)
     expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
     expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
     expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
-    expect(page.find('#attack')['data-midi']).to eq(dummy_patch.attack.to_s)
-    expect(page.find('#decay_release')['data-midi']).to eq(dummy_patch.decay_release.to_s)
-    expect(page.find('#cutoff_eg_int')['data-midi']).to eq(dummy_patch.cutoff_eg_int.to_s)
-    expect(page.find('#octave')['data-midi']).to eq(dummy_patch.octave.to_s)
-    expect(page.find('#peak')['data-midi']).to eq(dummy_patch.peak.to_s)
-    expect(page.find('#cutoff')['data-midi']).to eq(dummy_patch.cutoff.to_s)
-    expect(page.find('#lfo_rate')['data-midi']).to eq(dummy_patch.lfo_rate.to_s)
-    expect(page.find('#lfo_int')['data-midi']).to eq(dummy_patch.lfo_int.to_s)
-    expect(page.find('#vco1_pitch')['data-midi']).to eq(dummy_patch.vco1_pitch.to_s)
-    expect(page.find('#vco2_pitch')['data-midi']).to eq(dummy_patch.vco2_pitch.to_s)
-    expect(page.find('#vco3_pitch')['data-midi']).to eq(dummy_patch.vco3_pitch.to_s)
-    expect(page.find('#slide_time', visible: false)['data-midi']).to eq(dummy_patch.slide_time.to_s)
-    expect(page.find('#expression', visible: false)['data-midi']).to eq(dummy_patch.expression.to_s)
-    expect(page.find('#gate_time', visible: false)['data-midi']).to eq(dummy_patch.gate_time.to_s)
-    expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find('#vco2_active_button')['data-active']).to eq('false')
-    expect(page.find('#vco2_active_button')['data-active']).to eq('false')
-    expect(page.find('#vco1_active_button')['data-active']).to eq('false')
-    expect(page.find('#vco_group_one_light')['data-active']).to eq 'false'
-    expect(page.find('#vco_group_two_light')['data-active']).to eq 'true'
-    expect(page.find('#vco_group_three_light')['data-active']).to eq 'false'
-    expect(page.find('#lfo_target_amp_light')['data-active']).to eq 'true'
-    expect(page.find('#lfo_target_pitch_light')['data-active']).to eq 'true'
-    expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq 'false'
-    expect(page.find('#lfo_wave_light')['data-active']).to eq 'true'
-    expect(page.find('#vco1_wave_light')['data-active']).to eq 'true'
-    expect(page.find('#vco2_wave_light')['data-active']).to eq 'true'
-    expect(page.find('#vco3_wave_light')['data-active']).to eq 'false'
-    expect(page.find('#sustain_on_light')['data-active']).to eq 'true'
-    expect(page.find('#amp_eg_on_light')['data-active']).to eq 'true'
-
-    expect(page).to have_content(dummy_patch.name)
-    expect(page).to have_content(dummy_patch.notes)
-
     expect(page).to have_selector('.sequence-show')
-
     expect(page).to have_css('.volca')
     expect(page).to have_content("by #{user.username}")
     expect(page).to have_link('Edit')
@@ -289,16 +256,18 @@ RSpec.feature 'sequences', type: :feature, js: true do
     click_link 'new-patch'
     expect(current_path).to eq(new_patch_path)
 
-    dummy_patch = FactoryGirl.build(:patch)
+    dummy_patch = FactoryGirl.build(:patch, vco_group: 'two')
     fill_out_patch_form(dummy_patch, true)
-
     click_button 'Save'
     visit edit_patch_path(Patch.last)
+
     expect(page).not_to have_selector('.sequence-box')
     expect(page).to have_link('Add sequences')
+
     click_link('Add sequences')
 
     expect(page).not_to have_selector('.sequence-box', count: 1)
+
     page.find('#patch_sequences_attributes_0_step_1_note_display')
         .drag_to(seq_form_light(0, 1, 'slide'))
     seq_form_light(0, 1, 'slide').trigger('click')

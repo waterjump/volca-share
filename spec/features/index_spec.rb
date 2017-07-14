@@ -19,17 +19,10 @@ RSpec.feature 'patch index', type: :feature, js: true do
     FactoryGirl.create(:patch, secret: false, user_id: user.id)
 
     login
-
     visit patches_path
-    expect(page).to have_button('Delete')
-
     click_button('Delete')
-    user.reload
-    expect(user.patches.count).to eq(0)
-
     visit patches_path
-    expect(page).to have_selector 'h1', text: 'Patches', visible: false
-    expect(page).to have_title('Browse Patches | VolcaShare')
+
     expect(page).to have_content('No patches to show.')
   end
 
@@ -38,8 +31,8 @@ RSpec.feature 'patch index', type: :feature, js: true do
     user_2 = FactoryGirl.create(:user)
 
     login(user_2)
-
     visit patches_path
+
     expect(page).not_to have_button('Delete')
   end
 
@@ -53,96 +46,143 @@ RSpec.feature 'patch index', type: :feature, js: true do
     expect(page).not_to have_content(patch2.name)
   end
 
-  scenario 'anonymous users do not see controls to edit or delete anonymous patches' do
-    patch1 = FactoryGirl.create(:patch, secret: false)
+  describe 'as anonymous user' do
+    let(:patch) { FactoryGirl.create(:patch, secret: false) }
 
-    visit root_path
+    before do
+      patch
+      visit root_path
+    end
 
-    expect(page).not_to have_button('Delete')
-    expect(page).not_to have_selector('.edit.glyph')
+    it 'doesn\'t display controls to delete anononymous patches' do
+      expect(page).not_to have_button('Delete')
+    end
+
+    it 'doesn\'t display controls to edit anononymous patches' do
+      expect(page).not_to have_selector('.edit.glyph')
+    end
+
+    it 'shows anonymous patches' do
+      expect(page).to have_content(patch.name)
+    end
   end
 
-  scenario 'shows anonymous patches' do
-    patch1 = FactoryGirl.create(:patch, secret: false)
-
-    visit root_path
-
-    expect(page).to have_content(patch1.name)
-  end
-
-  scenario 'patches are paginated on index' do
-    user = FactoryGirl.create(:user)
-    first_patch = FactoryGirl.create(:patch, secret: false, user_id: user.id)
-    30.times do
+  describe 'pagination of patch index' do
+    let(:first_patch) do
       FactoryGirl.create(:patch, secret: false, user_id: user.id)
     end
-    last_patch = FactoryGirl.create(:patch, secret: false, user_id: user.id)
-
-    visit patches_path
-    expect(page).to have_content(last_patch.name)
-    expect(page).not_to have_content(first_patch.name)
-    expect(page).to have_selector('.pagination')
-    expect(page).to have_selector('.patch-holder', count: 20)
-    within '.pagination' do
-      expect(page).to have_link('2')
-      expect(page).not_to have_link('3')
+    let(:last_patch) do
+      FactoryGirl.create(:patch, secret: false, user_id: user.id)
     end
 
-    click_link '2'
-    expect(page).not_to have_content(last_patch.name)
-    expect(page).to have_content(first_patch.name)
-    expect(page).to have_selector('.pagination')
-    expect(page).to have_selector('.patch-holder', count: 12)
-    expect(page).to have_link('2')
+    before do
+      first_patch
+      30.times do
+        FactoryGirl.create(:patch, secret: false, user_id: user.id)
+      end
+      last_patch
+      visit patches_path
+    end
+
+    describe 'first page' do
+      it 'shows most recent patches first' do
+        expect(page).to have_content(last_patch.name)
+      end
+
+      it 'does not show patches older than newest 20' do
+        expect(page).not_to have_content(first_patch.name)
+      end
+
+      it 'shows the pagination controls' do
+        expect(page).to have_selector('.pagination')
+      end
+
+      it 'shows 20 patches per page' do
+        expect(page).to have_selector('.patch-holder', count: 20)
+      end
+
+      it 'shows link to next page' do
+        within '.pagination' do
+          expect(page).to have_link('2')
+        end
+      end
+
+      it 'doesn\'t show link to invalid pages' do
+        within '.pagination' do
+          expect(page).not_to have_link('3')
+        end
+      end
+    end
+
+    describe 'second page' do
+      before { click_link '2' }
+
+      it 'doesn\'t show newewst 20 patches' do
+        expect(page).not_to have_content(last_patch.name)
+      end
+
+      it 'shows oldest patch' do
+        expect(page).to have_content(first_patch.name)
+      end
+
+      it 'show the pagination controls' do
+        expect(page).to have_selector('.pagination')
+      end
+
+      it 'shows remaining patches' do
+        expect(page).to have_selector('.patch-holder', count: 12)
+      end
+
+      it 'shows pagination links to other pages' do
+        expect(page).to have_link('1')
+      end
+    end
   end
 
-  scenario 'user patches are shown on tag pages' do
+  scenario 'link to tag pages are shown' do
     patch1 = FactoryGirl.create(
       :patch,
       secret: false,
       user_id: user.id,
       tag_list: 'cool'
     )
-    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
 
-    visit patch_path(patch2)
-
+    visit patch_path(patch1)
     click_link('#cool')
-    expect(page).to have_selector 'h1', text: '#cool tags', visible: false
-    expect(page).to have_content(patch1.name)
-    expect(page).to have_content(patch2.name)
-
-    click_link(patch2.name)
-    expect(current_path).to eq(patch_path(patch2.id))
+    expect(page).to have_current_path(tags_show_path(tag: 'cool'))
   end
 
-  scenario 'anonymous patches are shown on tag pages' do
-    patch1 = FactoryGirl.create(
-      :patch,
-      secret: false,
-      user_id: nil,
-      tag_list: 'cool'
-    )
-
-    visit('/tags/show?tag=cool')
-    expect(page).to have_content(patch1.name)
-  end
-
-  scenario 'audio samples can be provided by registered users' do
-    # Soundcloud comes from FactoryGirl
-    patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
-
-    visit patches_path
-    within '.patch-holder' do
-      # speaker icon
-      expect(page).to have_xpath('/html/body/div[1]/div[2]/div[3]/div[2]/div[1]')
-      find(:xpath, '/html/body/div[1]/div[2]/div[3]/div[2]/div[1]').click
+  describe 'audio previews are shown' do
+    let(:patch) do
+      FactoryGirl.create(:patch, user_id: user.id, secret: false)
     end
 
-    expect(page).to have_selector('iframe')
-    expect(page).to have_link('Go to Patch')
+    before do
+      patch
+      visit patches_path
+    end
 
-    click_link 'Go to Patch'
-    expect(page.current_path).to eq(user_patch_path(user.slug, patch.slug))
+    it 'shows the speaker icon' do
+      within '.patch-holder' do
+        expect(page).to have_xpath('/html/body/div[1]/div[2]/div[3]/div[2]/div[1]')
+      end
+    end
+
+    describe 'audio preview' do
+      before do
+        within '.patch-holder' do
+          find(:xpath, '/html/body/div[1]/div[2]/div[3]/div[2]/div[1]').click
+        end
+      end
+
+      it 'shows preview in an iframe' do
+        expect(page).to have_selector('iframe')
+      end
+
+      it 'links to patch' do
+        click_link 'Go to Patch'
+        expect(page.current_path).to eq(user_patch_path(user.slug, patch.slug))
+      end
+    end
   end
 end
