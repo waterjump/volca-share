@@ -179,9 +179,9 @@ $pink: #fd9994;
 
     .bottom-row {
       position: absolute;
-      top: 83%;
+      top: 69%;
       width: 100%;
-      height: 13%;
+      height: 28%;
       padding-left: 5%;
       input[type="radio"], input[type="checkbox"]  {
         display:none;
@@ -197,12 +197,22 @@ $pink: #fd9994;
           height: 89%;
           position: relative;
           display: inline-block;
+          .note-light {
+            position: absolute;
+            height: 14%;
+            width: 40%;
+            border-radius: 50%;
+            top: 7%;
+            left: 35%;
+            border: 1px solid black;
+            display: none;
+          }
           .light {
             width: 73%;
-            height: 53%;
+            height: 25%;
             border-radius: 50%;
             background-color: gray;
-            top: 53%;
+            top: 80%;
             left: 16%;
             border: 1px black solid;
             position: absolute;
@@ -361,8 +371,8 @@ fieldset {
             .light {
               border: 2px black solid;
               // width: 47%;
-              // height: 34%;
-              // top: 55%;
+              height: 25%;
+              top: 80%;
               // left: 30%;
             }
           }
@@ -438,11 +448,14 @@ fieldset {
       .bottom-row {
         label {
           span {
+            .note-light {
+              border: solid black;
+            }
             .light {
               border: black solid;
               width: 47%;
-              height: 34%;
-              top: 55%;
+              height: 16%;
+              top: 81%;
               left: 30%;
             }
           }

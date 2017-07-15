@@ -3,6 +3,7 @@ $ ->
   return if $('body.form').length == 0
   activeKnob = undefined
   clickedPoint = undefined
+  currentPoint = undefined
   midi = undefined
   display = new VolcaShare.Display($('#led'))
   dragging = false
@@ -303,14 +304,17 @@ $ ->
     return
 
   $('.sequence-holder').on 'mouseenter', '.note-display', ->
-    value = $(this).data('starting-note')
     return false if dragging
+    value = $(this).data('starting-note')
     display.update(value, false, false, true)
-    playNote $(this).html()
+    playNote($(this).html())
+    $('.note-light').hide()
+    $('.note-' + ((value + 3) % 12)).show()
     return
 
   $('.sequence-holder').on 'mouseleave', '.note-display', ->
     return false if dragging
+    $('.note-light').hide()
     stopNote()
     return
 
@@ -318,60 +322,86 @@ $ ->
     dragging = true if clicked
     return unless dragging
     e.preventDefault()
-    degree = undefined
     $('body').css 'cursor', 'ns-resize'
     currentPoint = e.pageY or Math.round(e.originalEvent.touches[0].pageY)
-    if activeKnob != null
-      degree = activeKnob.rotation + clickedPoint - currentPoint
-      if degree > limit
-        activeKnob.rotation = limit
-        clickedPoint = currentPoint
-      if degree < -limit
-        activeKnob.rotation = -limit
-        clickedPoint = currentPoint
-      degree = activeKnob.rotation + clickedPoint - currentPoint
-      if currentPoint != clickedPoint or degree == -limit or degree == limit
-        activeKnob.rotate degree
-        midi = Math.round(63.5 / limit * degree + 63.5)
-        if midiOut.ready()
-          midiOut.output.sendControlChange $(activeKnob.element).data('control-number'), midi, midiOut.channel
-        activeKnob.inputElement.val midi
-        display.update midi, activeKnob.isPitch, activeKnob.isOctave, false
-    else if activeNote != null
-      num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint) / 4)
-      num = 127 if num > 127
-      num = 0 if num < 0
-      display.update(num, false, false, true)
-      activeNote.data('note', num)
-      activeNote.html(VolcaShare.midiNoteNumbers[num])
-      playNote(VolcaShare.midiNoteNumbers[num])
+    turnKnob(e)
+    changeSequenceNote(e)
+    return
+
+  turnKnob = (e) ->
+    return unless activeKnob != null
+    degree = activeKnob.rotation + clickedPoint - currentPoint
+    if degree > limit
+      activeKnob.rotation = limit
+      clickedPoint = currentPoint
+    if degree < -limit
+      activeKnob.rotation = -limit
+      clickedPoint = currentPoint
+    degree = activeKnob.rotation + clickedPoint - currentPoint
+    if currentPoint != clickedPoint or degree == -limit or degree == limit
+      activeKnob.rotate(degree)
+      midi = Math.round(63.5 / limit * degree + 63.5)
+      if midiOut.ready()
+        midiOut.output.sendControlChange(
+          $(activeKnob.element).data('control-number'),
+          midi,
+          midiOut.channel
+        )
+      activeKnob.inputElement.val(midi)
+      display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false)
+    return
+
+  changeSequenceNote = (e) =>
+    return unless activeNote != null
+    num = activeNote.data('starting-note') + Math.floor((clickedPoint - currentPoint) / 6)
+    num = 127 if num > 127
+    num = 0 if num < 0
+    return unless num != activeNote.data('note')
+    display.update(num, false, false, true)
+    activeNote.data('note', num)
+    activeNote.html(VolcaShare.midiNoteNumbers[num])
+    playNote(VolcaShare.midiNoteNumbers[num])
+    $('.note-light').hide()
+    $('.note-' + ((num + 3) % 12)).show()
     return
 
   $(document).on 'mouseup touchend', (e) ->
     clicked = false
-    if dragging
-      dragging = false
-      currentPoint = e.pageY or Math.round(e.originalEvent.changedTouches[0].pageY)
-      $('body').css 'cursor', 'default'
-      if activeKnob != null
-        currentAngle = activeKnob.rotation + clickedPoint - currentPoint
-        if activeKnob.rotation > limit
-          activeKnob.rotation = limit
-          currentPoint = clickedPoint
-        if activeKnob.rotation < -limit
-          activeKnob.rotation = -limit
-          currentPoint = clickedPoint
-        $(activeKnob.element).data('rotation', currentAngle)
-        $(activeKnob.element).data('midi', midi)
-        activeKnob = null
-      else if activeNote != null
-        activeNote.data('starting-note', activeNote.data('note'))
-        stopNote()
-        inputId = activeNote['0'].parentNode.attributes['0'].value
-        $('input#' + inputId).val(activeNote.data('note'))
-        activeNote = null
-    else if activeKnob != null
-      if typeof activeKnob == VolcaShare.Knob
-        display.update(activeKnob.midi, activeKnob.isPitch, false)
+    tapKnob() unless dragging
+    return unless dragging
+    dragging = false
+    currentPoint = e.pageY or Math.round(e.originalEvent.changedTouches[0].pageY)
+    $('body').css 'cursor', 'default'
+    endKnobTurn()
+    endNoteChange()
+    return
+
+  endKnobTurn = ->
+    return unless activeKnob != null
+    currentAngle = activeKnob.rotation + clickedPoint - currentPoint
+    if activeKnob.rotation > limit
+      activeKnob.rotation = limit
+      currentPoint = clickedPoint
+    if activeKnob.rotation < -limit
+      activeKnob.rotation = -limit
+      currentPoint = clickedPoint
+    $(activeKnob.element).data('rotation', currentAngle)
+    $(activeKnob.element).data('midi', midi)
+    activeKnob = null
+    return
+
+  endNoteChange = ->
+    return unless activeNote != null
+    activeNote.data('starting-note', activeNote.data('note'))
+    stopNote()
+    $('.note-light').hide()
+    inputId = activeNote['0'].parentNode.attributes['0'].value
+    $('input#' + inputId).val(activeNote.data('note'))
+    activeNote = null
+    return
+
+  tapKnob = ->
+    return unless activeKnob != null and typeof activeKnob == VolcaShare.Knob
+    display.update(activeKnob.midi, activeKnob.isPitch, false)
     return
   return
