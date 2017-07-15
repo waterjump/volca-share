@@ -1,4 +1,4 @@
-ruby '2.3.0'
+ruby '2.3.1'
 
 source 'https://rubygems.org'
 
@@ -11,7 +11,7 @@ gem 'bootstrap-sass', '~> 3.3.6'
 gem 'mongoid', '~> 5.1.0'
 gem 'devise'
 gem 'rubocop', '~> 0.40.0', require: false
-gem 'bundler', '1.14.6'
+gem 'bundler', '~> 1.15'
 gem 'mongoid-simple-tags'
 gem 'bootstrap-tagsinput-rails'
 gem 'dotenv-rails', groups: [:development, :test]
