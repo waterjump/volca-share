@@ -2,9 +2,9 @@ $ ->
   return if $('body.show').length == 0
   activeKnob = undefined
   knob = undefined
-  display = new (VolcaShare.Display)($('#led'))
+  display = new (VS.Display)($('#led'))
   limit = 140
-  new VolcaShare.MidiOut
+  new VS.MidiOut
 
   loadAudioSample = ->
     element = $('.sample')
@@ -13,7 +13,7 @@ $ ->
     return
 
   $('.knob').each ->
-    my_knob = new VolcaShare.Knob(this)
+    my_knob = new VS.Knob(this)
     degree = my_knob.degreeForMidi($(this).data('midi'), limit)
     $(this).data 'rotation', degree
     my_knob.autoRotate degree, '#' + $(this).attr('id')
@@ -29,7 +29,7 @@ $ ->
     return
 
   $('.step-note').each ->
-    $(this).html(VolcaShare.midiNoteNumbers[parseInt($(this).data('note'))])
+    $(this).html(VS.midiNoteNumbers[parseInt($(this).data('note'))])
     return
 
   $('.button').each ->
@@ -43,7 +43,7 @@ $ ->
   loadAudioSample()
   $('.knob').mouseenter ->
     midi = $(this).data('midi')
-    activeKnob = new VolcaShare.Knob(this)
+    activeKnob = new VS.Knob(this)
     display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false)
     return
   return

@@ -12,7 +12,7 @@
 //
 
 
-//= require _init.coffee.erb
+//= require _setup.coffee
 //= require jquery
 //= require jquery_ujs
 //= require webmidi.min.js

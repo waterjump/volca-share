@@ -1,0 +1,163 @@
+VS.Sequences = ->
+  display = VS.display
+  midiOut = VS.midiOut
+  scope = @
+  vcoGroupCounts = {one: 3, two: 2, three: 1}
+  @sequencesActive = $('.remove-sequence[value=\'false\']').toArray().length > 1
+  @sequenceCount = 0
+  @activeNote = null
+
+  lightSequences = ->
+    $('.bottom-row label, .sequence-box label').each ->
+      myInput = $('input#' + $(this).attr('for'))
+      $(this).find('span').find('div').addClass('lit') if myInput.prop('checked')
+      return
+    return
+
+  setSequenceNotes = ->
+    $('.note-display').each ->
+      $(this).html VS.midiNoteNumbers[$(this).data('starting-note')]
+      return
+    return
+
+  @init = ->
+    lightSequences()
+    setSequenceNotes()
+    return
+
+  showSequences = ->
+    $('.sequence-message').removeClass('hidden')
+    i = 0
+    while i < scope.sequenceCount
+      totalSequenceCount = $('.sequence-area .sequence-form').toArray().length
+      content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount)
+      $('.sequence-holder').append(content)
+      i++
+    $('#toggle-sequences').text('Remove sequences')
+    scope.sequencesActive = true
+    return
+
+  hideSequences = ->
+    $('.sequence-area .remove-sequence').val('true')
+    $('.sequence-area .sequence-form').addClass('hidden')
+    $('.sequence-message').addClass('hidden')
+    $('#toggle-sequences').text('Add sequences')
+    scope.sequencesActive = false
+    return
+
+  setSequenceCount = ->
+    vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val()
+    scope.sequenceCount = vcoGroupCounts[vcoGroup]
+    return
+
+  $('#toggle-sequences').on 'click tap', (e) ->
+    e.preventDefault()
+    setSequenceCount()
+    if scope.sequencesActive then hideSequences() else showSequences()
+    $('.sequence-box .multi').each ->
+      myInput = $('input#' + $(this).parent().attr('for'))
+      $(this).find('div').addClass('lit') if myInput.prop('checked')
+      return
+    return
+
+  $('.sequence-holder').on 'mousedown touchstart', '.note-display', (e) ->
+    VS.clickedPoint = e.pageY or Math.round(e.originalEvent.touches[0].pageY)
+    e.preventDefault()
+    e.stopPropagation()
+    VS.clicked = true
+    scope.activeNote = $(this)
+    VS.activeKnob = null
+    return
+
+  $('.sequence-holder').on 'click tap', '.sequence-box label', ->
+    $(this).find('span').find('div').toggleClass('lit')
+    return
+
+  # TODO: this method sucks lol.  Refactor.
+  $('.bottom-row .multi').on 'click tap', ->
+    $('.light[data-radio]').each ->
+      $(this).removeClass('lit')
+      return
+    if scope.sequencesActive
+      vcoGroup = $('input#' + $(this).parent().attr('for')).val()
+      mySequenceCount = vcoGroupCounts[vcoGroup]
+      hiddenSequences = $('.sequence-area .sequence-form.hidden').toArray()
+      shownSequences = $('.sequence-area .sequence-form').not('.hidden').toArray()
+      disabledSequences = $('.sequence-area .sequence-form:not(\'.hidden\') .remove-sequence[value=\'true\']').toArray()
+      totalSequenceCount = $('.sequence-area .sequence-form').toArray().length
+      activeSequences = $('.sequence-area .remove-sequence[value=\'false\']').toArray()
+      if mySequenceCount > activeSequences.length
+        if mySequenceCount > shownSequences.length
+          # uncheck all boxes
+          $(disabledSequences).each ->
+            $(this).val('false')
+            $(this).removeAttr('disabled')
+            return
+          $('.sequence-area .sequence-form').each ->
+            $(this).css('opacity', '1.0')
+            return
+          activeSequences = $('.sequence-area .remove-sequence[value=\'false\']').toArray()
+          #add sequences
+          difference = mySequenceCount - (activeSequences.length)
+          i = activeSequences.length
+          while i < activeSequences.length + difference
+            content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount - 1)
+            $('.sequence-holder').append(content)
+            i++
+        else
+          #uncheck boxes
+          i = 0
+          while i < mySequenceCount
+            $(disabledSequences[i]).val 'false'
+            $(shownSequences[i]).css 'opacity', '1.0'
+            i++
+      else if activeSequences.length > mySequenceCount
+        #check boxes
+        difference = activeSequences.length - mySequenceCount
+        i = activeSequences.length - 1
+        while i > activeSequences.length - 1 - difference
+          $(activeSequences[i]).val('true')
+          $(shownSequences[i]).css('opacity', '0.5')
+          i--
+    $(this).find('.light').addClass('lit')
+    return
+
+  $('.sequence-holder').on 'mouseenter', '.note-display', ->
+    return false if VS.dragging
+    value = $(this).data('starting-note')
+    display.update(value, false, false, true)
+    midiOut.playNote($(this).html())
+    $('.note-light').hide()
+    $('.note-' + ((value + 3) % 12)).show()
+    return
+
+  $('.sequence-holder').on 'mouseleave', '.note-display', ->
+    return false if VS.dragging
+    $('.note-light').hide()
+    midiOut.stopNote()
+    return
+
+  @changeSequenceNote = (e) =>
+    return unless @activeNote != null
+    num = @activeNote.data('starting-note') + Math.floor((VS.clickedPoint - VS.currentPoint) / 6)
+    num = 127 if num > 127
+    num = 0 if num < 0
+    return unless num != @activeNote.data('note')
+    display.update(num, false, false, true)
+    @activeNote.data('note', num)
+    @activeNote.html(VS.midiNoteNumbers[num])
+    midiOut.playNote(VS.midiNoteNumbers[num])
+    $('.note-light').hide()
+    $('.note-' + ((num + 3) % 12)).show()
+    return
+
+  @endNoteChange = ->
+    return unless @activeNote != null
+    @activeNote.data('starting-note', @activeNote.data('note'))
+    midiOut.stopNote()
+    $('.note-light').hide()
+    inputId = @activeNote['0'].parentNode.attributes['0'].value
+    $('input#' + inputId).val(@activeNote.data('note'))
+    @activeNote = null
+    return
+  return

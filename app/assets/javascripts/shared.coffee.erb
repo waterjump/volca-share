@@ -13,11 +13,11 @@ midiMultiples =
   10: 'A#'
   11: 'B'
 
-VolcaShare.midiNoteNumbers = {}
+VS.midiNoteNumbers = {}
 
 i = 0
 while i < 128
-  VolcaShare.midiNoteNumbers[i] = midiMultiples[i % 12] + (Math.floor(i / 12) - 2)
+  VS.midiNoteNumbers[i] = midiMultiples[i % 12] + (Math.floor(i / 12) - 2)
   i++
 
 $ ->
