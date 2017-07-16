@@ -1,31 +1,32 @@
 VolcaShare.MidiOut = ->
-  parent = this
+  parent = @
   @supported
   @output
   @channel
+  @playingNote
 
   @ready = ->
-    parent.output != undefined and parent.channel != undefined
+    @output != undefined and @channel != undefined
 
   @changeChannel = (element) ->
-    parent.channel = $(element).val()
+    @channel = $(element).val()
     return
 
   @changeOutput = (element) ->
-    parent.output = WebMidi.getOutputByName($(element).val())
+    @output = WebMidi.getOutputByName($(element).val())
     return
 
   @updateForm = ->
-    return unless parent.supported and WebMidi.outputs.length > 0
+    return unless @supported and WebMidi.outputs.length > 0
     items = '<option>Midi Device</option>'
     $(WebMidi.outputs).each ->
       items += '<option value="' + @name + '">' + @name + '</option>'
       return
     $('#midi-device').html(items)
     $('#midi-device option:eq(1)').attr('selected', 'selected')
-    parent.changeOutput($('#midi-device option:eq(1)'))
+    @changeOutput($('#midi-device option:eq(1)'))
     $('#midi-channel option:eq(1)').attr('selected', 'selected')
-    parent.changeChannel($('#midi-channel option:eq(1)'))
+    @changeChannel($('#midi-channel option:eq(1)'))
     $('#midi-output').removeClass('hidden')
     $('.midi-enabled').css('border', 'lightgreen solid')
     $('#enable-web-midi').hide()
@@ -33,20 +34,43 @@ VolcaShare.MidiOut = ->
     return
 
   @enableSync = ->
-    return unless parent.ready()
+    return unless @ready()
     $('#sync').removeClass('disabled')
     return
 
   @init = ->
+    scope = @
     WebMidi.enable (err) ->
-      if err
-        # console.log("An error occurred", err);
-      else
-        parent.supported = true
-        parent.updateForm()
-        parent.enableSync()
+      return console.log err if err
+      scope.supported = true
+      scope.updateForm()
+      scope.enableSync()
       return
     return
 
   @init()
+
+  @syncMidi = ->
+    return unless @ready()
+    $('.knob').each ->
+      @output.sendControlChange(
+        $(this).data('control-number'),
+        $(this).data('midi'),
+        @channel
+      )
+      return
+    return
+
+  @playNote = (note) ->
+    return unless @ready() && @playingNote != note
+    @output.stopNote(@playingNote) if @playingNote != undefined
+    @output.playNote(note)
+    @playingNote = note
+    return
+
+  @stopNote = ->
+    return unless @ready() && @playingNote != undefined
+    @output.stopNote(@playingNote)
+    @playingNote = undefined
+    return
   return

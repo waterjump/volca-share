@@ -13,32 +13,8 @@ $ ->
   sequencesActive = $('.remove-sequence[value=\'false\']').toArray().length > 1
   sequenceCount = 0
   midiOut = new VolcaShare.MidiOut
-  playingNote = undefined
   vcoGroupCounts = {one: 3, two: 2, three: 1}
 
-  syncMidi = ->
-    return unless midiOut.ready()
-    $('.knob').each ->
-      midiOut.output.sendControlChange(
-        $(this).data('control-number'),
-        $(this).data('midi'),
-        midiOut.channel
-      )
-      return
-    return
-
-  playNote = (note) ->
-    return unless midiOut.ready() && playingNote != note
-    midiOut.output.stopNote(playingNote) if playingNote != undefined
-    midiOut.output.playNote(note)
-    playingNote = note
-    return
-
-  stopNote = ->
-    return unless midiOut.ready() && playingNote != undefined
-    midiOut.output.stopNote(playingNote)
-    playingNote = undefined
-    return
 
   #
   # initialize
@@ -151,7 +127,7 @@ $ ->
 
   # TODO: Abstract for use with show view also.
   $('#sync').on 'click tap', ->
-    syncMidi()
+    midiOut.syncMidi()
     return
 
   # TODO DRY this up.
@@ -219,7 +195,7 @@ $ ->
     randomizeVcoActive()
     randomizeCheckboxes()
     randomizeVcoGroup()
-    syncMidi()
+    midiOut.syncMidi()
     return
 
   $('.bottom-row .on-off').on 'click tap', ->
@@ -307,7 +283,7 @@ $ ->
     return false if dragging
     value = $(this).data('starting-note')
     display.update(value, false, false, true)
-    playNote($(this).html())
+    midiOut.playNote($(this).html())
     $('.note-light').hide()
     $('.note-' + ((value + 3) % 12)).show()
     return
@@ -315,7 +291,7 @@ $ ->
   $('.sequence-holder').on 'mouseleave', '.note-display', ->
     return false if dragging
     $('.note-light').hide()
-    stopNote()
+    midiOut.stopNote()
     return
 
   $(document).on 'mousemove touchmove', (e) ->
@@ -360,7 +336,7 @@ $ ->
     display.update(num, false, false, true)
     activeNote.data('note', num)
     activeNote.html(VolcaShare.midiNoteNumbers[num])
-    playNote(VolcaShare.midiNoteNumbers[num])
+    midiOut.playNote(VolcaShare.midiNoteNumbers[num])
     $('.note-light').hide()
     $('.note-' + ((num + 3) % 12)).show()
     return
@@ -393,7 +369,7 @@ $ ->
   endNoteChange = ->
     return unless activeNote != null
     activeNote.data('starting-note', activeNote.data('note'))
-    stopNote()
+    midiOut.stopNote()
     $('.note-light').hide()
     inputId = activeNote['0'].parentNode.attributes['0'].value
     $('input#' + inputId).val(activeNote.data('note'))
