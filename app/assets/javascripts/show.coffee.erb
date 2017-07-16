@@ -4,32 +4,12 @@ $ ->
   knob = undefined
   display = new (VolcaShare.Display)($('#led'))
   limit = 140
-  midiOut = new VolcaShare.MidiOut
+  new VolcaShare.MidiOut
 
   loadAudioSample = ->
     element = $('.sample')
     return unless element.data('embed-code') != undefined
     element.html(element.data('embed-code'))
-    return
-
-  $('#midi-device').change ->
-    midiOut.changeOutput(this)
-    midiOut.enableSync()
-    return
-
-  $('#midi-channel').change ->
-    midiOut.changeChannel(this)
-    midiOut.enableSync()
-    return
-
-  $('#sync').click ->
-    return unless midiOut.ready()
-    $('.knob').each ->
-      midiOut.output.sendControlChange(
-        $(this).data('control-number'),
-        $(this).data('midi'),
-        midiOut.channel
-      )
     return
 
   $('.knob').each ->

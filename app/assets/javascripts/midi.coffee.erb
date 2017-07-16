@@ -1,5 +1,5 @@
 VolcaShare.MidiOut = ->
-  parent = @
+  scope = @
   @supported
   @output
   @channel
@@ -39,9 +39,8 @@ VolcaShare.MidiOut = ->
     return
 
   @init = ->
-    scope = @
     WebMidi.enable (err) ->
-      return console.log err if err
+      return if err
       scope.supported = true
       scope.updateForm()
       scope.enableSync()
@@ -53,10 +52,10 @@ VolcaShare.MidiOut = ->
   @syncMidi = ->
     return unless @ready()
     $('.knob').each ->
-      @output.sendControlChange(
+      scope.output.sendControlChange(
         $(this).data('control-number'),
         $(this).data('midi'),
-        @channel
+        scope.channel
       )
       return
     return
@@ -72,5 +71,19 @@ VolcaShare.MidiOut = ->
     return unless @ready() && @playingNote != undefined
     @output.stopNote(@playingNote)
     @playingNote = undefined
+    return
+
+  $('#midi-device').change ->
+    scope.changeOutput(this)
+    scope.enableSync()
+    return
+
+  $('#midi-channel').change ->
+    scope.changeChannel(this)
+    scope.enableSync()
+    return
+
+  $('#sync').on 'click tap', ->
+    scope.syncMidi()
     return
   return

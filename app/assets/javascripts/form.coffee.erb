@@ -112,24 +112,6 @@ $ ->
     $(this).find('span').find('div').toggleClass('lit')
     return
 
-
-  # TODO: Abstract for use with show view also.
-  $('#midi-device').change ->
-    midiOut.changeOutput(this)
-    midiOut.enableSync()
-    return
-
-  # TODO: Abstract for use with show view also.
-  $('#midi-channel').change ->
-    midiOut.changeChannel(this)
-    midiOut.enableSync()
-    return
-
-  # TODO: Abstract for use with show view also.
-  $('#sync').on 'click tap', ->
-    midiOut.syncMidi()
-    return
-
   # TODO DRY this up.
   $('#randomize').on 'click tap', (e) ->
     e.preventDefault()
