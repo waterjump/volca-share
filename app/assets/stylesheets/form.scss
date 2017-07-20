@@ -17,6 +17,7 @@ $pink: #fd9994;
     cursor: ns-resize;
   }
 }
+
 .stretchy {
   padding-bottom: percentage(1 / $aspect / 100);
   position: relative;
@@ -262,7 +263,6 @@ $pink: #fd9994;
   width: 100%;
 }
 
-
 #midi-only-panel{
   border-radius: 8px;
   overflow: hidden;
@@ -317,6 +317,7 @@ $pink: #fd9994;
 #interface {
   padding: 0;
 }
+
 .stretchy2 {
   width: 100%;
   position: relative;
@@ -363,19 +364,13 @@ fieldset {
 }
 
 @media (min-width: 440px) {
-  .stretchy {
-    .volca {
-      .bottom-row {
-        label {
-          span {
-            .light {
-              border: 2px black solid;
-              // width: 47%;
-              height: 25%;
-              top: 80%;
-              // left: 30%;
-            }
-          }
+  .bottom-row {
+    label {
+      span {
+        .light {
+          border: 2px black solid;
+          height: 25%;
+          top: 80%;
         }
       }
     }
@@ -468,7 +463,6 @@ fieldset {
 @media (min-width: 990px) {
   .stretchy {
     padding-bottom: 52.685%;
-    position: relative;
     max-width: 830px;
     .volca {
       margin-left: 53px;
@@ -483,7 +477,6 @@ fieldset {
   .stretchy {
     width: 100%;
     padding-bottom: 57.923%;
-    max-width: 830px;
     .volca {
       margin: 0;
     }
