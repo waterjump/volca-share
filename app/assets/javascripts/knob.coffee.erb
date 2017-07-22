@@ -3,9 +3,16 @@ VS.Knob = (element) ->
   @element = element
   @midi = $(@element).data('midi')
   @rotation = $(@element).data('rotation') or 0
-  @isPitch = $(@element).attr('id').split('_')[1] == 'pitch'
-  @isOctave = $(@element).attr('id') == 'octave'
+  @displayStyle = 'midiString'
   @inputElement = $('input#patch_' + $(@element).attr('id'))
+
+  setDisplayStyle = ->
+    if $(scope.element).attr('id').split('_')[1] == 'pitch'
+      scope.displayStyle = 'pitchString'
+    else if $(scope.element).attr('id') == 'octave'
+      scope.displayStyle = 'octaveString'
+
+  setDisplayStyle()
 
   @rotate = (degree) ->
     knob = $(@element)

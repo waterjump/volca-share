@@ -37,6 +37,6 @@ $ ->
   $('.knob').mouseenter ->
     midi = $(this).data('midi')
     activeKnob = new VS.Knob(this)
-    display.update(midi, activeKnob.isPitch, activeKnob.isOctave, false)
+    display.update(midi, activeKnob.displayStyle)
     return
   return

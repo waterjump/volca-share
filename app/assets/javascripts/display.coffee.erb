@@ -29,17 +29,8 @@ VS.Display = (element) ->
 
   @element = element
 
-  @constructDisplayString = (value, pitch, octave, note) ->
-    if pitch == true
-      @pitchString value
-    else if octave
-      @octaveString value
-    else if note
-      @noteString value
-    else
-      @midiString value
-
-  @pitchString = (value) ->
+  @pitchString = (val) ->
+    value = @vcoPitchValues[val]
     return 'blank o f f'.split(' ') if value == 0
     thousands = 'blank'
     tensString = '' + Math.abs(value) / 100
@@ -127,11 +118,8 @@ VS.Display = (element) ->
       ones = '' + value
     [thousands, hundreds, tens, ones]
 
-  # TODO: Pass in an object (hash) instead of many parameters
-  @update = (midi, pitch, octave, note) ->
-    displayValue = midi
-    displayValue = @vcoPitchValues[midi] if pitch
-    displayString = @constructDisplayString(displayValue, pitch, octave, note)
+  @update = (value, displayStyle) ->
+    displayString = @[displayStyle](value)
     digits = [@digit1, @digit2, @digit3, @digit4]
 
     flip = (digit, char) ->

@@ -139,7 +139,7 @@ VS.Form = ->
     midi = $(this).data('midi')
     return false if VS.dragging
     VS.activeKnob = new VS.Knob(this)
-    display.update(midi, VS.activeKnob.isPitch, VS.activeKnob.isOctave, false)
+    display.update(midi, VS.activeKnob.displayStyle)
     return
 
   $(document).on 'mousemove touchmove', (e) ->
@@ -172,7 +172,7 @@ VS.Form = ->
           midiOut.channel
         )
       VS.activeKnob.inputElement.val(midi)
-      display.update(midi, VS.activeKnob.isPitch, VS.activeKnob.isOctave, false)
+      display.update(midi, VS.activeKnob.displayStyle)
     return
 
   $(document).on 'mouseup touchend', (e) ->
@@ -202,6 +202,6 @@ VS.Form = ->
 
   tapKnob = ->
     return unless VS.activeKnob != null and typeof VS.activeKnob == VS.Knob
-    display.update(VS.activeKnob.midi, VS.activeKnob.isPitch, false)
+    display.update(VS.activeKnob.midi, VS.activeKnob.displayStyle)
     return
   return

@@ -125,7 +125,7 @@ VS.Sequences = ->
   $('.sequence-holder').on 'mouseenter', '.note-display', ->
     return false if VS.dragging
     value = $(this).data('starting-note')
-    display.update(value, false, false, true)
+    display.update(value, 'noteString')
     midiOut.playNote($(this).html())
     $('.note-light').hide()
     $('.note-' + ((value + 3) % 12)).show()
@@ -143,7 +143,7 @@ VS.Sequences = ->
     num = 127 if num > 127
     num = 0 if num < 0
     return unless num != @activeNote.data('note')
-    display.update(num, false, false, true)
+    display.update(num, 'noteString')
     @activeNote.data('note', num)
     @activeNote.html(VS.midiNoteNumbers[num])
     midiOut.playNote(VS.midiNoteNumbers[num])
