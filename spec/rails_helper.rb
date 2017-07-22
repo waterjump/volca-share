@@ -13,6 +13,7 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'vcr'
 require 'feature_macros'
+require 'capybara-screenshot/rspec'
 
 VCR.configure do |config|
   config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'

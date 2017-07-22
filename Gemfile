@@ -33,6 +33,7 @@ group :development, :test do
   gem 'factory_girl_rails', '~> 4.0'
   gem 'poltergeist'
   gem 'launchy'
+  gem 'capybara-screenshot'
 end
 
 group :test do

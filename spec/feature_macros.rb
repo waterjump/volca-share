@@ -57,6 +57,10 @@ def seq_form_light(seq, step, param)
   )
 end
 
+def rotation_from_midi(midi)
+  ((midi - 63.5) / (63.5 /140)).round.to_s
+end
+
 def reflects_patch(patch)
   # Knobs
   expect(page.find('#attack')['data-midi']).to eq(patch.attack.to_s)
@@ -70,6 +74,17 @@ def reflects_patch(patch)
   expect(page.find('#vco1_pitch')['data-midi']).to eq(patch.vco1_pitch.to_s)
   expect(page.find('#vco2_pitch')['data-midi']).to eq(patch.vco2_pitch.to_s)
   expect(page.find('#vco3_pitch')['data-midi']).to eq(patch.vco3_pitch.to_s)
+  expect(page.find('span.attack', visible: false).text).to eq(rotation_from_midi(patch.attack).to_s)
+  expect(page.find('span.decay_release', visible: false).text).to eq(rotation_from_midi(patch.decay_release).to_s)
+  expect(page.find('span.cutoff_eg_int', visible: false).text).to eq(rotation_from_midi(patch.cutoff_eg_int).to_s)
+  expect(page.find('span.octave', visible: false).text).to eq(rotation_from_midi(patch.octave).to_s)
+  expect(page.find('span.peak', visible: false).text).to eq(rotation_from_midi(patch.peak).to_s)
+  expect(page.find('span.cutoff', visible: false).text).to eq(rotation_from_midi(patch.cutoff).to_s)
+  expect(page.find('span.lfo_rate', visible: false).text).to eq(rotation_from_midi(patch.lfo_rate).to_s)
+  expect(page.find('span.lfo_int', visible: false).text).to eq(rotation_from_midi(patch.lfo_int).to_s)
+  expect(page.find('span.vco1_pitch', visible: false).text).to eq(rotation_from_midi(patch.vco1_pitch).to_s)
+  expect(page.find('span.vco2_pitch', visible: false).text).to eq(rotation_from_midi(patch.vco2_pitch).to_s)
+  expect(page.find('span.vco3_pitch', visible: false).text).to eq(rotation_from_midi(patch.vco3_pitch).to_s)
   expect(page).to have_css('#vco1_pitch.lit') if patch.vco1_active
   expect(page).to have_css('#vco2_pitch.lit') if patch.vco2_active
   expect(page).to have_css('#vco3_pitch.lit') if patch.vco3_active
@@ -95,39 +110,41 @@ def reflects_patch(patch)
   expect(page.find('#vco_group_one_light')['data-active']).to eq((patch.vco_group == 'one').to_s)
   expect(page.find('#vco_group_two_light')['data-active']).to eq((patch.vco_group == 'two').to_s)
   expect(page.find('#vco_group_three_light')['data-active']).to eq((patch.vco_group == 'three').to_s)
+  expect(page.find('#lfo_target_amp_light')['data-active']).to eq(patch.lfo_target_amp.to_s)
+  expect(page.find('#lfo_target_pitch_light')['data-active']).to eq(patch.lfo_target_pitch.to_s)
+  expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq(patch.lfo_target_cutoff.to_s)
+  expect(page.find('#lfo_wave_light')['data-active']).to eq(patch.lfo_wave.to_s)
+  expect(page.find('#vco1_wave_light')['data-active']).to eq(patch.vco1_wave.to_s)
+  expect(page.find('#vco2_wave_light')['data-active']).to eq(patch.vco2_wave.to_s)
+  expect(page.find('#vco3_wave_light')['data-active']).to eq(patch.vco3_wave.to_s)
+  expect(page.find('#sustain_on_light')['data-active']).to eq(patch.sustain_on.to_s)
+  expect(page.find('#amp_eg_on_light')['data-active']).to eq(patch.amp_eg_on.to_s)
   expect(page).to have_css('#vco_group_one_light.lit') if patch.vco_group == 'one'
   expect(page).to have_css('#vco_group_two_light.lit') if patch.vco_group == 'two'
   expect(page).to have_css('#vco_group_three_light.lit') if patch.vco_group == 'three'
+  expect(page).to have_css('#lfo_target_amp_light.lit') if patch.lfo_target_amp
+  expect(page).to have_css('#lfo_target_pitch_light.lit') if patch.lfo_target_pitch
+  expect(page).to have_css('#lfo_target_cutoff_light.lit') if patch.lfo_target_cutoff
+  expect(page).to have_css('#lfo_wave_light.lit') if patch.lfo_wave
+  expect(page).to have_css('#vco1_wave_light.lit') if patch.vco1_wave
+  expect(page).to have_css('#vco2_wave_light.lit') if patch.vco2_wave
+  expect(page).to have_css('#vco3_wave_light.lit') if patch.vco3_wave
+  expect(page).to have_css('#sustain_on_light.lit') if patch.sustain_on
+  expect(page).to have_css('#amp_eg_on_light.lit') if patch.amp_eg_on
   expect(page).not_to have_css('#vco_group_one_light.lit') unless patch.vco_group == 'one'
   expect(page).not_to have_css('#vco_group_two_light.lit') unless patch.vco_group == 'two'
   expect(page).not_to have_css('#vco_group_three_light.lit') unless patch.vco_group == 'three'
-  expect(page.find('#lfo_target_amp_light')['data-active']).to eq(patch.lfo_target_amp.to_s)
-  expect(page).to have_css('#lfo_target_amp_light.lit') if patch.lfo_target_amp
   expect(page).not_to have_css('#lfo_target_amp_light.lit') unless patch.lfo_target_amp
-  expect(page.find('#lfo_target_pitch_light')['data-active']).to eq(patch.lfo_target_pitch.to_s)
-  expect(page).to have_css('#lfo_target_pitch_light.lit') if patch.lfo_target_pitch
   expect(page).not_to have_css('#lfo_target_pitch_light.lit') unless patch.lfo_target_pitch
-  expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq(patch.lfo_target_cutoff.to_s)
-  expect(page).to have_css('#lfo_target_cutoff_light.lit') if patch.lfo_target_cutoff
   expect(page).not_to have_css('#lfo_target_cutoff_light.lit') unless patch.lfo_target_cutoff
-  expect(page.find('#lfo_wave_light')['data-active']).to eq(patch.lfo_wave.to_s)
-  expect(page).to have_css('#lfo_wave_light.lit') if patch.lfo_wave
   expect(page).not_to have_css('#lfo_wave_light.lit') unless patch.lfo_wave
-  expect(page.find('#vco1_wave_light')['data-active']).to eq(patch.vco1_wave.to_s)
-  expect(page).to have_css('#vco1_wave_light.lit') if patch.vco1_wave
   expect(page).not_to have_css('#vco1_wave_light.lit') unless patch.vco1_wave
-  expect(page.find('#vco2_wave_light')['data-active']).to eq(patch.vco2_wave.to_s)
-  expect(page).to have_css('#vco2_wave_light.lit') if patch.vco2_wave
   expect(page).not_to have_css('#vco2_wave_light.lit') unless patch.vco2_wave
-  expect(page.find('#vco3_wave_light')['data-active']).to eq(patch.vco3_wave.to_s)
-  expect(page).to have_css('#vco3_wave_light.lit') if patch.vco3_wave
   expect(page).not_to have_css('#vco3_wave_light.lit') unless patch.vco3_wave
-  expect(page.find('#sustain_on_light')['data-active']).to eq(patch.sustain_on.to_s)
-  expect(page).to have_css('#sustain_on_light.lit') if patch.sustain_on
   expect(page).not_to have_css('#sustain_on_light.lit') unless patch.sustain_on
-  expect(page.find('#amp_eg_on_light')['data-active']).to eq(patch.amp_eg_on.to_s)
-  expect(page).to have_css('#amp_eg_on_light.lit') if patch.amp_eg_on
   expect(page).not_to have_css('#amp_eg_on_light.lit') unless patch.amp_eg_on
+
+  # Content
   expect(page).to have_content(patch.name)
   expect(page).to have_content(patch.notes)
 end

@@ -1,4 +1,5 @@
 VS.Knob = (element) ->
+  scope = @
   @element = element
   @midi = $(@element).data('midi')
   @rotation = $(@element).data('rotation') or 0
@@ -21,10 +22,14 @@ VS.Knob = (element) ->
   @degreeForMidi = (midi, limit) ->
     Math.round (midi - 63.5) / (63.5 / limit)
 
-  @autoRotate = (d, selector) ->
+  @autoRotate = (d) ->
+    <% if Rails.env.test? %>
+    $(scope.element).css(transform: 'rotate(' + d + 'deg)')
+    <% else %>
     currentRotation = parseInt(@rotation)
     $(deg: currentRotation).animate { deg: d }, step: (now, fx) ->
-      $(selector).css transform: 'rotate(' + now + 'deg)'
+      $(scope.element).css(transform: 'rotate(' + now + 'deg)')
       return
+    <% end %>
     return
   return

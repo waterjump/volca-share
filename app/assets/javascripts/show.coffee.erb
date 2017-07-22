@@ -16,7 +16,7 @@ $ ->
     my_knob = new VS.Knob(this)
     degree = my_knob.degreeForMidi($(this).data('midi'), limit)
     $(this).data 'rotation', degree
-    my_knob.autoRotate degree, '#' + $(this).attr('id')
+    my_knob.autoRotate(degree)
     return
 
   $('.bottom-row label').each ->
