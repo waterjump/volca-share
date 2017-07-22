@@ -14,7 +14,7 @@
               .step{ class: num % 4 == 0 ? 'line' : '' }
                 .note.param
                   = label_tag("patch[sequences][#{seq_num}][step_#{num}[note]]]", id: "patch_sequences_attributes_#{seq_num}_step_#{num}_note_display") do
-                    %span.step-note{ data: { note: step.note } }
+                    %span.note-display{ data: { starting_note: step.note } }
                       C3
                 .slide.param
                   = label_tag("patch[sequences][#{seq_num}][step_#{num}[slide]]]") do

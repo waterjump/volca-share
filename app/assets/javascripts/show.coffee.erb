@@ -1,10 +1,12 @@
 $ ->
   return if $('body.show').length == 0
   activeKnob = undefined
-  knob = undefined
-  display = new (VS.Display)($('#led'))
+  display = VS.display
   limit = 140
   new VS.MidiOut
+  sequences = VS.sequences
+
+  sequences.init()
 
   loadAudioSample = ->
     element = $('.sample')
@@ -19,17 +21,8 @@ $ ->
     my_knob.autoRotate(degree)
     return
 
-  $('.bottom-row label').each ->
-    if $(this).find('span').find('div').data('active')
-      $(this).find('span').find('div').addClass('lit')
-    return
-
-  $('.sequence-light').each ->
+  $('.light').each ->
     $(this).addClass('lit') if $(this).data('active')
-    return
-
-  $('.step-note').each ->
-    $(this).html(VS.midiNoteNumbers[parseInt($(this).data('note'))])
     return
 
   $('.button').each ->

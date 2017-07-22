@@ -277,6 +277,8 @@ RSpec.feature 'sequences', type: :feature, js: true do
     seq_form_light(0, 7, 'step_mode').trigger('click')
 
     click_button 'Save'
+    find('#patch_sequences_attributes_0_step_1_note_display').hover
+    expect(page).to have_css('.note-7.lit')
     expect(page).to have_selector('.sequence-show')
     expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('E2')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')

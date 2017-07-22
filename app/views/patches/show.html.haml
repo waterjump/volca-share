@@ -48,54 +48,67 @@
       .bottom-row
         = label_tag('patch[vco_group_one]') do
           %span
+            .note-light.note-0.lit
             .light{ id: 'vco_group_one_light', data: { active: @patch.vco_group_one.to_s } }
 
         = label_tag('patch[vco_group_two]') do
           %span
+            .note-light.note-1.lit
             .light{ id: 'vco_group_two_light', data: { active: @patch.vco_group_two.to_s } }
 
         = label_tag('patch[vco_group_three]') do
           %span
+            .note-light.note-2.lit
             .light{ id: 'vco_group_three_light', data: { active: @patch.vco_group_three.to_s } }
 
         = label_tag('patch[lfo_target_amp]') do
           %span
+            .note-light.note-3.lit
             .light{ id: 'lfo_target_amp_light', data: { active: @patch.lfo_target_amp.to_s } }
 
         = label_tag('patch[lfo_target_pitch]') do
           %span
+            .note-light.note-4.lit
             .light{ id: 'lfo_target_pitch_light', data: { active: @patch.lfo_target_pitch.to_s } }
 
         = label_tag('patch[lfo_target_cutoff]') do
           %span
+            .note-light.note-5.lit
             .light{ id: 'lfo_target_cutoff_light', data: { active: @patch.lfo_target_cutoff.to_s } }
 
         = label_tag('patch[lfo_wave]') do
           %span
+            .note-light.note-6.lit
             .light{ id: 'lfo_wave_light', data: { active: @patch.lfo_wave.to_s } }
 
         = label_tag('patch[vco1_wave]') do
           %span
+            .note-light.note-7.lit
             .light{ id: 'vco1_wave_light', data: { active: @patch.vco1_wave.to_s } }
 
         = label_tag('patch[vco2_wave]') do
           %span
+            .note-light.note-8.lit
             .light{ id: 'vco2_wave_light', data: { active: @patch.vco2_wave.to_s } }
 
         = label_tag('patch[vco3_wave]') do
           %span
+            .note-light.note-9.lit
             .light{ id: 'vco3_wave_light', data: { active: @patch.vco3_wave.to_s } }
 
         = label_tag('patch[sustain_on]') do
           %span
+            .note-light.note-10.lit
             .light{ id: 'sustain_on_light', data: { active: @patch.sustain_on.to_s } }
 
         = label_tag('patch[amp_eg_on]') do
           %span
+            .note-light.note-11.lit
             .light{ id: 'amp_eg_on_light', data: { active: @patch.amp_eg_on.to_s } }
   .field.sequence-area
-    - if @patch.sequences.present?
-      = render 'sequences/show'
+    .sequence-holder
+      - if @patch.sequences.present?
+        = render 'sequences/show'
 #patch-metadata.col-md-9.col-lg-3
   - show_class = @patch.show_midi_only_knobs? ? '' : :hidden
   .q{ class: show_class }
