@@ -14,7 +14,6 @@ gem 'rubocop', '~> 0.40.0', require: false
 gem 'bundler', '~> 1.15'
 gem 'mongoid-simple-tags'
 gem 'bootstrap-tagsinput-rails'
-gem 'dotenv-rails', groups: [:development, :test]
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
@@ -34,6 +33,7 @@ group :development, :test do
   gem 'poltergeist'
   gem 'launchy'
   gem 'capybara-screenshot'
+  gem 'dotenv-rails'
 end
 
 group :test do
@@ -41,6 +41,7 @@ group :test do
   gem 'mongoid-rspec', '3.0.0'
   gem 'vcr'
   gem 'webmock'
+  gem 'simplecov', :require => false
 end
 
 group :development do
