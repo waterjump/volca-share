@@ -2,4 +2,5 @@
   %h1= "Patches by #{@user.username}"
   %p= pluralize(@patches.count, 'patch')
   .patches
+    = render 'shared/audio_preview'
     = render 'shared/patches'
