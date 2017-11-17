@@ -44,18 +44,10 @@ module VolcaShare
         end
     end
 
-    def audio_sample_regex
-      "#{prefix}#{audio_sample_regex_body}#{suffix}"
-    end
-
-    def audio_sample_regex_body
-      "(#{regexes.join('|')})"
-    end
-
     def description
       return unless notes.present?
       return notes.squish if notes.squish.length <= 100
-      notes[0..100].squish + '...'
+      "#{notes.squish[0..96].split(' ')[0..-2].join(' ')}..."
     end
 
     def formatted_tags
