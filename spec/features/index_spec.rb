@@ -1,15 +1,6 @@
 require 'rails_helper'
 
-RSpec.feature 'patch index', type: :feature, js: true do
-  def perform_around
-    VCR.use_cassette('oembed') do
-      yield
-    end
-  end
-
-  around(:each) do |example|
-    perform_around(&example)
-  end
+RSpec.describe 'Patch index page', type: :feature, js: true do
 
   let(:user) { FactoryGirl.create(:user) }
 

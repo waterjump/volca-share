@@ -16,16 +16,6 @@ RSpec.feature 'tags', type: :feature, js: true do
     visit root_path
   end
 
-  def perform_around
-    VCR.use_cassette('oembed') do
-      yield
-    end
-  end
-
-  around(:each) do |example|
-    perform_around(&example)
-  end
-
   scenario 'user patches are shown on tag pages' do
     patch1 = FactoryGirl.create(
       :patch,
