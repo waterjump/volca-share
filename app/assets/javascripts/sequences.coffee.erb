@@ -70,6 +70,7 @@ VS.Sequences = ->
     return
 
   $('.sequence-holder').on 'click tap', '.sequence-box label', ->
+    return if $('body.show').length > 0
     $(this).find('span').find('div').toggleClass('lit')
     return
 

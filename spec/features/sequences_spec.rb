@@ -161,6 +161,35 @@ RSpec.describe 'sequences', type: :feature, js: true do
     expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
   end
 
+  describe 'patch show page sequence display' do
+    it 'does not toggle light when clicked' do
+      steps_1 = []
+      steps_2 = []
+
+      16.times do |index|
+        steps_1 << create(:step, index: index + 1)
+        steps_2 << create(:step, index: index + 1)
+      end
+
+      steps_1.first.update(slide: true)
+
+      sequence_1 = create(:sequence, steps: steps_1)
+      sequence_2 = create(:sequence, steps: steps_2)
+
+      patch = FactoryGirl.create(
+        :patch,
+        name: '666',
+        user_id: user.id,
+        sequences: [sequence_1, sequence_2]
+      )
+
+      login
+      visit patch_path(patch)
+      first('#patch_sequences_0_step_1_slide_light').trigger('click')
+      expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
+    end
+  end
+
   scenario 'can be edited' do
     login
 
