@@ -9,6 +9,7 @@
     %link{:href => asset_path('favicon.ico'), :rel => 'shortcut icon'}/
     = stylesheet_link_tag    'application', media: 'all', async: Rails.env.production?
     = javascript_include_tag 'application', async: Rails.env.production?
+    %script{:async => "", :src => "https://widget.battleforthenet.com/widget.js"}
     = csrf_meta_tags
   %body{ class: @body_class}
     - if Rails.env.production?
