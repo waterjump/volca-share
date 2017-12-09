@@ -61,7 +61,7 @@ def rotation_from_midi(midi)
   ((midi - 63.5) / (63.5 /140)).round.to_s
 end
 
-def reflects_patch(patch)
+def reflects_patch(patch, form = false)
   # Knobs
   expect(page.find('#attack')['data-midi']).to eq(patch.attack.to_s)
   expect(page.find('#decay_release')['data-midi']).to eq(patch.decay_release.to_s)
@@ -96,9 +96,6 @@ def reflects_patch(patch)
   expect(page.find('#gate_time', visible: false)['data-midi']).to eq(patch.gate_time.to_s)
 
   # Buttons
-  expect(page.find('#vco1_active_button')['data-active']).to eq(patch.vco1_active.to_s)
-  expect(page.find('#vco2_active_button')['data-active']).to eq(patch.vco2_active.to_s)
-  expect(page.find('#vco3_active_button')['data-active']).to eq(patch.vco3_active.to_s)
   expect(page).to have_css('#vco1_active_button.lit') if patch.vco1_active
   expect(page).to have_css('#vco2_active_button.lit') if patch.vco2_active
   expect(page).to have_css('#vco3_active_button.lit') if patch.vco3_active
@@ -107,18 +104,6 @@ def reflects_patch(patch)
   expect(page).not_to have_css('#vco3_active_button.lit') unless patch.vco3_active
 
   # Lights
-  expect(page.find('#vco_group_one_light')['data-active']).to eq((patch.vco_group == 'one').to_s)
-  expect(page.find('#vco_group_two_light')['data-active']).to eq((patch.vco_group == 'two').to_s)
-  expect(page.find('#vco_group_three_light')['data-active']).to eq((patch.vco_group == 'three').to_s)
-  expect(page.find('#lfo_target_amp_light')['data-active']).to eq(patch.lfo_target_amp.to_s)
-  expect(page.find('#lfo_target_pitch_light')['data-active']).to eq(patch.lfo_target_pitch.to_s)
-  expect(page.find('#lfo_target_cutoff_light')['data-active']).to eq(patch.lfo_target_cutoff.to_s)
-  expect(page.find('#lfo_wave_light')['data-active']).to eq(patch.lfo_wave.to_s)
-  expect(page.find('#vco1_wave_light')['data-active']).to eq(patch.vco1_wave.to_s)
-  expect(page.find('#vco2_wave_light')['data-active']).to eq(patch.vco2_wave.to_s)
-  expect(page.find('#vco3_wave_light')['data-active']).to eq(patch.vco3_wave.to_s)
-  expect(page.find('#sustain_on_light')['data-active']).to eq(patch.sustain_on.to_s)
-  expect(page.find('#amp_eg_on_light')['data-active']).to eq(patch.amp_eg_on.to_s)
   expect(page).to have_css('#vco_group_one_light.lit') if patch.vco_group == 'one'
   expect(page).to have_css('#vco_group_two_light.lit') if patch.vco_group == 'two'
   expect(page).to have_css('#vco_group_three_light.lit') if patch.vco_group == 'three'
@@ -145,6 +130,7 @@ def reflects_patch(patch)
   expect(page).not_to have_css('#amp_eg_on_light.lit') unless patch.amp_eg_on
 
   # Content
+  return if form
   expect(page).to have_content(patch.name)
   expect(page).to have_content(patch.notes)
 end

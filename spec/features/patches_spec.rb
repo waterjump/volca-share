@@ -7,9 +7,9 @@ RSpec.feature 'patches', type: :feature, js: true do
 
   scenario 'have initialized values' do
     click_link 'new-patch'
-    expect(page.find('#vco_group_three_light')['data-active']).not_to eq(nil)
-    expect(page.find('#lfo_target_cutoff_light')['data-active']).not_to eq(nil)
-    expect(page.find('#vco3_wave_light')['data-active']).not_to eq(nil)
+    expect(page).to have_css('#vco_group_three_light.lit')
+    expect(page).to have_css('#lfo_target_cutoff_light.lit')
+    expect(page).to have_css('#vco3_wave_light.lit')
   end
 
   scenario 'can be created by users' do
@@ -104,6 +104,19 @@ RSpec.feature 'patches', type: :feature, js: true do
     expect(page).to have_content(/Sean Barrett/i)
   end
 
+  describe 'editing a patch' do
+    describe 'patch edit form' do
+      # TODO: Move to a view spec.
+      it 'reflects original patch' do
+        patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
+        login
+
+        visit edit_patch_path(patch.slug)
+        reflects_patch(patch, true)
+      end
+    end
+  end
+
   scenario 'audio samples are limited to soundcloud, freesound, and youtube' do
     patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
     login
@@ -133,7 +146,7 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: '63',
       cutoff: '63',
       gate_time: '127',
-      lfo_target_pitch: '',
+      lfo_target_pitch: false,
       vco3_active: 'true'
     }
 
@@ -147,7 +160,7 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
       gate_time: page.find('#gate_time', visible: false)['data-midi'],
-      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
+      lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
       vco3_active: page.find('#vco3_active_button')['data-active']
     }
 
@@ -164,7 +177,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     default_patch = {
       attack: '63',
       cutoff: '63',
-      lfo_target_pitch: '',
+      lfo_target_pitch: false,
       vco3_active: 'true',
       slide_time: '63',
       expression: '127',
@@ -180,7 +193,7 @@ RSpec.feature 'patches', type: :feature, js: true do
     random_patch = {
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
-      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
+      lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
       vco3_active: page.find('#vco3_active_button')['data-active'],
       slide_time: page.find('#slide_time', visible: false)['data-midi'],
       expression: page.find('#expression', visible: false)['data-midi'],
@@ -197,10 +210,10 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: '63',
       cutoff: '63',
       gate_time: '127',
-      lfo_target_pitch: '',
-      vco_group_3: 'true',
-      vco_group_2: 'false',
-      vco_group_1: 'false'
+      lfo_target_pitch: false,
+      vco_group_3: true,
+      vco_group_2: false,
+      vco_group_1: false
     }
 
     visit new_patch_path
@@ -213,10 +226,10 @@ RSpec.feature 'patches', type: :feature, js: true do
       attack: page.find('#attack')['data-midi'],
       cutoff: page.find('#cutoff')['data-midi'],
       gate_time: page.find('#gate_time', visible: false)['data-midi'],
-      lfo_target_pitch: page.find('#lfo_target_pitch_light')['data-active'],
-      vco_group_3: page.find('#vco_group_three_light')['data-active'],
-      vco_group_2: page.find('#vco_group_two_light')['data-active'],
-      vco_group_1: page.find('#vco_group_one_light')['data-active']
+      lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
+      vco_group_3: page.has_css?('#vco_group_three_light.lit'),
+      vco_group_2: page.has_css?('#vco_group_two_light.lit'),
+      vco_group_1: page.has_css?('#vco_group_one_light.lit')
     }
 
     expect(random_patch).not_to eq(default_patch)

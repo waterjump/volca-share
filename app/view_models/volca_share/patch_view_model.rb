@@ -18,6 +18,11 @@ module VolcaShare
       {}
     end
 
+    def lit?(field)
+      return 'lit' if model.send(field)
+      ''
+    end
+
     def index_classes
       classes = []
       classes << 'secret' if secret

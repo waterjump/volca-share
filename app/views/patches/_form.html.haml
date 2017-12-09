@@ -26,87 +26,87 @@
         .notch
       .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
         .notch
-      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 } }
+      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 } }
+      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 }, class: @patch.lit?(:vco2_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 } }
+      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 }, class: @patch.lit?(:vco3_active) }
         .notch
-      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' } }
-      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' } }
-      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' } }
+      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' }, class: @patch.lit?(:vco1_active) }
+      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
+      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' }, class: @patch.lit?(:vco3_active) }
       .bottom-row
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
         = label_tag('patch[vco_group_one]') do
           %span.multi
             .note-light.note-0.lit
-            .light{ id: 'vco_group_one_light', data: { radio: true, active: @patch.vco_group_one.to_s } }
+            .light{ id: 'vco_group_one_light', data: { radio: true }, class: @patch.vco_group_one ? 'lit' : '' }
 
         = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
         = label_tag('patch[vco_group_two]') do
           %span.multi
             .note-light.note-1.lit
-            .light{ id: 'vco_group_two_light', data: { radio: true, active: @patch.vco_group_two.to_s } }
+            .light{ id: 'vco_group_two_light', data: { radio: true }, class: @patch.vco_group_two ? 'lit' : '' }
 
         = radio_button_tag 'patch[vco_group]', 'three', @patch.vco_group_three, class: :control
         = label_tag('patch[vco_group_three]') do
           %span.multi
             .note-light.note-2.lit
-            .light{ id: 'vco_group_three_light', data: { radio: true, active: @patch.vco_group_three.to_s } }
+            .light{ id: 'vco_group_three_light', data: { radio: true }, class: @patch.vco_group_three ? 'lit' : '' }
 
         = check_box :patch, :lfo_target_amp, @patch.checked?('lfo_target_amp'), 'true', 'false'
         = label_tag('patch[lfo_target_amp]') do
           %span.on-off
             .note-light.note-3.lit
-            .light{ id: 'lfo_target_amp_light', data: { active: @patch.lfo_target_amp.to_s } }
+            .light{ id: 'lfo_target_amp_light', class: @patch.lit?(:lfo_target_amp) }
 
         = check_box :patch, :lfo_target_pitch, @patch.checked?('lfo_target_pitch'), 'true', 'false'
         = label_tag('patch[lfo_target_pitch]') do
           %span.on-off
             .note-light.note-4.lit
-            .light{ id: 'lfo_target_pitch_light', data: { active: @patch.lfo_target_pitch.to_s } }
+            .light{ id: 'lfo_target_pitch_light', class: @patch.lit?(:lfo_target_pitch) }
 
         = check_box :patch, :lfo_target_cutoff, @patch.checked?('lfo_target_cutoff'), 'true', 'false'
         = label_tag('patch[lfo_target_cutoff]') do
           %span.on-off
             .note-light.note-5.lit
-            .light{ id: 'lfo_target_cutoff_light', data: { active: @patch.lfo_target_cutoff.to_s } }
+            .light{ id: 'lfo_target_cutoff_light', class: @patch.lit?(:lfo_target_cutoff) }
 
         = check_box :patch, :lfo_wave, @patch.checked?('lfo_wave'), 'true', 'false'
         = label_tag('patch[lfo_wave]') do
           %span.on-off
             .note-light.note-6.lit
-            .light{ id: 'lfo_wave_light', data: { active: @patch.lfo_wave.to_s } }
+            .light{ id: 'lfo_wave_light', class: @patch.lit?(:lfo_wave) }
 
         = check_box :patch, :vco1_wave, @patch.checked?('vco1_wave'), 'true', 'false'
         = label_tag('patch[vco1_wave]') do
           %span.on-off
             .note-light.note-7.lit
-            .light{ id: 'vco1_wave_light', data: { active: @patch.vco1_wave.to_s } }
+            .light{ id: 'vco1_wave_light', class: @patch.lit?(:vco1_wave) }
 
         = check_box :patch, :vco2_wave, @patch.checked?('vco2_wave'), 'true', 'false'
         = label_tag('patch[vco2_wave]') do
           %span.on-off
             .note-light.note-8.lit
-            .light{ id: 'vco2_wave_light', data: { active: @patch.vco2_wave.to_s } }
+            .light{ id: 'vco2_wave_light', class: @patch.lit?(:vco2_wave) }
 
         = check_box :patch, :vco3_wave, @patch.checked?('vco3_wave'), 'true', 'false'
         = label_tag('patch[vco3_wave]') do
           %span.on-off
             .note-light.note-9.lit
-            .light{ id: 'vco3_wave_light', data: { active: @patch.vco3_wave.to_s } }
+            .light{ id: 'vco3_wave_light', class: @patch.lit?(:vco3_wave) }
 
         = check_box :patch, :sustain_on, @patch.checked?('sustain_on'), 'true', 'false'
         = label_tag('patch[sustain_on]') do
           %span.on-off
             .note-light.note-10.lit
-            .light{ id: 'sustain_on_light', data: { active: @patch.sustain_on.to_s } }
+            .light{ id: 'sustain_on_light', class: @patch.lit?(:sustain_on) }
 
         = check_box :patch, :amp_eg_on, @patch.checked?('amp_eg_on'), 'true', 'false'
         = label_tag('patch[amp_eg_on]') do
           %span.on-off
             .note-light.note-11.lit
-            .light{ id: 'amp_eg_on_light', data: { active: @patch.amp_eg_on.to_s } }
+            .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
 
   = range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
   = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden

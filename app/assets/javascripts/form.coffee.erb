@@ -11,15 +11,6 @@ VS.Form = ->
   #
   # initialize
   #
-  lightButtons = ->
-    $('.button').each ->
-      if $(this).data('active')
-        vco = $(this).attr('id').split('_')[0]
-        vcoKnob = $('.knob#' + vco + '_pitch')
-        $(this).addClass('lit')
-        vcoKnob.addClass('lit')
-      return
-    return
 
   rotateKnobs = ->
     $('.knob').each ->
@@ -31,7 +22,6 @@ VS.Form = ->
     return
 
   init = ->
-    lightButtons()
     rotateKnobs()
     sequences.init()
     return

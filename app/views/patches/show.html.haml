@@ -36,75 +36,75 @@
         .notch
       .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
         .notch
-      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 } }
+      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 } }
+      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 }, class: @patch.lit?(:vco2_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 } }
+      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 }, class: @patch.lit?(:vco3_active) }
         .notch
-      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' } }
-      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' } }
-      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' } }
+      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' }, class: @patch.lit?(:vco1_active) }
+      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
+      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' }, class: @patch.lit?(:vco3_active) }
       .bottom-row
         = label_tag('patch[vco_group_one]') do
           %span
             .note-light.note-0.lit
-            .light{ id: 'vco_group_one_light', data: { active: @patch.vco_group_one.to_s } }
+            .light{ id: 'vco_group_one_light', class: @patch.vco_group_one ? 'lit' : '' }
 
         = label_tag('patch[vco_group_two]') do
           %span
             .note-light.note-1.lit
-            .light{ id: 'vco_group_two_light', data: { active: @patch.vco_group_two.to_s } }
+            .light{ id: 'vco_group_two_light', class: @patch.vco_group_two ? 'lit' : '' }
 
         = label_tag('patch[vco_group_three]') do
           %span
             .note-light.note-2.lit
-            .light{ id: 'vco_group_three_light', data: { active: @patch.vco_group_three.to_s } }
+            .light{ id: 'vco_group_three_light', class: @patch.vco_group_three ? 'lit' : '' }
 
         = label_tag('patch[lfo_target_amp]') do
           %span
             .note-light.note-3.lit
-            .light{ id: 'lfo_target_amp_light', data: { active: @patch.lfo_target_amp.to_s } }
+            .light{ id: 'lfo_target_amp_light', class: @patch.lit?(:lfo_target_amp) }
 
         = label_tag('patch[lfo_target_pitch]') do
           %span
             .note-light.note-4.lit
-            .light{ id: 'lfo_target_pitch_light', data: { active: @patch.lfo_target_pitch.to_s } }
+            .light{ id: 'lfo_target_pitch_light', class: @patch.lit?(:lfo_target_pitch) }
 
         = label_tag('patch[lfo_target_cutoff]') do
           %span
             .note-light.note-5.lit
-            .light{ id: 'lfo_target_cutoff_light', data: { active: @patch.lfo_target_cutoff.to_s } }
+            .light{ id: 'lfo_target_cutoff_light', class: @patch.lit?(:lfo_target_cutoff) }
 
         = label_tag('patch[lfo_wave]') do
           %span
             .note-light.note-6.lit
-            .light{ id: 'lfo_wave_light', data: { active: @patch.lfo_wave.to_s } }
+            .light{ id: 'lfo_wave_light', class: @patch.lit?(:lfo_wave) }
 
         = label_tag('patch[vco1_wave]') do
           %span
             .note-light.note-7.lit
-            .light{ id: 'vco1_wave_light', data: { active: @patch.vco1_wave.to_s } }
+            .light{ id: 'vco1_wave_light', class: @patch.lit?(:vco1_wave) }
 
         = label_tag('patch[vco2_wave]') do
           %span
             .note-light.note-8.lit
-            .light{ id: 'vco2_wave_light', data: { active: @patch.vco2_wave.to_s } }
+            .light{ id: 'vco2_wave_light', class: @patch.lit?(:vco2_wave) }
 
         = label_tag('patch[vco3_wave]') do
           %span
             .note-light.note-9.lit
-            .light{ id: 'vco3_wave_light', data: { active: @patch.vco3_wave.to_s } }
+            .light{ id: 'vco3_wave_light', class: @patch.lit?(:vco3_wave) }
 
         = label_tag('patch[sustain_on]') do
           %span
             .note-light.note-10.lit
-            .light{ id: 'sustain_on_light', data: { active: @patch.sustain_on.to_s } }
+            .light{ id: 'sustain_on_light', class: @patch.lit?(:sustain_on) }
 
         = label_tag('patch[amp_eg_on]') do
           %span
             .note-light.note-11.lit
-            .light{ id: 'amp_eg_on_light', data: { active: @patch.amp_eg_on.to_s } }
+            .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
   .field.sequence-area
     .sequence-holder
       - if @patch.sequences.present?

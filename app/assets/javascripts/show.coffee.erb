@@ -21,18 +21,6 @@ $ ->
     my_knob.autoRotate(degree)
     return
 
-  $('.light').each ->
-    $(this).addClass('lit') if $(this).data('active')
-    return
-
-  $('.button').each ->
-    return unless $(this).data('active')
-    vco = $(this).attr('id').split('_')[0]
-    vcoKnob = $('.knob#' + vco + '_pitch')
-    $(this).addClass('lit')
-    vcoKnob.addClass('lit')
-    return
-
   loadAudioSample()
   $('.knob').mouseenter ->
     midi = $(this).data('midi')
