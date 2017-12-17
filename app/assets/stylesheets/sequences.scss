@@ -111,10 +111,13 @@
             height: 72%;
             width: 52%;
             border-radius: 50%;
-            background-color: gray;
+            background-color: #DDDDDD;
             left: 37%;
-            border: black solid;
+            border: lightgray solid;
             position: absolute;
+          }
+          .lit {
+            border: black solid;
           }
         }
       }
