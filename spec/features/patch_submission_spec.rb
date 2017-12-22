@@ -1,119 +1,49 @@
 require 'rails_helper'
 
-RSpec.feature 'patches', type: :feature, js: true do
+RSpec.describe 'Creating a patch', type: :feature, js: true do
   let(:user) { FactoryGirl.create(:user) }
-
-  before(:each) { visit root_path }
-
-  scenario 'have initialized values' do
-    click_link 'new-patch'
-    expect(page).to have_css('#vco_group_three_light.lit')
-    expect(page).to have_css('#lfo_target_cutoff_light.lit')
-    expect(page).to have_css('#vco3_wave_light.lit')
-  end
-
-  scenario 'can be created by users' do
-    login
-
-    visit root_path
-    expect(page).to have_link 'New Patch'
-
-    click_link 'new-patch'
-    expect(page).to have_title('New Patch | VolcaShare')
-    expect(current_path).to eq(new_patch_path)
-    expect(page.status_code).to eq(200)
-
-    dummy_patch = FactoryGirl.build(
+  let(:dummy_patch) do
+    FactoryGirl.build(
       :patch,
       name: 'My Cool Patch',
       notes: 'This patch is cool.'
     )
-
-    fill_out_patch_form(dummy_patch)
-
-    expect(page).to have_css('.bootstrap-tagsinput')
-    click_button 'Save'
-
-    reflects_patch(dummy_patch)
-    expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
-    expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
-    expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
-    expect(page).to have_css('.volca')
-    expect(page).to have_content("by #{user.username}")
-    expect(page).to have_link('Edit')
-    expect(page).to have_button('Delete')
   end
 
-  scenario 'can be created by anonymous users' do
-    visit root_path
-    expect(page).to have_link 'New Patch'
+  context 'when user is logged in' do
+    before do
+      login
+      visit new_patch_path
+      fill_out_patch_form(dummy_patch)
+      click_button 'Save'
+    end
 
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
-    expect(page.status_code).to eq(200)
-    expect(page).not_to have_content('Secret?')
+    it 'persists patch' do
+      expect(Patch.first.attributes).to include(
+        dummy_patch.attributes.except('_id')
+      )
+    end
 
-    dummy_patch = FactoryGirl.build(:patch)
-
-    fill_out_patch_form(dummy_patch, true)
-
-    expect(page).to have_css('.bootstrap-tagsinput')
-    click_button 'Save'
-
-    expect(page).to have_selector('h1', text: "#{dummy_patch.name} by ¯\\_(ツ)_/¯", visible: false)
-
-    reflects_patch(dummy_patch)
-    expect(page).to have_css('.volca')
-    expect(page).to have_content('by ¯\_(ツ)_/¯')
-    expect(page).not_to have_link('Edit')
-    expect(page).not_to have_button('Delete')
+    it 'directs user to patch show page' do
+      expect(current_path).to eq(user_patch_path(user.slug, Patch.first.slug))
+    end
   end
 
-  scenario 'can be deleted by author' do
-    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
-    expect(user.patches.count).to eq(1)
+  context 'when user is anonymous' do
+    before do
+      visit new_patch_path
+      fill_out_patch_form(dummy_patch, true)
+      click_button 'Save'
+    end
 
-    login
+    it 'is persisted' do
+      expect(Patch.first.attributes).to include(
+        dummy_patch.attributes.except('_id', 'audio_sample')
+      )
+    end
 
-    visit patch_path(patch1)
-    expect(page).to have_button('Delete')
-
-    click_button('Delete')
-    user.reload
-    expect(user.patches.count).to eq(0)
-
-    visit patches_path
-    expect(page).to have_content('No patches to show.')
-  end
-
-  scenario 'cannot be deleted by non-author' do
-    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
-    user_2 = FactoryGirl.create(:user)
-
-    login(user_2)
-
-    visit patch_path(patch1)
-    expect(page).not_to have_button('Delete')
-  end
-
-  scenario 'header is shown' do
-    expect(page).to have_content(/VolcaShare/i)
-  end
-
-  scenario 'footer is shown' do
-    expect(page).to have_content(/Sean Barrett/i)
-  end
-
-  describe 'editing a patch' do
-    describe 'patch edit form' do
-      # TODO: Move to a view spec.
-      it 'reflects original patch' do
-        patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
-        login
-
-        visit edit_patch_path(patch.slug)
-        reflects_patch(patch, true)
-      end
+    it 'directs user to show patch page' do
+      expect(current_path).to eq(patch_path(Patch.first))
     end
   end
 

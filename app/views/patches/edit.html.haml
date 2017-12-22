@@ -4,7 +4,7 @@
   .col-xl-3.col-lg-3.col-md-3.col-sm-12
     = render 'midi_button'
 = render 'midi_control'
-= form_tag :patch, method: :patch, id: :patch_form do
+= form_tag(patch_path(@patch.slug), method: :put, id: :patch_form) do
   - if @patch.errors.any?
     #error_explanation
       %h2= "#{pluralize(@patch.errors.count, "error")} prohibited this patch from being saved:"

@@ -73,21 +73,19 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #oembed' do
     it 'assigns the requested patch as @patch' do
-      VCR.use_cassette('oembed') do
-        patch = create(:patch)
-        get :oembed, { slug: patch.to_param, format: :json }, valid_session
-        expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)['name']).to eq(patch.name)
-        expect(JSON.parse(response.body)['audio_sample_code'])
-          .to eq(
-                  '<iframe width="100%" height="81" scrolling="no"'\
-                  ' frameborder="no" src="https://w.soundcloud.com/player/'\
-                  '?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks'\
-                  '%2F258722704&show_artwork=true&maxheight=81"></iframe>'
-                )
-        expect(JSON.parse(response.body)['patch_location'])
-          .to eq("/patch/#{patch.id}")
-      end
+      patch = create(:patch)
+      get :oembed, { slug: patch.to_param, format: :json }, valid_session
+      expect(response.status).to eq(200)
+      expect(JSON.parse(response.body)['name']).to eq(patch.name)
+      expect(JSON.parse(response.body)['audio_sample_code'])
+        .to eq(
+                '<iframe width="100%" height="81" scrolling="no"'\
+                ' frameborder="no" src="https://w.soundcloud.com/player/'\
+                '?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks'\
+                '%2F258722704&show_artwork=true&maxheight=81"></iframe>'
+              )
+      expect(JSON.parse(response.body)['patch_location'])
+        .to eq("/patch/#{patch.id}")
     end
   end
 
@@ -221,7 +219,7 @@ RSpec.describe PatchesController, type: :controller do
   end
 
   describe 'DELETE #destroy' do
-    context 'user is author' do
+    context 'when user is author' do
       it 'destroys the requested patch' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         expect do
@@ -229,15 +227,15 @@ RSpec.describe PatchesController, type: :controller do
         end.to change(Patch, :count).by(-1)
       end
 
-      it 'redirects to the patches list' do
+      it 'redirects to the patches index' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         delete :destroy, { slug: patch.to_param }, valid_session
         expect(response).to redirect_to(patches_url)
       end
     end
 
-    context 'user is not author' do
-      it 'disallows non-author to destroy' do
+    context 'when user is not author' do
+      it 'is disallowed' do
         patch = Patch.create! valid_attributes.merge(user_id: 'abc123')
         delete :destroy, { slug: patch.to_param }, valid_session
         expect(response).to redirect_to(patch_url(patch))

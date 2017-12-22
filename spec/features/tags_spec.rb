@@ -57,13 +57,7 @@ RSpec.feature 'tags', type: :feature, js: true do
     )
     patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
 
-    visit patch_path(patch2)
-
-    click_link('#cool')
-    expect(page).to have_selector 'h1', text: '#cool tags', visible: false
-    expect(page).to have_content(patch1.name)
-    expect(page).to have_content(patch2.name)
-    expect(page).to have_selector('.speaker')
+    visit tags_show_path(tag: :cool)
     page.find('.speaker', match: :first).trigger('click')
 
     expect(page).to have_selector('#preview-modal-body')

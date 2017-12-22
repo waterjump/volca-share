@@ -1,109 +1,101 @@
 require 'rails_helper'
 
-RSpec.describe 'sequences', type: :feature, js: true do
+RSpec.describe 'Sequences', type: :feature, js: true do
   let(:user) { FactoryGirl.create(:user) }
 
-  before(:each) { visit root_path }
+  context 'when user is logged in' do
+    it 'can be created' do
+      login
+      visit new_patch_path
+      expect(page).to have_title('New Patch | VolcaShare')
 
-  scenario 'can be created by users' do
-    login
-    visit root_path
-    expect(page).to have_link 'New Patch'
-    click_link 'new-patch'
-    expect(page).to have_title('New Patch | VolcaShare')
-    expect(current_path).to eq(new_patch_path)
-    expect(page.status_code).to eq(200)
+      dummy_patch = FactoryGirl.build(
+        :patch,
+        name: 'My Cool Patch',
+        notes: 'This patch is cool.'
+      )
 
-    dummy_patch = FactoryGirl.build(
-      :patch,
-      name: 'My Cool Patch',
-      notes: 'This patch is cool.'
-    )
+      fill_out_patch_form(dummy_patch)
 
-    fill_out_patch_form(dummy_patch)
-    expect(page).to have_css('.bootstrap-tagsinput')
-    expect(page).to have_link('Add sequences')
+      click_link 'Add sequences'
+      expect(page).to have_selector('.sequence-form')
+      # TODO: move to view spec
+      expect(page).to have_content('Use the VCO Group selector to change the number of sequences.')
 
-    click_link 'Add sequences'
-    expect(page).to have_selector('.sequence-form')
-    expect(page).to have_content('Use the VCO Group selector to change the number of sequences.')
+      click_button 'Save'
 
-    click_button 'Save'
-
-    reflects_patch(dummy_patch)
-    expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
-    expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
-    expect(page).to have_selector 'h1', text: "#{dummy_patch.name} by #{user.username}", visible: false
-    expect(page).to have_selector('.sequence-show')
-    expect(page).to have_css('.volca')
-    expect(page).to have_content("by #{user.username}")
-    expect(page).to have_link('Edit')
-    expect(page).to have_button('Delete')
+      reflects_patch(dummy_patch)
+      expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
+      expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
+      expect(page).to have_selector('.sequence-show')
+    end
   end
 
-  scenario 'are limited to three when VCO group one is selected' do
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+  context 'when VCO group one is selected' do
+    it 'is limited to three sequences' do
+      visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
-    fill_out_patch_form(dummy_patch, true)
-    find('#vco_group_one_light').click
+      dummy_patch = FactoryGirl.build(:patch)
+      fill_out_patch_form(dummy_patch, true)
+      find('#vco_group_one_light').click
 
-    click_link 'Add sequences'
-    expect(page).to have_selector('.sequence-box', count: 3)
-    expect(page).not_to have_link 'Add sequences'
-    expect(page).to have_link 'Remove sequences'
-    page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]').trigger('click')
-    page.find('label[for=patch_sequences_attributes_1_step_2_slide]').trigger('click')
-    page.find('label[for=patch_sequences_attributes_2_step_3_active_step]').trigger('click')
+      click_link 'Add sequences'
+      expect(page).to have_selector('.sequence-box', count: 3)
+      expect(page).not_to have_link 'Add sequences'
+      expect(page).to have_link 'Remove sequences'
+      page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]').trigger('click')
+      page.find('label[for=patch_sequences_attributes_1_step_2_slide]').trigger('click')
+      page.find('label[for=patch_sequences_attributes_2_step_3_active_step]').trigger('click')
 
-    click_button 'Save'
-    expect(Patch.first.sequences.count).to eq(3)
-    expect(page).to       have_selector('.sequence-box', count: 3)
-    expect(page).not_to   have_css('#patch_sequences_0_step_1_step_mode_light.lit')
-    expect(page).to       have_css('#patch_sequences_1_step_2_slide_light.lit')
-    expect(page).not_to   have_css('#patch_sequences_2_step_3_active_step_light.lit')
+      click_button 'Save'
+      expect(Patch.first.sequences.count).to eq(3)
+      expect(page).to       have_selector('.sequence-box', count: 3)
+      expect(page).not_to   have_css('#patch_sequences_0_step_1_step_mode_light.lit')
+      expect(page).to       have_css('#patch_sequences_1_step_2_slide_light.lit')
+      expect(page).not_to   have_css('#patch_sequences_2_step_3_active_step_light.lit')
+    end
   end
 
-  scenario 'are limited to two when VCO group two is selected' do
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+  context 'when VCO group two is selected' do
+    it 'is limited to two sequences' do
+      visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
-    fill_out_patch_form(dummy_patch, true)
-    find('#vco_group_two_light').click
+      dummy_patch = FactoryGirl.build(:patch)
+      fill_out_patch_form(dummy_patch, true)
+      find('#vco_group_two_light').click
 
-    click_link 'Add sequences'
-    expect(page).to have_selector('.sequence-box', count: 2)
-    expect(page).not_to have_link 'Add sequences'
-    expect(page).to have_link 'Remove sequences'
+      click_link 'Add sequences'
+      expect(page).to have_selector('.sequence-box', count: 2)
+      expect(page).not_to have_link 'Add sequences'
+      expect(page).to have_link 'Remove sequences'
 
-    click_button 'Save'
-    expect(Patch.first.sequences.count).to eq(2)
-    expect(page).to have_selector('.sequence-box', count: 2)
+      click_button 'Save'
+      expect(Patch.first.sequences.count).to eq(2)
+      expect(page).to have_selector('.sequence-box', count: 2)
+    end
   end
 
-  scenario 'are limited to one when VCO group three is selected' do
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+  context 'when VCO group three is selected' do
+    it 'is limited to one sequence' do
+      visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
-    fill_out_patch_form(dummy_patch, true)
-    find('#vco_group_three_light').click
+      dummy_patch = FactoryGirl.build(:patch)
+      fill_out_patch_form(dummy_patch, true)
+      find('#vco_group_three_light').click
 
-    click_link 'Add sequences'
-    expect(page).to have_selector('.sequence-box', count: 1)
-    expect(page).not_to have_link 'Add sequences'
-    expect(page).to have_link 'Remove sequences'
+      click_link 'Add sequences'
+      expect(page).to have_selector('.sequence-box', count: 1)
+      expect(page).not_to have_link 'Add sequences'
+      expect(page).to have_link 'Remove sequences'
 
-    click_button 'Save'
-    expect(Patch.first.sequences.count).to eq(1)
-    expect(page).to have_selector('.sequence-box', count: 1)
+      click_button 'Save'
+      expect(Patch.first.sequences.count).to eq(1)
+      expect(page).to have_selector('.sequence-box', count: 1)
+    end
   end
 
-  scenario 'are shown after the patch is saved' do
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+  it 'shows sequences after the patch is saved' do
+    visit new_patch_path
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
@@ -163,25 +155,13 @@ RSpec.describe 'sequences', type: :feature, js: true do
 
   describe 'patch show page sequence display' do
     it 'does not toggle light when clicked' do
-      steps_1 = []
-      steps_2 = []
-
-      16.times do |index|
-        steps_1 << create(:step, index: index + 1)
-        steps_2 << create(:step, index: index + 1)
-      end
-
-      steps_1.first.update(slide: true)
-
-      sequence_1 = create(:sequence, steps: steps_1)
-      sequence_2 = create(:sequence, steps: steps_2)
-
       patch = FactoryGirl.create(
-        :patch,
+        :patch_with_sequences,
         name: '666',
         user_id: user.id,
-        sequences: [sequence_1, sequence_2]
+        sequence_count: 2
       )
+      patch.sequences.first.steps.first.update(slide: true)
 
       login
       visit patch_path(patch)
@@ -192,11 +172,7 @@ RSpec.describe 'sequences', type: :feature, js: true do
 
   scenario 'can be edited' do
     login
-
-    visit root_path
-    expect(page).to have_link 'New Patch'
-
-    click_link 'new-patch'
+    visit new_patch_path
 
     dummy_patch = FactoryGirl.build(:patch)
 
@@ -219,42 +195,28 @@ RSpec.describe 'sequences', type: :feature, js: true do
   end
 
   scenario 'can be decremented' do
-    steps_1 = []
-    steps_2 = []
-
-    16.times do |index|
-      steps_1 << create(:step, index: index + 1)
-      steps_2 << create(:step, index: index + 1)
-    end
-
-    sequence_1 = create(:sequence, steps: steps_1)
-    sequence_2 = create(:sequence, steps: steps_2)
-
     patch = FactoryGirl.create(
-      :patch,
+      :patch_with_sequences,
       name: '666',
       user_id: user.id,
-      sequences: [sequence_1, sequence_2]
+      sequence_count: 2
     )
 
     login
-    visit patch_path(patch)
-    expect(page).to have_link('Edit')
+    visit edit_patch_path(patch)
 
-    click_link 'Edit'
     expect(page).to have_selector('.sequence-box', count: 2)
     find('#vco_group_three_light').click
 
     click_button 'Save'
-    patch = Patch.find_by(name: '666')
+    patch = Patch.last
     expect(patch.sequences.count).to eq(1)
     expect(patch.sequences.first.steps.count).to eq(16)
     expect(page).to have_selector('.sequence-box', count: 1)
   end
 
   scenario 'can be ignored before persisted' do
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+    visit new_patch_path
 
     dummy_patch = FactoryGirl.build(:patch)
     fill_out_patch_form(dummy_patch, true)
@@ -265,15 +227,15 @@ RSpec.describe 'sequences', type: :feature, js: true do
     find('#vco_group_three_light').click
 
     click_button 'Save'
-    patch = Patch.where(name: dummy_patch.name).first
+    patch = Patch.last
+    # patch = Patch.where(name: dummy_patch.name).first
     expect(patch.sequences.count).to eq(1)
     expect(page).to have_selector('.sequence-box', count: 1)
   end
 
   scenario 'can be added on edit' do
     login
-    click_link 'new-patch'
-    expect(current_path).to eq(new_patch_path)
+    visit new_patch_path
 
     dummy_patch = FactoryGirl.build(:patch, vco_group: 'two')
     fill_out_patch_form(dummy_patch, true)
@@ -324,59 +286,36 @@ RSpec.describe 'sequences', type: :feature, js: true do
   end
 
   scenario 'can be deleted' do
-    steps_1 = []
-    steps_2 = []
-
-    16.times do |index|
-      steps_1 << create(:step, index: index + 1)
-      steps_2 << create(:step, index: index + 1)
-    end
-
-    sequence_1 = create(:sequence, steps: steps_1)
-    sequence_2 = create(:sequence, steps: steps_2)
-
     patch = FactoryGirl.create(
-      :patch,
+      :patch_with_sequences,
       name: '666',
       user_id: user.id,
-      sequences: [sequence_1, sequence_2]
+      sequence_count: 2
     )
 
     login
-    visit patch_path(patch)
-    expect(page).to have_link('Edit')
+    visit edit_patch_path(patch)
 
-    click_link 'Edit'
     expect(page).to have_selector('.sequence-box', count: 2)
     click_link 'Remove sequences'
 
     click_button 'Save'
-    patch = Patch.find_by(name: '666')
+    patch = Patch.last
     expect(patch.sequences.count).to eq(0)
     expect(page).not_to have_selector('.sequence-box')
   end
 
   scenario 'count changes accurately 1' do
-    steps_1 = []
-
-    16.times do |index|
-      steps_1 << create(:step, index: index + 1)
-    end
-
-    sequence_1 = create(:sequence, steps: steps_1)
-
     patch = FactoryGirl.create(
-      :patch,
+      :patch_with_sequences,
       name: '666',
       user_id: user.id,
-      sequences: [sequence_1]
+      sequence_count: 1
     )
 
     login
-    visit patch_path(patch)
-    expect(page).to have_link('Edit')
+    visit edit_patch_path(patch)
 
-    click_link 'Edit'
     expect(page).to have_selector('.sequence-box', count: 1)
     click_link 'Remove sequences'
 
@@ -385,32 +324,23 @@ RSpec.describe 'sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 3)
 
     click_button 'Save'
-    patch = Patch.find_by(name: '666')
+    patch = Patch.last
     expect(patch.sequences.count).to eq(3)
     expect(page).to have_selector('.sequence-box', count: 3)
   end
 
   scenario 'count changes accurately 2' do
-    steps_1 = []
-
-    16.times do |index|
-      steps_1 << create(:step, index: index + 1)
-    end
-
-    sequence_1 = create(:sequence, steps: steps_1)
-
     patch = FactoryGirl.create(
-      :patch,
+      :patch_with_sequences,
       name: '666',
       user_id: user.id,
-      sequences: [sequence_1]
+      sequence_count: 1
     )
 
     login
-    visit patch_path(patch)
-    expect(page).to have_link('Edit')
+    visit edit_patch_path(patch)
 
-    click_link 'Edit'
+    # TODO: move to view spec
     expect(page).to have_selector('.sequence-box', count: 1)
 
     click_link 'Remove sequences'
@@ -422,7 +352,7 @@ RSpec.describe 'sequences', type: :feature, js: true do
     expect(page.all('.sequence-area .remove-sequence', visible: false).last.value).to eq('true')
 
     click_button 'Save'
-    patch = Patch.find_by(name: '666')
+    patch = Patch.last
     expect(patch.sequences.count).to eq(2)
     expect(page).to have_selector('.sequence-box', count: 2)
   end

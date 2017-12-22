@@ -33,14 +33,27 @@ FactoryGirl.define do
     gate_time (0..127).to_a.sample
     audio_sample 'https://soundcloud.com/69bot/shallow'
     slug { name.parameterize }
+
+    factory :patch_with_sequences do
+      transient do
+        sequence_count 3
+      end
+      after(:build) do |patch, evaluator|
+        build_list(:sequence, evaluator.sequence_count, patch: patch)
+      end
+    end
   end
 
   factory :sequence do |_s|
-    association :patch
+    patch
+    after(:build) do |sequence, evaluator|
+      16.times do |index|
+        sequence.steps << build(:step, index: index + 1)
+      end
+    end
   end
 
   factory :step do
-    association :sequence
     index (1..16).to_a.sample
     note (0..127).to_a.sample
     step_mode { FFaker::Boolean.maybe }

@@ -141,13 +141,11 @@
     - if @patch.user.present? && @patch.user == current_user
       = link_to 'Edit', edit_patch_path(@patch.slug)
       \|
-      = form_tag patch_path(@patch), method: :delete do
+      = form_tag patch_path(@patch.slug), method: :delete do
         = submit_tag 'Delete', class: :link
       \|
     - else
       %strong
         = "To edit, delete, or make your patches browsable, "
         = link_to 'create an account', new_user_registration_path
-      %br
-    = link_to 'Back', patch_path
 = render 'knob_debug'

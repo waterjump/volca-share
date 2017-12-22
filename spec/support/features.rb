@@ -5,7 +5,7 @@ RSpec.configure do |config|
     end
   end
 
-  config.around(:example, type: :feature) do |example|
+  config.around(:example) do |example|
     perform_around(&example)
   end
 end
