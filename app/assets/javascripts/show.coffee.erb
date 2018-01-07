@@ -8,12 +8,6 @@ $ ->
 
   sequences.init()
 
-  loadAudioSample = ->
-    element = $('.sample')
-    return unless element.data('embed-code') != undefined
-    element.html(element.data('embed-code'))
-    return
-
   $('.knob').each ->
     my_knob = new VS.Knob(this)
     degree = my_knob.degreeForMidi($(this).data('midi'), limit)
@@ -21,7 +15,6 @@ $ ->
     my_knob.autoRotate(degree)
     return
 
-  loadAudioSample()
   $('.knob').mouseenter ->
     midi = $(this).data('midi')
     activeKnob = new VS.Knob(this)

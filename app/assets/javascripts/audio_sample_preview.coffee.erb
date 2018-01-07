@@ -1,0 +1,10 @@
+$ ->
+  return if $('body.show').length == 0 && $('body.form').length == 0
+  loadAudioSample = ->
+    element = $('.sample')
+    return unless element.data('embed-code') != undefined
+    element.html(element.data('embed-code'))
+    return
+
+  loadAudioSample()
+  return

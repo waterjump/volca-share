@@ -155,10 +155,6 @@
       .field
         = label_tag :privacy, 'Secret?'
         = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
-      .field
-        = label_tag :audio_sample, 'Audio Sample URL'
-        = render 'audio_sample', button_text: '?'
-        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: @patch.audio_sample_regex
     - else
       = hidden_field_tag 'patch[secret]', 'false'
     .field
@@ -167,6 +163,13 @@
     .field
       = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
       = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+    - if current_user.present?
+      .field
+        = label_tag :audio_sample, 'Audio Sample URL'
+        = render 'audio_sample', button_text: '?'
+        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: @patch.audio_sample_regex
+      - if @patch.audio_sample.present?
+        .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
     - if current_user.nil? && !Rails.env.test?
       = recaptcha_tags
     - if current_user.nil?

@@ -15,5 +15,4 @@ RSpec.describe 'patches/edit.html.haml', type: :view do
   it 'reflects patch' do
     reflects_patch(@patch, interface: rendered, form: true)
   end
-  it 'shows audio preview'
 end
