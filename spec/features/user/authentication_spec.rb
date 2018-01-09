@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.feature 'Authentication process', type: :feature do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
   before(:each) { visit root_path }
 
   scenario 'User can sign up' do

@@ -2,12 +2,12 @@ require 'rails_helper'
 
 RSpec.describe 'Patch index page', type: :feature, js: true do
 
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   before(:each) { visit root_path }
 
   scenario 'can be deleted by author on patch browse page' do
-    FactoryGirl.create(:patch, secret: false, user_id: user.id)
+    FactoryBot.create(:patch, secret: false, user_id: user.id)
 
     login
     visit patches_path
@@ -18,8 +18,8 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
   end
 
   scenario 'cannot be deleted by non-author on patch browse page' do
-    FactoryGirl.create(:patch, secret: false, user_id: user.id)
-    user_2 = FactoryGirl.create(:user)
+    FactoryBot.create(:patch, secret: false, user_id: user.id)
+    user_2 = FactoryBot.create(:user)
 
     login(user_2)
     visit patches_path
@@ -28,8 +28,8 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
   end
 
   scenario 'that are private are not shown on the index' do
-    patch1 = FactoryGirl.create(:patch, secret: false, user_id: user.id)
-    patch2 = FactoryGirl.create(:patch, secret: true, user_id: user.id)
+    patch1 = FactoryBot.create(:patch, secret: false, user_id: user.id)
+    patch2 = FactoryBot.create(:patch, secret: true, user_id: user.id)
 
     visit root_path
 
@@ -38,7 +38,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
   end
 
   describe 'as anonymous user' do
-    let(:patch) { FactoryGirl.create(:patch, secret: false) }
+    let(:patch) { FactoryBot.create(:patch, secret: false) }
 
     before do
       patch
@@ -60,16 +60,16 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
   describe 'pagination of patch index' do
     let(:first_patch) do
-      FactoryGirl.create(:patch, secret: false, user_id: user.id)
+      FactoryBot.create(:patch, secret: false, user_id: user.id)
     end
     let(:last_patch) do
-      FactoryGirl.create(:patch, secret: false, user_id: user.id)
+      FactoryBot.create(:patch, secret: false, user_id: user.id)
     end
 
     before do
       first_patch
       30.times do
-        FactoryGirl.create(:patch, secret: false, user_id: user.id)
+        FactoryBot.create(:patch, secret: false, user_id: user.id)
       end
       last_patch
       visit patches_path
@@ -131,7 +131,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
   end
 
   scenario 'link to tag pages are shown' do
-    patch1 = FactoryGirl.create(
+    patch1 = FactoryBot.create(
       :patch,
       secret: false,
       user_id: user.id,
@@ -145,7 +145,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
   describe 'audio previews are shown' do
     let(:patch) do
-      FactoryGirl.create(:patch, user_id: user.id, secret: false)
+      FactoryBot.create(:patch, user_id: user.id, secret: false)
     end
 
     before do

@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :patch do |_p|
     name { FFaker::Lorem.characters(10) }
     attack (0..127).to_a.sample

@@ -1,11 +1,11 @@
 RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
 
   config.before(:each) do
     begin
       DatabaseCleaner.strategy = :truncation
       DatabaseCleaner.start
-      # FactoryGirl.lint
+      # FactoryBot.lint
     ensure
       DatabaseCleaner.clean
     end

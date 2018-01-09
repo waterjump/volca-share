@@ -147,7 +147,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'PUT #update' do
     context 'with valid params' do
       let!(:user) do
-        FactoryGirl.create(:user, id: '123')
+        FactoryBot.create(:user, id: '123')
       end
 
       let(:new_attributes) do

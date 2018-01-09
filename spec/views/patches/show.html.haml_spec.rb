@@ -1,15 +1,15 @@
 require 'rails_helper'
 
 RSpec.describe 'patches/show.html.haml', type: :view do
-  let!(:user) { FactoryGirl.build(:user) }
+  let!(:user) { FactoryBot.build(:user) }
   let(:user_patch) do
     VolcaShare::PatchViewModel.wrap(
-      user.patches.build(FactoryGirl.attributes_for(:patch))
+      user.patches.build(FactoryBot.attributes_for(:patch))
     )
   end
   let(:anonymous_patch) do
     VolcaShare::PatchViewModel.wrap(
-      FactoryGirl.build(:patch)
+      FactoryBot.build(:patch)
     )
   end
   context 'baseline functionality' do
@@ -52,7 +52,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
       before do
         render(
           template: 'patches/show.html.haml',
-          locals: { current_user: FactoryGirl.create(:user) }
+          locals: { current_user: FactoryBot.create(:user) }
         )
       end
       it 'does not show edit link' do
@@ -68,7 +68,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
       @patch = user_patch
       render(
         template: 'patches/show.html.haml',
-        locals: { current_user: FactoryGirl.create(:user) }
+        locals: { current_user: FactoryBot.create(:user) }
       )
     end
     it 'does not show edit link' do
@@ -87,7 +87,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
 
       render(
         template: 'patches/show.html.haml',
-        locals: { current_user: FactoryGirl.create(:user) }
+        locals: { current_user: FactoryBot.create(:user) }
       )
     end
     it 'has h1 for SEO purposes' do

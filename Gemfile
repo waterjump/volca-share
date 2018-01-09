@@ -29,7 +29,7 @@ group :development, :test do
   gem 'capybara'
   gem 'better_errors'
   gem 'ffaker'
-  gem 'factory_girl_rails', '~> 4.0'
+  gem 'factory_bot_rails', '~> 4.0'
   gem 'poltergeist'
   gem 'launchy'
   gem 'capybara-screenshot'

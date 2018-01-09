@@ -3,13 +3,13 @@ require 'rails_helper'
 RSpec.feature 'tags', type: :feature, js: true do
   let(:patches) do
     [
-      FactoryGirl.create(:patch, name: 'Patch 1', tags: %w(lead cool)),
-      FactoryGirl.create(:patch, name: 'Patch 2', tags: %w(bass wow)),
-      FactoryGirl.create(:patch, name: 'Patch 3', tags: %w(lead scary))
+      FactoryBot.create(:patch, name: 'Patch 1', tags: %w(lead cool)),
+      FactoryBot.create(:patch, name: 'Patch 2', tags: %w(bass wow)),
+      FactoryBot.create(:patch, name: 'Patch 3', tags: %w(lead scary))
     ]
   end
 
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   before(:each) do
     user.patches << patches
@@ -17,13 +17,13 @@ RSpec.feature 'tags', type: :feature, js: true do
   end
 
   scenario 'user patches are shown on tag pages' do
-    patch1 = FactoryGirl.create(
+    patch1 = FactoryBot.create(
       :patch,
       secret: false,
       user_id: user.id,
       tag_list: 'cool'
     )
-    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
+    patch2 = FactoryBot.create(:patch, secret: false, tag_list: 'cool')
 
     visit patch_path(patch2)
 
@@ -37,7 +37,7 @@ RSpec.feature 'tags', type: :feature, js: true do
   end
 
   scenario 'anonymous patches are shown on tag pages' do
-    patch1 = FactoryGirl.create(
+    patch1 = FactoryBot.create(
       :patch,
       secret: false,
       user_id: nil,
@@ -49,13 +49,13 @@ RSpec.feature 'tags', type: :feature, js: true do
   end
 
   scenario 'have audio previews' do
-    patch1 = FactoryGirl.create(
+    patch1 = FactoryBot.create(
       :patch,
       secret: false,
       user_id: user.id,
       tag_list: 'cool'
     )
-    patch2 = FactoryGirl.create(:patch, secret: false, tag_list: 'cool')
+    patch2 = FactoryBot.create(:patch, secret: false, tag_list: 'cool')
 
     visit tags_show_path(tag: :cool)
     page.find('.speaker', match: :first).trigger('click')

@@ -4,13 +4,13 @@ module VolcaShare
   describe PatchViewModel do
 
     subject do
-      PatchViewModel.wrap(FactoryGirl.build(:patch))
+      PatchViewModel.wrap(FactoryBot.build(:patch))
     end
 
     describe '#vco_group_one' do
       context 'when vco_group is set to one' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'one'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'one'))
         end
         it 'returns true' do
           expect(subject.vco_group_one).to be true
@@ -18,7 +18,7 @@ module VolcaShare
       end
       context 'when vco_group is not set to one' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'two'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'two'))
         end
         it 'returns false' do
           expect(subject.vco_group_one).to be false
@@ -29,7 +29,7 @@ module VolcaShare
     describe '#vco_group_two' do
       context 'when vco_group is set to two' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'two'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'two'))
         end
         it 'returns true' do
           expect(subject.vco_group_two).to be true
@@ -37,7 +37,7 @@ module VolcaShare
       end
       context 'when vco_group is not set to two' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'one'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'one'))
         end
         it 'returns false' do
           expect(subject.vco_group_two).to be false
@@ -48,7 +48,7 @@ module VolcaShare
     describe '#vco_group_three' do
       context 'when vco_group is set to three' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'three'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'three'))
         end
         it 'returns true' do
           expect(subject.vco_group_three).to be true
@@ -57,7 +57,7 @@ module VolcaShare
 
       context 'when vco_group is not set to three' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, vco_group: 'two'))
+          PatchViewModel.wrap(FactoryBot.build(:patch, vco_group: 'two'))
         end
         it 'returns false' do
           expect(subject.vco_group_three).to be false
@@ -68,7 +68,7 @@ module VolcaShare
     describe '#checked?' do
       subject do
         PatchViewModel.wrap(
-          FactoryGirl.build(
+          FactoryBot.build(
             :patch,
             amp_eg_on: true,
             lfo_target_amp: false
@@ -90,7 +90,7 @@ module VolcaShare
     describe '#lit?' do
       subject do
         PatchViewModel.wrap(
-          FactoryGirl.build(
+          FactoryBot.build(
             :patch,
             amp_eg_on: true,
             lfo_target_amp: false
@@ -112,7 +112,7 @@ module VolcaShare
       context 'when patch is not secret and doesn\'t have audio' do
         subject do
           PatchViewModel.wrap(
-            FactoryGirl.build(:patch, secret: false, audio_sample: nil)
+            FactoryBot.build(:patch, secret: false, audio_sample: nil)
           )
         end
         it 'returns nil' do
@@ -121,7 +121,7 @@ module VolcaShare
       end
       context 'when the patch is secret' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, secret: true))
+          PatchViewModel.wrap(FactoryBot.build(:patch, secret: true))
         end
         it 'returns an array with a string \'secret\'' do
           expect(subject.index_classes).to include('secret')
@@ -138,7 +138,7 @@ module VolcaShare
       context 'when patch has a user' do
         subject do
           PatchViewModel.wrap(
-            FactoryGirl.build(:patch, user: FactoryGirl.build(:user))
+            FactoryBot.build(:patch, user: FactoryBot.build(:user))
           )
         end
         it 'returns username' do
@@ -156,7 +156,7 @@ module VolcaShare
       context 'when freesound id is short' do
         subject do
           PatchViewModel.wrap(
-            FactoryGirl.build(
+            FactoryBot.build(
               :patch,
               audio_sample: 'https://freesound.org/people/Bram/sounds/11/'
             )
@@ -174,7 +174,7 @@ module VolcaShare
       context 'when freesound id is long' do
         subject do
           PatchViewModel.wrap(
-            FactoryGirl.build(
+            FactoryBot.build(
               :patch,
               audio_sample: 'https://freesound.org/people/LoomyPoo/sounds/371855/'
             )
@@ -194,7 +194,7 @@ module VolcaShare
     describe '#description' do
       context 'when patch has no notes' do
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, notes: nil))
+          PatchViewModel.wrap(FactoryBot.build(:patch, notes: nil))
         end
         it 'returns nil' do
           expect(subject.description).to be_nil
@@ -203,7 +203,7 @@ module VolcaShare
       context 'when patch notes are less than 100 characters squished' do
         notes = '  This is    a really cool patch.   '
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, notes: notes))
+          PatchViewModel.wrap(FactoryBot.build(:patch, notes: notes))
         end
 
         it 'returns squished notes' do
@@ -215,7 +215,7 @@ module VolcaShare
                 ' writing more things here so that this descriptions will' \
                 ' exceed one hundred characters for testing purposes'
         subject do
-          PatchViewModel.wrap(FactoryGirl.build(:patch, notes: notes))
+          PatchViewModel.wrap(FactoryBot.build(:patch, notes: notes))
         end
         it 'returns first 100 characters of squished notes' do
           expect(subject.description.length).to be <= 100
@@ -239,7 +239,7 @@ module VolcaShare
       context 'when midi only patch fields are default values' do
         subject do
           PatchViewModel.wrap(
-            FactoryGirl.build(
+            FactoryBot.build(
               :patch,
               gate_time: 127,
               expression: 127,

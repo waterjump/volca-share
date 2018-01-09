@@ -1,9 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a patch', type: :feature, js: true do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
   let(:dummy_patch) do
-    FactoryGirl.build(
+    FactoryBot.build(
       :patch,
       name: 'My Cool Patch',
       notes: 'This patch is cool.'
@@ -48,7 +48,7 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
   end
 
   scenario 'audio samples are limited to soundcloud, freesound, and youtube' do
-    patch = FactoryGirl.create(:patch, user_id: user.id, secret: false)
+    patch = FactoryBot.create(:patch, user_id: user.id, secret: false)
     login
 
     visit edit_patch_path(patch.slug)

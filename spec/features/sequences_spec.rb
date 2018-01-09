@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Sequences', type: :feature, js: true do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   context 'when user is logged in' do
     it 'can be created' do
@@ -9,7 +9,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       visit new_patch_path
       expect(page).to have_title('New Patch | VolcaShare')
 
-      dummy_patch = FactoryGirl.build(
+      dummy_patch = FactoryBot.build(
         :patch,
         name: 'My Cool Patch',
         notes: 'This patch is cool.'
@@ -35,7 +35,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     it 'is limited to three sequences' do
       visit new_patch_path
 
-      dummy_patch = FactoryGirl.build(:patch)
+      dummy_patch = FactoryBot.build(:patch)
       fill_out_patch_form(dummy_patch, true)
       find('#vco_group_one_light').click
 
@@ -60,7 +60,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     it 'is limited to two sequences' do
       visit new_patch_path
 
-      dummy_patch = FactoryGirl.build(:patch)
+      dummy_patch = FactoryBot.build(:patch)
       fill_out_patch_form(dummy_patch, true)
       find('#vco_group_two_light').click
 
@@ -79,7 +79,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     it 'is limited to one sequence' do
       visit new_patch_path
 
-      dummy_patch = FactoryGirl.build(:patch)
+      dummy_patch = FactoryBot.build(:patch)
       fill_out_patch_form(dummy_patch, true)
       find('#vco_group_three_light').click
 
@@ -97,7 +97,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   it 'shows sequences after the patch is saved' do
     visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
+    dummy_patch = FactoryBot.build(:patch)
     fill_out_patch_form(dummy_patch, true)
     find('#vco_group_three_light').click
     click_link 'Add sequences'
@@ -155,7 +155,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
   describe 'patch show page sequence display' do
     it 'does not toggle light when clicked' do
-      patch = FactoryGirl.create(
+      patch = FactoryBot.create(
         :patch_with_sequences,
         name: '666',
         user_id: user.id,
@@ -174,7 +174,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     login
     visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
+    dummy_patch = FactoryBot.build(:patch)
 
     fill_out_patch_form(dummy_patch)
     find('#vco_group_two_light').click
@@ -195,7 +195,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   end
 
   scenario 'can be decremented' do
-    patch = FactoryGirl.create(
+    patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
       user_id: user.id,
@@ -218,7 +218,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   scenario 'can be ignored before persisted' do
     visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch)
+    dummy_patch = FactoryBot.build(:patch)
     fill_out_patch_form(dummy_patch, true)
     find('#vco_group_two_light').click
     click_link 'Add sequences'
@@ -237,7 +237,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     login
     visit new_patch_path
 
-    dummy_patch = FactoryGirl.build(:patch, vco_group: 'two')
+    dummy_patch = FactoryBot.build(:patch, vco_group: 'two')
     fill_out_patch_form(dummy_patch, true)
     click_button 'Save'
     visit edit_patch_path(Patch.last)
@@ -286,7 +286,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   end
 
   scenario 'can be deleted' do
-    patch = FactoryGirl.create(
+    patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
       user_id: user.id,
@@ -306,7 +306,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   end
 
   scenario 'count changes accurately 1' do
-    patch = FactoryGirl.create(
+    patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
       user_id: user.id,
@@ -330,7 +330,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
   end
 
   scenario 'count changes accurately 2' do
-    patch = FactoryGirl.create(
+    patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
       user_id: user.id,
