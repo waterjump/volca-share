@@ -20,13 +20,17 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       click_link 'Add sequences'
       expect(page).to have_selector('.sequence-form')
       # TODO: move to view spec
-      expect(page).to have_content('Use the VCO Group selector to change the number of sequences.')
+      expect(page).to have_content(
+        'Use the VCO Group selector to change the number of sequences.'
+      )
 
       click_button 'Save'
 
       reflects_patch(dummy_patch)
       expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
-      expect(page).to have_title("#{dummy_patch.name} by #{user.username} | VolcaShare")
+      expect(page).to have_title(
+        "#{dummy_patch.name} by #{user.username} | VolcaShare"
+      )
       expect(page).to have_selector('.sequence-show')
     end
   end
@@ -43,16 +47,23 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       expect(page).to have_selector('.sequence-box', count: 3)
       expect(page).not_to have_link 'Add sequences'
       expect(page).to have_link 'Remove sequences'
-      page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]').trigger('click')
-      page.find('label[for=patch_sequences_attributes_1_step_2_slide]').trigger('click')
-      page.find('label[for=patch_sequences_attributes_2_step_3_active_step]').trigger('click')
+      page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]')
+          .trigger('click')
+      page.find('label[for=patch_sequences_attributes_1_step_2_slide]')
+          .trigger('click')
+      page.find('label[for=patch_sequences_attributes_2_step_3_active_step]')
+          .trigger('click')
 
       click_button 'Save'
       expect(Patch.first.sequences.count).to eq(3)
-      expect(page).to       have_selector('.sequence-box', count: 3)
-      expect(page).not_to   have_css('#patch_sequences_0_step_1_step_mode_light.lit')
-      expect(page).to       have_css('#patch_sequences_1_step_2_slide_light.lit')
-      expect(page).not_to   have_css('#patch_sequences_2_step_3_active_step_light.lit')
+      expect(page).to have_selector('.sequence-box', count: 3)
+      expect(page).not_to(
+        have_css('#patch_sequences_0_step_1_step_mode_light.lit')
+      )
+      expect(page).to have_css('#patch_sequences_1_step_2_slide_light.lit')
+      expect(page).not_to(
+        have_css('#patch_sequences_2_step_3_active_step_light.lit')
+      )
     end
   end
 
@@ -123,7 +134,9 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
-    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('G#2')
+    expect(
+      page.find('#patch_sequences_attributes_0_step_1_note_display').text
+    ).to eq('G#2')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_6_slide_light.lit')
@@ -137,19 +150,27 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     expect(page).to have_css('#patch_sequences_0_step_1_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_2_step_mode_light.lit')
-    expect(page).not_to have_css('#patch_sequences_0_step_3_step_mode_light.lit')
+    expect(page).not_to(
+      have_css('#patch_sequences_0_step_3_step_mode_light.lit')
+    )
     expect(page).to have_css('#patch_sequences_0_step_4_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_6_step_mode_light.lit')
-    expect(page).not_to have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    expect(page).not_to(
+      have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    )
     expect(page).to have_css('#patch_sequences_0_step_8_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_9_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_10_step_mode_light.lit')
-    expect(page).not_to have_css('#patch_sequences_0_step_11_step_mode_light.lit')
+    expect(page).not_to(
+      have_css('#patch_sequences_0_step_11_step_mode_light.lit')
+    )
     expect(page).to have_css('#patch_sequences_0_step_12_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_13_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_14_step_mode_light.lit')
-    expect(page).not_to have_css('#patch_sequences_0_step_15_step_mode_light.lit')
+    expect(page).not_to(
+      have_css('#patch_sequences_0_step_15_step_mode_light.lit')
+    )
     expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
   end
 
@@ -190,8 +211,12 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     click_link 'Edit'
     expect(page).to have_selector('.sequence-form')
-    expect(page).not_to have_selector('#patch_sequences_attributes_0_step_1_step_mode_light.lit')
-    expect(page).to have_selector('#patch_sequences_attributes_1_step_2_slide_light.lit')
+    expect(page).not_to(
+      have_selector('#patch_sequences_attributes_0_step_1_step_mode_light.lit')
+    )
+    expect(page).to(
+      have_selector('#patch_sequences_attributes_1_step_2_slide_light.lit')
+    )
   end
 
   scenario 'can be decremented' do
@@ -228,7 +253,6 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     click_button 'Save'
     patch = Patch.last
-    # patch = Patch.where(name: dummy_patch.name).first
     expect(patch.sequences.count).to eq(1)
     expect(page).to have_selector('.sequence-box', count: 1)
   end
@@ -261,7 +285,9 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     find('#patch_sequences_attributes_0_step_1_note_display').hover
     expect(page).to have_css('.note-7.lit')
     expect(page).to have_selector('.sequence-show')
-    expect(page.find('#patch_sequences_attributes_0_step_1_note_display').text).to eq('E2')
+    expect(
+      page.find('#patch_sequences_attributes_0_step_1_note_display').text
+    ).to eq('E2')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
@@ -273,7 +299,9 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_css('#patch_sequences_0_step_4_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_6_step_mode_light.lit')
-    expect(page).not_to have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    expect(page).not_to(
+      have_css('#patch_sequences_0_step_7_step_mode_light.lit')
+    )
     expect(page).to have_css('#patch_sequences_0_step_8_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_9_step_mode_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_10_step_mode_light.lit')
@@ -349,7 +377,9 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 3)
     find('#vco_group_two_light').click
     expect(page).to have_selector('.sequence-form', count: 3)
-    expect(page.all('.sequence-area .remove-sequence', visible: false).last.value).to eq('true')
+    expect(
+      page.all('.sequence-area .remove-sequence', visible: false).last.value
+    ).to eq('true')
 
     click_button 'Save'
     patch = Patch.last
