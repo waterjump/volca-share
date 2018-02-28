@@ -4,7 +4,11 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
   let(:user) { FactoryBot.create(:user) }
 
-  before(:each) { visit root_path }
+  it 'can be accessed by link in header' do
+    visit root_path
+    click_link('Browse')
+    expect(current_path).to eq(patches_path)
+  end
 
   scenario 'can be deleted by author on patch browse page' do
     FactoryBot.create(:patch, secret: false, user_id: user.id)
@@ -31,7 +35,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     patch1 = FactoryBot.create(:patch, secret: false, user_id: user.id)
     patch2 = FactoryBot.create(:patch, secret: true, user_id: user.id)
 
-    visit root_path
+    visit patches_path
 
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
@@ -42,7 +46,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
     before do
       patch
-      visit root_path
+      visit patches_path
     end
 
     it 'doesn\'t display controls to delete anononymous patches' do
@@ -68,7 +72,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
     before do
       first_patch
-      30.times do
+      20.times do
         FactoryBot.create(:patch, secret: false, user_id: user.id)
       end
       last_patch
@@ -108,7 +112,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     describe 'second page' do
       before { click_link '2' }
 
-      it 'doesn\'t show newewst 20 patches' do
+      it 'doesn\'t show newest 20 patches' do
         expect(page).not_to have_content(last_patch.name)
       end
 
@@ -121,7 +125,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       end
 
       it 'shows remaining patches' do
-        expect(page).to have_selector('.patch-holder', count: 12)
+        expect(page).to have_selector('.patch-holder', count: 2)
       end
 
       it 'shows pagination links to other pages' do

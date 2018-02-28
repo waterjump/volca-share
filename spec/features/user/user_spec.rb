@@ -3,8 +3,6 @@ require 'rails_helper'
 RSpec.describe 'User profile page', type: :feature, js: true do
   let(:user) { FactoryBot.create(:user, username: 'arly.lowe') }
 
-  before(:each) { visit root_path }
-
   it 'shows patch previews in iframe' do
     FactoryBot.create(:patch, user_id: user.id, secret: false)
     visit user_path(user.slug)
@@ -22,7 +20,7 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
 
-    visit root_path
+    visit patches_path
     click_link user.username
     expect(page).to have_title("Patches by #{user.username} | VolcaShare")
     expect(page).to have_content(patch1.name)

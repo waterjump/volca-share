@@ -1,10 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Home page', type: :feature, js: true do
-  before(:each) { visit root_path }
+  before { visit root_path }
 
   it 'shows h1' do
-    expect(page).to have_selector('h1', text: 'Patches')
+    expect(page).to have_selector('h1', text: 'New patch', visible: false)
   end
 
   it 'shows header' do

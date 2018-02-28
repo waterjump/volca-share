@@ -11,9 +11,9 @@ RSpec.feature 'tags', type: :feature, js: true do
 
   let(:user) { FactoryBot.create(:user) }
 
-  before(:each) do
+  before do
     user.patches << patches
-    visit root_path
+    visit patches_path
   end
 
   scenario 'user patches are shown on tag pages' do

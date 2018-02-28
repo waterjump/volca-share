@@ -9,6 +9,7 @@
       %a.navbar-brand{href: '/'} VolcaShare
     #navbar.navbar-collapse.collapse
       %ul.nav.navbar-nav
+        %li= link_to 'Browse', patches_path
         %li= link_to 'About', about_path
       %ul.nav.navbar-nav.navbar-right
         %li= link_to 'New Patch', new_patch_path, id: 'new-patch'
