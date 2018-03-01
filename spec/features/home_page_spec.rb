@@ -10,7 +10,6 @@ RSpec.describe 'Home page', type: :feature, js: true do
   it 'shows header' do
     expect(page).to have_link('VolcaShare')
     expect(page).to have_link('About')
-    expect(page).to have_link('New Patch')
     expect(page).to have_link('Log in')
     expect(page).to have_link('Sign Up')
   end

@@ -12,7 +12,6 @@
         %li= link_to 'Browse', patches_path
         %li= link_to 'About', about_path
       %ul.nav.navbar-nav.navbar-right
-        %li= link_to 'New Patch', new_patch_path, id: 'new-patch'
         - if current_user.present?
           %li= link_to 'Log out', destroy_user_session_path, method: :delete
         - else
