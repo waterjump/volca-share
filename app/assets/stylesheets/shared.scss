@@ -54,28 +54,13 @@ body {
   margin: 0 5px 0 10px;
   display: inline-block;
   height: 20px;
-  border-radius: 0 5px 5px 0;
-  padding: 0 8px 0 9px;
+  border-radius: 5px;
+  padding: 0 6px 0 6px;
   background: #cacaca;
   border-top-width: 1px;
   border-bottom-width: 1px;
   color: #000;
   line-height: 18px;
-}
-.tag:before{
-  position: absolute;
-  content: "\25CF";
-  color: white;
-  text-shadow: 0 0 1px #333;
-  font-size: 11px;
-  line-height: 0px;
-  text-indent: 9px;
-  left: -12px;
-  width: 1px;
-  height: 0px;
-  border-right: 12px solid #cacaca;;
-  border-top: 10px solid transparent;
-  border-bottom: 9px solid transparent;
 }
 
 #login, #sign-up {
