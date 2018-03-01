@@ -102,39 +102,8 @@ body {
   }
 }
 
-@media(min-width: 768px) {
-  .jumbotron {
-    iframe {
-      width: 138%;
-    }
-  }
-}
-
-
-@media(min-width: 768px) {
-  .jumbotron {
-    iframe {
-      width: 138%;
-    }
-  }
-}
-
-
 @media(min-width: 990px) {
   #sign-up {
     border-left: 1px solid #d8d8d8;
-  }
-  .jumbotron {
-    iframe {
-      width: 129%;
-    }
-  }
-}
-
-@media(min-width: 1200px) {
-  .jumbotron {
-    iframe {
-      width: 124%;
-    }
   }
 }
