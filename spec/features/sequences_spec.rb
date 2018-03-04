@@ -273,6 +273,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     expect(page).not_to have_selector('.sequence-box', count: 1)
 
+    # TODO: The following line is imprecise
     page.find('#patch_sequences_attributes_0_step_1_note_display')
         .drag_to(seq_form_light(0, 1, 'slide'))
     seq_form_light(0, 1, 'slide').trigger('click')
@@ -283,11 +284,11 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     click_button 'Save'
     find('#patch_sequences_attributes_0_step_1_note_display').hover
-    expect(page).to have_css('.note-7.lit')
+    expect(page).to have_css('.note-8.lit')
     expect(page).to have_selector('.sequence-show')
     expect(
       page.find('#patch_sequences_attributes_0_step_1_note_display').text
-    ).to eq('E2')
+    ).to eq('F2')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
