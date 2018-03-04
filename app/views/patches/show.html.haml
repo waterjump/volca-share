@@ -122,8 +122,9 @@
           .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
             .notch
 
-  .col-xl-3.col-lg-3.col-md-3.col-sm-12
+  .mb-3
     = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
+
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'
     %p
@@ -146,6 +147,6 @@
       \|
     - else
       %strong
-        = "To edit, delete, or make your patches browsable, "
+        = "To edit or delete your patches, "
         = link_to 'create an account', new_user_registration_path
 = render 'knob_debug'

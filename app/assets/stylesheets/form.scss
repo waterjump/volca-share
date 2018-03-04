@@ -1,6 +1,9 @@
 $aspect: 1800 / 1072 / 100;
 $pink: #fd9994;
 
+.mb-3 {
+  margin-bottom: 1rem !important;
+}
 
 .form {
   .button {
@@ -292,6 +295,10 @@ $pink: #fd9994;
   }
 }
 
+#patch-metadata {
+  padding: 0;
+}
+
 #randomize {
   background-image: image_url('randomize.png');
   background-repeat: no-repeat;
@@ -300,6 +307,10 @@ $pink: #fd9994;
   background-position-y: 2px;
   width: 34px;
   height: 34px;
+}
+
+#save_or_cancel {
+  padding: 10px 0;
 }
 
 #patch-title {
@@ -463,7 +474,12 @@ fieldset {
       margin-left: 53px;
     }
   }
-  #patch-metadata {
+  #interface {
+    fieldset {
+      margin-left: 53px;
+    }
+  }
+  #patch-metadata, #save_or_cancel {
     margin-left: 53px;
   }
 }
@@ -474,6 +490,11 @@ fieldset {
     padding-bottom: 57.923%;
     .volca {
       margin: 0;
+    }
+  }
+  #interface {
+    fieldset {
+      margin-left: 0px;
     }
   }
   #midi-only-panel{
@@ -495,6 +516,10 @@ fieldset {
         height: 100%;
       }
     }
+  }
+
+  #save_or_cancel {
+    margin-left: 0
   }
 
   .stretchy2 {

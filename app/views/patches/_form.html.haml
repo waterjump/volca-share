@@ -126,17 +126,18 @@
   = range_field_tag 'patch[expression]', (@patch.expression || 127), in: 0..127, class: :hidden
   = range_field_tag 'patch[gate_time]', (@patch.gate_time || 127), in: 0..127, class: :hidden
 
-  .field.sequence-area
-    - if @patch.sequences.present?
-      = link_to 'Remove sequences', '#', id: 'toggle-sequences'
-      .sequence-holder
-        .sequence-message Use the VCO Group selector to change the number of sequences.
-        - @patch.sequences.each_with_index do |sequence, seq_num|
-          = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
-    - else
-      = link_to 'Add sequences', '#', id: 'toggle-sequences'
-      .sequence-holder
-        .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
+  %fieldset
+    .field.sequence-area
+      - if @patch.sequences.present?
+        = link_to 'Remove sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
+        .sequence-holder
+          .sequence-message Use the VCO Group selector to change the number of sequences.
+          - @patch.sequences.each_with_index do |sequence, seq_num|
+            = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
+      - else
+        = link_to 'Add sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
+        .sequence-holder
+          .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
 
 .col-lg-3.col-md-9#patch-metadata
   #midi-only-panel.hidden
@@ -151,7 +152,7 @@
         .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
           .notch
   %fieldset
-    .field
+    .field.mb-3
       = render 'midi_button'
       = render 'randomize'
     - if current_user.present?
@@ -179,7 +180,7 @@
       %strong
         = "To edit, or delete your patches, "
         = link_to 'create an account', new_user_registration_path
-.col-sm-12
+#save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
     = link_to 'Cancel', patches_path
