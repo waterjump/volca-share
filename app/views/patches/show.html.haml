@@ -9,8 +9,6 @@
           = link_to(@patch.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
-  .col-xl-3.col-lg-3.col-md-3.col-sm-12
-    = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
 = render 'midi_control'
 #interface.col-lg-9.show
   .stretchy
@@ -124,6 +122,8 @@
           .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
             .notch
 
+  .col-xl-3.col-lg-3.col-md-3.col-sm-12
+    = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'
     %p

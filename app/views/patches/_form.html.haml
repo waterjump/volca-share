@@ -151,6 +151,9 @@
         .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
           .notch
   %fieldset
+    .field
+      = render 'midi_button'
+      = render 'randomize'
     - if current_user.present?
       .field
         = label_tag :privacy, 'Secret?'

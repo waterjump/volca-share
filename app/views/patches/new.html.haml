@@ -1,8 +1,5 @@
 .clearfix
   %h1.hidden New patch
-  .col-xl-12.col-lg-12.col-md-12.col-sm-12
-    = render 'midi_button'
-    = render 'randomize'
 = render 'midi_control'
 = form_tag '/patch', method: :post, id: :patch_form do
   - if @patch.errors.any?
