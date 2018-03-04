@@ -3,6 +3,15 @@ require 'rails_helper'
 RSpec.describe 'User profile page', type: :feature, js: true do
   let(:user) { FactoryBot.create(:user, username: 'arly.lowe') }
 
+  context 'when user is logged in' do
+    it 'can be accessed via the top navigation' do
+      user = FactoryBot.create(:user)
+      login(user)
+      click_link 'My Patches'
+      expect(current_path).to eq(user_path(user.slug))
+    end
+  end
+
   it 'shows patch previews in iframe' do
     FactoryBot.create(:patch, user_id: user.id, secret: false)
     visit user_path(user.slug)
