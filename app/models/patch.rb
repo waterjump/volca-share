@@ -39,7 +39,10 @@ class Patch
   field :audio_sample, type: String
   field :slug, type: String
 
-  belongs_to :user, class_name: 'User', inverse_of: :patches
+  belongs_to :user,
+             class_name: 'User',
+             inverse_of: :patches,
+             optional: true
   embeds_many :sequences, class_name: 'Sequence'
   accepts_nested_attributes_for :sequences, allow_destroy: true
 

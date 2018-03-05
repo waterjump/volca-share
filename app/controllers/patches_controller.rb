@@ -176,7 +176,7 @@ class PatchesController < ApplicationController
 
     final_return = {}
     final_return[:sequences_attributes] =
-      cycle_sequences(params[:patch][:sequences_attributes])
+      cycle_sequences(params[:patch][:sequences_attributes].to_h)
 
     @sequence_params ||= final_return
   end

@@ -50,15 +50,16 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #show' do
     it 'assigns the requested patch as @patch' do
+
       patch = Patch.create!(valid_attributes)
-      get :show, { slug: patch.to_param }, valid_session
+      get :show, params: { slug: patch.to_param }, session: valid_session
       expect(assigns(:patch)).to eq(patch)
     end
   end
 
   describe 'GET #new' do
     it 'assigns a new patch as @patch' do
-      get :new, {}, valid_session
+      get :new, params: {}, session: valid_session
       expect(assigns(:patch)).to be_a_new(VolcaShare::PatchViewModel)
     end
   end
@@ -66,7 +67,7 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #edit' do
     it 'assigns the requested patch as @patch' do
       patch = create(:patch)
-      get :edit, { slug: patch.to_param }, valid_session
+      get :edit, params: { slug: patch.to_param }, session: valid_session
       expect(assigns(:patch)).to eq(patch)
     end
   end
@@ -74,7 +75,9 @@ RSpec.describe PatchesController, type: :controller do
   describe 'GET #oembed' do
     it 'assigns the requested patch as @patch' do
       patch = create(:patch)
-      get :oembed, { slug: patch.to_param, format: :json }, valid_session
+      get :oembed,
+          params: { slug: patch.to_param, format: :json },
+          session: valid_session
       expect(response.status).to eq(200)
       expect(JSON.parse(response.body)['name']).to eq(patch.name)
       expect(JSON.parse(response.body)['audio_sample_code'])
@@ -95,8 +98,8 @@ RSpec.describe PatchesController, type: :controller do
         expect do
           post(
             :create,
-            { patch: valid_attributes.merge(tags: tags_string) },
-            valid_session
+            params: { patch: valid_attributes.merge(tags: tags_string) },
+            session: valid_session
           )
         end.to change(Patch, :count).by(1)
       end
@@ -104,8 +107,8 @@ RSpec.describe PatchesController, type: :controller do
       it 'assigns a newly created patch as @patch' do
         post(
           :create,
-          { patch: valid_attributes.merge(tags: tags_string) },
-          valid_session
+          params: { patch: valid_attributes.merge(tags: tags_string) },
+          session: valid_session
         )
         expect(assigns(:patch)).to be_a(Patch)
         expect(assigns(:patch)).to be_persisted
@@ -114,8 +117,8 @@ RSpec.describe PatchesController, type: :controller do
       it 'redirects to the created patch' do
         post(
           :create,
-          { patch: valid_attributes.merge(tags: tags_string) },
-          valid_session
+          params: { patch: valid_attributes.merge(tags: tags_string) },
+          session: valid_session
         )
         expect(response).to redirect_to(
           user_patch_url(User.first.slug, Patch.last.slug)
@@ -127,8 +130,8 @@ RSpec.describe PatchesController, type: :controller do
       it 'assigns a newly created but unsaved patch as @patch' do
         post(
           :create,
-          { patch: invalid_attributes.merge(tags: tags_string) },
-          valid_session
+          params: { patch: invalid_attributes.merge(tags: tags_string) },
+          session: valid_session
         )
         expect(assigns(:patch)).to be_a_new(VolcaShare::PatchViewModel)
       end
@@ -136,8 +139,8 @@ RSpec.describe PatchesController, type: :controller do
       it "re-renders the 'new' template" do
         post(
           :create,
-          { patch: invalid_attributes.merge(tags: tags_string) },
-          valid_session
+          params: { patch: invalid_attributes.merge(tags: tags_string) },
+          session: valid_session
         )
         expect(response).to render_template('new')
       end
@@ -159,8 +162,11 @@ RSpec.describe PatchesController, type: :controller do
         patch.save
         put(
           :update,
-          { slug: patch.slug, patch: new_attributes.merge(tags: tags_string) },
-          valid_session
+          params: {
+            slug: patch.slug,
+            patch: new_attributes.merge(tags: tags_string)
+          },
+          session: valid_session
         )
         patch.reload
         expect(patch.name).to eq(new_attributes[:name])
@@ -171,11 +177,11 @@ RSpec.describe PatchesController, type: :controller do
         patch.save
         put(
           :update,
-          {
+          params: {
             slug: patch.slug,
             patch: valid_attributes.merge(tags: tags_string)
           },
-          valid_session
+          session: valid_session
         )
         expect(assigns(:patch)).to eq(patch)
       end
@@ -185,11 +191,11 @@ RSpec.describe PatchesController, type: :controller do
         patch.save
         put(
           :update,
-          {
+          params: {
             slug: patch.slug,
             patch: valid_attributes.merge(tags: tags_string)
           },
-          valid_session
+          session: valid_session
         )
         expect(response).to redirect_to(user_patch_path(user.slug, patch.slug))
       end
@@ -200,11 +206,11 @@ RSpec.describe PatchesController, type: :controller do
         patch = Patch.create! valid_attributes
         put(
           :update,
-          {
+          params: {
             slug: patch.to_param,
             patch: invalid_attributes.merge(tags: tags_string)
           },
-          valid_session
+          session: valid_session
         )
         expect(assigns(:patch)).to eq(patch)
       end
@@ -213,11 +219,11 @@ RSpec.describe PatchesController, type: :controller do
         patch = Patch.create! valid_attributes
         put(
           :update,
-          {
+          params: {
             slug: patch.to_param,
             patch: invalid_attributes.merge(tags: tags_string)
           },
-          valid_session
+          session: valid_session
         )
         expect(response).to render_template('edit')
       end
@@ -229,13 +235,17 @@ RSpec.describe PatchesController, type: :controller do
       it 'destroys the requested patch' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         expect do
-          delete :destroy, { slug: patch.to_param }, valid_session
+          delete :destroy,
+                 params: { slug: patch.to_param },
+                 session: valid_session
         end.to change(Patch, :count).by(-1)
       end
 
       it 'redirects to the patches index' do
         patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
-        delete :destroy, { slug: patch.to_param }, valid_session
+        delete :destroy,
+               params: { slug: patch.to_param },
+               session: valid_session
         expect(response).to redirect_to(patches_url)
       end
     end
@@ -243,7 +253,9 @@ RSpec.describe PatchesController, type: :controller do
     context 'when user is not author' do
       it 'is disallowed' do
         patch = Patch.create! valid_attributes.merge(user_id: 'abc123')
-        delete :destroy, { slug: patch.to_param }, valid_session
+        delete :destroy,
+                params: { slug: patch.to_param },
+                session: valid_session
         expect(response).to redirect_to(patch_url(patch))
       end
     end

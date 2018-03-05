@@ -12,9 +12,9 @@ gem 'jbuilder', '~> 2.0'
 gem 'jquery-rails'
 gem 'kaminari-actionview'
 gem 'kaminari-mongoid'
-gem 'mongoid', '~> 5.1.0'
+gem 'mongoid'
 gem 'mongoid-simple-tags'
-gem 'rails', '4.2.7.1'
+gem 'rails', '5.0.6'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'rubocop', '~> 0.49.0', require: false
 gem 'ruby-oembed'
@@ -33,12 +33,13 @@ group :development, :test do
   gem 'ffaker'
   gem 'launchy'
   gem 'poltergeist'
-  gem 'rspec-rails', '~> 3.4'
+  gem 'rspec-rails'
 end
 
 group :test do
   gem 'database_cleaner'
-  gem 'mongoid-rspec', '3.0.0'
+  gem 'mongoid-rspec'
+  gem 'rails-controller-testing'
   gem 'simplecov', require: false
   gem 'vcr'
   gem 'webmock'
