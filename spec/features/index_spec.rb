@@ -10,6 +10,39 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     expect(current_path).to eq(patches_path)
   end
 
+  it 'is sorted by quality' do
+    okay_patch = FactoryBot.create(:patch, name: 'okay', audio_sample: '')
+    complete_patch = FactoryBot.create(:patch, name: 'complete')
+    minimal_patch = FactoryBot.create(
+      :patch,
+      tags: [],
+      notes: '',
+      audio_sample: '',
+      name: 'minimal'
+    )
+    visit patches_path
+    expect(all('.patch')[0]).to have_link('complete')
+    expect(all('.patch')[1]).to have_link('okay')
+    expect(all('.patch')[2]).to have_link('minimal')
+  end
+
+  it 'can be sorted to show newest' do
+    okay_patch = FactoryBot.create(:patch, name: 'okay', audio_sample: '')
+    complete_patch = FactoryBot.create(:patch, name: 'complete')
+    minimal_patch = FactoryBot.create(
+      :patch,
+      tags: [],
+      notes: '',
+      audio_sample: '',
+      name: 'minimal'
+    )
+    visit patches_path
+    click_link 'Date Created'
+    expect(all('.patch')[0]).to have_link('minimal')
+    expect(all('.patch')[1]).to have_link('complete')
+    expect(all('.patch')[2]).to have_link('okay')
+  end
+
   scenario 'can be deleted by author on patch browse page' do
     FactoryBot.create(:patch, secret: false, user_id: user.id)
 
@@ -64,7 +97,14 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
   describe 'pagination of patch index' do
     let(:first_patch) do
-      FactoryBot.create(:patch, secret: false, user_id: user.id)
+      FactoryBot.create(
+        :patch,
+        secret: false,
+        user_id: user.id,
+        notes: '',
+        audio_sample: '',
+        tags: []
+      )
     end
     let(:last_patch) do
       FactoryBot.create(:patch, secret: false, user_id: user.id)
@@ -73,7 +113,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     before do
       first_patch
       20.times do
-        FactoryBot.create(:patch, secret: false, user_id: user.id)
+        FactoryBot.create(:patch, secret: false, user_id: user.id, audio_sample: '')
       end
       last_patch
       visit patches_path
@@ -158,16 +198,12 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     end
 
     it 'shows the speaker icon' do
-      within '.patch-holder' do
-        expect(page).to have_xpath('/html/body/div[1]/div[2]/div[3]/div[2]/div[1]')
-      end
+      expect(first('.patch')).to have_css('.speaker')
     end
 
     describe 'audio preview' do
       before do
-        within '.patch-holder' do
-          find(:xpath, '/html/body/div[1]/div[2]/div[3]/div[2]/div[1]').click
-        end
+        first('.speaker').click
       end
 
       it 'shows preview in an iframe' do

@@ -12,12 +12,14 @@ class PatchesController < ApplicationController
   # GET /patches
   # GET /patches.json
   def index
+    @sort = :quality
+    @sort = :created_at if params['sort'] == 'newest'
     @patches =
       Kaminari.paginate_array(
         VolcaShare::PatchViewModel.wrap(
           Patch
             .browsable
-            .order_by(created_at: 'desc')
+            .desc(@sort)
         )
       ).page(params[:page].to_i)
     @title = 'Browse Patches'

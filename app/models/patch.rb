@@ -38,6 +38,8 @@ class Patch
   field :notes, type: String
   field :audio_sample, type: String
   field :slug, type: String
+  field :quality, type: Integer
+  field :quality_updated_at, type: Time
 
   belongs_to :user,
              class_name: 'User',
@@ -61,4 +63,24 @@ class Patch
   validates :audio_sample, audio_sample: true
 
   scope :browsable, -> { where(secret: false) }
+
+  after_save :persist_quality
+
+  def persist_quality
+    return unless quality.nil? || quality_updated_at < updated_at
+    set(quality: calculate_quality)
+    set(quality_updated_at: Time.now)
+  end
+
+  private
+
+  def calculate_quality
+    qual = 0
+    qual += 1 if sequences.any?
+    qual += 1 if audio_sample.present?
+    qual += 1 if tags.any?
+    qual += 2 if notes.length > 30
+    qual += 2 if created_at >= 1.month.ago
+    qual
+  end
 end
