@@ -142,10 +142,10 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_css('#patch_sequences_0_step_6_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_9_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_10_slide_light.lit')
-    expect(page).to have_css('#patch_sequences_0_step_11_slide_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_11_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_13_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_14_slide_light.lit')
-    expect(page).to have_css('#patch_sequences_0_step_15_slide_light.lit')
+    expect(page).not_to have_css('#patch_sequences_0_step_15_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_16_slide_light.lit')
 
     expect(page).to have_css('#patch_sequences_0_step_1_step_mode_light.lit')
@@ -183,6 +183,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
         sequence_count: 2
       )
       patch.sequences.first.steps.first.update(slide: true)
+      patch.sequences.first.steps.first.update(step_mode: true)
+      patch.sequences.first.steps.first.update(active_step: true)
 
       login
       visit patch_path(patch)

@@ -11,19 +11,22 @@
           .steps.clearfix
             - sequence.steps.each do |step|
               - num = step.index
+              - note_grayed_out = !step.step_mode || !step.active_step
               .step{ class: num % 4 == 0 ? 'line' : '' }
                 .note.param
-                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[note]]]", id: "patch_sequences_attributes_#{seq_num}_step_#{num}_note_display") do
+                  = label_tag("patch[sequences][#{seq_num}][step_#{num}[note]]]", id: "patch_sequences_attributes_#{seq_num}_step_#{num}_note_display", class: note_grayed_out ? 'grayed-out' : '') do
                     %span.note-display{ data: { starting_note: step.note } }
                       C3
                 .slide.param
                   = label_tag("patch[sequences][#{seq_num}][step_#{num}[slide]]]") do
+                    - slide_lit = step.slide && step.step_mode && step.active_step
                     %span
-                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_slide_light", data: { active: step.slide.to_s }, class: step.slide ? 'lit' : '' }
+                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_slide_light", data: { active: step.slide.to_s }, class: slide_lit ? 'lit' : '' }
                 .step-mode.param
                   = label_tag("patch[sequences][#{seq_num}][step_#{num}[step_mode]]]") do
+                    - step_mode_lit = step.step_mode && step.active_step
                     %span
-                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_step_mode_light", data: { active: step.step_mode.to_s }, class: step.step_mode ? 'lit' : '' }
+                      .light.sequence-light{ id: "patch_sequences_#{seq_num}_step_#{num}_step_mode_light", data: { active: step.step_mode.to_s }, class: step_mode_lit ? 'lit' : '' }
                 .active-step.param
                   = label_tag("patch[sequences][#{seq_num}][step_#{num}[active_step]]]") do
                     %span

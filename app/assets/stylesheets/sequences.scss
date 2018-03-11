@@ -93,6 +93,9 @@
           font-size: 22px;
           position: relative;
           top: -3px;
+          .grayed-out {
+            color: lightgray;
+          }
           label {
             margin: 0
           }
