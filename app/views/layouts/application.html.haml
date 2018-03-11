@@ -34,8 +34,6 @@
       = render 'shared/header'
       = yield
     = render 'shared/footer'
-    - if Rails.env.production?
-      %script{:src => "//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-586b92001f0d0f8c", :type => "text/javascript"}
     %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
     :javascript
       window.jQuery || document.write('<\/script>')
