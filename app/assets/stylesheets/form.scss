@@ -28,7 +28,7 @@ $pink: #fd9994;
   .volca {
     width: 100%;
     height: 100%;
-    background-image: image_url('VolcaBass-medium.jpg');
+    background-image: image_url('VolcaBass-small.jpg');
     background-size: cover;
     position: absolute;
     top: 0;
@@ -370,6 +370,11 @@ fieldset {
 }
 
 @media (min-width: 440px) {
+  .stretchy {
+    .volca {
+      background-image: image_url('VolcaBass-medium.jpg');
+    }
+  }
   .bottom-row {
     label {
       span {
