@@ -23,3 +23,4 @@
 //= require display.coffee.erb
 //= require knob.coffee.erb
 //= require_tree .
+//= require cookies_eu

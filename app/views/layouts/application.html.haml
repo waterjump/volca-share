@@ -34,6 +34,8 @@
       = render 'shared/header'
       = yield
     = render 'shared/footer'
+    = render 'cookies_eu/consent_banner' unless Rails.env.test?
+
     %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
     :javascript
       window.jQuery || document.write('<\/script>')
