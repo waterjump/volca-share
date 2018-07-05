@@ -25,6 +25,7 @@ gem 'sass-rails', '~> 5.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'sendgrid-ruby'
 gem 'sinatra', '~> 2.0.2'
+gem 'sprockets', '~> 3.7.2'
 gem 'uglifier', '>= 1.3.0'
 
 group :development, :test do
