@@ -7,14 +7,14 @@ class Patch
   include ActiveModel::Validations
 
   field :name, type: String
-  field :attack, type: Integer
-  field :decay_release, type: Integer
-  field :cutoff_eg_int, type: Integer
-  field :octave, type: Integer
-  field :peak, type: Integer
-  field :cutoff, type: Integer
-  field :lfo_rate, type: Integer
-  field :lfo_int, type: Integer
+  field :attack, type: Integer, default: 63
+  field :decay_release, type: Integer, default: 63
+  field :cutoff_eg_int, type: Integer, default: 63
+  field :octave, type: Integer, default: 63
+  field :peak, type: Integer, default: 63
+  field :cutoff, type: Integer, default: 63
+  field :lfo_rate, type: Integer, default: 63
+  field :lfo_int, type: Integer, default: 63
   field :vco1_pitch, type: Integer, default: 63
   field :vco1_active, type: Mongoid::Boolean, default: true
   field :vco2_pitch, type: Integer, default: 63
@@ -22,15 +22,15 @@ class Patch
   field :vco3_pitch, type: Integer, default: 63
   field :vco3_active, type: Mongoid::Boolean, default: true
   field :vco_group, type: String, default: 'three'
-  field :lfo_target_amp, type: Mongoid::Boolean
-  field :lfo_target_pitch, type: Mongoid::Boolean
+  field :lfo_target_amp, type: Mongoid::Boolean, default: false
+  field :lfo_target_pitch, type: Mongoid::Boolean, default: false
   field :lfo_target_cutoff, type: Mongoid::Boolean, default: true
   field :lfo_wave, type: Boolean, default: false
   field :vco1_wave, type: Boolean, default: false
   field :vco2_wave, type: Boolean, default: false
   field :vco3_wave, type: Boolean, default: true
-  field :sustain_on, type: Mongoid::Boolean
-  field :amp_eg_on, type: Mongoid::Boolean
+  field :sustain_on, type: Mongoid::Boolean, default: false
+  field :amp_eg_on, type: Mongoid::Boolean, default: false
   field :slide_time, type: Integer, default: 63
   field :expression, type: Integer, default: 127
   field :gate_time, type: Integer, default: 127
@@ -61,10 +61,41 @@ class Patch
   validates :vco2_pitch, numericality: { greater_than: -1, less_than: 128 }
   validates :vco3_pitch, numericality: { greater_than: -1, less_than: 128 }
   validates :audio_sample, audio_sample: true
+  validate :patch_is_not_default
 
   scope :browsable, -> { where(secret: false) }
 
   after_save :persist_quality
+
+  def patch_is_not_default
+    not_default =
+      attack_changed_from_default? ||
+      decay_release_changed_from_default? ||
+      cutoff_eg_int_changed_from_default? ||
+      octave_changed_from_default? ||
+      peak_changed_from_default? ||
+      cutoff_changed_from_default? ||
+      lfo_rate_changed_from_default? ||
+      lfo_int_changed_from_default? ||
+      vco1_pitch_changed_from_default? ||
+      vco1_active_changed_from_default? ||
+      vco2_pitch_changed_from_default? ||
+      vco2_active_changed_from_default? ||
+      vco3_pitch_changed_from_default? ||
+      vco3_active_changed_from_default? ||
+      vco_group_changed_from_default? ||
+      lfo_target_amp_changed_from_default? ||
+      lfo_target_pitch_changed_from_default? ||
+      lfo_target_cutoff_changed_from_default? ||
+      lfo_wave_changed_from_default? ||
+      vco1_wave_changed_from_default? ||
+      vco2_wave_changed_from_default? ||
+      vco3_wave_changed_from_default? ||
+      sustain_on_changed_from_default? ||
+      amp_eg_on_changed_from_default?
+
+    errors.add(:patch, 'is not valid.') unless not_default
+  end
 
   def persist_quality
     return unless quality.nil? || quality_updated_at < updated_at
