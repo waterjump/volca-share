@@ -38,7 +38,7 @@ class Patch
   field :notes, type: String
   field :audio_sample, type: String
   field :slug, type: String
-  field :quality, type: Integer
+  field :quality, type: Float
   field :quality_updated_at, type: Time
 
   belongs_to :user,
@@ -97,21 +97,33 @@ class Patch
     errors.add(:patch, 'is not valid.') unless not_default
   end
 
+  # NOTE: Fine for now but needs to be a cron eventually.
   def persist_quality
-    return unless quality.nil? || quality_updated_at < updated_at
     set(quality: calculate_quality)
-    set(quality_updated_at: Time.now)
+    Patch.all.each do |patch|
+      patch.set(quality: patch.calculate_quality)
+    end
   end
 
-  private
+  protected
 
   def calculate_quality
-    qual = 0
+    qual = 1
     qual += 1 if sequences.any?
     qual += 1 if audio_sample.present?
     qual += 1 if tags.any?
+    qual += 0.5 if notes.present?
     qual += 2 if notes.length > 30
-    qual += 2 if created_at >= 1.month.ago
-    qual
+
+    base_score = Math.log([qual, 1].max)
+
+    time_difference = (Time.now - created_at) / 2.month.to_f
+
+    if time_difference > 1
+      x = time_difference - 1
+      base_score = base_score * Math.exp(-8*x*x)
+    end
+
+    base_score
   end
 end

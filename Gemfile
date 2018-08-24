@@ -46,6 +46,7 @@ group :test do
   gem 'mongoid-rspec'
   gem 'rails-controller-testing'
   gem 'simplecov', require: false
+  gem 'timecop'
   gem 'vcr'
   gem 'webmock'
 end

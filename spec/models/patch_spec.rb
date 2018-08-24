@@ -69,79 +69,26 @@ RSpec.describe Patch, 'validations' do
       patch = FactoryBot.create(:patch)
       patch.update!(quality: nil)
       patch.persist_quality
-      expect(patch.read_attribute(:quality)).to eq(6)
+      expect(patch.read_attribute(:quality)).to be_present
     end
 
     it 'updates quality value when patch is updated' do
       patch = FactoryBot.create(:patch)
-      patch.update!(notes: '')
-      expect(patch.read_attribute(:quality)).to eq(4)
-    end
-  end
+      initial_quality = patch.quality
+      patch.update!(notes: '', audio_sample: nil)
 
-  describe '#quality' do
-    context 'when patch has no tags, notes, audio, or sequences' do
-      it 'returns 2' do
-        patch = FactoryBot.create(
-          :patch,
-          tags: [],
-          notes: '',
-          audio_sample: '',
-          sequences: []
-        )
-        expect(patch.quality).to eq(2)
-      end
+      expect(patch.read_attribute(:quality)).to be < initial_quality
     end
-    context 'when patch has sequences but no tags, notes, or audio' do
-      it 'returns 3' do
-        patch = FactoryBot.create(
-          :patch,
-          tags: [],
-          notes: '',
-          audio_sample: '',
-          sequences: [FactoryBot.create(:sequence)]
-        )
-        expect(patch.quality).to eq(3)
+
+    it 'updates quality for all patches' do
+      old_patch = nil
+      Timecop.freeze(6.months.ago) do
+        old_patch = FactoryBot.create(:patch)
+        expect(old_patch.quality).to be > 1
       end
-    end
-    context 'when patch has no tags or notes' do
-      it 'returns 4' do
-        patch = FactoryBot.create(
-          :patch,
-          tags: [],
-          notes: '',
-          sequences: [FactoryBot.create(:sequence)]
-        )
-        expect(patch.quality).to eq(4)
-      end
-    end
-    context 'when patch has no notes' do
-      it 'returns 5' do
-        patch = FactoryBot.create(
-          :patch,
-          notes: '',
-          sequences: [FactoryBot.create(:sequence)]
-        )
-        expect(patch.quality).to eq(5)
-      end
-    end
-    context 'when all patch fields have been used' do
-      context 'and it new in the last month' do
-        it 'returns 7' do
-          patch = FactoryBot.create(:patch_with_sequences)
-          expect(patch.quality).to eq (7)
-        end
-      end
-      context 'and it is older than one month' do
-        it 'returns 5' do
-          patch = FactoryBot.create(
-            :patch,
-            sequences: [FactoryBot.create(:sequence)],
-            created_at: 2.months.ago
-          )
-          expect(patch.quality).to eq(5)
-        end
-      end
+      new_patch = FactoryBot.create(:patch)
+      old_patch.reload
+      expect(old_patch.quality).to be < 0.001
     end
   end
 end
