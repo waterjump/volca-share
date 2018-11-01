@@ -84,7 +84,7 @@ GEM
       js_cookie_rails (~> 2.2.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.3)
+    crass (1.0.4)
     database_cleaner (1.6.2)
     debug_inspector (0.0.3)
     devise (4.4.1)
@@ -108,7 +108,7 @@ GEM
       factory_bot (~> 4.8.2)
       railties (>= 3.0.0)
     ffaker (2.8.1)
-    ffi (1.9.23)
+    ffi (1.9.25)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     haml (5.0.4)
@@ -147,7 +147,7 @@ GEM
       mongoid
     launchy (2.4.3)
       addressable (~> 2.3)
-    loofah (2.2.2)
+    loofah (2.2.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.0)
@@ -175,7 +175,7 @@ GEM
     multi_json (1.13.1)
     mustermann (1.0.2)
     nio4r (2.2.0)
-    nokogiri (1.8.2)
+    nokogiri (1.8.5)
       mini_portile2 (~> 2.3.0)
     orm_adapter (0.5.0)
     parallel (1.12.1)
@@ -353,13 +353,14 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails (~> 4.0)
   ffaker
+  ffi (~> 1.9.24)
   haml-rails
   jbuilder (~> 2.0)
   jquery-rails
   kaminari-actionview
   kaminari-mongoid
   launchy
-  loofah (~> 2.2.1)
+  loofah (~> 2.2.3)
   mongoid
   mongoid-rspec
   mongoid-simple-tags
