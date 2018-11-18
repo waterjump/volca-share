@@ -18,6 +18,7 @@ gem 'loofah', '~> 2.2.3'
 gem 'mongoid'
 gem 'mongoid-simple-tags'
 gem 'rails', '5.1.5'
+gem 'rack', '~> 2.0.6'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'rubocop', '~> 0.49.0', require: false

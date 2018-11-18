@@ -188,7 +188,7 @@ GEM
     powerpack (0.1.1)
     public_suffix (3.0.2)
     puma (3.11.2)
-    rack (2.0.5)
+    rack (2.0.6)
     rack-protection (2.0.3)
       rack
     rack-test (0.8.3)
@@ -366,6 +366,7 @@ DEPENDENCIES
   mongoid-simple-tags
   poltergeist
   puma
+  rack (~> 2.0.6)
   rails (= 5.1.5)
   rails-controller-testing
   rails-html-sanitizer (~> 1.0.4)
