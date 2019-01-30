@@ -112,7 +112,7 @@ module VolcaShare
       context 'when patch is not secret and doesn\'t have audio' do
         subject do
           PatchViewModel.wrap(
-            FactoryBot.build(:patch, secret: false, audio_sample: nil)
+            FactoryBot.build(:patch, audio_sample: nil)
           )
         end
         it 'returns nil' do

@@ -43,55 +43,54 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     expect(all('.patch')[2]).to have_link('okay')
   end
 
-  scenario 'can be deleted by author on patch browse page' do
-    FactoryBot.create(:patch, secret: false, user_id: user.id)
+  context 'when user is logged in' do
+    it 'allows user to delete their own patches' do
+      FactoryBot.create(:patch, user_id: user.id)
 
-    login
-    visit patches_path
-    click_button('Delete')
-    visit patches_path
-
-    expect(page).to have_content('No patches to show.')
-  end
-
-  scenario 'cannot be deleted by non-author on patch browse page' do
-    FactoryBot.create(:patch, secret: false, user_id: user.id)
-    user_2 = FactoryBot.create(:user)
-
-    login(user_2)
-    visit patches_path
-
-    expect(page).not_to have_button('Delete')
-  end
-
-  scenario 'that are private are not shown on the index' do
-    patch1 = FactoryBot.create(:patch, secret: false, user_id: user.id)
-    patch2 = FactoryBot.create(:patch, secret: true, user_id: user.id)
-
-    visit patches_path
-
-    expect(page).to have_content(patch1.name)
-    expect(page).not_to have_content(patch2.name)
-  end
-
-  describe 'as anonymous user' do
-    let(:patch) { FactoryBot.create(:patch, secret: false) }
-
-    before do
-      patch
+      login
       visit patches_path
+      click_button('Delete')
+
+      expect(page).to have_content('No patches to show.')
     end
 
-    it 'doesn\'t display controls to delete anononymous patches' do
+    it 'does not allow user to delete patches of others' do
+      FactoryBot.create(:patch, user_id: user.id)
+      user_2 = FactoryBot.create(:user)
+
+      login(user_2)
+      visit patches_path
+
+      expect(page).not_to have_button('Delete')
+    end
+  end
+
+
+  context 'when user as not logged in' do
+    let!(:patch) { FactoryBot.create(:patch) }
+
+    before { visit patches_path }
+
+    it "doesn't display controls to delete anononymous patches" do
       expect(page).not_to have_button('Delete')
     end
 
-    it 'doesn\'t display controls to edit anononymous patches' do
+    it "doesn't display controls to edit anononymous patches" do
       expect(page).not_to have_selector('.edit.glyph')
     end
 
     it 'shows anonymous patches' do
       expect(page).to have_content(patch.name)
+    end
+
+    it 'does not show secret patches' do
+      patch1 = FactoryBot.create(:patch, user_id: user.id)
+      patch2 = FactoryBot.create(:patch, secret: true, user_id: user.id)
+
+      visit patches_path
+
+      expect(page).to have_content(patch1.name)
+      expect(page).not_to have_content(patch2.name)
     end
   end
 
@@ -99,7 +98,6 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     let(:first_patch) do
       FactoryBot.create(
         :patch,
-        secret: false,
         user_id: user.id,
         notes: '',
         audio_sample: '',
@@ -107,14 +105,12 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       )
     end
     let(:last_patch) do
-      FactoryBot.create(:patch, secret: false, user_id: user.id)
+      FactoryBot.create(:patch, user_id: user.id)
     end
 
     before do
       first_patch
-      20.times do
-        FactoryBot.create(:patch, secret: false, user_id: user.id, audio_sample: '')
-      end
+      20.times { FactoryBot.create(:patch, user_id: user.id, audio_sample: '') }
       last_patch
       visit patches_path
     end
@@ -174,22 +170,20 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     end
   end
 
-  scenario 'link to tag pages are shown' do
-    patch1 = FactoryBot.create(
-      :patch,
-      secret: false,
-      user_id: user.id,
-      tag_list: 'cool'
-    )
+  context 'when a patch has tags' do
+    it 'shows link to tag page' do
+      patch1 = FactoryBot.create(:patch, user_id: user.id,tag_list: 'cool')
 
-    visit patch_path(patch1)
-    click_link('#cool')
-    expect(page).to have_current_path(tags_show_path(tag: 'cool'))
+      visit patch_path(patch1)
+      click_link('#cool')
+
+      expect(page).to have_current_path(tags_show_path(tag: 'cool'))
+    end
   end
 
   describe 'audio previews are shown' do
     let(:patch) do
-      FactoryBot.create(:patch, user_id: user.id, secret: false)
+      FactoryBot.create(:patch, user_id: user.id)
     end
 
     before do

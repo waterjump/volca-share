@@ -220,6 +220,9 @@ def reflects_patch(patch, options = {})
 
   # Content
   return if form
+  patch.tags.each do |tag|
+    expect(interface).to have_link("##{tag}")
+  end
   expect(interface).to have_content(patch.name)
   expect(interface).to have_content(patch.notes)
 end

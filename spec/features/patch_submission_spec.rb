@@ -47,31 +47,44 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     end
   end
 
-  scenario 'audio samples are limited to soundcloud, freesound, and youtube' do
-    patch = FactoryBot.create(:patch, user_id: user.id, secret: false)
-    login
+  describe 'audio samples' do
+    let(:patch) { FactoryBot.create(:patch, user_id: user.id) }
+    before do
+      login
+      visit edit_patch_path(patch.slug)
+    end
 
-    visit edit_patch_path(patch.slug)
-    expect(current_path).to eq(edit_patch_path(patch.slug))
-    expect(page.status_code).to eq(200)
+    it 'accepts valid soundcloud URLS' do
+      fill_in 'patch[audio_sample]',
+              with: 'https://soundcloud.com/69bot/take-it-to-the-streets'
+      click_button 'Save'
+      expect(page.body).to have_content('Patch saved successfully.')
+    end
 
-    fill_in 'patch[audio_sample]', with: 'https://somewebsite.edu/69bot/shallow'
-    click_button 'Save'
-    expect(page).to have_content('Audio sample needs to be direct SoundCloud, Freesound or YouTube link.')
+    it 'accepts valid youtube URLS' do
+      fill_in 'patch[audio_sample]',
+              with: 'https://youtube.com/watch?v=GF60Iuh643I'
+      click_button 'Save'
+      expect(page.body).to have_content('Patch saved successfully.')
+    end
 
-    # YouTube
-    fill_in 'patch[audio_sample]', with: 'https://youtube.com/watch?v=GF60Iuh643I'
-    click_button 'Save'
-    expect(page.body).to have_content('Patch saved successfully.')
+    it 'accepts valid freesound URLS' do
+      fill_in 'patch[audio_sample]',
+              with: 'https://freesound.org/people/volcashare/sounds/123456'
+      click_button 'Save'
+      expect(page.body).to have_content('Patch saved successfully.')
+    end
 
-    # Freesound
-    visit edit_patch_path(patch.slug)
-    fill_in 'patch[audio_sample]', with: 'https://freesound.org/people/volcashare/sounds/123456'
-    click_button 'Save'
-    expect(page.body).to have_content('Patch saved successfully.')
+    it 'rejects invalid URLS' do
+      fill_in 'patch[audio_sample]', with: 'https://foo.edu/69bot/shallow'
+      click_button 'Save'
+      expect(page).to have_content(
+        'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
+      )
+    end
   end
 
-  scenario 'can be randomized' do
+  it 'can be randomized' do
     default_patch = {
       attack: '63',
       cutoff: '63',
@@ -103,69 +116,73 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     expect(page).not_to have_selector('#randomize')
   end
 
-  scenario 'do not randomize midi-only-controls if midi not available' do
-    default_patch = {
-      attack: '63',
-      cutoff: '63',
-      lfo_target_pitch: false,
-      vco3_active: 'true',
-      slide_time: '63',
-      expression: '127',
-      gate_time: '127'
-    }
+  context 'when MIDI is not available' do
+    it 'does not randomize midi-only controls if midi not available' do
+      default_patch = {
+        attack: '63',
+        cutoff: '63',
+        lfo_target_pitch: false,
+        vco3_active: 'true',
+        slide_time: '63',
+        expression: '127',
+        gate_time: '127'
+      }
 
-    visit new_patch_path
-    expect(page).to have_link('randomize')
-    click_link 'randomize'
-    fill_in 'patch[name]', with: 'Schnackenpfefferhausen'
-    click_button 'Save'
+      visit new_patch_path
+      expect(page).to have_link('randomize')
+      click_link 'randomize'
+      fill_in 'patch[name]', with: 'Schnackenpfefferhausen'
+      click_button 'Save'
 
-    random_patch = {
-      attack: page.find('#attack')['data-midi'],
-      cutoff: page.find('#cutoff')['data-midi'],
-      lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
-      vco3_active: page.find('#vco3_active_button')['data-active'],
-      slide_time: page.find('#slide_time', visible: false)['data-midi'],
-      expression: page.find('#expression', visible: false)['data-midi'],
-      gate_time: page.find('#gate_time', visible: false)['data-midi']
-    }
+      random_patch = {
+        attack: page.find('#attack')['data-midi'],
+        cutoff: page.find('#cutoff')['data-midi'],
+        lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
+        vco3_active: page.find('#vco3_active_button')['data-active'],
+        slide_time: page.find('#slide_time', visible: false)['data-midi'],
+        expression: page.find('#expression', visible: false)['data-midi'],
+        gate_time: page.find('#gate_time', visible: false)['data-midi']
+      }
 
-    expect(random_patch).not_to eq(default_patch)
-    expect(random_patch.slice(:slide_time, :expression, :gate_time))
-      .to eq default_patch.slice(:slide_time, :expression, :gate_time)
+      expect(random_patch).not_to eq(default_patch)
+      expect(random_patch.slice(:slide_time, :expression, :gate_time))
+        .to eq default_patch.slice(:slide_time, :expression, :gate_time)
+    end
   end
 
-  scenario 'that have sequences do not randomize vco groups' do
-    default_patch = {
-      attack: '63',
-      cutoff: '63',
-      gate_time: '127',
-      lfo_target_pitch: false,
-      vco_group_3: true,
-      vco_group_2: false,
-      vco_group_1: false
-    }
+  context 'when sequences are present' do
+    it 'does not randomize vco groups' do
+      default_patch = {
+        attack: '63',
+        cutoff: '63',
+        gate_time: '127',
+        lfo_target_pitch: false,
+        vco_group_3: true,
+        vco_group_2: false,
+        vco_group_1: false
+      }
 
-    visit new_patch_path
-    click_link 'Add sequences'
-    click_link 'randomize'
-    fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
-    click_button 'Save'
+      visit new_patch_path
+      click_link 'Add sequences'
+      click_link 'randomize'
+      fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
+      click_button 'Save'
 
-    random_patch = {
-      attack: page.find('#attack')['data-midi'],
-      cutoff: page.find('#cutoff')['data-midi'],
-      gate_time: page.find('#gate_time', visible: false)['data-midi'],
-      lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
-      vco_group_3: page.has_css?('#vco_group_three_light.lit'),
-      vco_group_2: page.has_css?('#vco_group_two_light.lit'),
-      vco_group_1: page.has_css?('#vco_group_one_light.lit')
-    }
+      random_patch = {
+        attack: page.find('#attack')['data-midi'],
+        cutoff: page.find('#cutoff')['data-midi'],
+        gate_time: page.find('#gate_time', visible: false)['data-midi'],
+        lfo_target_pitch: page.has_css?('#lfo_target_pitch_light.lit'),
+        vco_group_3: page.has_css?('#vco_group_three_light.lit'),
+        vco_group_2: page.has_css?('#vco_group_two_light.lit'),
+        vco_group_1: page.has_css?('#vco_group_one_light.lit')
+      }
 
-    expect(random_patch).not_to eq(default_patch)
-    expect(random_patch[:vco_group_3]).to eq(default_patch[:vco_group_3])
-    expect(random_patch[:vco2_active]).to eq(default_patch[:vco2_active])
-    expect(random_patch[:vco1_active]).to eq(default_patch[:vco1_active])
-    expect(page).to have_selector('.sequence-show', count: 1)
+      expect(random_patch).not_to eq(default_patch)
+      expect(random_patch[:vco_group_3]).to eq(default_patch[:vco_group_3])
+      expect(random_patch[:vco2_active]).to eq(default_patch[:vco2_active])
+      expect(random_patch[:vco1_active]).to eq(default_patch[:vco1_active])
+      expect(page).to have_selector('.sequence-show', count: 1)
+    end
   end
 end

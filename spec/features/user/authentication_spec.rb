@@ -2,130 +2,123 @@ require 'rails_helper'
 
 RSpec.feature 'Authentication process', type: :feature do
   let(:user) { FactoryBot.create(:user) }
-  before(:each) { visit root_path }
 
-  scenario 'User can sign up' do
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    within '#new_user' do
-      fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: FFaker::Internet.user_name
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
+  describe 'signing up' do
+    before { visit new_user_registration_path }
+    it 'signs up user' do
+      pw = Devise.friendly_token.first(8)
+      within '#new_user' do
+        fill_in 'user_email', with: FFaker::Internet.email
+        fill_in 'user_username', with: FFaker::Internet.user_name
+        fill_in 'user_password', with: pw
+        fill_in 'user_password_confirmation', with: pw
+        click_button 'Sign up'
+      end
+
+      expect(current_path).to eq(root_path)
+      expect(page).to have_content('Welcome! You have signed up successfully.')
     end
 
-    expect(current_path).to eq(root_path)
-    expect(page).to have_content('Welcome! You have signed up successfully.')
+    context 'when username is too shorter than two characters' do
+      it 'rejects sign up' do
+        pw = Devise.friendly_token.first(8)
+        within '#new_user' do
+          fill_in 'user_email', with: FFaker::Internet.email
+          fill_in 'user_username', with: 'Q'
+          fill_in 'user_password', with: pw
+          fill_in 'user_password_confirmation', with: pw
+          click_button 'Sign up'
+        end
+        expect(page).to have_content('Username is too short')
+      end
+    end
+
+    context 'when email already exists' do
+      it 'rejects sign up' do
+        email = FFaker::Internet.email
+        FactoryBot.create(:user, email: email)
+
+        pw = Devise.friendly_token.first(8)
+        within '#new_user' do
+          fill_in 'user_email', with: email
+          fill_in 'user_username', with: FFaker::Internet.user_name
+          fill_in 'user_password', with: pw
+          fill_in 'user_password_confirmation', with: pw
+          click_button 'Sign up'
+        end
+
+        expect(page).to have_content('Email is already taken')
+      end
+    end
+
+    context 'when username already exists' do
+      it 'rejects sign up' do
+        username = 'thrillho'
+        password = '12345'
+        FactoryBot.create(:user, username: username)
+
+        within '#new_user' do
+          fill_in 'user_email', with: FFaker::Internet.email
+          fill_in 'user_username', with: username
+          fill_in 'user_password', with: password
+          fill_in 'user_password_confirmation', with: password
+          click_button 'Sign up'
+        end
+
+        expect(page).to have_content('Username is already taken')
+      end
+    end
+
+    context 'when username contains an invalid character' do
+      it 'rejects sign up' do
+        pw = Devise.friendly_token.first(8)
+        within '#new_user' do
+          fill_in 'user_email', with: FFaker::Internet.email
+          fill_in 'user_username', with: 'Best+User'
+          fill_in 'user_password', with: pw
+          fill_in 'user_password_confirmation', with: pw
+          click_button 'Sign up'
+        end
+        expect(page).to have_content('Username is invalid')
+      end
+    end
   end
 
-  scenario 'User logs in' do
-    click_link 'Log in'
-    login
-    expect(current_path).to eq(root_path)
-    expect(page).to have_content('Signed in successfully.')
+  describe 'logging in' do
+    it 'logs user in' do
+      visit root_path
+      click_link 'Log in'
+      within '#login' do
+        fill_in 'user[email]', with: user.email
+        fill_in 'user[password]', with: user.password
+        click_button 'Log in'
+      end
+
+      expect(current_path).to eq(root_path)
+      expect(page).to have_content('Signed in successfully.')
+    end
+
+    context 'when password is incorrect' do
+      it 'rejects login' do
+        visit new_user_session_path
+        within '#login' do
+          fill_in 'user[email]', with: user.email
+          fill_in 'user[password]', with: 'WrongPassword123'
+          click_button 'Log in'
+        end
+
+        expect(page).to have_content('Invalid Email or password.')
+        expect(current_path).to eq(new_user_session_path)
+      end
+    end
   end
 
-  scenario 'User logs out' do
-    click_link 'Log in'
-    login
-    click_link 'Log out'
-    expect(current_path).to eq(root_path)
-    expect(page).to have_content('Signed out successfully.')
-  end
-
-  scenario 'User enters incorrect password' do
-    click_link 'Log in'
-    within '#login' do
-      fill_in 'user[email]', with: user.email
-      fill_in 'user[password]', with: 'WrongPassword123'
-      click_button 'Log in'
+  describe 'logging out' do
+    it 'logs user out' do
+      login
+      click_link 'Log out'
+      expect(current_path).to eq(root_path)
+      expect(page).to have_content('Signed out successfully.')
     end
-    expect(page).to have_content('Invalid Email or password.')
-    expect(current_path).to eq(new_user_session_path)
-  end
-
-  scenario 'User enters 1 character username' do
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    within '#new_user' do
-      fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: 'Q'
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-    expect(page).to have_content('Username is too short')
-  end
-
-  scenario 'User enters username with invalid character' do
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    within '#new_user' do
-      fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: 'Best+User'
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-    expect(page).to have_content('Username is invalid')
-  end
-
-  scenario 'User signs up with existing email' do
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    email = FFaker::Internet.email
-
-    within '#new_user' do
-      fill_in 'user_email', with: email
-      fill_in 'user_username', with: FFaker::Internet.user_name
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-
-    expect(current_path).to eq(root_path)
-    expect(page).to have_content('Welcome! You have signed up successfully.')
-
-    click_link 'Log out'
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    within '#new_user' do
-      fill_in 'user_email', with: email
-      fill_in 'user_username', with: FFaker::Internet.user_name
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-
-    expect(page).to have_content('Email is already taken')
-  end
-
-  scenario 'User signs up with existing username' do
-    visit(new_user_registration_path)
-    pw = Devise.friendly_token.first(8)
-    username = 'hotlava69'
-    within '#new_user' do
-      fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: username
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-
-    expect(current_path).to eq(root_path)
-    expect(page).to have_content('Welcome! You have signed up successfully.')
-
-    click_link 'Log out'
-    visit(new_user_registration_path)
-    within '#new_user' do
-      fill_in 'user_email', with: FFaker::Internet.email
-      fill_in 'user_username', with: username
-      fill_in 'user_password', with: pw
-      fill_in 'user_password_confirmation', with: pw
-      click_button 'Sign up'
-    end
-
-    expect(page).to have_content('Username is already taken')
   end
 end

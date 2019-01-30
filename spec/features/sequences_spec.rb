@@ -7,7 +7,6 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     it 'can be created' do
       login
       visit new_patch_path
-      expect(page).to have_title('New Patch | VolcaShare')
 
       dummy_patch = FactoryBot.build(
         :patch,
@@ -193,7 +192,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     end
   end
 
-  scenario 'can be edited' do
+  it 'can be edited' do
     login
     visit new_patch_path
 
@@ -221,7 +220,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     )
   end
 
-  scenario 'can be decremented' do
+  it 'can be decremented' do
     patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
@@ -242,7 +241,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 1)
   end
 
-  scenario 'can be ignored before persisted' do
+  it 'can be ignored before persisted' do
     visit new_patch_path
 
     dummy_patch = FactoryBot.build(:patch)
@@ -259,7 +258,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 1)
   end
 
-  scenario 'can be added on edit' do
+  it 'can be added on edit' do
     login
     visit new_patch_path
 
@@ -316,7 +315,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_css('#patch_sequences_0_step_16_step_mode_light.lit')
   end
 
-  scenario 'can be deleted' do
+  it 'can be deleted' do
     patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
@@ -336,7 +335,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).not_to have_selector('.sequence-box')
   end
 
-  scenario 'count changes accurately 1' do
+  it 'changes count accurately 1' do
     patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
@@ -360,7 +359,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 3)
   end
 
-  scenario 'count changes accurately 2' do
+  it 'changes count accurately 2' do
     patch = FactoryBot.create(
       :patch_with_sequences,
       name: '666',
