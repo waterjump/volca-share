@@ -1,8 +1,8 @@
-ruby '2.3.1'
+ruby '2.3.3'
 
 source 'https://rubygems.org'
 
-gem 'bootstrap-sass', '~> 3.3.6'
+gem 'bootstrap-sass', '>= 3.4.1'
 gem 'bootstrap-tagsinput-rails'
 gem 'bundler', '~> 1.15'
 gem 'coffee-rails'
