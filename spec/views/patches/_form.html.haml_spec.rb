@@ -14,4 +14,12 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
       expect(rendered).to have_css('.sample')
     end
   end
+
+  it 'shows tag input placeholders' do
+    @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
+    render partial: 'patches/form.html.haml'
+    expect(rendered).to have_selector(
+      'input[placeholder="tags, separated, by, commas"]'
+    )
+  end
 end

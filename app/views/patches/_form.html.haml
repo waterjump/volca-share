@@ -163,7 +163,7 @@
       = hidden_field_tag 'patch[secret]', 'false'
     .field
       = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
-      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'Tags'
+      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'tags, separated, by, commas'
     .field
       = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
       = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
