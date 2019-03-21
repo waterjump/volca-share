@@ -46,6 +46,7 @@ end
 
 group :test do
   gem 'database_cleaner'
+  gem 'fuubar'
   gem 'mongoid-rspec'
   gem 'rails-controller-testing'
   gem 'simplecov', require: false
