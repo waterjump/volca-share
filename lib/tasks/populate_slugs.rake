@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :volcashare do
   desc 'Populates slugs retroactively'
   task populate_slugs: :environment do

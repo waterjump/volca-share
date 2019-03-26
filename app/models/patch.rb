@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'audio_sample_validator.rb'
 
 class Patch

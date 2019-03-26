@@ -3,5 +3,3 @@ Documentation:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
-Style/FrozenStringLiteralComment:
-  Enabled: false

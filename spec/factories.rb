@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def midi_range
   0..127
 end

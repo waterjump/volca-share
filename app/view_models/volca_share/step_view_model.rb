@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module VolcaShare
   class StepViewModel < ApplicationViewModel
     def step_mode_checked

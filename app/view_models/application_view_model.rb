@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationViewModel
   attr_reader :model, :options
 

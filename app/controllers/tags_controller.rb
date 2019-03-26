@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagsController < ApplicationController
   # GET /tags/1
   # GET /tags/1.json

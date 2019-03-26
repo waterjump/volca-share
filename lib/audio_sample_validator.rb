@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AudioSampleValidator < ActiveModel::EachValidator
   include AudioRegex
   def self.kind

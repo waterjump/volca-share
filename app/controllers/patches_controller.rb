@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PatchesController < ApplicationController
   before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
   before_action :format_tags, only: [:create, :update]

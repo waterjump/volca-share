@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.configure do |config|
   def perform_around
     VCR.use_cassette('oembed') do

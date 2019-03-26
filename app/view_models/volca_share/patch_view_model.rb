@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module VolcaShare
   class PatchViewModel < ApplicationViewModel
     include AudioRegex

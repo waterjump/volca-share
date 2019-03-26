@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def login(usr = user)
   visit new_user_session_path
   within '#login' do
