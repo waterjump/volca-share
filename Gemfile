@@ -21,7 +21,7 @@ gem 'rails', '5.1.6.2'
 gem 'rack', '~> 2.0.6'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
-gem 'rubocop', '~> 0.49.0', require: false
+gem 'rubocop', '~> 0.66.0', require: false
 gem 'ruby-oembed'
 gem 'sass-rails', '~> 5.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
