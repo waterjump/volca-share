@@ -12,15 +12,15 @@
 //
 
 
-//= require _setup.coffee
+//= require _setup
 //= require jquery
 //= require jquery_ujs
 //= require webmidi.min.js
 //= require bootstrap-sprockets
-//= require index.coffee.erb
+//= require index
 //= require bootstrap-tagsinput
-//= require midi.coffee
-//= require display.coffee.erb
-//= require knob.coffee.erb
+//= require midi
+//= require display
+//= require knob
 //= require_tree .
 //= require cookies_eu

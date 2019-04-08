@@ -47,4 +47,9 @@ Rails.application.configure do
     Bullet.bullet_logger = true
     Bullet.raise = true # raise an error if n+1 query occurs
   end
+
+  config.assets.prefix = '/assets_test'
+  config.assets.compile = true
+  config.serve_static_assets = true
+  config.assets.js_compressor = Uglifier.new(harmony: true)
 end
