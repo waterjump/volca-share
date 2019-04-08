@@ -1,0 +1,180 @@
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+VS.Display = function(element) {
+
+  const Digit = function(element) {
+    this.element = element;
+
+    this.setSprite = function(character) {
+      if ((character !== 'blank') && isNaN(character)) {
+        $(this.element).css('background-image', 'url(<%= asset_path("symbols.jpg") %>)');
+        $(this.element).css('background-size', '605%');
+      } else {
+        $(this.element).css('background-image', 'url(<%= asset_path("numbers.jpg") %>)');
+        $(this.element).css('background-size', '1120%');
+      }
+    };
+
+    this.calculateClockOffset = function(value, place) {
+      let mapping = {};
+      const midiString = `${value}`;
+      const digit = midiString[midiString.length - place];
+      mapping = {
+        'dash': -0.5,
+        'c': 19,
+        'n': 38,
+        'o': 59,
+        'f': 79,
+        't': 99.7,
+        'blank': 99.2
+      };
+      return mapping[value] || (parseInt(digit, 10) * 9.98);
+    };
+  };
+
+  this.element = element;
+
+  this.pitchString = function(val) {
+    let hundreds, ones, tens;
+    let value = this.vcoPitchValues[val];
+    if (value === 0) { return 'blank o f f'.split(' '); }
+    let thousands = 'blank';
+    const tensString = `${Math.abs(value) / 100}`;
+    if (value < 0) { thousands = 'dash'; }
+    value = Math.abs(value);
+    if ((value >= 100) && (value < 1000)) {
+      ones = 'n';
+      tens = tensString[0];
+      hundreds = '0';
+    } else if (value >= 1000) {
+      ones = 'n';
+      tens = (`${value}`)[1];
+      hundreds = (`${value}`)[0];
+    } else if ((value < 100) && (value >= 10)) {
+      ones = 'c';
+      tens = (`${value}`)[1];
+      hundreds = (`${value}`)[0];
+    } else if (value < 10) {
+      ones = 'c';
+      tens = (`${value}`)[0];
+      hundreds = '0';
+    }
+    return [thousands, hundreds, tens, ones];
+  };
+
+  this.octaveString = function(value) {
+    let ones = undefined;
+    switch (true) {
+      case value < 22:
+        ones = '1';
+        break;
+      case (value >= 22) && (value < 44):
+        ones = '2';
+        break;
+      case (value >= 44) && (value < 66):
+        ones = '3';
+        break;
+      case (value >= 66) && (value < 88):
+        ones = '4';
+        break;
+      case (value >= 88) && (value < 110):
+        ones = '5';
+        break;
+      case (value >= 110) && (value <= 127):
+        ones = '6';
+        break;
+    }
+    return (`o c t ${ones}`).split(' ');
+  };
+
+  this.noteString = function(value) {
+    let ones = undefined;
+    const thousands = 'o';
+    const hundreds = 'c';
+    let tens = 't';
+    switch (true) {
+      case value < 9:
+        tens = 'dash';
+        ones = '1';
+        break;
+      case (value >= 9) && (value < 21):
+        ones = '0';
+        break;
+      case (value >= 21) && (value < 33):
+        ones = '1';
+        break;
+      case (value >= 33) && (value < 45):
+        ones = '2';
+        break;
+      case (value >= 45) && (value < 57):
+        ones = '3';
+        break;
+      case (value >= 57) && (value < 69):
+        ones = '4';
+        break;
+      case (value >= 69) && (value < 81):
+        ones = '5';
+        break;
+      case (value >= 81) && (value < 93):
+        ones = '6';
+        break;
+      case (value >= 93) && (value < 105):
+        ones = '7';
+        break;
+      case (value >= 105) && (value < 117):
+        ones = '8';
+        break;
+      case value > 117:
+        ones = '9';
+        break;
+    }
+    return [thousands, hundreds, tens, ones];
+  };
+
+  this.midiString = function(value) {
+    let hundreds, ones, tens;
+    const thousands = 'blank';
+    if (value > 99) {
+      hundreds = (`${value}`)[0];
+      tens = (`${value}`)[1];
+      ones = (`${value}`)[2];
+    } else if (value > 9) {
+      hundreds = 'blank';
+      tens = (`${value}`)[0];
+      ones = (`${value}`)[1];
+    } else {
+      hundreds = 'blank';
+      tens = 'blank';
+      ones = `${value}`;
+    }
+    return [thousands, hundreds, tens, ones];
+  };
+
+  this.update = function(value, displayStyle) {
+    const displayString = this[displayStyle](value);
+    const digits = [this.digit1, this.digit2, this.digit3, this.digit4];
+
+    const flip = function(digit, char) {
+      digit.setSprite(char);
+      return $(digit.element).css('background-position', digit.calculateClockOffset(char, 1) + '% 0');
+    };
+
+    for (let i = 0; i < digits.length; i++) { const digit = digits[i]; flip(digits[i], displayString[i]); }
+  };
+
+  this.digit1 = new Digit($('#thousands'));
+  this.digit2 = new Digit($('#hundreds'));
+  this.digit3 = new Digit($('#tens'));
+  this.digit4 = new Digit($('#ones'));
+  this.vcoPitchValues = [
+    -1200,-1200,-1100,-1000,-900,-800,-700,-600,-500,-400,-300,-200,-100,-96,-92,
+    -88,-84,-80,-78,-76,-74,-72,-70,-68,-66,-64,-62,-60,-58,-56,-54,-52,-50,-48,
+    -46,-44,-42,-40,-38,-36,-34,-32,-30,-28,-26,-24,-22,-20,-18,-16,-14,-12,-10,
+    -8,-6,-4,-2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,4,6,8,10,12,14,16,18,20,22,24,26,
+    28,30,32,34,36,38,40,42,44,46,48,50,52,54,56,58,60,62,64,66,68,70,72,74,76,
+    78,80,84,88,92,96,100,200,300,400,500,600,700,800,900,1000,1100,1200,1200
+  ];
+};

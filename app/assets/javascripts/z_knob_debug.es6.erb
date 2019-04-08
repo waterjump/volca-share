@@ -1,0 +1,18 @@
+<% if Rails.env.test? %>
+$(function() {
+  $('.knob').each(function() {
+    const st = $(this).css('transform');
+    if (st !== 'none') {
+      const values = st.split('(')[1].split(')')[0].split(',');
+      const a = values[0];
+      const b = values[1];
+      const c = values[2];
+      const d = values[3];
+      const scale = Math.sqrt((a * a) + (b * b));
+      const sin = b / scale;
+      const angle = Math.round((Math.atan2(b, a) * 180) / Math.PI);
+      $(`span.${$(this).attr('id')}`).html(angle);
+    }
+  });
+});
+<% end %>
