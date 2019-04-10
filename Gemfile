@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '2.3.3'
+ruby '2.6.1'
 
 source 'https://rubygems.org'
 
@@ -55,7 +55,7 @@ group :test do
   gem 'simplecov', require: false
   gem 'timecop'
   gem 'vcr'
-  gem 'webmock'
+  gem 'webmock', '~> 3.5.0'
 end
 
 group :development do

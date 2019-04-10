@@ -130,7 +130,7 @@ GEM
       haml (>= 4.0.6, < 6.0)
       html2haml (>= 1.0.1)
       railties (>= 4.0.1)
-    hashdiff (0.3.7)
+    hashdiff (0.3.8)
     html2haml (2.2.0)
       erubis (~> 2.7.0)
       haml (>= 4.0, < 6)
@@ -281,7 +281,7 @@ GEM
     ruby_http_client (3.3.0)
     ruby_parser (3.11.0)
       sexp_processor (~> 4.9)
-    safe_yaml (1.0.4)
+    safe_yaml (1.0.5)
     sass (3.5.5)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
@@ -339,7 +339,7 @@ GEM
       binding_of_caller (>= 0.7.2)
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
-    webmock (3.3.0)
+    webmock (3.5.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
       hashdiff
@@ -403,10 +403,10 @@ DEPENDENCIES
   uglifier (>= 1.3.0)
   vcr
   web-console (~> 2.0)
-  webmock
+  webmock (~> 3.5.0)
 
 RUBY VERSION
-   ruby 2.3.3p222
+   ruby 2.6.1p33
 
 BUNDLED WITH
-   1.16.1
+   1.17.2
