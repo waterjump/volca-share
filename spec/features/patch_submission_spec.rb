@@ -46,6 +46,7 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
 
     it 'directs user to show patch page' do
       expect(current_path).to eq(patch_path(Patch.first))
+      expect(page).to have_title("#{dummy_patch.name} by ¯\\_(ツ)_/¯ | VolcaShare")
     end
   end
 

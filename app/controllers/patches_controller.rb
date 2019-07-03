@@ -138,7 +138,7 @@ class PatchesController < ApplicationController
         Patch.find(params[:slug]) # HACK: this is actually the id (-_-,)
       end
     @patch = VolcaShare::PatchViewModel.wrap(patch_model)
-    user = " by #{@patch.user.try(:username)}" || ''
+    user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"
     @title = "#{@patch.name}#{user}"
   end
 
