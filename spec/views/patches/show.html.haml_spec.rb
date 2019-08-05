@@ -58,6 +58,16 @@ RSpec.describe 'patches/show.html.haml', type: :view do
       end
     end
 
+    context 'when audio sample code is not present' do
+      before { allow(@patch).to receive(:audio_sample_code).and_return(nil) }
+
+      it 'does not show audio sample section title' do
+        render
+
+        expect(rendered).not_to have_content('Audio sample')
+      end
+    end
+
     context 'when user is not author' do
       before do
         render(

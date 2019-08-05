@@ -155,6 +155,23 @@ module VolcaShare
     end
 
     describe '#audio_sample_code' do
+      context 'when audio sample is from soundcloud' do
+        context 'and url is not found' do
+          subject do
+            PatchViewModel.wrap(
+              FactoryBot.build(
+                :patch,
+                audio_sample: 'https://soundcloud.com/volcashare/temp'
+              )
+            )
+          end
+
+          it 'returns nil' do
+            expect(subject.audio_sample_code).to be_nil
+          end
+        end
+      end
+
       context 'when freesound id is short' do
         subject do
           PatchViewModel.wrap(

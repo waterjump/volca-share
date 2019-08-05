@@ -10,22 +10,26 @@ $(function() {
     const slug = $(this).data('slug');
     $.ajax({
       url: `/oembed?slug=${slug}`,
-      data: { format: 'json'
-    },
+      data: { format: 'json' },
       error(jqXHR, textStatus, errorThrown) {
         // alert(errorThrown);
       },
       success(data) {
-        $('#preview-modal-body').html(data['audio_sample_code']);
         $('#audioPreviewModaLabel').html(`Preview: ${data['name']}`);
         $('#go-to-patch').attr('href', data['patch_location']);
-        if (/youtu\.?be/.test(data['audio_sample_code'])) {
-          $('#preview-modal-body').height('270px');
-          $('iframe').css({'margin': '0 auto 0 42px'});
-        }
-        if (/freesound/.test(data['audio_sample_code'])) {
-          $('#preview-modal-body').height('30px');
-          $('iframe').css({'margin': '0 auto 0 87px'});
+
+        if(data['audio_sample_code'] == null) {
+          $('#preview-modal-body').html('Whoops! This preview isn\'t avaiable.')
+        } else {
+          $('#preview-modal-body').html(data['audio_sample_code']);
+          if (/youtu\.?be/.test(data['audio_sample_code'])) {
+            $('#preview-modal-body').height('270px');
+            $('iframe').css({'margin': '0 auto 0 42px'});
+          }
+          if (/freesound/.test(data['audio_sample_code'])) {
+            $('#preview-modal-body').height('30px');
+            $('iframe').css({'margin': '0 auto 0 87px'});
+          }
         }
       }
     });
