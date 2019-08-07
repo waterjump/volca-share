@@ -112,14 +112,14 @@ class Patch
   def calculate_quality
     qual = 1
     qual += 1 if sequences.any?
-    qual += 1 if audio_sample.present?
+    qual += 3 if audio_sample.present?
     qual += 1 if tags.any?
     qual += 0.5 if notes.present?
     qual += 2 if notes.length > 30
 
     base_score = Math.log([qual, 1].max)
 
-    time_difference = (Time.now - created_at) / 2.month.to_f
+    time_difference = (Time.now - created_at) / 2.years.to_f
 
     if time_difference > 1
       x = time_difference - 1
