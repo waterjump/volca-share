@@ -46,12 +46,13 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
   end
 
   context 'when user is logged in' do
-    it 'allows user to delete their own patches' do
+    it 'allows user to delete their own patches', js: true do
       FactoryBot.create(:patch, user_id: user.id)
 
       login
       visit patches_path
-      click_button('Delete')
+
+      accept_confirm { click_button('Delete') }
 
       expect(page).to have_content('No patches to show.')
     end

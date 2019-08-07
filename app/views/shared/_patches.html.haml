@@ -47,5 +47,5 @@
           - if current_user.present? && patch.user == current_user
             = link_to edit_patch_path(patch.slug) do
               .edit.glyph
-            = form_tag patch_path(patch.slug), method: :delete, class: :dekete_form do
+            = form_tag patch_path(patch.slug), method: :delete, class: :delete_form, data: { confirm: 'Are you sure you want to delete that patch?' } do
               = submit_tag 'Delete', class: 'delete glyph'
