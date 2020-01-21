@@ -21,5 +21,9 @@ Rails.application.routes.draw do
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get
 
+  namespace 'keys' do
+    resources :patches, only: [:new]
+  end
+
   root 'patches#new'
 end
