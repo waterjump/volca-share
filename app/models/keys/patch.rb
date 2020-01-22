@@ -6,6 +6,8 @@ module Keys
     include Mongoid::Timestamps
     include Mongoid::Document::Taggable
     include ActiveModel::Validations
+
+    field :name, type: String
   end
 end
 
