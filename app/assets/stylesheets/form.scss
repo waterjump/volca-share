@@ -27,6 +27,27 @@ $pink: #fd9994;
   max-width: 830px;
   .volca.keys {
     background-image: image_url('VolcaKeys-small.jpg');
+    .first-row {
+      top: 17.7%;
+    }
+    .second-row {
+      top: 29.5%;
+    }
+    .third-row {
+      top: 41.3%;
+    }
+    .vco-column {
+      left: 20.6%;
+    }
+    .vcf-column {
+      left: 30.5%;
+    }
+    .lfo-column {
+      left: 40.2%;
+    }
+    .eg-column {
+      left: 50%;
+    }
   }
   .volca {
     width: 100%;
@@ -68,10 +89,6 @@ $pink: #fd9994;
       top: 11.15%
     }
 
-    #attack {
-      left: 33.3%;
-    }
-
     #decay_release {
       left: 42.2%;
     }
@@ -83,16 +100,6 @@ $pink: #fd9994;
     #octave {
       left: 2.8%;
       top: 32.5%;
-    }
-
-    #peak {
-      top: 32.45%;
-      left: 14.6%;
-    }
-
-    #cutoff {
-      top: 28.8%;
-      left: 25%;
     }
 
     .lfo {
@@ -226,6 +233,22 @@ $pink: #fd9994;
           }
         }
       }
+    }
+  }
+  .volca.bass {
+    // TODO: Move bass specific stuff here
+    #attack {
+      left: 33.3%;
+    }
+
+    #cutoff {
+      top: 28.8%;
+      left: 25%;
+    }
+
+    #peak {
+      top: 32.45%;
+      left: 14.6%;
     }
   }
 }
@@ -412,9 +435,6 @@ fieldset {
       .eg {
         top: 14.15%;
       }
-      #attack {
-        left: 34.875%;
-      }
       #decay_release {
         left: 43.9%;
       }
@@ -424,14 +444,6 @@ fieldset {
       #octave {
         left: 4.4%;
         top: 35%;
-      }
-      #peak {
-        top: 35%;
-        left: 16.25%;
-      }
-      #cutoff {
-        top: 31.5%;
-        left: 26.5%;
       }
       .lfo {
         top: 35%;
@@ -472,6 +484,22 @@ fieldset {
             }
           }
         }
+      }
+    }
+    .volca.bass {
+      // TODO: Move Bass specific stuff here
+      #attack {
+        left: 34.875%;
+      }
+
+      #cutoff {
+        top: 31.5%;
+        left: 26.5%;
+      }
+
+      #peak {
+        top: 35%;
+        left: 16.25%;
       }
     }
   }
