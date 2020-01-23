@@ -401,7 +401,24 @@ fieldset {
       background-image: image_url('VolcaBass-medium.jpg');
     }
     .volca.keys {
-      background-image: image_url('VolcaKeys-medium.jpg');
+      .dark {
+        left: 8.2%;
+        width: 7.7%;
+        height: percentage(7.7 * $aspect);
+        background-color: #333;
+        .notch {
+          background-color: #ddd;
+          height: 23%;
+        }
+      }
+      #voice {
+        top: 20.5%;
+      }
+      #octave {
+        left: 8.2%;
+        top: 40.5%;
+      }
+      background-image: image_url('VolcaKeys-medium-shopped.jpg');
     }
   }
   .bottom-row {
