@@ -143,7 +143,11 @@ class PatchesController < ApplicationController
   end
 
   def patch_created?
-    (@patch.user.present? || verify_recaptcha(model: @patch)) && @patch.save
+    (
+      @patch.user.present? ||
+      (!Rails.env.production? || verify_recaptcha(model: @patch))
+    ) &&
+      @patch.save
   end
 
   def format_tags
