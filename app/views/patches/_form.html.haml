@@ -5,11 +5,11 @@
 #interface.col-lg-9.form
   .stretchy
     .volca.bass
-      .small.knob.eg.midi-enabled#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
+      .small.knob.eg.midi-enabled.lit#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
         .notch
-      .small.knob.eg.midi-enabled#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
+      .small.knob.eg.midi-enabled.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
         .notch
-      .small.knob.eg.midi-enabled#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
+      .small.knob.eg.midi-enabled.lit#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
         .notch
       #led
         .digit#thousands

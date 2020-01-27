@@ -22,7 +22,7 @@ module VolcaShare
 
     def lit?(field)
       return 'lit' if model.send(field)
-      ''
+      'unlit'
     end
 
     def index_classes

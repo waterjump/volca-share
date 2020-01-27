@@ -72,7 +72,6 @@ $pink: #fd9994;
     .small {
       width: 7%;
       height: percentage(7 * $aspect);
-      background-color: $pink;
     }
 
     .medium {
@@ -116,7 +115,6 @@ $pink: #fd9994;
 
     .vco {
       top: 35.2%;
-      background-color: #d6d7dc;
     }
 
     #vco1_pitch {
@@ -264,6 +262,10 @@ $pink: #fd9994;
     height: 25%;
     left: 46%;
   }
+}
+
+.knob.unlit {
+  background-color: #d6d7dc !important;
 }
 
 .lit {

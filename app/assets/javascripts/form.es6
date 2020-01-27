@@ -113,6 +113,7 @@ VS.Form = function() {
     const input = $(`input#patch_${$(this).attr('id').split('_').slice(0, -1).join('_')}`);
     $(this).toggleClass('lit');
     vcoKnob.toggleClass('lit');
+    vcoKnob.toggleClass('unlit');
     $(this).data('active', !value);
     input.prop('checked', !value);
   });

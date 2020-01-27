@@ -104,12 +104,14 @@ module VolcaShare
           expect(subject.lit?(:amp_eg_on)).to eq('lit')
         end
       end
+
       context 'when field is false' do
-        it 'returns an empty string' do
-          expect(subject.lit?(:lfo_target_amp)).to eq('')
+        it 'returns unlit' do
+          expect(subject.lit?(:lfo_target_amp)).to eq('unlit')
         end
       end
     end
+
     describe '#index_classes' do
       context 'when patch is not secret and doesn\'t have audio' do
         subject do
