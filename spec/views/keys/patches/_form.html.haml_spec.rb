@@ -36,6 +36,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     expect(rendered).to have_css('#decay-release')
     expect(rendered).to have_css('#sustain')
     expect(rendered).to have_css('#delay-time')
+    expect(rendered).to have_css('#delay-feedback')
   end
 
   xit 'shows tag input placeholders' do
