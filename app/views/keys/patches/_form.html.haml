@@ -99,11 +99,22 @@
         -# STEP TRIGGER
         = check_box :patch,
                     :step_trigger,
-                    @patch.checked?('lfo_trigger_sync'),
+                    @patch.checked?('step_trigger'),
                     'true',
                     'false'
         = label_tag('patch[step_trigger]') do
           %span.on-off
             .light{ id: 'step_trigger_light',
                     class: @patch.lit?(:step_trigger) }
+
+        -# TEMPO SYNC
+        = check_box :patch,
+                    :tempo_sync,
+                    @patch.checked?('tempo_sync'),
+                    'true',
+                    step_trigger'false'
+        = label_tag('patch[tempo_sync]') do
+          %span.on-off
+            .light{ id: 'tempo_sync_light',
+                    class: @patch.lit?(:tempo_sync) }
 
