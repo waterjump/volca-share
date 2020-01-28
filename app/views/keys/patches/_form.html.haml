@@ -42,18 +42,48 @@
         .placeholder
         .placeholder
         .placeholder
-        = radio_button_tag 'patch[lfo_shape]', 'saw', @patch.lfo_shape_saw, class: :control
+
+        -# LFO SHAPE SAW
+        = radio_button_tag 'patch[lfo_shape]',
+                           'saw',
+                           @patch.lfo_shape_saw,
+                           class: :control
         = label_tag('patch[lfo_shape_saw]') do
           %span.multi
-            .note-light.note-0.lit
-            .light{ id: 'lfo_shape_saw_light', data: { radio: true }, class: @patch.lfo_shape_saw ? 'lit' : '' }
-        = radio_button_tag 'patch[lfo_shape]', 'tri', @patch.lfo_shape_tri, class: :control
+            .light{ id: 'lfo_shape_saw_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_saw ? 'lit' : '' }
+
+
+        -# LFO SHAPE TRI
+        = radio_button_tag 'patch[lfo_shape]',
+                           'tri',
+                           @patch.lfo_shape_tri,
+                           class: :control
         = label_tag('patch[lfo_shape_tri]') do
           %span.multi
-            .note-light.note-0.lit
-            .light{ id: 'lfo_shape_tri_light', data: { radio: true }, class: @patch.lfo_shape_tri ? 'lit' : '' }
-        = radio_button_tag 'patch[lfo_shape]', 'square', @patch.lfo_shape_square, class: :control
+            .light{ id: 'lfo_shape_tri_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_tri ? 'lit' : '' }
+
+        -# LFO SHAPE SQUARE
+        = radio_button_tag 'patch[lfo_shape]',
+                           'square',
+                           @patch.lfo_shape_square,
+                           class: :control
         = label_tag('patch[lfo_shape_square]') do
           %span.multi
-            .note-light.note-0.lit
-            .light{ id: 'lfo_shape_square_light', data: { radio: true }, class: @patch.lfo_shape_square ? 'lit' : '' }
+            .light{ id: 'lfo_shape_square_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_square ? 'lit' : '' }
+
+        -# LFO TRIGGER SYNC
+        = check_box :patch,
+                    :lfo_trigger_sync,
+                    @patch.checked?('lfo_trigger_sync'),
+                    'true',
+                    'false'
+        = label_tag('patch[lfo_trigger_sync]') do
+          %span.on-off
+            .light{ id: 'lfo_trigger_sync_light',
+                    class: @patch.lit?(:lfo_trigger_sync) }

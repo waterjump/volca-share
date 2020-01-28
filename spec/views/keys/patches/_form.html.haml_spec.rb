@@ -42,6 +42,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     expect(rendered).to have_css('#lfo_shape_saw_light')
     expect(rendered).to have_css('#lfo_shape_tri_light.lit')
     expect(rendered).to have_css('#lfo_shape_square_light')
+    expect(rendered).to have_css('#lfo_trigger_sync_light')
   end
 
   xit 'shows tag input placeholders' do
