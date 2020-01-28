@@ -92,3 +92,18 @@
         .placeholder
         .placeholder
         .placeholder
+
+        -# METRONOME
+        .placeholder
+
+        -# STEP TRIGGER
+        = check_box :patch,
+                    :step_trigger,
+                    @patch.checked?('lfo_trigger_sync'),
+                    'true',
+                    'false'
+        = label_tag('patch[step_trigger]') do
+          %span.on-off
+            .light{ id: 'step_trigger_light',
+                    class: @patch.lit?(:step_trigger) }
+

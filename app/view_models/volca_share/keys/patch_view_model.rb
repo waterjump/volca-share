@@ -21,6 +21,9 @@ module VolcaShare
       def lfo_trigger_sync
       end
 
+      def step_trigger
+      end
+
       def lit?(*args)
       end
 
