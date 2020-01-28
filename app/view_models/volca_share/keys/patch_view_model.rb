@@ -24,6 +24,9 @@ module VolcaShare
       def step_trigger
       end
 
+      def tempo_sync
+      end
+
       def lit?(*args)
       end
 
