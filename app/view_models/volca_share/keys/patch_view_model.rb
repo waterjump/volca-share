@@ -3,19 +3,29 @@
 module VolcaShare
   module Keys
     class PatchViewModel < ApplicationViewModel
+      # NOTE: All methods in this view model are stubs unless
+      #   specified otherwise.
+
       def lfo_shape_saw
-        # TODO: This is a stub
         true
       end
 
       def lfo_shape_tri
-        # TODO: This is a stub
         true
       end
 
       def lfo_shape_square
-        # TODO: This is a stub
         true
+      end
+
+      def lfo_trigger_sync
+      end
+
+      def lit?(*args)
+      end
+
+      def checked?(*args)
+        {}
       end
     end
   end
