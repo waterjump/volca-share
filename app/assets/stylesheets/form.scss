@@ -25,6 +25,8 @@ $pink: #fd9994;
   padding-bottom: percentage(1 / $aspect / 100);
   position: relative;
   max-width: 830px;
+
+  // NOTE: Keys specific SMALL size
   .volca.keys {
     background-image: image_url('VolcaKeys-small.jpg');
     .first-row {
@@ -233,6 +235,8 @@ $pink: #fd9994;
       }
     }
   }
+
+  // NOTE: Bass specific SMALL size
   .volca.bass {
     // TODO: Move bass specific stuff here
     #attack {
@@ -413,6 +417,16 @@ fieldset {
           height: 23%;
         }
       }
+
+      .bottom-row {
+        padding-left: 5%;
+        .placeholder {
+          float: left;
+          height: 100%;
+          width: 5.95%;
+        }
+      }
+
       #voice {
         top: 20.5%;
       }
