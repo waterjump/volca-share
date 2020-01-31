@@ -6,6 +6,18 @@ VS.Knob = function(element) {
   this.displayStyle = 'midiString';
   this.inputElement = $(`input#patch_${$(this.element).attr('id')}`);
 
+  const setLimits = function() {
+    if ($(scope.element).hasClass('dark')) {
+      scope.leftLimit = -90;
+      scope.rightLimit = 60;
+    } else {
+      scope.leftLimit = -140;
+      scope.rightLimit = 140;
+    }
+  }
+
+  setLimits();
+
   const setDisplayStyle = function() {
     if ($(scope.element).attr('id').split('_')[1] === 'pitch') {
       scope.displayStyle = 'pitchString';

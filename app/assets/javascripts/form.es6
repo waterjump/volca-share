@@ -146,20 +146,65 @@ VS.Form = function() {
     sequences.changeSequenceNote(e);
   });
 
+  const calculateDegree = function() {
+    if ($(VS.activeKnob.element).hasClass('dark')) {
+      // SNAP KNOBS
+      // I suspect this is slow.
+      difference = VS.clickedPoint - VS.currentPoint;
+
+      if (difference > -15 && difference <= 15) {
+        return VS.activeKnob.rotation;
+      } else if (difference <= -135) {
+        snapped_degree = -150;
+      } else if (difference > -135 && difference <= -105) {
+        snapped_degree = -120;
+      } else if (difference > -105 && difference <= -75) {
+        snapped_degree = -90;
+      } else if (difference > -75 && difference <= -45) {
+        snapped_degree = -60;
+      } else if (difference > -45 && difference <= -15) {
+        snapped_degree = -30;
+      } else if (difference > 15 && difference <= 45) {
+        snapped_degree = 30;
+      } else if (difference > 45 && difference <= 75) {
+        snapped_degree = 60;
+      } else if (difference > 75 && difference <= 105) {
+        snapped_degree = 90;
+      } else if (difference > 105 && difference <= 135) {
+        snapped_degree = 120;
+      } else if (difference > 135) {
+        snapped_degree = 150;
+      }
+
+      return VS.activeKnob.rotation + snapped_degree;
+    } else {
+      // GLIDE KNOBS
+      return (VS.activeKnob.rotation + VS.clickedPoint) - VS.currentPoint;
+    }
+  };
+
   var turnKnob = function(e) {
     if (VS.activeKnob === null) { return; }
-    let degree = (VS.activeKnob.rotation + VS.clickedPoint) - VS.currentPoint;
-    if (degree > limit) {
-      VS.activeKnob.rotation = limit;
+
+    let degree = calculateDegree();
+
+    const leftLimit = VS.activeKnob.leftLimit;
+    const rightLimit = VS.activeKnob.rightLimit;
+
+    if (degree > rightLimit) {
+      VS.activeKnob.rotation = rightLimit;
       VS.clickedPoint = VS.currentPoint;
     }
-    if (degree < -limit) {
-      VS.activeKnob.rotation = -limit;
+    if (degree < leftLimit) {
+      VS.activeKnob.rotation = leftLimit;
       VS.clickedPoint = VS.currentPoint;
     }
-    degree = (VS.activeKnob.rotation + VS.clickedPoint) - VS.currentPoint;
-    if ((VS.currentPoint !== VS.clickedPoint) || (degree === -limit) || (degree === limit)) {
+
+    degree = calculateDegree();
+
+    if ((VS.currentPoint !== VS.clickedPoint) || (degree === leftLimit) || (degree === rightLimit)) {
       VS.activeKnob.rotate(degree);
+      // TODO: The following line is only correct for glide knobs
       midi = Math.round(((63.5 / limit) * degree) + 63.5);
       if (midiOut.ready()) {
         midiOut.output.sendControlChange(
@@ -186,13 +231,16 @@ VS.Form = function() {
 
   var endKnobTurn = function() {
     if (VS.activeKnob === null) { return; }
-    const currentAngle = (VS.activeKnob.rotation + VS.clickedPoint) - VS.currentPoint;
-    if (VS.activeKnob.rotation > limit) {
-      VS.activeKnob.rotation = limit;
+    const currentAngle = calculateDegree();
+    let leftLimit = VS.activeKnob.leftLimit;
+    let rightLimit = VS.activeKnob.rightLimit;
+
+    if (VS.activeKnob.rotation > rightLimit) {
+      VS.activeKnob.rotation = rightLimit;
       VS.currentPoint = VS.clickedPoint;
     }
-    if (VS.activeKnob.rotation < -limit) {
-      VS.activeKnob.rotation = -limit;
+    if (VS.activeKnob.rotation < leftLimit) {
+      VS.activeKnob.rotation = leftLimit;
       VS.currentPoint = VS.clickedPoint;
     }
     $(VS.activeKnob.element).data('rotation', currentAngle);
