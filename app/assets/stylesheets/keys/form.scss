@@ -1,72 +1,128 @@
 $aspect: 1800 / 1072 / 100;
 
-.stretchy {
-  // NOTE: SMALL size
-  .volca.keys {
-    background-image: image_url('VolcaKeys-small.jpg');
-    .first-row {
-      top: 17.7%;
+.volca.keys {
+  background-image: image_url('VolcaKeys-small-shopped.jpg');
+
+  .small {
+    width: 6%;
+    height: percentage(6 * $aspect);
+  }
+
+  .first-row {
+    top: 16.7%;
+  }
+
+  .second-row {
+    top: 28.5%;
+  }
+
+  .third-row {
+    top: 40.3%;
+  }
+
+  .vco-column {
+    left: 19.5%;
+  }
+
+  .vcf-column {
+    left: 29.3%;
+  }
+
+  .lfo-column {
+    left: 38.9%;
+  }
+
+  .eg-column {
+    left: 48.8%;
+  }
+
+  .dark {
+    left: 8.2%;
+    width: 7.7%;
+    height: percentage(7.7 * $aspect);
+    background-color: #333;
+
+    .notch {
+      background-color: #ddd;
+      height: 23%;
     }
-    .second-row {
-      top: 29.5%;
-    }
-    .third-row {
-      top: 41.3%;
-    }
-    .vco-column {
-      left: 20.6%;
-    }
-    .vcf-column {
-      left: 30.5%;
-    }
-    .lfo-column {
-      left: 40.2%;
-    }
-    .eg-column {
-      left: 50%;
+  }
+
+  #voice {
+    top: 20.5%;
+  }
+
+  #octave {
+    left: 8.2%;
+    top: 40.5%;
+  }
+
+  #delay-feedback {
+    left: 70.7%;
+    top: 27%;
+  }
+
+  #delay-time {
+    left: 61.7%;
+    top: 27%;
+  }
+
+  .bottom-row {
+    padding-left: 5%;
+
+    .placeholder {
+      float: left;
+      height: 100%;
+      width: 5.95%;
     }
   }
 }
 
-@media (min-width: 440px) {
-  .stretchy {
-    .volca.keys {
-      .dark {
-        left: 8.2%;
-        width: 7.7%;
-        height: percentage(7.7 * $aspect);
-        background-color: #333;
-        .notch {
-          background-color: #ddd;
-          height: 23%;
-        }
-      }
+@media (min-width: 768px) {
+  .volca.keys {
+    background-image: image_url('VolcaKeys-medium-shopped.jpg');
 
-      .bottom-row {
-        padding-left: 5%;
-        .placeholder {
-          float: left;
-          height: 100%;
-          width: 5.95%;
-        }
-      }
+    .small {
+      width: 3.6%;
+      height: percentage(3.6 * $aspect);
+    }
 
-      #voice {
-        top: 20.5%;
-      }
-      #octave {
-        left: 8.2%;
-        top: 40.5%;
-      }
-      #delay-time {
-        top: 28.2%;
-        left: 62.9%;
-      }
-      #delay-feedback {
-        top: 28.2%;
-        left: 71.8%;
-      }
-      background-image: image_url('VolcaKeys-medium-shopped.jpg');
+    .first-row {
+      top: 17.7%;
+    }
+
+    .second-row {
+      top: 29.5%;
+    }
+
+    .third-row {
+      top: 41.3%;
+    }
+
+    .vco-column {
+      left: 20.6%;
+    }
+
+    .vcf-column {
+      left: 30.5%;
+    }
+
+    .lfo-column {
+      left: 40.2%;
+    }
+
+    .eg-column {
+      left: 50%;
+    }
+
+    #delay-time {
+      top: 28.2%;
+      left: 62.9%;
+    }
+
+    #delay-feedback {
+      top: 28.2%;
+      left: 71.8%;
     }
   }
 }
