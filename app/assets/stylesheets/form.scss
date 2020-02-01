@@ -29,7 +29,6 @@ $pink: #fd9994;
   .volca {
     width: 100%;
     height: 100%;
-    background-image: image_url('VolcaBass-small.jpg');
     background-size: cover;
     position: absolute;
     top: 0;
@@ -61,89 +60,6 @@ $pink: #fd9994;
       height: percentage(13.5 * $aspect);
     }
 
-    .eg {
-      top: 11.15%
-    }
-
-    #decay_release {
-      left: 42.2%;
-    }
-
-    #cutoff_eg_int {
-      left: 51.2%;
-    }
-
-    #octave {
-      left: 2.8%;
-      top: 32.5%;
-    }
-
-    .lfo {
-      top: 32.4%;
-    }
-
-    #lfo_rate {
-      left:39.6%;
-    }
-
-    #lfo_int{
-      left: 50.9%;
-    }
-
-    .vco {
-      top: 35.2%;
-    }
-
-    #vco1_pitch {
-      left: 61.3%;
-    }
-
-    #vco2_pitch {
-      left: 70.3%;
-    }
-
-    #vco3_pitch {
-      left: 79.3%;
-    }
-
-    #led {
-      top: 49%;
-      left: 5.2%;
-      width: 16.5%;
-      height: 13.7%;
-      position: absolute;
-      background-color: #141414;
-    }
-
-    .digit {
-      background-image: image_url('numbers.jpg');
-      background-repeat: no-repeat;
-      width: 18.5%;
-      height: 100%;
-      display: inline-block;
-      margin: 0;
-      background-size: 1120%;
-      position: absolute;
-      top: 14%;
-      background-position: 99.5% 0;
-    }
-
-    #thousands {
-      left: 5%;
-    }
-
-    #hundreds {
-      left: 30%;
-    }
-
-    #tens {
-      left: 53%;
-    }
-
-    #ones {
-      left: 75%;
-    }
-
     .button {
       width: 6.4%;
       height: 6%;
@@ -152,18 +68,6 @@ $pink: #fd9994;
       background-color: #d6d7dc;
       border: solid black;
       border-radius: 5px;
-    }
-
-    #vco1_active_button {
-      left: 61.5%;
-    }
-
-    #vco2_active_button {
-      left: 70.6%;
-    }
-
-    #vco3_active_button {
-      left: 79.6%;
     }
 
     .bottom-row {
@@ -208,24 +112,6 @@ $pink: #fd9994;
           }
         }
       }
-    }
-  }
-
-  // NOTE: Bass specific SMALL size
-  .volca.bass {
-    // TODO: Move bass specific stuff here
-    #attack {
-      left: 33.3%;
-    }
-
-    #cutoff {
-      top: 28.8%;
-      left: 25%;
-    }
-
-    #peak {
-      top: 32.45%;
-      left: 14.6%;
     }
   }
 }
@@ -377,11 +263,6 @@ fieldset {
 }
 
 @media (min-width: 440px) {
-  .stretchy {
-    .volca {
-      background-image: image_url('VolcaBass-medium.jpg');
-    }
-  }
   .bottom-row {
     label {
       span {
@@ -410,43 +291,7 @@ fieldset {
         width: 10.5%;
         height: percentage(10.5 * $aspect);
       }
-      .eg {
-        top: 14.15%;
-      }
-      #decay_release {
-        left: 43.9%;
-      }
-      #cutoff_eg_int {
-        left: 52.915%;
-      }
-      #octave {
-        left: 4.4%;
-        top: 35%;
-      }
-      .lfo {
-        top: 35%;
-      }
 
-      #lfo_rate {
-        left:41.25%;
-      }
-
-      #lfo_int{
-        left: 52.5%;
-      }
-      .vco {
-        top: 37.2%;
-      }
-      #vco1_pitch {
-        left: 62.9%;
-      }
-      #vco2_pitch {
-        left: 71.9%;
-      }
-
-      #vco3_pitch {
-        left: 80.9%;
-      }
       .bottom-row {
         label {
           span {
@@ -462,22 +307,6 @@ fieldset {
             }
           }
         }
-      }
-    }
-    .volca.bass {
-      // TODO: Move Bass specific stuff here
-      #attack {
-        left: 34.875%;
-      }
-
-      #cutoff {
-        top: 31.5%;
-        left: 26.5%;
-      }
-
-      #peak {
-        top: 35%;
-        left: 16.25%;
       }
     }
   }

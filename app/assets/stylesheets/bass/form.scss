@@ -1,0 +1,181 @@
+.volca.bass {
+  background-image: image_url('VolcaBass-small.jpg');
+
+  .eg {
+    top: 11.15%
+  }
+
+  #attack {
+    left: 33.3%;
+  }
+
+  #decay_release {
+    left: 42.2%;
+  }
+
+  #cutoff_eg_int {
+    left: 51.2%;
+  }
+
+  #octave {
+    left: 2.8%;
+    top: 32.5%;
+  }
+
+  #cutoff {
+    top: 28.8%;
+    left: 25%;
+  }
+
+  #peak {
+    top: 32.45%;
+    left: 14.6%;
+  }
+
+  .lfo {
+    top: 32.4%;
+  }
+
+  #lfo_rate {
+    left:39.6%;
+  }
+
+  #lfo_int{
+    left: 50.9%;
+  }
+
+  .vco {
+    top: 35.2%;
+  }
+
+  #vco1_pitch {
+    left: 61.3%;
+  }
+
+  #vco2_pitch {
+    left: 70.3%;
+  }
+
+  #vco3_pitch {
+    left: 79.3%;
+  }
+
+  #vco1_active_button {
+    left: 61.5%;
+  }
+
+  #vco2_active_button {
+    left: 70.6%;
+  }
+
+  #vco3_active_button {
+    left: 79.6%;
+  }
+
+  #led {
+    top: 49%;
+    left: 5.2%;
+    width: 16.5%;
+    height: 13.7%;
+    position: absolute;
+    background-color: #141414;
+  }
+
+  .digit {
+    background-image: image_url('numbers.jpg');
+    background-repeat: no-repeat;
+    width: 18.5%;
+    height: 100%;
+    display: inline-block;
+    margin: 0;
+    background-size: 1120%;
+    position: absolute;
+    top: 14%;
+    background-position: 99.5% 0;
+  }
+
+  #thousands {
+    left: 5%;
+  }
+
+  #hundreds {
+    left: 30%;
+  }
+
+  #tens {
+    left: 53%;
+  }
+
+  #ones {
+    left: 75%;
+  }
+}
+
+@media (min-width: 440px) {
+  .volca.bass {
+    background-image: image_url('VolcaBass-medium.jpg');
+  }
+}
+
+@media (min-width: 768px) {
+  .volca.bass {
+    .eg {
+      top: 14.15%;
+    }
+
+    #attack {
+      left: 34.875%;
+    }
+
+    #decay_release {
+      left: 43.9%;
+    }
+
+    #cutoff_eg_int {
+      left: 52.915%;
+    }
+
+    #octave {
+      left: 4.4%;
+      top: 35%;
+    }
+
+    .lfo {
+      top: 35%;
+    }
+
+    #lfo_rate {
+      left:41.25%;
+    }
+
+    #lfo_int{
+      left: 52.5%;
+    }
+
+    .vco {
+      top: 37.2%;
+    }
+
+    #vco1_pitch {
+      left: 62.9%;
+    }
+
+    #vco2_pitch {
+      left: 71.9%;
+    }
+
+    #vco3_pitch {
+      left: 80.9%;
+    }
+
+    #cutoff {
+      top: 31.5%;
+      left: 26.5%;
+    }
+
+    #peak {
+      top: 35%;
+      left: 16.25%;
+    }
+  }
+}
