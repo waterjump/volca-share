@@ -4,10 +4,6 @@ def midi_range
   0..127
 end
 
-def one_to_sixteen
-  1..16
-end
-
 FactoryBot.define do
   factory :patch do |_p|
     name { FFaker::Lorem.characters(10) }
@@ -52,29 +48,5 @@ FactoryBot.define do
         build_list(:sequence, evaluator.sequence_count, patch: patch)
       end
     end
-  end
-
-  factory :sequence do |_s|
-    patch
-    after(:build) do |sequence, _evaluator|
-      16.times do |index|
-        sequence.steps << build(:step, index: index + 1)
-      end
-    end
-  end
-
-  factory :step do
-    index one_to_sixteen.to_a.sample
-    note midi_range.to_a.sample
-    step_mode { FFaker::Boolean.maybe }
-    slide { FFaker::Boolean.maybe }
-    active_step { FFaker::Boolean.maybe }
-  end
-
-  factory :user do
-    username { FFaker::Internet.user_name[0..19] }
-    email { FFaker::Internet.email }
-    password { Devise.friendly_token.first(8) }
-    slug { username.parameterize }
   end
 end
