@@ -50,18 +50,22 @@ class Patch
   embeds_many :sequences, class_name: 'Sequence'
   accepts_nested_attributes_for :sequences, allow_destroy: true
 
+  midi_validation_options = {
+    numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
+  }
+
   validates_presence_of :name, :slug
   validates_uniqueness_of :name, :slug
-  validates :attack, numericality: { greater_than: -1, less_than: 128 }
-  validates :decay_release, numericality: { greater_than: -1, less_than: 128 }
-  validates :cutoff_eg_int, numericality: { greater_than: -1, less_than: 128 }
-  validates :peak, numericality: { greater_than: -1, less_than: 128 }
-  validates :cutoff, numericality: { greater_than: -1, less_than: 128 }
-  validates :lfo_rate, numericality: { greater_than: -1, less_than: 128 }
-  validates :lfo_int, numericality: { greater_than: -1, less_than: 128 }
-  validates :vco1_pitch, numericality: { greater_than: -1, less_than: 128 }
-  validates :vco2_pitch, numericality: { greater_than: -1, less_than: 128 }
-  validates :vco3_pitch, numericality: { greater_than: -1, less_than: 128 }
+  validates :attack, midi_validation_options
+  validates :decay_release, midi_validation_options
+  validates :cutoff_eg_int, midi_validation_options
+  validates :peak, midi_validation_options
+  validates :cutoff, midi_validation_options
+  validates :lfo_rate, midi_validation_options
+  validates :lfo_int, midi_validation_options
+  validates :vco1_pitch, midi_validation_options
+  validates :vco2_pitch, midi_validation_options
+  validates :vco3_pitch, midi_validation_options
   validates :audio_sample, audio_sample: true
   validate :patch_is_not_default
 
