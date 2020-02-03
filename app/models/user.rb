@@ -28,6 +28,7 @@ class User
   field :last_sign_in_ip,    type: String
 
   has_many :patches, class_name: 'Patch'
+  has_many :keys_patches, class_name: 'Keys::Patch'
   field :slug, type: String
 
   ## Confirmable

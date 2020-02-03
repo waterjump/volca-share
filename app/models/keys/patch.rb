@@ -33,6 +33,11 @@ module Keys
     field :step_trigger, type: Boolean, default: false
     field :tempo_delay, type: Boolean, default: true
 
+    belongs_to :user,
+               class_name: 'User',
+               inverse_of: :keys_patches,
+               optional: true
+
     midi_validation_options = {
       numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
     }
@@ -40,20 +45,20 @@ module Keys
     validates_presence_of :name, :slug
     validates :voice, inclusion: { in: [0, 19, 38, 57, 76, 95] }
     validates :octave, inclusion: { in: [0, 19, 38, 57, 76, 95] }
-    validates :detune, :only_integer, midi_validation_options
-    validates :portamento, :only_integer, midi_validation_options
-    validates :vco_eg_int, :only_integer, midi_validation_options
-    validates :cutoff, :only_integer, midi_validation_options
-    validates :peak, :only_integer, midi_validation_options
-    validates :vcf_eg_int, :only_integer, midi_validation_options
-    validates :lfo_rate, :only_integer, midi_validation_options
-    validates :lfo_pitch_int, :only_integer, midi_validation_options
-    validates :lfo_cutoff_int, :only_integer, midi_validation_options
-    validates :attack, :only_integer, midi_validation_options
-    validates :decay_release, :only_integer, midi_validation_options
-    validates :sustain, :only_integer, midi_validation_options
-    validates :delay_time, :only_integer, midi_validation_options
-    validates :delay_feedback, :only_integer, midi_validation_options
+    validates :detune, midi_validation_options
+    validates :portamento, midi_validation_options
+    validates :vco_eg_int, midi_validation_options
+    validates :cutoff, midi_validation_options
+    validates :peak, midi_validation_options
+    validates :vcf_eg_int, midi_validation_options
+    validates :lfo_rate, midi_validation_options
+    validates :lfo_pitch_int, midi_validation_options
+    validates :lfo_cutoff_int, midi_validation_options
+    validates :attack, midi_validation_options
+    validates :decay_release, midi_validation_options
+    validates :sustain, midi_validation_options
+    validates :delay_time, midi_validation_options
+    validates :delay_feedback, midi_validation_options
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
   end
 end

@@ -12,6 +12,11 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { registrations: 'users/registrations' }
   resources :user, user_options do
     resources :patch, only: [:show], param: :slug, controller: 'patches'
+    resources :keys_patch,
+              only: [:show],
+              param: :slug,
+              controller: 'keys/patches',
+              path: 'keys'
   end
 
   resources :patch, param: :slug, controller: 'patches', except: [:index]
@@ -22,7 +27,8 @@ Rails.application.routes.draw do
   match 'oembed' => 'patches#oembed', via: :get
 
   namespace 'keys' do
-    resources :patches, only: [:new]
+    resources :patch, controller: 'patches', only: [:new, :show]
+    post 'patch' => 'patches#create'
   end
 
   root 'patches#new'
