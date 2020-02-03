@@ -4,7 +4,8 @@ require 'rails_helper'
 
 module Keys
   RSpec.describe PatchesController, type: :controller do
-    let(:valid_attributes) { attributes_for(:patch) }
+    let(:valid_attributes) { attributes_for(:keys_patch) }
+    let(:invalid_attributes) { attributes_for(:keys_patch, attack: 'bort') }
     let(:valid_session) { {} }
 
     describe 'GET #new' do
@@ -42,6 +43,27 @@ module Keys
         it 'redirects to anonymous patch show page' do
           post :create, params: { patch: params }, session: valid_session
           expect(response).to redirect_to(keys_patch_path(Patch.last.id))
+        end
+      end
+
+      context 'when parameters are invalid' do
+        it 'does not create a patch' do
+          expect do
+            post(
+              :create,
+              params: { patch: invalid_attributes },
+              session: valid_session
+            )
+          end.not_to change { Patch.count }
+        end
+
+        it 'redirects to edit path' do
+          post(
+            :create,
+            params: { patch: invalid_attributes },
+            session: valid_session
+          )
+          expect(response).to render_template('patches/new')
         end
       end
     end
