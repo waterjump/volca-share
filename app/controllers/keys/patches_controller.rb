@@ -22,8 +22,7 @@ module Keys
 
           format.json { :no_content }
         else
-          # TODO: Redirect to edit page and show errors
-          format.html { :no_content }
+          format.html { render 'patches/new', local: { patch: @patch } }
           format.json { :no_content }
         end
       end
@@ -32,7 +31,13 @@ module Keys
     private
 
     def patch_params
-      @patch_params ||= params.require(:patch).permit(:name)
+      @patch_params ||=
+        params
+          .require(:patch)
+          .permit(
+            :name,
+            :attack
+          )
     end
 
     def patch_location
