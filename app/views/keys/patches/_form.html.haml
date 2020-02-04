@@ -63,12 +63,12 @@
 
         -# LFO SHAPE TRI
         = radio_button_tag 'patch[lfo_shape]',
-                           'tri',
+                           'triangle',
                            @patch.lfo_shape_tri,
                            class: :control
-        = label_tag('patch[lfo_shape_tri]') do
+        = label_tag('patch[lfo_shape_triangle]') do
           %span.multi
-            .light{ id: 'lfo_shape_tri_light',
+            .light{ id: 'lfo_shape_triangle_light',
                     data: { radio: true },
                     class: @patch.lfo_shape_tri ? 'lit' : '' }
 
@@ -113,14 +113,41 @@
             .light{ id: 'step_trigger_light',
                     class: @patch.lit?(:step_trigger) }
 
-        -# TEMPO SYNC
+        -# TEMPO DELAY
         = check_box :patch,
-                    :tempo_sync,
-                    @patch.checked?('tempo_sync'),
+                    :tempo_delay,
+                    @patch.checked?('tempo_delay'),
                     'true',
                     'false'
-        = label_tag('patch[tempo_sync]') do
+        = label_tag('patch[tempo_delay]') do
           %span.on-off
-            .light{ id: 'tempo_sync_light',
-                    class: @patch.lit?(:tempo_sync) }
+            .light{ id: 'tempo_delay_light',
+                    class: @patch.lit?(:tempo_delay) }
 
+.col-lg-3.col-md-9#patch-metadata
+  %fieldset
+    .field
+      = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
+      = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+
+
+  = range_field_tag 'patch[voice]', (@patch.voice || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[octave]', (@patch.octave || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[detune]', (@patch.detune || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[portamento]', (@patch.portamento || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vco_eg_int]', (@patch.vco_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[peak]', (@patch.peak || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vcf_eg_int]', (@patch.vcf_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_pitch_int]', (@patch.lfo_pitch_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_cutoff_int]', (@patch.lfo_cutoff_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[attack]', (@patch.attack || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[sustain]', (@patch.sustain || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
+
+#save_or_cancel.col-sm-12
+  .actions
+    = submit_tag 'Save', class: 'btn btn-primary'

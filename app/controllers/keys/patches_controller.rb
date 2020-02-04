@@ -16,10 +16,7 @@ module Keys
 
       respond_to do |format|
         if @patch.save
-          format.html do
-            redirect_to patch_location
-          end
-
+          format.html { redirect_to patch_location }
           format.json { :no_content }
         else
           format.html { render 'patches/new', local: { patch: @patch } }
@@ -36,7 +33,27 @@ module Keys
           .require(:patch)
           .permit(
             :name,
-            :attack
+            :voice,
+            :octave,
+            :detune,
+            :portamento,
+            :vco_eg_int,
+            :cutoff,
+            :peak,
+            :vcf_eg_int,
+            :lfo_rate,
+            :lfo_pitch_int,
+            :lfo_cutoff_int,
+            :attack,
+            :decay_release,
+            :sustain,
+            :delay_time,
+            :delay_feedback,
+            :lfo_shape,
+            :lfo_trigger_sync,
+            :step_trigger,
+            :tempo_delay,
+            :notes
           )
     end
 

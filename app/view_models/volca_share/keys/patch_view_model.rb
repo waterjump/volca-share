@@ -27,10 +27,15 @@ module VolcaShare
       def tempo_sync
       end
 
-      def lit?(*args)
+      # TODO: Move to ApplicationViewModel or a module?
+      def lit?(field)
+        return 'lit' if model.send(field)
+        'unlit'
       end
 
-      def checked?(*args)
+      # TODO: Move to ApplicationViewModel or a module?
+      def checked?(field)
+        return { checked: true } if model.send(field)
         {}
       end
     end

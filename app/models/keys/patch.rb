@@ -39,7 +39,11 @@ module Keys
                optional: true
 
     midi_validation_options = {
-      numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 127 }
+      numericality: {
+        only_integer: true,
+        greater_than_or_equal_to: 0,
+        less_than_or_equal_to: 127
+      }
     }
 
     validates_presence_of :name, :slug
