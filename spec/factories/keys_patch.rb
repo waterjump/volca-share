@@ -3,8 +3,9 @@
 FactoryBot.define do
   factory :keys_patch, class: Keys::Patch do |_p|
     name { FFaker::Lorem.characters(10) }
-    voice { midi_range.to_a.sample }
-    octave { midi_range.to_a.sample }
+    notes { FFaker::Lorem.paragraph }
+    voice { [0, 19, 38, 57, 76, 95].sample }
+    octave { [0, 19, 38, 57, 76, 95].sample }
     detune { midi_range.to_a.sample }
     portamento { midi_range.to_a.sample }
     vco_eg_int { midi_range.to_a.sample }
