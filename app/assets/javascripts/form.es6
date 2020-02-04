@@ -204,8 +204,23 @@ VS.Form = function() {
 
     if ((VS.currentPoint !== VS.clickedPoint) || (degree === leftLimit) || (degree === rightLimit)) {
       VS.activeKnob.rotate(degree);
-      // TODO: The following line is only correct for glide knobs
-      midi = Math.round(((63.5 / limit) * degree) + 63.5);
+
+      // TODO: Refactor! This is ugly.  The way the Knob class is defined
+      //   isn't polymorphism friendly.
+      if ($(VS.activeKnob.element).hasClass('dark')) {
+        midi_map = {
+          '-90': 10,
+          '-60': 30,
+          '-30': 50,
+          '0': 70,
+          '30': 100,
+          '60': 120
+        };
+        midi = midi_map[degree];
+      } else {
+        midi = Math.round(((63.5 / limit) * degree) + 63.5);
+      }
+
       if (midiOut.ready()) {
         midiOut.output.sendControlChange(
           $(VS.activeKnob.element).data('control-number'),
