@@ -47,8 +47,8 @@ module Keys
     }
 
     validates_presence_of :name, :slug
-    validates :voice, inclusion: { in: [0, 19, 38, 57, 76, 95] }
-    validates :octave, inclusion: { in: [0, 19, 38, 57, 76, 95] }
+    validates :voice, inclusion: { in: [10, 30, 50, 70, 100, 120] }
+    validates :octave, inclusion: { in: [10, 30, 50, 70, 100, 120] }
     validates :detune, midi_validation_options
     validates :portamento, midi_validation_options
     validates :vco_eg_int, midi_validation_options
