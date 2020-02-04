@@ -149,12 +149,12 @@ RSpec.describe Keys::Patch do
     it { is_expected.to validate_presence_of(:slug) }
 
     it do
-      is_expected.to validate_inclusion_of(:voice).to_allow(0, 19, 38, 57, 76, 95)
+      is_expected.to validate_inclusion_of(:voice).to_allow(10, 30, 50, 70, 100, 120)
     end
 
     it do
       is_expected.to(
-        validate_inclusion_of(:octave).to_allow(0, 19, 38, 57, 76, 95)
+        validate_inclusion_of(:octave).to_allow(10, 30, 50, 70, 100, 120)
       )
     end
 
