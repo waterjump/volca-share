@@ -39,12 +39,12 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     expect(rendered).to have_css('#delay_feedback')
 
     # Bottom row
-    expect(rendered).to have_css('#lfo_shape_saw_light')
+    expect(rendered).to have_css('#lfo_shape_saw_light.unlit')
     expect(rendered).to have_css('#lfo_shape_triangle_light.lit')
-    expect(rendered).to have_css('#lfo_shape_square_light')
-    expect(rendered).to have_css('#lfo_trigger_sync_light')
-    expect(rendered).to have_css('#step_trigger_light')
-    expect(rendered).to have_css('#tempo_delay_light')
+    expect(rendered).to have_css('#lfo_shape_square_light.unlit')
+    expect(rendered).to have_css('#lfo_trigger_sync_light.unlit')
+    expect(rendered).to have_css('#step_trigger_light.unlit')
+    expect(rendered).to have_css('#tempo_delay_light.lit')
   end
 
   xit 'shows tag input placeholders' do

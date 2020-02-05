@@ -58,19 +58,19 @@
           %span.multi
             .light{ id: 'lfo_shape_saw_light',
                     data: { radio: true },
-                    class: @patch.lfo_shape_saw ? 'lit' : '' }
+                    class: @patch.lfo_shape_saw ? 'lit' : 'unlit' }
 
 
         -# LFO SHAPE TRI
         = radio_button_tag 'patch[lfo_shape]',
                            'triangle',
-                           @patch.lfo_shape_tri,
+                           @patch.lfo_shape_triangle,
                            class: :control
         = label_tag('patch[lfo_shape_triangle]') do
           %span.multi
             .light{ id: 'lfo_shape_triangle_light',
                     data: { radio: true },
-                    class: @patch.lfo_shape_tri ? 'lit' : '' }
+                    class: @patch.lfo_shape_triangle ? 'lit' : 'unlit' }
 
         -# LFO SHAPE SQUARE
         = radio_button_tag 'patch[lfo_shape]',
@@ -81,7 +81,7 @@
           %span.multi
             .light{ id: 'lfo_shape_square_light',
                     data: { radio: true },
-                    class: @patch.lfo_shape_square ? 'lit' : '' }
+                    class: @patch.lfo_shape_square ? 'lit' : 'unlit' }
 
         -# LFO TRIGGER SYNC
         = check_box :patch,
