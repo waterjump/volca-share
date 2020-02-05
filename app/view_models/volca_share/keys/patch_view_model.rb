@@ -4,28 +4,17 @@ module VolcaShare
   module Keys
     class PatchViewModel < ApplicationViewModel
       include Shared
-      # NOTE: All methods in this view model are stubs unless
-      #   specified otherwise.
 
       def lfo_shape_saw
-        true
+        model.lfo_shape == 'saw'
       end
 
-      def lfo_shape_tri
-        true
+      def lfo_shape_triangle
+        model.lfo_shape == 'triangle'
       end
 
       def lfo_shape_square
-        true
-      end
-
-      def lfo_trigger_sync
-      end
-
-      def step_trigger
-      end
-
-      def tempo_sync
+        model.lfo_shape == 'square'
       end
     end
   end
