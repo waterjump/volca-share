@@ -3,6 +3,7 @@
 module VolcaShare
   module Keys
     class PatchViewModel < ApplicationViewModel
+      include Shared
       # NOTE: All methods in this view model are stubs unless
       #   specified otherwise.
 
@@ -25,18 +26,6 @@ module VolcaShare
       end
 
       def tempo_sync
-      end
-
-      # TODO: Move to ApplicationViewModel or a module?
-      def lit?(field)
-        return 'lit' if model.send(field)
-        'unlit'
-      end
-
-      # TODO: Move to ApplicationViewModel or a module?
-      def checked?(field)
-        return { checked: true } if model.send(field)
-        {}
       end
     end
   end

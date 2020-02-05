@@ -67,51 +67,6 @@ module VolcaShare
       end
     end
 
-    describe '#checked?' do
-      subject do
-        PatchViewModel.wrap(
-          FactoryBot.build(
-            :patch,
-            amp_eg_on: true,
-            lfo_target_amp: false
-          )
-        )
-      end
-      context 'when field is true' do
-        it 'returns hash with checked: true' do
-          expect(subject.checked?(:amp_eg_on)).to eq(checked: true)
-        end
-      end
-      context 'when field is false' do
-        it 'returns an empty hash' do
-          expect(subject.checked?(:lfo_target_amp)).to eq({})
-        end
-      end
-    end
-
-    describe '#lit?' do
-      subject do
-        PatchViewModel.wrap(
-          FactoryBot.build(
-            :patch,
-            amp_eg_on: true,
-            lfo_target_amp: false
-          )
-        )
-      end
-      context 'when field is true' do
-        it 'returns lit' do
-          expect(subject.lit?(:amp_eg_on)).to eq('lit')
-        end
-      end
-
-      context 'when field is false' do
-        it 'returns unlit' do
-          expect(subject.lit?(:lfo_target_amp)).to eq('unlit')
-        end
-      end
-    end
-
     describe '#index_classes' do
       context 'when patch is not secret and doesn\'t have audio' do
         subject do

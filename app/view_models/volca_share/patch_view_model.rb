@@ -3,6 +3,8 @@
 module VolcaShare
   class PatchViewModel < ApplicationViewModel
     include AudioRegex
+    include Shared
+
     def vco_group_one
       vco_group == 'one'
     end
@@ -13,16 +15,6 @@ module VolcaShare
 
     def vco_group_three
       vco_group == 'three'
-    end
-
-    def checked?(field)
-      return { checked: true } if model.send(field)
-      {}
-    end
-
-    def lit?(field)
-      return 'lit' if model.send(field)
-      'unlit'
     end
 
     def index_classes
