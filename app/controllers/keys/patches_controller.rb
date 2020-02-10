@@ -31,7 +31,7 @@ module Keys
         begin
           Patch.find_by(slug: params[:slug])
         rescue
-          Patch.find(params[:slug]) # HACK: this is actually the id (-_-,)
+          Patch.find(params[:id])
         end
       @patch = VolcaShare::Keys::PatchViewModel.wrap(patch_model)
       user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"
