@@ -205,12 +205,6 @@ module VolcaShare
       end
     end
 
-    describe '#formatted_tags' do
-      it 'returns a string of tags in lowercase' do
-        expect(subject.formatted_tags).not_to match(/[A-Z]+/)
-      end
-    end
-
     describe '#show_midi_only_knobs?' do
       context 'when midi only patch fields are default values' do
         subject do

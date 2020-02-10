@@ -106,6 +106,12 @@
                     class: @patch.lit?(:tempo_delay) }
 
 .col-lg-3.col-md-9#patch-metadata
+  - if @patch.tags.any?
+    = label_tag 'patch[tags]', 'Tags'
+    %p
+      - @patch.tags.each do |tag|
+        -# TODO: Implement tags page for keys patches
+        = link_to "\##{tag}", '#', class: :tag
   - if @patch.notes.present?
     = label_tag 'patch[notes]', 'Notes'
     .well

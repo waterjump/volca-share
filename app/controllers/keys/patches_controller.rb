@@ -2,6 +2,8 @@
 
 module Keys
   class PatchesController < ApplicationController
+    before_action :format_tags, only: [:create, :update]
+
     def new
       @body_class = :form
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
@@ -9,7 +11,6 @@ module Keys
     end
 
     def create
-      patch_params
       @patch_params[:slug] = @patch_params[:name].parameterize
       @patch = current_user.present? ? current_user.keys_patches.new : Keys::Patch.new
       @patch.attributes = patch_params
@@ -66,8 +67,16 @@ module Keys
             :lfo_trigger_sync,
             :step_trigger,
             :tempo_delay,
+            :tags,
             :notes
           )
+    end
+
+    # TODO: This is used in both patch controllers. Maybe pull into module?
+    def format_tags
+      tags = patch_params[:tags]
+      return @patch_params.merge!(tags: []) unless tags.present?
+      @patch_params.merge!(tags: tags.split(',').map(&:downcase).map(&:strip))
     end
 
     def patch_location

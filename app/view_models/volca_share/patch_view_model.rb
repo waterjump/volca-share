@@ -53,10 +53,6 @@ module VolcaShare
       "#{notes.squish[0..96].split(' ')[0..-2].join(' ')}..."
     end
 
-    def formatted_tags
-      tags.map(&:downcase).join(', ')
-    end
-
     def show_midi_only_knobs?
       slide_time != 63 || expression != 127 || gate_time != 127
     end
