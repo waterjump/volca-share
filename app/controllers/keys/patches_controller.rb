@@ -25,6 +25,19 @@ module Keys
       end
     end
 
+    def show
+      @body_class = 'show'
+      patch_model =
+        begin
+          Patch.find_by(slug: params[:slug])
+        rescue
+          Patch.find(params[:slug]) # HACK: this is actually the id (-_-,)
+        end
+      @patch = VolcaShare::Keys::PatchViewModel.wrap(patch_model)
+      user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"
+      @title = "#{@patch.name}#{user}"
+    end
+
     private
 
     def patch_params

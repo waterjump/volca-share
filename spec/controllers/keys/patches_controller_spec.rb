@@ -15,6 +15,14 @@ module Keys
       end
     end
 
+    describe 'GET #show' do
+      it 'assigns the requested patch as @patch' do
+        patch = Patch.create!(valid_attributes)
+        get :show, params: { slug: patch.to_param }, session: valid_session
+        expect(assigns(:patch)).to eq(patch)
+      end
+    end
+
     describe 'POST #create' do
       let(:params) { attributes_for(:keys_patch) }
 
