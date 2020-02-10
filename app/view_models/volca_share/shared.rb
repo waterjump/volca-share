@@ -11,5 +11,9 @@ module VolcaShare
       return 'lit' if model.send(field)
       'unlit'
     end
+
+    def formatted_tags
+      tags.map(&:downcase).join(', ')
+    end
   end
 end

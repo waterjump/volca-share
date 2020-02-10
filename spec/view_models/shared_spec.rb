@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-class DummyViewModel
+class DummyViewModel < ApplicationViewModel
   include VolcaShare::Shared
   def model; end
 end
@@ -39,6 +39,14 @@ RSpec.describe VolcaShare::Shared do
         allow(view_model).to receive(:model).and_return(double(my_field: false))
         expect(view_model.lit?('my_field')).to eq('unlit')
       end
+    end
+  end
+
+  describe '#formatted_tags' do
+    it 'returns a string of tags in lowercase' do
+      allow(view_model).to receive(:model).and_return(double(tags: %w(Larry CURLY moe)))
+      expect(view_model.formatted_tags).to eq('larry, curly, moe')
+      expect(view_model.formatted_tags).not_to match(/[A-Z]+/)
     end
   end
 end

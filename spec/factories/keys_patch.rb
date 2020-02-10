@@ -26,5 +26,6 @@ FactoryBot.define do
     tempo_delay { FFaker::Boolean.maybe }
 
     slug { name.parameterize }
+    tags { FFaker::Lorem.words(3) }
   end
 end

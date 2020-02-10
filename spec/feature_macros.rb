@@ -72,6 +72,8 @@ def fill_out_keys_patch_form(patch, anon = false)
   find('#lfo_trigger_sync_light').click if patch.lfo_trigger_sync
   find('#step_trigger_light').click if patch.step_trigger
   find('#tempo_delay_light').click unless patch.tempo_delay
+
+  fill_in 'patch[tags]', with: patch.tags.join(', '), visible: false
   return if anon
   check 'patch[secret]' if patch.secret?
 end
@@ -300,7 +302,6 @@ def reflects_keys_patch(patch, options = {})
     expect(interface).to have_css('#lfo_shape_square_light.unlit')
   end
 
-  # TODO: FROM HERE DOWN IS COPIED FROM BASS SPECS.  CHANGE.
   # Content
   return if form
 
