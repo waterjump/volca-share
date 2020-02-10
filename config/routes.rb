@@ -16,7 +16,7 @@ Rails.application.routes.draw do
               only: [:show],
               param: :slug,
               controller: 'keys/patches',
-              path: 'keys'
+              path: 'keys/patch'
   end
 
   resources :patch, param: :slug, controller: 'patches', except: [:index]
@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   match 'oembed' => 'patches#oembed', via: :get
 
   namespace 'keys' do
-    resources :patch, controller: 'patches', only: [:new, :show], param: :slug
+    resources :patch, controller: 'patches', only: [:new, :show], param: :id
     post 'patch' => 'patches#create'
   end
 

@@ -18,7 +18,7 @@ module Keys
     describe 'GET #show' do
       it 'assigns the requested patch as @patch' do
         patch = Patch.create!(valid_attributes)
-        get :show, params: { slug: patch.to_param }, session: valid_session
+        get :show, params: { id: patch.to_param }, session: valid_session
         expect(assigns(:patch)).to eq(patch)
       end
     end
