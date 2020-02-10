@@ -24,5 +24,7 @@ FactoryBot.define do
     lfo_trigger_sync { FFaker::Boolean.maybe }
     step_trigger { FFaker::Boolean.maybe }
     tempo_delay { FFaker::Boolean.maybe }
+
+    slug { name.parameterize }
   end
 end

@@ -1,0 +1,112 @@
+.clearfix
+  .col-xl-9.col-lg-9.col-md-9.col-sm-12#patch-title
+    %h1.hidden= "#{@patch.name} by #{@patch.user&.username || '¯\_(ツ)_/¯'}"
+    %span.h1
+      = @patch.name
+      .small
+        by
+        - if @patch.user.present?
+          = link_to(@patch.user.username, user_path(@patch.user.slug))
+        - else
+          ¯\_(ツ)_/¯
+#interface.col-lg-9.form
+  .stretchy
+    .volca.keys
+      .small.knob.first-row.vco-column.lit#detune{ data: { midi: @patch.detune || 0 } }
+        .notch
+      .small.knob.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento || 0 } }
+        .notch
+      .small.knob.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int || 0 } }
+        .notch
+      .small.knob.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff || 63 } }
+        .notch
+      .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak || 0 } }
+        .notch
+      .small.knob.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int || 0 } }
+        .notch
+      .small.knob.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate || 0 } }
+        .notch
+      .small.knob.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int || 0 } }
+        .notch
+      .small.knob.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int || 0 } }
+        .notch
+      .small.knob.first-row.eg-column.lit#attack{ data: { midi: @patch.attack || 0 } }
+        .notch
+      .small.knob.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release || 63 } }
+        .notch
+      .small.knob.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain || 127 } }
+        .notch
+      .knob.dark#voice{ data: { midi: @patch.voice || 70 } }
+        .notch
+      .knob.dark#octave{ data: { midi: @patch.octave || 70 } }
+        .notch
+      .small.knob.unlit#delay_time{ data: { midi: @patch.delay_time || 0 } }
+        .notch
+      .small.knob.unlit#delay_feedback{ data: { midi: @patch.delay_feedback || 0 } }
+        .notch
+
+      .bottom-row
+        .placeholder
+        .placeholder
+        .placeholder
+
+        -# LFO SHAPE SAW
+        = label_tag('patch[lfo_shape_saw]') do
+          %span.multi
+            .light{ id: 'lfo_shape_saw_light',
+                    class: @patch.lfo_shape_saw ? 'lit' : 'unlit' }
+
+
+        -# LFO SHAPE TRI
+        = label_tag('patch[lfo_shape_triangle]') do
+          %span.multi
+            .light{ id: 'lfo_shape_triangle_light',
+                    class: @patch.lfo_shape_triangle ? 'lit' : 'unlit' }
+
+        -# LFO SHAPE SQUARE
+        = label_tag('patch[lfo_shape_square]') do
+          %span.multi
+            .light{ id: 'lfo_shape_square_light',
+                    class: @patch.lfo_shape_square ? 'lit' : 'unlit' }
+
+        -# LFO TRIGGER SYNC
+        = label_tag('patch[lfo_trigger_sync]') do
+          %span.on-off
+            .light{ id: 'lfo_trigger_sync_light',
+                    class: @patch.lit?(:lfo_trigger_sync) }
+
+        -# TEMPO PLACEHOLDERS
+        .placeholder
+        .placeholder
+        .placeholder
+
+        -# METRONOME
+        .placeholder
+
+        -# STEP TRIGGER
+        = check_box :patch,
+                    :step_trigger,
+                    @patch.checked?('step_trigger'),
+                    'true',
+                    'false'
+        = label_tag('patch[step_trigger]') do
+          %span.on-off
+            .light{ id: 'step_trigger_light',
+                    class: @patch.lit?(:step_trigger) }
+
+        -# TEMPO DELAY
+        = check_box :patch,
+                    :tempo_delay,
+                    @patch.checked?('tempo_delay'),
+                    'true',
+                    'false'
+        = label_tag('patch[tempo_delay]') do
+          %span.on-off
+            .light{ id: 'tempo_delay_light',
+                    class: @patch.lit?(:tempo_delay) }
+
+.col-lg-3.col-md-9#patch-metadata
+  - if @patch.notes.present?
+    = label_tag 'patch[notes]', 'Notes'
+    .well
+      = @patch.notes
