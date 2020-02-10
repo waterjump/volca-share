@@ -302,6 +302,24 @@ def reflects_keys_patch(patch, options = {})
     expect(interface).to have_css('#lfo_shape_square_light.unlit')
   end
 
+  if patch.lfo_trigger_sync
+    expect(interface).to have_css('#lfo_trigger_sync_light.lit')
+  else
+    expect(interface).to have_css('#lfo_trigger_sync_light.unlit')
+  end
+
+  if patch.tempo_delay
+    expect(interface).to have_css('#tempo_delay_light.lit')
+  else
+    expect(interface).to have_css('#tempo_delay_light.unlit')
+  end
+
+  if patch.step_trigger
+    expect(interface).to have_css('#step_trigger_light.lit')
+  else
+    expect(interface).to have_css('#step_trigger_light.unlit')
+  end
+
   # Content
   return if form
 
