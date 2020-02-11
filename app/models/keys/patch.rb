@@ -12,8 +12,8 @@ module Keys
     field :notes, type: String
     field :slug, type: String
 
-    field :voice, type: Integer, default: 57
-    field :octave, type: Integer, default: 57
+    field :voice, type: Integer, default: 70
+    field :octave, type: Integer, default: 70
     field :detune, type: Integer, default: 0
     field :portamento, type: Integer, default: 0
     field :vco_eg_int, type: Integer, default: 0

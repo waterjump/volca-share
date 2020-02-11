@@ -260,6 +260,72 @@ def reflects_patch(patch, options = {})
   expect(interface).to have_content(patch.notes)
 end
 
+def keys_js_knobs_rotated(patch, options = {})
+  interface = page
+
+  expect(interface.find('span.detune', visible: false).text).to(
+    eq(rotation_from_midi(patch.detune).to_s)
+  )
+  expect(interface.find('span.portamento', visible: false).text).to(
+    eq(rotation_from_midi(patch.portamento).to_s)
+  )
+  expect(interface.find('span.vco_eg_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.vco_eg_int).to_s)
+  )
+  expect(interface.find('span.cutoff', visible: false).text).to(
+    eq(rotation_from_midi(patch.cutoff).to_s)
+  )
+  expect(interface.find('span.peak', visible: false).text).to(
+    eq(rotation_from_midi(patch.peak).to_s)
+  )
+  expect(interface.find('span.vcf_eg_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.vcf_eg_int).to_s)
+  )
+  expect(interface.find('span.lfo_rate', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_rate).to_s)
+  )
+  expect(interface.find('span.lfo_pitch_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_pitch_int).to_s)
+  )
+  expect(interface.find('span.lfo_cutoff_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_cutoff_int).to_s)
+  )
+  expect(interface.find('span.attack', visible: false).text).to(
+    eq(rotation_from_midi(patch.attack).to_s)
+  )
+  expect(interface.find('span.decay_release', visible: false).text).to(
+    eq(rotation_from_midi(patch.decay_release).to_s)
+  )
+ expect(interface.find('span.sustain', visible: false).text).to(
+    eq(rotation_from_midi(patch.sustain).to_s)
+  )
+  expect(interface.find('span.voice', visible: false).text).to(
+    eq(snap_knob_rotation_from_midi(patch.voice).to_s)
+  )
+  expect(interface.find('span.octave', visible: false).text).to(
+    eq(snap_knob_rotation_from_midi(patch.octave).to_s)
+  )
+  expect(interface.find('span.delay_time', visible: false).text).to(
+    eq(rotation_from_midi(patch.delay_time).to_s)
+  )
+  expect(interface.find('span.delay_feedback', visible: false).text).to(
+    eq(rotation_from_midi(patch.delay_feedback).to_s)
+  )
+end
+
+def snap_knob_rotation_from_midi(midi)
+  midi_to_degree_map = {
+    10 => -90,
+    30 => -60,
+    50 => -30,
+    70 => 0,
+    100 => 30,
+    120 => 60
+  }
+
+  midi_to_degree_map[midi]
+end
+
 def reflects_keys_patch(patch, options = {})
   interface = options[:interface] || page
   form = options[:form] || false

@@ -40,7 +40,22 @@ VS.Knob = function(element) {
     knob.css('-ms-transform-origin', '50% 50%');
   };
 
-  this.degreeForMidi = (midi, limit) => Math.round((midi - 63.5) / (63.5 / limit));
+  this.degreeForMidi = function(midi, limit) {
+    if ($(scope.element).hasClass('dark')) {
+      midiToAngleMap = {
+        '10': -90,
+        '30': -60,
+        '50': -30,
+        '70': 0,
+        '100': 30,
+        '120': 60
+      };
+
+      return midiToAngleMap[midi];
+    } else {
+      return Math.round((midi - 63.5) / (63.5 / limit));
+    }
+  };
 
   this.autoRotate = function(d) {
     <% if Rails.env.test? %>

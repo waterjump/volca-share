@@ -19,13 +19,13 @@ RSpec.describe Keys::Patch do
 
     it do
       is_expected.to(
-        have_field(:voice).of_type(Integer).with_default_value_of(57)
+        have_field(:voice).of_type(Integer).with_default_value_of(70)
       )
     end
 
     it do
       is_expected.to(
-        have_field(:octave).of_type(Integer).with_default_value_of(57)
+        have_field(:octave).of_type(Integer).with_default_value_of(70)
       )
     end
 

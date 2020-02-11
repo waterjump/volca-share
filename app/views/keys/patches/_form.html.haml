@@ -11,37 +11,37 @@
 #interface.col-lg-9.form
   .stretchy
     .volca.keys
-      .small.knob.first-row.vco-column.lit#detune
+      .small.knob.first-row.vco-column.lit#detune{ data: { midi: @patch.detune } }
         .notch
-      .small.knob.second-row.vco-column.lit#portamento
+      .small.knob.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento } }
         .notch
-      .small.knob.third-row.vco-column.lit#vco_eg_int
+      .small.knob.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int } }
         .notch
-      .small.knob.first-row.vcf-column.lit#cutoff
+      .small.knob.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff } }
         .notch
-      .small.knob.second-row.vcf-column.lit#peak
+      .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak } }
         .notch
-      .small.knob.third-row.vcf-column.lit#vcf_eg_int
+      .small.knob.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int } }
         .notch
-      .small.knob.first-row.lfo-column.lit#lfo_rate
+      .small.knob.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate } }
         .notch
-      .small.knob.second-row.lfo-column.lit#lfo_pitch_int
+      .small.knob.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int } }
         .notch
-      .small.knob.third-row.lfo-column.lit#lfo_cutoff_int
+      .small.knob.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int } }
         .notch
-      .small.knob.first-row.eg-column.lit#attack
+      .small.knob.first-row.eg-column.lit#attack{ data: { midi: @patch.attack } }
         .notch
-      .small.knob.second-row.eg-column.lit#decay_release
+      .small.knob.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release } }
         .notch
-      .small.knob.third-row.eg-column.lit#sustain
+      .small.knob.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain } }
         .notch
-      .knob.dark#voice
+      .dark.knob#voice{ data: { midi: @patch.voice } }
         .notch
-      .knob.dark#octave
+      .dark.knob#octave{ data: { midi: @patch.octave } }
         .notch
-      .small.knob.unlit#delay_time
+      .small.knob.unlit#delay_time{ data: { midi: @patch.delay_time } }
         .notch
-      .small.knob.unlit#delay_feedback
+      .small.knob.unlit#delay_feedback{ data: { midi: @patch.delay_feedback } }
         .notch
 
       .bottom-row
