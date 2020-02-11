@@ -50,4 +50,11 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
       expect(current_path).to eq(keys_patch_path(Keys::Patch.first.id))
     end
   end
+
+  describe 'initial form situation' do
+    it 'shows knobs turned to default values' do
+      visit new_keys_patch_path
+      keys_js_knobs_rotated(Keys::Patch.new)
+    end
+  end
 end
