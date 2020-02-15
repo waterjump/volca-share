@@ -3,8 +3,8 @@
 module Keys
   class PatchesController < ApplicationController
     before_action :format_tags, only: [:create, :update]
-    before_action :set_patch, only: [:show, :edit]
-    before_action :authenticate_user!, only: [:edit]
+    before_action :set_patch, only: [:show, :edit, :update]
+    before_action :authenticate_user!, only: [:edit, :update]
 
     def new
       @body_class = :form
@@ -36,6 +36,26 @@ module Keys
       @body_class = :form
       if @patch.user_id != current_user.id
         flash[:notice] = 'You may not edit that patch.'
+        redirect_to user_keys_patch_path(@patch.user.slug, @patch.slug)
+      end
+    end
+
+    def update
+      if @patch.user == current_user
+        original_slug = @patch.slug
+        @patch_params[:slug] = @patch_params[:name].parameterize
+
+        if @patch.update_attributes(@patch_params)
+          redirect_to(
+            user_keys_patch_url(@patch.user.slug, @patch.slug),
+            notice: 'Patch saved successfully.'
+          )
+        else
+          @body_class = :form
+          render :edit, status: :unprocessable_entity
+        end
+      else
+        flash[:notice] = 'You are not allowed to update that patch'
         render :show, status: :unauthorized
       end
     end
