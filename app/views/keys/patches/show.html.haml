@@ -9,7 +9,7 @@
           = link_to(@patch.user.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
-#interface.col-lg-9.form
+#interface.col-lg-9
   .stretchy
     .volca.keys
       .small.knob.first-row.vco-column.lit#detune{ data: { midi: @patch.detune || 0 } }
@@ -52,26 +52,26 @@
 
         -# LFO SHAPE SAW
         = label_tag('patch[lfo_shape_saw]') do
-          %span.multi
+          %span
             .light{ id: 'lfo_shape_saw_light',
                     class: @patch.lfo_shape_saw ? 'lit' : 'unlit' }
 
 
         -# LFO SHAPE TRI
         = label_tag('patch[lfo_shape_triangle]') do
-          %span.multi
+          %span
             .light{ id: 'lfo_shape_triangle_light',
                     class: @patch.lfo_shape_triangle ? 'lit' : 'unlit' }
 
         -# LFO SHAPE SQUARE
         = label_tag('patch[lfo_shape_square]') do
-          %span.multi
+          %span
             .light{ id: 'lfo_shape_square_light',
                     class: @patch.lfo_shape_square ? 'lit' : 'unlit' }
 
         -# LFO TRIGGER SYNC
         = label_tag('patch[lfo_trigger_sync]') do
-          %span.on-off
+          %span
             .light{ id: 'lfo_trigger_sync_light',
                     class: @patch.lit?(:lfo_trigger_sync) }
 
@@ -90,7 +90,7 @@
                     'true',
                     'false'
         = label_tag('patch[step_trigger]') do
-          %span.on-off
+          %span
             .light{ id: 'step_trigger_light',
                     class: @patch.lit?(:step_trigger) }
 
@@ -101,7 +101,7 @@
                     'true',
                     'false'
         = label_tag('patch[tempo_delay]') do
-          %span.on-off
+          %span
             .light{ id: 'tempo_delay_light',
                     class: @patch.lit?(:tempo_delay) }
 
