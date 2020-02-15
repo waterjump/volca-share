@@ -3,6 +3,8 @@
 module Keys
   class PatchesController < ApplicationController
     before_action :format_tags, only: [:create, :update]
+    before_action :set_patch, only: [:show, :edit]
+    before_action :authenticate_user!, only: [:edit]
 
     def new
       @body_class = :form
@@ -28,6 +30,18 @@ module Keys
 
     def show
       @body_class = 'show'
+    end
+
+    def edit
+      if @patch.user_id != current_user.id
+        flash[:notice] = 'You may not edit that patch.'
+        render :show, status: :unauthorized
+      end
+    end
+
+    private
+
+    def set_patch
       patch_model =
         begin
           Patch.find_by(slug: params[:slug])
@@ -38,8 +52,6 @@ module Keys
       user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"
       @title = "#{@patch.name}#{user}"
     end
-
-    private
 
     def patch_params
       @patch_params ||=
