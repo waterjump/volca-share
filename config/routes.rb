@@ -27,7 +27,7 @@ Rails.application.routes.draw do
   match 'oembed' => 'patches#oembed', via: :get
 
   namespace 'keys' do
-    resources :patch, controller: 'patches', only: [:new, :show], param: :id
+    resources :patch, controller: 'patches', only: [:new, :show, :update], param: :id
     post 'patch' => 'patches#create'
   end
 

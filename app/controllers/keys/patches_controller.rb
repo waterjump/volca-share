@@ -33,6 +33,7 @@ module Keys
     end
 
     def edit
+      @body_class = :form
       if @patch.user_id != current_user.id
         flash[:notice] = 'You may not edit that patch.'
         render :show, status: :unauthorized
