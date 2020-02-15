@@ -47,9 +47,11 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     expect(rendered).to have_css('#tempo_delay_light.lit')
   end
 
-  xit 'shows tag input placeholders' do
-    @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
+  it 'shows tag input placeholders' do
+    @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
+
     render partial: 'keys/patches/form.html.haml'
+
     expect(rendered).to have_selector(
       'input[placeholder="tags, separated, by, commas"]'
     )
