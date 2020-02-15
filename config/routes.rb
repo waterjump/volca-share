@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   resources :user, user_options do
     resources :patch, only: [:show], param: :slug, controller: 'patches'
     resources :keys_patch,
-              only: [:show],
+              only: [:show, :edit],
               param: :slug,
               controller: 'keys/patches',
               path: 'keys/patch'

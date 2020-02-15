@@ -23,6 +23,77 @@ module Keys
       end
     end
 
+    describe 'GET #edit' do
+      context 'when user is logged in' do
+        login_user
+
+        context 'when patch belongs to current user' do
+          let(:patch_to_edit) { @user.keys_patches.create!(valid_attributes) }
+
+          before do
+            get :edit,
+                params: { slug: patch_to_edit.slug, user_slug: @user.slug },
+                session: valid_session
+          end
+
+          it 'assigns the requested patch as @patch' do
+            expect(assigns(:patch)).to(
+              eq(VolcaShare::Keys::PatchViewModel.wrap(patch_to_edit))
+            )
+          end
+
+          it 'renders edit page' do
+            expect(response).to render_template('patches/edit')
+          end
+        end
+
+        context 'when patch does not belong to current user' do
+          let(:some_other_user) { create(:user) }
+          let(:patch_to_edit) do
+            some_other_user.keys_patches.create!(valid_attributes)
+          end
+
+          before do
+            get :edit,
+                params: {
+                  slug: patch_to_edit.slug,
+                  user_slug: some_other_user.slug
+                },
+                session: valid_session
+          end
+
+          it 'returns unauthorized status' do
+            expect(response.status).to eq(401)
+          end
+
+          it 'redirects to show patch page' do
+            expect(response).to render_template(:show)
+          end
+        end
+      end
+
+      context 'when user is not logged in' do
+        let(:user) { create(:user) }
+        let(:patch_to_edit) { user.keys_patches.create!(valid_attributes) }
+
+        before do
+          get :edit,
+              params: { slug: patch_to_edit.slug, user_slug: user.slug },
+              session: valid_session
+        end
+
+        it 'shows message to user' do
+          expect(flash[:alert]).to(
+            eq('You need to sign in or sign up before continuing.')
+          )
+        end
+
+        it 'redirects to sign in / sign_up page' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+    end
+
     describe 'POST #create' do
       let(:params) { attributes_for(:keys_patch) }
 
