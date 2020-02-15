@@ -62,12 +62,11 @@ module Keys
                 session: valid_session
           end
 
-          it 'returns unauthorized status' do
-            expect(response.status).to eq(401)
-          end
-
           it 'redirects to show patch page' do
-            expect(response).to render_template(:show)
+            expect(response).to(
+              redirect_to(
+                user_keys_patch_path(some_other_user.slug, patch_to_edit.slug))
+            )
           end
         end
       end
@@ -79,6 +78,167 @@ module Keys
         before do
           get :edit,
               params: { slug: patch_to_edit.slug, user_slug: user.slug },
+              session: valid_session
+        end
+
+        it 'shows message to user' do
+          expect(flash[:alert]).to(
+            eq('You need to sign in or sign up before continuing.')
+          )
+        end
+
+        it 'redirects to sign in / sign_up page' do
+          expect(response).to redirect_to(new_user_session_path)
+        end
+      end
+    end
+
+    describe 'PUT #update' do
+      context 'when user is logged in' do
+        login_user
+
+        context 'when patch belongs to current user' do
+          let(:patch_to_update) do
+            @user.keys_patches.create(attributes_for(:keys_patch))
+          end
+
+          let(:new_attributes) do
+            attributes_for(
+              :keys_patch,
+              name: 'Updated Patch'
+            )
+          end
+
+          context 'when patch is valid' do
+            it 'updates the patch' do
+              expect do
+                put :update,
+                    params: { id: patch_to_update.id, patch: new_attributes },
+                    session: valid_session
+              end.to change { patch_to_update.reload.attributes }
+            end
+
+            it 'assigns the patch as @patch' do
+              put :update,
+                  params: { id: patch_to_update.id, patch: new_attributes },
+                  session: valid_session
+
+              expect(assigns(:patch).model).to eq(patch_to_update)
+            end
+
+            it 'redirects to the patch show page' do
+              put :update,
+                  params: { id: patch_to_update.id, patch: new_attributes },
+                  session: valid_session
+
+              expect(response).to(
+                redirect_to(
+                  user_keys_patch_path(@user.slug, patch_to_update.reload.slug)
+                )
+              )
+            end
+          end
+
+          context 'when patch is not valid' do
+            let(:invalid_attributes) do
+              attributes_for(
+                :keys_patch,
+                name: 'Updated Patch',
+                attack: 'bort'
+              )
+            end
+
+            it 'does not update the patch' do
+              expect do
+                put :update,
+                    params: {
+                      id: patch_to_update.id,
+                      patch: invalid_attributes
+                    },
+                    session: valid_session
+              end.not_to change { patch_to_update.reload.attributes }
+            end
+
+            it 'assigns the patch as @patch' do
+              put :update,
+                  params: {
+                    id: patch_to_update.id,
+                    patch: invalid_attributes
+                  },
+                  session: valid_session
+
+              expect(assigns[:patch].model).to eq(patch_to_update)
+            end
+
+            it 're-renders the edit template' do
+              put :update,
+                  params: {
+                    id: patch_to_update.id,
+                    patch: invalid_attributes
+                  },
+                  session: valid_session
+
+              expect(response).to render_template('keys/patches/edit')
+            end
+          end
+        end
+
+        context 'when patch does not belong to current user' do
+            let(:some_other_user) { create(:user) }
+            let(:new_attributes) do
+              attributes_for(:keys_patch, name: 'Updated Patch')
+            end
+
+            let(:patch) do
+              some_other_user.keys_patches.create!(attributes_for(:keys_patch))
+            end
+
+            it 'does not update the patch' do
+              expect do
+                put :update,
+                    params: { id: patch.id, patch: new_attributes },
+                    session: valid_session
+              end.not_to change { patch.reload }
+            end
+
+            it 'shows a message to the user' do
+              put :update,
+                  params: { id: patch.id, patch: new_attributes },
+                  session: valid_session
+
+              expect(flash[:notice]).to(
+                eq('You are not allowed to update that patch')
+              )
+            end
+
+            it 'assigns the patch as @patch' do
+              put :update,
+                  params: { id: patch.id, patch: new_attributes },
+                  session: valid_session
+
+              expect(assigns(:patch).model).to eq(patch)
+            end
+
+            it 'redirects to the patch show page' do
+              put :update,
+                  params: { id: patch.id, patch: new_attributes },
+                  session: valid_session
+
+              expect(response).to render_template('keys/patches/show')
+            end
+        end
+      end
+
+      context 'when user is not logged in' do
+        let(:user) { create(:user) }
+        let(:patch_to_update) { user.keys_patches.create!(valid_attributes) }
+        let(:new_attributes) do
+          attributes_for(:keys_patch, name: 'Updated Patch')
+        end
+
+        before do
+          put :update,
+              params: { id: patch_to_update.id, patch: new_attributes },
               session: valid_session
         end
 
