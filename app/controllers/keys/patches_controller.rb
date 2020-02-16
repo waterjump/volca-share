@@ -124,7 +124,8 @@ module Keys
             :step_trigger,
             :tempo_delay,
             :tags,
-            :notes
+            :notes,
+            :secret
           )
     end
 

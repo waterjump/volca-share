@@ -47,6 +47,18 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     expect(rendered).to have_css('#tempo_delay_light.lit')
   end
 
+  context 'when user is logged in' do
+    it 'shows checkbox to make the patch secret' do
+      @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
+      render(
+        partial: 'keys/patches/form.html.haml',
+        locals: { current_user: create(:user) }
+      )
+
+      expect(rendered).to have_css('#patch_secret')
+    end
+  end
+
   it 'shows tag input placeholders' do
     @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
 
