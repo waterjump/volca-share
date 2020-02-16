@@ -33,7 +33,8 @@ Capybara.register_driver :poltergeist do |app|
     app,
     timeout: 60,
     js_errors: false,
-    phantomjs_logger: IO.new(IO.sysopen('/dev/null', 'w+')),
+    # NOTE: Comment this out to see javascipt console stuff during tests
+    phantomjs_logger: IO.new(IO.sysopen('/dev/null', 'w+'))
   )
 end
 

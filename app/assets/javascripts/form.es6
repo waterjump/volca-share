@@ -123,6 +123,7 @@ VS.Form = function() {
     e.preventDefault();
     e.stopPropagation();
     VS.clicked = true;
+    VS.dragging = true;
     VS.activeKnob = new VS.Knob(this);
     sequences.activeNote = null;
     const knob = $(VS.activeKnob.element);
