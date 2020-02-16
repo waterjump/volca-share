@@ -13,6 +13,6 @@
 
 .col-sm-12
   - if @patch.persisted?
-    = link_to 'Show', @patch
+    = link_to 'Cancel', user_keys_patch_path(@patch.user.slug, @patch.slug)
 = render 'knob_debug'
 
