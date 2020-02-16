@@ -3,8 +3,8 @@
 module Keys
   class PatchesController < ApplicationController
     before_action :format_tags, only: [:create, :update]
-    before_action :set_patch, only: [:show, :edit, :update]
-    before_action :authenticate_user!, only: [:edit, :update]
+    before_action :set_patch, only: [:show, :edit, :update, :destroy]
+    before_action :authenticate_user!, only: [:edit, :update, :destroy]
 
     def new
       @body_class = :form
@@ -57,6 +57,29 @@ module Keys
       else
         flash[:notice] = 'You are not allowed to update that patch'
         render :show, status: :unauthorized
+      end
+    end
+
+    def destroy
+      if current_user.present? && current_user == @patch.user && @patch.destroy
+        redirect_to(
+          user_url(current_user.slug),
+          notice: 'Patch was successfully deleted.'
+        )
+      else
+        notice_message = 'Patch could not be deleted.'
+
+        if @patch.user.present?
+          redirect_to(
+            user_keys_patch_url(@patch.user.slug, @patch.slug),
+            notice: notice_message
+          )
+        else
+          redirect_to(
+            keys_patch_url(@patch.id),
+            notice: notice_message
+          )
+        end
       end
     end
 

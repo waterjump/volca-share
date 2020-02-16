@@ -306,5 +306,61 @@ module Keys
         end
       end
     end
+
+    describe 'DELETE #destroy' do
+      context 'when user is logged in' do
+        login_user
+
+        context 'when user is author' do
+          it 'destroys the requested patch' do
+            patch = @user.keys_patches.create(attributes_for(:keys_patch))
+
+            expect do
+              delete :destroy, params: { id: patch.id }, session: valid_session
+            end.to change { Keys::Patch.count }.by(-1)
+            expect(Keys::Patch.where(id: patch.id).count).to eq(0)
+          end
+
+          it 'redirects to user show page' do
+            patch = @user.keys_patches.create(attributes_for(:keys_patch))
+
+            delete :destroy, params: { id: patch.id }, session: valid_session
+
+            expect(response).to redirect_to(user_url(@user.slug))
+          end
+        end
+
+        context 'when user is not author' do
+          it 'does not destroy the requested patch' do
+            patch = create(:user).keys_patches.create(attributes_for(:keys_patch))
+
+            expect do
+              delete :destroy, params: { id: patch.id }, session: valid_session
+            end.not_to change { Keys::Patch.count }
+            expect(Keys::Patch.where(id: patch.id).count).to eq(1)
+          end
+
+          it 'redirects to patch show page' do
+            patch = create(:user).keys_patches.create(attributes_for(:keys_patch))
+
+            delete :destroy, params: { id: patch.id }, session: valid_session
+
+            expect(response).to(
+              redirect_to(user_keys_patch_url(patch.user.slug, patch.slug))
+            )
+          end
+        end
+      end
+
+      context 'when user is not logged in' do
+        it 'does not destroy the requested patch' do
+          user = create(:user)
+          patch = user.keys_patches.create(attributes_for(:keys_patch))
+          expect do
+            delete :destroy, params: { id: patch.id }, session: valid_session
+          end.not_to change { Keys::Patch.count }
+        end
+      end
+    end
   end
 end
