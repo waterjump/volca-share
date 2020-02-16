@@ -19,6 +19,12 @@ RSpec.describe 'keys/patches/edit.html.haml', type: :view do
     it 'renders volca keys interface' do
       expect(rendered).to have_css('.volca.keys')
     end
+
+    it 'shows link to go back to show page' do
+      expect(rendered).to(
+        have_link('Cancel', href: user_keys_patch_path(user.slug, patch.slug))
+      )
+    end
   end
 
   context 'when patch has errors' do
