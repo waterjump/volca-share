@@ -9,6 +9,7 @@
           = link_to(@patch.user.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
+
 #interface.col-lg-9
   .stretchy
     .volca.keys
@@ -116,3 +117,4 @@
     = label_tag 'patch[notes]', 'Notes'
     .well
       = @patch.notes
+= render 'knob_debug'

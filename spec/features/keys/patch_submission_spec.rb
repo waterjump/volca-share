@@ -31,6 +31,11 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
         eq(user_keys_patch_path(user.slug, Keys::Patch.first.slug))
       )
     end
+
+    it 'reflects the keys patch' do
+      reflects_keys_patch(dummy_patch)
+      keys_js_knobs_rotated(dummy_patch)
+    end
   end
 
   context 'when user is not logged in' do
@@ -48,6 +53,11 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
 
     it 'directs user to user patch show page' do
       expect(current_path).to eq(keys_patch_path(Keys::Patch.first.id))
+    end
+
+    it 'reflects the keys patch' do
+      reflects_keys_patch(dummy_patch)
+      keys_js_knobs_rotated(dummy_patch)
     end
   end
 
