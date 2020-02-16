@@ -15,6 +15,7 @@ require 'capybara/poltergeist'
 require 'rubygems'
 require 'vcr'
 require 'feature_macros'
+require 'keys_feature_macros'
 require 'capybara-screenshot/rspec'
 
 VCR.configure do |config|
