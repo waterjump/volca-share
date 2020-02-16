@@ -126,12 +126,25 @@
 
 .col-lg-3.col-md-9#patch-metadata
   %fieldset
+    - if current_user.present?
+      .field
+        = label_tag :privacy, 'Secret?'
+        = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
     .field
       = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
-      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'tags, separated, by, commas'
+      = text_field_tag 'patch[tags]',
+                       @patch.formatted_tags,
+                       size: '50x1',
+                       class: 'form-control wtf',
+                       data: { role: 'tagsinput' },
+                       placeholder: 'tags, separated, by, commas'
     .field
       = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
-      = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+      = text_area_tag 'patch[notes]',
+                      @patch.notes,
+                      size: '30x5',
+                      class: 'form-control',
+                      placeholder: 'Description'
 
 
   = range_field_tag 'patch[voice]', (@patch.voice || 57), in: 0..127, class: :hidden
