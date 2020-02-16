@@ -117,4 +117,8 @@
     = label_tag 'patch[notes]', 'Notes'
     .well
       = @patch.notes
+.col-sm-12
+  .form-detail-actions
+    - if @patch.user.present? && @patch.user == current_user
+      = link_to 'Edit', edit_user_keys_patch_path(current_user.slug, @patch.slug)
 = render 'knob_debug'
