@@ -47,37 +47,6 @@ def fill_out_patch_form(patch, anon = false)
   fill_in 'patch[audio_sample]', with: patch.audio_sample
 end
 
-def fill_out_keys_patch_form(patch, anon = false)
-  fill_in 'patch[name]', with: patch.name
-  fill_in 'patch[notes]', with: patch.notes
-  range_select 'patch[voice]', patch.voice
-  range_select 'patch[octave]', patch.octave
-  range_select 'patch[detune]', patch.detune
-  range_select 'patch[portamento]', patch.portamento
-  range_select 'patch[vco_eg_int]', patch.vco_eg_int
-  range_select 'patch[cutoff]', patch.cutoff
-  range_select 'patch[peak]', patch.peak
-  range_select 'patch[vcf_eg_int]', patch.vcf_eg_int
-  range_select 'patch[lfo_rate]', patch.lfo_rate
-  range_select 'patch[lfo_pitch_int]', patch.lfo_pitch_int
-  range_select 'patch[lfo_cutoff_int]', patch.lfo_cutoff_int
-  range_select 'patch[attack]', patch.attack
-  range_select 'patch[decay_release]', patch.decay_release
-  range_select 'patch[sustain]', patch.sustain
-  range_select 'patch[delay_time]', patch.delay_time
-  range_select 'patch[delay_feedback]', patch.delay_feedback
-  find('#lfo_shape_saw_light').click if patch.lfo_shape == 'saw'
-  find('#lfo_shape_triangle_light').click if patch.lfo_shape == 'triangle'
-  find('#lfo_shape_square_light').click if patch.lfo_shape == 'square'
-  find('#lfo_trigger_sync_light').click if patch.lfo_trigger_sync
-  find('#step_trigger_light').click if patch.step_trigger
-  find('#tempo_delay_light').click unless patch.tempo_delay
-
-  fill_in 'patch[tags]', with: patch.tags.join(', '), visible: false
-  return if anon
-  check 'patch[secret]' if patch.secret?
-end
-
 def range_select(name, value)
   selector = %(input[type=range][name=\\"#{name}\\"])
   script = %-$("#{selector}").val(#{value})-
@@ -258,59 +227,6 @@ def reflects_patch(patch, options = {})
   end
   expect(interface).to have_content(patch.name)
   expect(interface).to have_content(patch.notes)
-end
-
-def keys_js_knobs_rotated(patch, options = {})
-  interface = page
-
-  expect(interface.find('span.detune', visible: false).text).to(
-    eq(rotation_from_midi(patch.detune).to_s)
-  )
-  expect(interface.find('span.portamento', visible: false).text).to(
-    eq(rotation_from_midi(patch.portamento).to_s)
-  )
-  expect(interface.find('span.vco_eg_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.vco_eg_int).to_s)
-  )
-  expect(interface.find('span.cutoff', visible: false).text).to(
-    eq(rotation_from_midi(patch.cutoff).to_s)
-  )
-  expect(interface.find('span.peak', visible: false).text).to(
-    eq(rotation_from_midi(patch.peak).to_s)
-  )
-  expect(interface.find('span.vcf_eg_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.vcf_eg_int).to_s)
-  )
-  expect(interface.find('span.lfo_rate', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_rate).to_s)
-  )
-  expect(interface.find('span.lfo_pitch_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_pitch_int).to_s)
-  )
-  expect(interface.find('span.lfo_cutoff_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_cutoff_int).to_s)
-  )
-  expect(interface.find('span.attack', visible: false).text).to(
-    eq(rotation_from_midi(patch.attack).to_s)
-  )
-  expect(interface.find('span.decay_release', visible: false).text).to(
-    eq(rotation_from_midi(patch.decay_release).to_s)
-  )
- expect(interface.find('span.sustain', visible: false).text).to(
-    eq(rotation_from_midi(patch.sustain).to_s)
-  )
-  expect(interface.find('span.voice', visible: false).text).to(
-    eq(snap_knob_rotation_from_midi(patch.voice).to_s)
-  )
-  expect(interface.find('span.octave', visible: false).text).to(
-    eq(snap_knob_rotation_from_midi(patch.octave).to_s)
-  )
-  expect(interface.find('span.delay_time', visible: false).text).to(
-    eq(rotation_from_midi(patch.delay_time).to_s)
-  )
-  expect(interface.find('span.delay_feedback', visible: false).text).to(
-    eq(rotation_from_midi(patch.delay_feedback).to_s)
-  )
 end
 
 def snap_knob_rotation_from_midi(midi)
