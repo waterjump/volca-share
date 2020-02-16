@@ -50,6 +50,10 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
       it 'shows edit link' do
         expect(rendered).to have_link('Edit')
       end
+
+      it 'shows delete link' do
+        expect(rendered).to have_button('Delete')
+      end
     end
 
     context 'when user is not the author' do
@@ -62,6 +66,10 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
 
       it 'does not show edit link' do
         expect(rendered).not_to have_link('Edit')
+      end
+
+      it 'does not show delete link' do
+        expect(rendered).not_to have_button('Delete')
       end
     end
   end
@@ -86,6 +94,10 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
 
     it 'does not show edit link' do
       expect(rendered).not_to have_link('Edit')
+    end
+
+    it 'does not show delete link' do
+      expect(rendered).not_to have_button('Delete')
     end
 
     it 'shows the volca interface' do
