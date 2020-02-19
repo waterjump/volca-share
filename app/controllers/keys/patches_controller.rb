@@ -18,7 +18,7 @@ module Keys
       @patch.attributes = patch_params
 
       respond_to do |format|
-        if @patch.save
+        if patch_created?
           format.html { redirect_to patch_location }
           format.json { :no_content }
         else
@@ -95,6 +95,14 @@ module Keys
       @patch = VolcaShare::Keys::PatchViewModel.wrap(patch_model)
       user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"
       @title = "#{@patch.name}#{user}"
+    end
+
+    def patch_created?
+      (
+        @patch.user.present? ||
+        (!Rails.env.production? || verify_recaptcha(model: @patch))
+      ) &&
+        @patch.save
     end
 
     def patch_params
