@@ -33,6 +33,17 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_selector('#audio-preview-modal')
   end
 
+  it 'shows both Bass and Keys patches' do
+    keys_patch = user.keys_patches.create(attributes_for(:keys_patch))
+    bass_patch = user.patches.create(attributes_for(:patch))
+
+    visit user_path(user.slug)
+    expect(page).to have_selector('h2', text: 'Volca Bass Patches')
+    expect(page).to have_content(bass_patch.name)
+    expect(page).to have_selector('h2', text: 'Volca Keys Patches')
+    expect(page).to have_content(keys_patch.name)
+  end
+
   it 'shows user created patches' do
     patch1 = FactoryBot.create(:patch, user_id: user.id)
     patch2 = FactoryBot.create(:patch, user_id: user.id, secret: true)

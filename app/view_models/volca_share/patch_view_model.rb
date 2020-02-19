@@ -47,12 +47,6 @@ module VolcaShare
         end
     end
 
-    def description
-      return unless notes.present?
-      return notes.squish if notes.squish.length <= 100
-      "#{notes.squish[0..96].split(' ')[0..-2].join(' ')}..."
-    end
-
     def show_midi_only_knobs?
       slide_time != 63 || expression != 127 || gate_time != 127
     end

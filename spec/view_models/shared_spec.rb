@@ -26,6 +26,48 @@ RSpec.describe VolcaShare::Shared do
     end
   end
 
+  describe '#description' do
+    before do
+      allow(view_model).to receive(:model).and_return(double(notes: notes))
+    end
+
+    context 'when patch has no notes' do
+      let(:notes) { nil }
+
+      it 'returns nil' do
+        expect(view_model.description).to be_nil
+      end
+    end
+
+    context 'when patch notes are less than 100 characters squished' do
+      let(:notes) { '  This is    a really cool patch.   ' }
+
+      it 'returns squished notes' do
+        expect(view_model.description).to eq('This is a really cool patch.')
+      end
+    end
+
+    context 'when patch notes exceed 100 chatacters squished' do
+      let(:notes) do
+        '  This is    a really cool patch and I am going to keep' \
+        ' writing more things here so that this descriptions will' \
+        ' exceed one hundred characters for testing purposes'
+      end
+
+      it 'returns first 100 characters of squished notes' do
+        expect(view_model.description.length).to be <= 100
+      end
+
+      it 'does not cut works in half' do
+        expect(view_model.description).not_to include('descript...')
+      end
+
+      it 'adds an ellipsis' do
+        expect(view_model.description[-3..-1]).to eq('...')
+      end
+    end
+  end
+
   describe '#lit?' do
     context 'when model field is true' do
       it 'returns "lit"' do
