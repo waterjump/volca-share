@@ -164,6 +164,8 @@
   = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
   = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
 
+  - if current_user.nil? && Rails.env.production?
+    = recaptcha_tags
 #save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
