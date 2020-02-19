@@ -64,6 +64,8 @@ module Keys
     validates :delay_time, midi_validation_options
     validates :delay_feedback, midi_validation_options
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
+
+    scope :browsable, -> { where(secret: false) }
   end
 end
 

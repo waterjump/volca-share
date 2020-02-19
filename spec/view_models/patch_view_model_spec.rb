@@ -167,44 +167,6 @@ module VolcaShare
       end
     end
 
-    describe '#description' do
-      context 'when patch has no notes' do
-        subject do
-          PatchViewModel.wrap(FactoryBot.build(:patch, notes: nil))
-        end
-        it 'returns nil' do
-          expect(subject.description).to be_nil
-        end
-      end
-      context 'when patch notes are less than 100 characters squished' do
-        notes = '  This is    a really cool patch.   '
-        subject do
-          PatchViewModel.wrap(FactoryBot.build(:patch, notes: notes))
-        end
-
-        it 'returns squished notes' do
-          expect(subject.description).to eq('This is a really cool patch.')
-        end
-      end
-      context 'when patch notes exceed 100 chatacters squished' do
-        notes = '  This is    a really cool patch and I am going to keep' \
-                ' writing more things here so that this descriptions will' \
-                ' exceed one hundred characters for testing purposes'
-        subject do
-          PatchViewModel.wrap(FactoryBot.build(:patch, notes: notes))
-        end
-        it 'returns first 100 characters of squished notes' do
-          expect(subject.description.length).to be <= 100
-        end
-        it 'does not cut works in half' do
-          expect(subject.description).not_to include('descript...')
-        end
-        it 'adds an ellipsis' do
-          expect(subject.description[-3..-1]).to eq('...')
-        end
-      end
-    end
-
     describe '#show_midi_only_knobs?' do
       context 'when midi only patch fields are default values' do
         subject do

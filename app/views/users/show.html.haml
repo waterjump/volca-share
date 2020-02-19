@@ -1,6 +1,12 @@
 .container
   %h1= "Patches by #{@user.username}"
   %p= pluralize(@patches.count, 'patch')
+  - show_subheaders = @keys_patches.any?
   .patches
     = render 'shared/audio_preview'
+    - if show_subheaders
+      %h2= 'Volca Bass Patches'
     = render 'shared/patches'
+    - if show_subheaders
+      %h2.col-sm-12= 'Volca Keys Patches'
+      = render 'shared/keys_patches'

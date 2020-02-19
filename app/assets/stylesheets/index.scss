@@ -47,8 +47,13 @@
       .image {
         width: 100%;
         height: 100px;
-        background-image: image_url('patch-image-pixel-art.png');
         box-sizing: border-box;
+      }
+      .image.bass {
+        background-image: image_url('patch-image-pixel-art.png');
+      }
+      .image.keys {
+        background-image: image_url('patch-keys-image-pixel-art.png');
       }
       .has-audio {
         border: 4px solid #00bd2d;
