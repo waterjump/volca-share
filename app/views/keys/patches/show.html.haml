@@ -9,41 +9,41 @@
           = link_to(@patch.user.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
-
+= render 'shared/midi_control'
 #interface.col-lg-9
   .stretchy
     .volca.keys
-      .small.knob.first-row.vco-column.lit#detune{ data: { midi: @patch.detune || 0 } }
+      .small.knob.midi-enabled.first-row.vco-column.lit#detune{ data: { midi: @patch.detune || 0, control_number: 42 } }
         .notch
-      .small.knob.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento || 0 } }
+      .small.knob.midi-enabled.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento || 0, control_number: 5 } }
         .notch
-      .small.knob.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int || 0 } }
+      .small.knob.midi-enabled.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int || 0, control_number: 43 } }
         .notch
-      .small.knob.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff || 63 } }
+      .small.knob.midi-enabled.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 44 } }
         .notch
-      .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak || 0 } }
+      .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak || 0, control_number: 0 } }
         .notch
-      .small.knob.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int || 0 } }
+      .small.knob.midi-enabled.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int || 0, control_number: 45 } }
         .notch
-      .small.knob.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate || 0 } }
+      .small.knob.midi-enabled.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate || 0, control_number: 46 } }
         .notch
-      .small.knob.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int || 0 } }
+      .small.knob.midi-enabled.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int || 0, control_number: 47 } }
         .notch
-      .small.knob.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int || 0 } }
+      .small.knob.midi-enabled.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int || 0, control_number: 48 } }
         .notch
-      .small.knob.first-row.eg-column.lit#attack{ data: { midi: @patch.attack || 0 } }
+      .small.knob.midi-enabled.first-row.eg-column.lit#attack{ data: { midi: @patch.attack || 0, control_number: 49 } }
         .notch
-      .small.knob.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release || 63 } }
+      .small.knob.midi-enabled.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 50 } }
         .notch
-      .small.knob.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain || 127 } }
+      .small.knob.midi-enabled.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain || 127, control_number: 51 } }
         .notch
-      .knob.dark#voice{ data: { midi: @patch.voice || 70 } }
+      .knob.dark.midi-enabled#voice{ data: { midi: @patch.voice || 70, control_number: 40 } }
         .notch
-      .knob.dark#octave{ data: { midi: @patch.octave || 70 } }
+      .knob.dark.midi-enabled#octave{ data: { midi: @patch.octave || 70, control_number: 41 } }
         .notch
-      .small.knob.unlit#delay_time{ data: { midi: @patch.delay_time || 0 } }
+      .small.knob.midi-enabled.unlit#delay_time{ data: { midi: @patch.delay_time || 0, control_number: 52 } }
         .notch
-      .small.knob.unlit#delay_feedback{ data: { midi: @patch.delay_feedback || 0 } }
+      .small.knob.midi-enabled.unlit#delay_feedback{ data: { midi: @patch.delay_feedback || 0, control_number: 53 } }
         .notch
 
       .bottom-row
@@ -107,6 +107,8 @@
                     class: @patch.lit?(:tempo_delay) }
 
 .col-lg-3.col-md-9#patch-metadata
+  .mb-3
+    = render 'shared/midi_button', button_text: 'Send this patch to your Volca', new_form: false
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'
     %p
