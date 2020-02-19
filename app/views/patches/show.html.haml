@@ -9,7 +9,7 @@
           = link_to(@patch.username, user_path(@patch.user.slug))
         - else
           ¯\_(ツ)_/¯
-= render 'midi_control'
+= render 'shared/midi_control'
 #interface.col-lg-9.show
   .stretchy
     .volca.bass
@@ -123,7 +123,7 @@
             .notch
 
   .mb-3
-    = render 'midi_button', button_text: 'Send this patch to your Volca', new_form: false
+    = render 'shared/midi_button', button_text: 'Send this patch to your Volca', new_form: false
 
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'

@@ -1,7 +1,7 @@
 .clearfix
   .col-sm-12#patch-title
     %h1 Edit patch
-= render 'midi_control'
+= render 'shared/midi_control'
 = form_tag(patch_path(@patch.slug), method: :put, id: :patch_form) do
   - if @patch.errors.any?
     #error_explanation

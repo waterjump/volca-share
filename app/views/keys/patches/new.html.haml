@@ -1,5 +1,6 @@
 .clearfix
   %h1.hidden New patch
+= render 'shared/midi_control'
 = form_tag '/keys/patch', method: :post, id: :patch_form do
   - if @patch.errors.any?
     #error_explanation

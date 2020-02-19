@@ -11,37 +11,37 @@
 #interface.col-lg-9.form
   .stretchy
     .volca.keys
-      .small.knob.first-row.vco-column.lit#detune{ data: { midi: @patch.detune } }
+      .small.knob.midi-enabled.first-row.vco-column.lit#detune{ data: { midi: @patch.detune, control_number: 42 } }
         .notch
-      .small.knob.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento } }
+      .small.knob.midi-enabled.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento, control_number: 5 } }
         .notch
-      .small.knob.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int } }
+      .small.knob.midi-enabled.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int, control_number: 43 } }
         .notch
-      .small.knob.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff } }
+      .small.knob.midi-enabled.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff, control_number: 44 } }
         .notch
       .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak } }
         .notch
-      .small.knob.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int } }
+      .small.knob.midi-enabled.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int, control_number: 45 } }
         .notch
-      .small.knob.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate } }
+      .small.knob.midi-enabled.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate, control_number: 46 } }
         .notch
-      .small.knob.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int } }
+      .small.knob.midi-enabled.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int, control_number: 47 } }
         .notch
-      .small.knob.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int } }
+      .small.knob.midi-enabled.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int, control_number: 48 } }
         .notch
-      .small.knob.first-row.eg-column.lit#attack{ data: { midi: @patch.attack } }
+      .small.knob.midi-enabled.first-row.eg-column.lit#attack{ data: { midi: @patch.attack, control_number: 49 } }
         .notch
-      .small.knob.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release } }
+      .small.knob.midi-enabled.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release, control_number: 50 } }
         .notch
-      .small.knob.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain } }
+      .small.knob.midi-enabled.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain, control_number: 51 } }
         .notch
-      .dark.knob#voice{ data: { midi: @patch.voice } }
+      .dark.knob.midi-enabled#voice{ data: { midi: @patch.voice, control_number: 40 } }
         .notch
-      .dark.knob#octave{ data: { midi: @patch.octave } }
+      .dark.knob.midi-enabled#octave{ data: { midi: @patch.octave, control_number: 41 } }
         .notch
-      .small.knob.unlit#delay_time{ data: { midi: @patch.delay_time } }
+      .small.knob.midi-enabled.unlit#delay_time{ data: { midi: @patch.delay_time, control_number: 52 } }
         .notch
-      .small.knob.unlit#delay_feedback{ data: { midi: @patch.delay_feedback } }
+      .small.knob.midi-enabled.unlit#delay_feedback{ data: { midi: @patch.delay_feedback, control_number: 53 } }
         .notch
 
       .bottom-row
@@ -126,6 +126,8 @@
 
 .col-lg-3.col-md-9#patch-metadata
   %fieldset
+    .field.mb-3
+      = render 'shared/midi_button'
     - if current_user.present?
       .field
         = label_tag :privacy, 'Secret?'
