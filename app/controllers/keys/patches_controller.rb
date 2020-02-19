@@ -22,6 +22,9 @@ module Keys
           format.html { redirect_to patch_location }
           format.json { :no_content }
         else
+          @patch = VolcaShare::Keys::PatchViewModel.wrap(@patch)
+          @body_class = :form
+          @title = 'New Keys Patch'
           format.html { render 'patches/new', local: { patch: @patch } }
           format.json { :no_content }
         end
