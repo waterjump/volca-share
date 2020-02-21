@@ -20,8 +20,12 @@
   - @patches.each do |patch|
     .wrapper.col-md-6.well.well-sm.patch-holder
       .image-holder
-        = link_to patch do
-          .image.bass{ class: patch.index_classes }
+        - if patch.user.present?
+          = link_to user_patch_path(patch.user.slug, patch.slug) do
+            .image.bass{ class: patch.index_classes }
+        - else
+          = link_to patch do
+            .image.bass{ class: patch.index_classes }
       .patch
         - if patch.audio_sample.present?
           .speaker{ data: { slug: patch.slug, toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
