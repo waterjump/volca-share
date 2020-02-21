@@ -275,5 +275,42 @@ RSpec.describe Keys::Patch do
         validate_inclusion_of(:lfo_shape).to_allow('saw', 'triangle', 'square')
       )
     end
+
+    context 'when patch is all default values' do
+      it 'is not valid' do
+        default_patch =
+          FactoryBot.build(
+            :keys_patch,
+            voice: 70,
+            octave: 70,
+            detune: 0,
+            portamento: 0,
+            vco_eg_int: 0,
+            cutoff: 63,
+            peak: 0,
+            vcf_eg_int: 0,
+            lfo_rate: 0,
+            lfo_pitch_int: 0,
+            lfo_cutoff_int: 0,
+            attack: 0,
+            decay_release: 63,
+            sustain: 127,
+            delay_time: 0,
+            delay_feedback: 0,
+            lfo_shape: 'triangle',
+            lfo_trigger_sync: false,
+            step_trigger: false,
+            tempo_delay: true
+          )
+        expect(default_patch).to be_invalid
+      end
+    end
+
+    context 'when patch is not all default values' do
+      it 'is valid' do
+        non_default_patch = FactoryBot.build(:keys_patch, peak: 69)
+        expect(non_default_patch).to be_valid
+      end
+    end
   end
 end

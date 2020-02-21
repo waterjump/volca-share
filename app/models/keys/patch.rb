@@ -64,8 +64,37 @@ module Keys
     validates :delay_time, midi_validation_options
     validates :delay_feedback, midi_validation_options
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
+    validate :patch_is_not_default
 
     scope :browsable, -> { where(secret: false) }
+
+    private
+
+    def patch_is_not_default
+      not_default =
+        voice_changed_from_default? ||
+        octave_changed_from_default? ||
+        detune_changed_from_default? ||
+        portamento_changed_from_default? ||
+        vco_eg_int_changed_from_default? ||
+        cutoff_changed_from_default? ||
+        peak_changed_from_default? ||
+        vcf_eg_int_changed_from_default? ||
+        lfo_rate_changed_from_default? ||
+        lfo_pitch_int_changed_from_default? ||
+        lfo_cutoff_int_changed_from_default? ||
+        attack_changed_from_default? ||
+        decay_release_changed_from_default? ||
+        sustain_changed_from_default? ||
+        delay_time_changed_from_default? ||
+        delay_feedback_changed_from_default? ||
+        lfo_shape_changed_from_default? ||
+        lfo_trigger_sync_changed_from_default? ||
+        step_trigger_changed_from_default? ||
+        tempo_delay_changed_from_default?
+
+      errors.add(:patch, 'is not valid.') unless not_default
+    end
   end
 end
 
