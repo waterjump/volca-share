@@ -43,7 +43,7 @@ module Keys
           end
 
           it 'renders edit page' do
-            expect(response).to render_template('patches/edit')
+            expect(response).to render_template('keys/patches/edit')
           end
         end
 
@@ -302,7 +302,7 @@ module Keys
             params: { patch: invalid_attributes },
             session: valid_session
           )
-          expect(response).to render_template('patches/new')
+          expect(response).to render_template('keys/patches/new')
         end
       end
     end

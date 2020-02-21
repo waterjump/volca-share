@@ -25,7 +25,11 @@ module Keys
           @patch = VolcaShare::Keys::PatchViewModel.wrap(@patch)
           @body_class = :form
           @title = 'New Keys Patch'
-          format.html { render 'patches/new', local: { patch: @patch } }
+
+          format.html do
+            render 'keys/patches/new', location: new_keys_patch_url(@patch)
+          end
+
           format.json { :no_content }
         end
       end
