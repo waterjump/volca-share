@@ -129,13 +129,12 @@ class PatchesController < ApplicationController
 
   private
 
-  # Use callbacks to share common setup or constraints between actions.
   def set_patch
     patch_model =
       begin
         Patch.find_by(slug: params[:slug])
       rescue
-        Patch.find(params[:slug]) # HACK: this is actually the id (-_-,)
+        Patch.find(params[:id])
       end
     @patch = VolcaShare::PatchViewModel.wrap(patch_model)
     user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"

@@ -140,9 +140,9 @@
 .col-sm-12
   .form-detail-actions
     - if @patch.user.present? && @patch.user == current_user
-      = link_to 'Edit', edit_patch_path(@patch.slug)
+      = link_to 'Edit', edit_patch_path(@patch)
       \|
-      = form_tag patch_path(@patch.slug), method: :delete do
+      = form_tag patch_path(@patch), method: :delete do
         = submit_tag 'Delete', class: :link
       \|
     - else

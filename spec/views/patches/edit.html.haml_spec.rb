@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'patches/edit.html.haml', type: :view do
   # TODO: move this to a spec helper specific to view specs
-  let!(:user) { FactoryBot.build(:user) }
+  let!(:user) { FactoryBot.create(:user) }
   let(:user_patch) do
     VolcaShare::PatchViewModel.wrap(
-      user.patches.build(FactoryBot.attributes_for(:patch))
+      user.patches.create(FactoryBot.attributes_for(:patch))
     )
   end
   before do

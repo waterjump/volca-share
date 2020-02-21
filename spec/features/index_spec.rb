@@ -2,6 +2,9 @@
 
 require 'rails_helper'
 
+# TODO: A lot of these tests can be covered by view specs instead of
+#   feature specs.
+
 RSpec.describe 'Patch index page', type: :feature, js: true do
 
   let(:user) { FactoryBot.create(:user) }
@@ -66,8 +69,18 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
       expect(page).not_to have_button('Delete')
     end
-  end
 
+    it 'links to the edit patch page' do
+      patch = FactoryBot.create(:patch, user_id: user.id)
+
+      login
+      visit patches_path
+
+      page.find(:css, '.edit').click
+
+      expect(page).to have_content('Edit patch')
+    end
+  end
 
   context 'when user as not logged in' do
     let!(:patch) { FactoryBot.create(:patch) }

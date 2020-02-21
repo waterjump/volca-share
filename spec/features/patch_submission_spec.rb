@@ -54,7 +54,7 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     let(:patch) { FactoryBot.create(:patch, user_id: user.id) }
     before do
       login
-      visit edit_patch_path(patch.slug)
+      visit edit_patch_path(patch.id)
     end
 
     it 'accepts valid soundcloud URLS' do
