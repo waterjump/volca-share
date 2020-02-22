@@ -2,11 +2,7 @@
 
 require 'rails_helper'
 
-# TODO: A lot of these tests can be covered by view specs instead of
-#   feature specs.
-
-RSpec.describe 'Patch index page', type: :feature, js: true do
-
+RSpec.describe 'Patch index page', type: :feature do
   let(:user) { FactoryBot.create(:user) }
 
   it 'can be accessed by link in header' do
@@ -25,7 +21,9 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       audio_sample: '',
       name: 'minimal'
     )
+
     visit patches_path
+
     expect(all('.patch')[0]).to have_link('complete')
     expect(all('.patch')[1]).to have_link('okay')
     expect(all('.patch')[2]).to have_link('minimal')
@@ -41,8 +39,11 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       audio_sample: '',
       name: 'minimal'
     )
+
     visit patches_path
+
     click_link 'Date Created'
+
     expect(all('.patch')[0]).to have_link('minimal')
     expect(all('.patch')[1]).to have_link('complete')
     expect(all('.patch')[2]).to have_link('okay')
@@ -60,17 +61,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       expect(page).to have_content('No patches to show.')
     end
 
-    it 'does not allow user to delete patches of others' do
-      FactoryBot.create(:patch, user_id: user.id)
-      user_2 = FactoryBot.create(:user)
-
-      login(user_2)
-      visit patches_path
-
-      expect(page).not_to have_button('Delete')
-    end
-
-    it 'links to the edit patch page' do
+    it 'links to the edit patch page', :js do
       patch = FactoryBot.create(:patch, user_id: user.id)
 
       login
@@ -82,20 +73,12 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     end
   end
 
-  context 'when user as not logged in' do
-    let!(:patch) { FactoryBot.create(:patch) }
-
-    before { visit patches_path }
-
-    it "doesn't display controls to delete anononymous patches" do
-      expect(page).not_to have_button('Delete')
-    end
-
-    it "doesn't display controls to edit anononymous patches" do
-      expect(page).not_to have_selector('.edit.glyph')
-    end
-
+  context 'when user is not logged in' do
     it 'shows anonymous patches' do
+      patch = create(:patch)
+
+      visit patches_path
+
       expect(page).to have_content(patch.name)
     end
 
@@ -110,7 +93,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     end
   end
 
-  describe 'pagination of patch index' do
+  describe 'pagination' do
     let(:first_patch) do
       FactoryBot.create(
         :patch,
@@ -120,14 +103,14 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
         tags: []
       )
     end
-    let(:last_patch) do
-      FactoryBot.create(:patch, user_id: user.id)
-    end
+
+    let(:last_patch) { create(:patch, user_id: user.id) }
 
     before do
       first_patch
       20.times { FactoryBot.create(:patch, user_id: user.id, audio_sample: '') }
       last_patch
+
       visit patches_path
     end
 
@@ -147,18 +130,6 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       it 'shows 20 patches per page' do
         expect(page).to have_selector('.patch-holder', count: 20)
       end
-
-      it 'shows link to next page' do
-        within '.pagination' do
-          expect(page).to have_link('2')
-        end
-      end
-
-      it 'doesn\'t show link to invalid pages' do
-        within '.pagination' do
-          expect(page).not_to have_link('3')
-        end
-      end
     end
 
     describe 'second page' do
@@ -174,47 +145,35 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
       it 'show the pagination controls' do
         expect(page).to have_selector('.pagination')
+        expect(page).to have_link('1')
       end
 
       it 'shows remaining patches' do
         expect(page).to have_selector('.patch-holder', count: 2)
-      end
-
-      it 'shows pagination links to other pages' do
-        expect(page).to have_link('1')
       end
     end
   end
 
   context 'when a patch has tags' do
     it 'shows link to tag page' do
-      patch1 = FactoryBot.create(:patch, user_id: user.id,tag_list: 'cool')
+      create(:patch, user_id: user.id, tag_list: 'cool')
 
-      visit patch_path(patch1)
+      visit patches_path
       click_link('#cool')
 
-      expect(page).to have_current_path(tags_show_path(tag: 'cool'))
+      expect(page).to have_content('#cool tags')
     end
   end
 
-  describe 'audio previews are shown' do
-    let(:patch) do
-      FactoryBot.create(:patch, user_id: user.id)
-    end
+  describe 'audio previews are shown', :js do
+    let!(:patch) { create(:patch, user_id: user.id) }
 
     before do
-      patch
       visit patches_path
     end
 
-    it 'shows the speaker icon' do
-      expect(first('.patch')).to have_css('.speaker')
-    end
-
     describe 'audio preview' do
-      before do
-        first('.speaker').click
-      end
+      before { first('.speaker').click }
 
       it 'shows preview in an iframe' do
         expect(page).to have_selector('iframe')
@@ -222,6 +181,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
 
       it 'links to patch' do
         click_link 'Go to Patch'
+
         expect(page.current_path).to eq(user_patch_path(user.slug, patch.slug))
       end
     end

@@ -17,6 +17,7 @@
             = link_to 'Quality', patches_path
           - else
             Quality
+
   - @patches.each do |patch|
     .wrapper.col-md-6.well.well-sm.patch-holder
       .image-holder
@@ -26,6 +27,7 @@
         - else
           = link_to patch do
             .image.bass{ class: patch.index_classes }
+
       .patch
         - if patch.audio_sample.present?
           .speaker{ data: { slug: patch.slug, toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
@@ -40,6 +42,7 @@
         .tags
           - patch.tags.each do |tag|
             = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag
+
       .info
         - if patch.user.present?
           = link_to patch.username, user_path(patch.user.slug), { class: :username }
@@ -51,5 +54,8 @@
           - if current_user.present? && patch.user == current_user
             = link_to edit_patch_path(patch) do
               .edit.glyph
-            = form_tag patch_path(patch), method: :delete, class: :delete_form, data: { confirm: 'Are you sure you want to delete that patch?' } do
+            = form_tag patch_path(patch),
+              method: :delete,
+              class: :delete_form,
+              data: { confirm: 'Are you sure you want to delete that patch?' } do
               = submit_tag 'Delete', class: 'delete glyph'
