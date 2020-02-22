@@ -25,6 +25,7 @@ FactoryBot.define do
     step_trigger { FFaker::Boolean.maybe }
     tempo_delay { FFaker::Boolean.maybe }
 
+    audio_sample { 'https://soundcloud.com/69bot/shallow' }
     slug { name.parameterize }
     tags { FFaker::Lorem.words(3) }
   end

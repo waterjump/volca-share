@@ -29,6 +29,7 @@ def fill_out_keys_patch_form(patch, anon = false)
   fill_in 'patch[tags]', with: patch.tags.join(', '), visible: false
   return if anon
   check 'patch[secret]' if patch.secret?
+  fill_in 'patch[audio_sample]', with: patch.audio_sample
 end
 
 def keys_js_knobs_rotated(patch, options = {})
@@ -155,6 +156,10 @@ def reflects_keys_patch(patch, options = {})
     expect(interface).to have_css('#step_trigger_light.lit')
   else
     expect(interface).to have_css('#step_trigger_light.unlit')
+  end
+
+  if patch.audio_sample.present?
+    expect(interface).to have_css('.sample')
   end
 
   # Content

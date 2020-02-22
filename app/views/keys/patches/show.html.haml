@@ -119,6 +119,9 @@
     = label_tag 'patch[notes]', 'Notes'
     .well
       = @patch.notes
+  - if @patch.audio_sample_code.present?
+    = label_tag 'patch[audio_sample]', 'Audio sample'
+    .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
 .col-sm-12
   .form-detail-actions
     - if @patch.user.present? && @patch.user == current_user

@@ -91,4 +91,87 @@ RSpec.describe VolcaShare::Shared do
       expect(view_model.formatted_tags).not_to match(/[A-Z]+/)
     end
   end
+
+  describe '#audio_sample_code' do
+    before do
+      allow(view_model).to(
+        receive(:model).and_return(double(audio_sample: audio_sample))
+      )
+    end
+
+    context 'when audio sample is from soundcloud' do
+      let(:audio_sample) do
+        'https://soundcloud.com/69bot/shallow'
+      end
+
+      it 'returns soundcloud embed code' do
+        expect(view_model.audio_sample_code).to(
+          eq(
+            '<iframe width="100%" height="81" scrolling="no" frameborder="no"' \
+            ' src="https://w.soundcloud.com/player/?visual=true&url=https%3A%' \
+            '2F%2Fapi.soundcloud.com%2Ftracks%2F258722704&show_artwork=true&m' \
+            'axheight=81"></iframe>'
+          )
+        )
+      end
+
+      context 'and url is not found' do
+        let(:audio_sample) { 'https://soundcloud.com/volcashare/temp' }
+
+        it 'returns nil' do
+          expect(view_model.audio_sample_code).to be_nil
+        end
+      end
+    end
+
+    context 'when audio sample is from youtube' do
+      let(:audio_sample) { 'https://youtube.com/watch?v=GF60Iuh643I' }
+
+      it 'returns the embeddable code' do
+        expect(view_model.audio_sample_code).to(
+          eq(
+            '<iframe width="480" height="270" ' \
+            'src="https://www.youtube.com/embed/GF60Iuh643I?feature=oembed" ' \
+            'frameborder="0" allowfullscreen></iframe>'
+          )
+        )
+      end
+
+      context 'when video is not found' do
+        let(:audio_sample) { 'https://youtube.com/watch?v=QF60Iuh643I' }
+
+        it 'returns nil' do
+          expect(view_model.audio_sample_code).to be_nil
+        end
+      end
+    end
+
+    context 'when freesound id is short' do
+      let(:audio_sample) { 'https://freesound.org/people/Bram/sounds/11' }
+
+      it 'parses the id' do
+        expect(view_model.audio_sample_code)
+          .to eq(
+            "<iframe frameborder='0' scrolling='no'"\
+            " src='http://www.freesound.org/embed/sound/iframe/11/simple/small/'"\
+            " width='375' height='30'></iframe>"
+          )
+      end
+    end
+
+    context 'when freesound id is long' do
+      let(:audio_sample) do
+        'https://freesound.org/people/LoomyPoo/sounds/371855/'
+      end
+
+      it 'parses the id' do
+        expect(view_model.audio_sample_code)
+          .to eq(
+            "<iframe frameborder='0' scrolling='no'"\
+            " src='http://www.freesound.org/embed/sound/iframe/371855/simple/small/'"\
+            " width='375' height='30'></iframe>"
+          )
+      end
+    end
+  end
 end

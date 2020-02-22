@@ -3,6 +3,7 @@
 module VolcaShare
   module Keys
     class PatchViewModel < ApplicationViewModel
+      include AudioRegex
       include Shared
 
       def lfo_shape_saw

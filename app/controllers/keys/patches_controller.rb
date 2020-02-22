@@ -19,7 +19,13 @@ module Keys
 
       respond_to do |format|
         if patch_created?
-          format.html { redirect_to patch_location }
+          format.html do
+            redirect_to(
+              patch_location,
+              notice: 'Patch saved successfully.'
+            )
+          end
+
           format.json { :no_content }
         else
           @patch = VolcaShare::Keys::PatchViewModel.wrap(@patch)
@@ -140,7 +146,8 @@ module Keys
             :tempo_delay,
             :tags,
             :notes,
-            :secret
+            :secret,
+            :audio_sample
           )
     end
 

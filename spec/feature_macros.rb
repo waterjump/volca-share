@@ -220,6 +220,10 @@ def reflects_patch(patch, options = {})
     expect(interface).not_to have_css('#amp_eg_on_light.lit')
   end
 
+  if patch.audio_sample.present?
+    expect(interface).to have_css('.sample')
+  end
+
   # Content
   return if form
   patch.tags.each do |tag|
@@ -240,74 +244,4 @@ def snap_knob_rotation_from_midi(midi)
   }
 
   midi_to_degree_map[midi]
-end
-
-def reflects_keys_patch(patch, options = {})
-  interface = options[:interface] || page
-  form = options[:form] || false
-  # Knobs
-  expect(interface).to have_css("#detune[data-midi='#{patch.detune}']")
-  expect(interface).to have_css("#portamento[data-midi='#{patch.portamento}']")
-  expect(interface).to have_css("#vco_eg_int[data-midi='#{patch.vco_eg_int}']")
-  expect(interface).to have_css("#cutoff[data-midi='#{patch.cutoff}']")
-  expect(interface).to have_css("#peak[data-midi='#{patch.peak}']")
-  expect(interface).to have_css("#vcf_eg_int[data-midi='#{patch.vcf_eg_int}']")
-  expect(interface).to have_css("#lfo_rate[data-midi='#{patch.lfo_rate}']")
-  expect(interface).to have_css("#lfo_pitch_int[data-midi='#{patch.lfo_pitch_int}']")
-  expect(interface).to have_css("#lfo_cutoff_int[data-midi='#{patch.lfo_cutoff_int}']")
-  expect(interface).to have_css("#attack[data-midi='#{patch.attack}']")
-  expect(interface).to(
-    have_css("#decay_release[data-midi='#{patch.decay_release}']")
-  )
-  expect(interface).to have_css("#sustain[data-midi='#{patch.sustain}']")
-  expect(interface).to have_css("#delay_time[data-midi='#{patch.delay_time}']")
-  expect(interface).to have_css("#delay_feedback[data-midi='#{patch.delay_feedback}']")
-  expect(interface).to have_css("#voice[data-midi='#{patch.voice}']")
-  expect(interface).to have_css("#octave[data-midi='#{patch.octave}']")
-
-  # Lights
-  if patch.lfo_shape == 'saw'
-    expect(interface).to have_css('#lfo_shape_saw_light.lit')
-  else
-    expect(interface).to have_css('#lfo_shape_saw_light.unlit')
-  end
-
-  if patch.lfo_shape == 'triangle'
-    expect(interface).to have_css('#lfo_shape_triangle_light.lit')
-  else
-    expect(interface).to have_css('#lfo_shape_triangle_light.unlit')
-  end
-
-  if patch.lfo_shape == 'square'
-    expect(interface).to have_css('#lfo_shape_square_light.lit')
-  else
-    expect(interface).to have_css('#lfo_shape_square_light.unlit')
-  end
-
-  if patch.lfo_trigger_sync
-    expect(interface).to have_css('#lfo_trigger_sync_light.lit')
-  else
-    expect(interface).to have_css('#lfo_trigger_sync_light.unlit')
-  end
-
-  if patch.tempo_delay
-    expect(interface).to have_css('#tempo_delay_light.lit')
-  else
-    expect(interface).to have_css('#tempo_delay_light.unlit')
-  end
-
-  if patch.step_trigger
-    expect(interface).to have_css('#step_trigger_light.lit')
-  else
-    expect(interface).to have_css('#step_trigger_light.unlit')
-  end
-
-  # Content
-  return if form
-
-  patch.tags.each do |tag|
-    expect(interface).to have_link("##{tag}")
-  end
-  expect(interface).to have_content(patch.name)
-  expect(interface).to have_content(patch.notes)
 end

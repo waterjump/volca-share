@@ -2,8 +2,9 @@
 
 require 'rails_helper'
 
-RSpec.describe 'patches/edit.html.haml', type: :view do
-  # TODO: move this to a spec helper specific to view specs
+# TODO: need to rewrite these test to ONLY test the edit template, not the
+#   form it renders
+RSpec.xdescribe 'patches/edit.html.haml', type: :view do
   let!(:user) { FactoryBot.create(:user) }
   let(:user_patch) do
     VolcaShare::PatchViewModel.wrap(

@@ -155,27 +155,33 @@
     .field.mb-3
       = render 'shared/midi_button'
       = render 'randomize'
+
     - if current_user.present?
       .field
         = label_tag :privacy, 'Secret?'
         = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
     - else
       = hidden_field_tag 'patch[secret]', 'false'
+
     .field
       = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
       = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'tags, separated, by, commas'
+
     .field
       = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
       = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+
     - if current_user.present?
       .field
         = label_tag :audio_sample, 'Audio Sample URL'
-        = render 'audio_sample', button_text: '?'
+        = render 'shared/audio_sample', button_text: '?'
         = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: @patch.audio_sample_regex
       - if @patch.audio_sample.present?
         .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
+
     - if current_user.nil? && Rails.env.production?
       = recaptcha_tags
+
     - if current_user.nil?
       %strong
         = "To edit, or delete your patches, "

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'audio_sample_validator.rb'
+
 module Keys
   class Patch
     include Mongoid::Document
@@ -9,6 +11,7 @@ module Keys
 
     field :name, type: String
     field :secret, type: Boolean, default: false
+    field :audio_sample, type: String
     field :notes, type: String
     field :slug, type: String
 
@@ -64,6 +67,7 @@ module Keys
     validates :delay_time, midi_validation_options
     validates :delay_feedback, midi_validation_options
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
+    validates :audio_sample, audio_sample: true
     validate :patch_is_not_default
 
     scope :browsable, -> { where(secret: false) }

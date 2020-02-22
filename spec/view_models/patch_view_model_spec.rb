@@ -111,62 +111,6 @@ module VolcaShare
       end
     end
 
-    describe '#audio_sample_code' do
-      context 'when audio sample is from soundcloud' do
-        context 'and url is not found' do
-          subject do
-            PatchViewModel.wrap(
-              FactoryBot.build(
-                :patch,
-                audio_sample: 'https://soundcloud.com/volcashare/temp'
-              )
-            )
-          end
-
-          it 'returns nil' do
-            expect(subject.audio_sample_code).to be_nil
-          end
-        end
-      end
-
-      context 'when freesound id is short' do
-        subject do
-          PatchViewModel.wrap(
-            FactoryBot.build(
-              :patch,
-              audio_sample: 'https://freesound.org/people/Bram/sounds/11/'
-            )
-          )
-        end
-        it 'parses the id' do
-          expect(subject.audio_sample_code)
-            .to eq(
-              "<iframe frameborder='0' scrolling='no'"\
-              " src='http://www.freesound.org/embed/sound/iframe/11/simple/small/'"\
-              " width='375' height='30'></iframe>"
-            )
-        end
-      end
-      context 'when freesound id is long' do
-        subject do
-          PatchViewModel.wrap(
-            FactoryBot.build(
-              :patch,
-              audio_sample: 'https://freesound.org/people/LoomyPoo/sounds/371855/'
-            )
-          )
-        end
-        it 'parses the id' do
-          expect(subject.audio_sample_code)
-            .to eq(
-              "<iframe frameborder='0' scrolling='no'"\
-              " src='http://www.freesound.org/embed/sound/iframe/371855/simple/small/'"\
-              " width='375' height='30'></iframe>"
-            )
-        end
-      end
-    end
-
     describe '#show_midi_only_knobs?' do
       context 'when midi only patch fields are default values' do
         subject do

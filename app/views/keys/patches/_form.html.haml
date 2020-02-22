@@ -166,6 +166,18 @@
   = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
   = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
 
+  - if current_user.present?
+    .field
+      = label_tag :audio_sample, 'Audio Sample URL'
+      = render 'shared/audio_sample', button_text: '?'
+      = text_field_tag 'patch[audio_sample]',
+                       @patch.audio_sample,
+                       class: 'form-control',
+                       required: false,
+                       placeholder: 'https://www.soundcloud.com/artist-name/track-name',
+                       pattern: @patch.audio_sample_regex
+    - if @patch.audio_sample.present?
+      .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
   - if current_user.nil? && Rails.env.production?
     = recaptcha_tags
 #save_or_cancel.col-sm-12

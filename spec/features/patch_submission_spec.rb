@@ -32,6 +32,15 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
   end
 
   context 'when user is anonymous' do
+    let(:dummy_patch) do
+      FactoryBot.build(
+        :patch,
+        name: 'My Cool Patch',
+        notes: 'This patch is cool.',
+        audio_sample: nil
+      )
+    end
+
     before do
       visit new_patch_path
       fill_out_patch_form(dummy_patch, true)
@@ -47,6 +56,11 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     it 'directs user to show patch page' do
       expect(current_path).to eq(patch_path(Patch.first))
       expect(page).to have_title("#{dummy_patch.name} by ¯\\_(ツ)_/¯ | VolcaShare")
+    end
+
+    it 'reflects the patch' do
+      reflects_patch(dummy_patch)
+      js_knobs_rotated(dummy_patch)
     end
   end
 

@@ -142,6 +142,14 @@ RSpec.describe Keys::Patch do
           .with_default_value_of(true)
       )
     end
+
+    it do
+      is_expected.to(
+        have_field(:audio_sample)
+          .of_type(String)
+          .with_default_value_of(nil)
+      )
+    end
   end
 
   describe 'validations' do
@@ -273,6 +281,12 @@ RSpec.describe Keys::Patch do
     it do
       is_expected.to(
         validate_inclusion_of(:lfo_shape).to_allow('saw', 'triangle', 'square')
+      )
+    end
+
+    it do
+      is_expected.to(
+        custom_validate(:audio_sample).with_validator(AudioSampleValidator)
       )
     end
 

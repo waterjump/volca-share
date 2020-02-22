@@ -3,13 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'keys/patches/_form.html.haml', type: :view do
-  xcontext 'when patch has an audio sample' do
+  context 'when patch has an audio sample' do
     let!(:user) { FactoryBot.build(:user) }
     let(:user_patch) do
-      VolcaShare::PatchViewModel.wrap(
-        user.patches.build(FactoryBot.attributes_for(:patch))
+      VolcaShare::Keys::PatchViewModel.wrap(
+        user.keys_patches.build(FactoryBot.attributes_for(:keys_patch))
       )
     end
+
     it 'shows a preview of the audio sample' do
       @patch = user_patch
       render partial: 'keys/patches/form.html.haml', locals: { current_user: user }
@@ -48,14 +49,20 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
   end
 
   context 'when user is logged in' do
-    it 'shows checkbox to make the patch secret' do
+    before do
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
       render(
         partial: 'keys/patches/form.html.haml',
         locals: { current_user: create(:user) }
       )
+    end
 
+    it 'shows checkbox to make the patch secret' do
       expect(rendered).to have_css('#patch_secret')
+    end
+
+    it 'has an audio sample field' do
+      expect(rendered).to have_css('#patch_audio_sample')
     end
   end
 
