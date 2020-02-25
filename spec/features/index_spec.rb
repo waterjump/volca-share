@@ -7,7 +7,8 @@ RSpec.describe 'Patch index page', type: :feature do
 
   it 'can be accessed by link in header' do
     visit root_path
-    click_link('Browse')
+    click_link('Bass')
+    first(:link, 'Browse').click
     expect(current_path).to eq(patches_path)
   end
 

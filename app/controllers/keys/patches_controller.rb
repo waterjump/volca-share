@@ -6,6 +6,16 @@ module Keys
     before_action :set_patch, only: [:show, :edit, :update, :destroy]
     before_action :authenticate_user!, only: [:edit, :update, :destroy]
 
+    def index
+      @keys_patches =
+        Kaminari.paginate_array(
+          VolcaShare::Keys::PatchViewModel.wrap(
+            Patch.browsable.includes(:user).desc(:created_at)
+          )
+        ).page(params[:page].to_i)
+      @title = 'Browse Keys Patches'
+    end
+
     def new
       @body_class = :form
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)

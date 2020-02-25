@@ -5,7 +5,7 @@
     %meta{:content => "width=device-width, initial-scale=1", :name => "viewport"}/
     %meta{:content => "Korg,Volca Bass,synthesizer,patch sheet,Web MIDI,share,patches,analog,bassline,lead,SFX,cutoff,envelope,peak,resonance,filter,LFO,oscillator,acid house,TB-303,audio,samples,VCF,VCO", :name => "Keywords"}/
     %meta{:content => "Browse, create, and share patches for the Korg Volca Bass synthesizer.  Sync and control parameters from the browser in real-time via Web MIDI", :name => "Description"}/
-    %title= [@title, 'VolcaShare'].reject { |c| c.blank? }.join(' | ')
+    %title= [@title, 'VolcaShare'].compact.join(' | ')
     %link{:href => asset_path('favicon.ico'), :rel => 'shortcut icon'}/
     = stylesheet_link_tag    'application', media: 'all', async: Rails.env.production?
     = javascript_include_tag 'application', async: Rails.env.production?

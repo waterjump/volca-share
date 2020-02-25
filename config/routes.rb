@@ -31,8 +31,9 @@ Rails.application.routes.draw do
               controller: 'patches',
               only: [:new, :show, :update, :destroy],
               param: :id
+    resources :patches, only: [:index]
     post 'patch' => 'patches#create'
   end
 
-  root 'patches#new'
+  root 'welcome#index'
 end
