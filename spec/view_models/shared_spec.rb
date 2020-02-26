@@ -124,10 +124,11 @@ RSpec.describe VolcaShare::Shared do
       end
     end
 
-    context 'when audio sample is from youtube' do
+    context 'when audio sample is regular youtube link' do
       let(:audio_sample) { 'https://youtube.com/watch?v=GF60Iuh643I' }
 
       it 'returns the embeddable code' do
+        expect(::OEmbed::Providers::Youtube).not_to receive(:get)
         expect(view_model.audio_sample_code).to(
           eq(
             '<iframe width="480" height="270" ' \
@@ -136,13 +137,42 @@ RSpec.describe VolcaShare::Shared do
           )
         )
       end
+    end
 
-      context 'when video is not found' do
-        let(:audio_sample) { 'https://youtube.com/watch?v=QF60Iuh643I' }
+    context 'when audio sample is shortened youtube link' do
+      let(:audio_sample) { 'https://youtu.be/GF60Iuh643I' }
 
-        it 'returns nil' do
-          expect(view_model.audio_sample_code).to be_nil
-        end
+      it 'returns the embeddable code' do
+        expect(::OEmbed::Providers::Youtube).not_to receive(:get)
+        expect(view_model.audio_sample_code).to(
+          eq(
+            '<iframe width="480" height="270" ' \
+            'src="https://www.youtube.com/embed/GF60Iuh643I?feature=oembed" ' \
+            'frameborder="0" allowfullscreen></iframe>'
+          )
+        )
+      end
+    end
+
+    context 'when youtube video is not found' do
+      let(:audio_sample) { 'https://youtube.com/watch?v=QF60Iuh643I' }
+
+      it 'returns embed code anyway (youtube will render video unavailable)' do
+        expect(view_model.audio_sample_code).to(
+          eq(
+            '<iframe width="480" height="270" ' \
+            'src="https://www.youtube.com/embed/QF60Iuh643I?feature=oembed" ' \
+            'frameborder="0" allowfullscreen></iframe>'
+          )
+        )
+      end
+    end
+
+    context 'when youtube link does not have proper id' do
+      let(:audio_sample) { 'https://youtube.com/watch?v=mommy' }
+
+      it 'returns nil' do
+        expect(view_model.audio_sample_code).to be_nil
       end
     end
 
