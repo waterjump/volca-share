@@ -204,6 +204,7 @@ GEM
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
+    rack-timeout (0.6.0)
     rails (5.1.6.2)
       actioncable (= 5.1.6.2)
       actionmailer (= 5.1.6.2)
@@ -386,6 +387,7 @@ DEPENDENCIES
   poltergeist
   puma
   rack (~> 2.0.6)
+  rack-timeout
   rails (= 5.1.6.2)
   rails-controller-testing
   rails-html-sanitizer (~> 1.0.4)

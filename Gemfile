@@ -23,6 +23,7 @@ gem 'mongoid-simple-tags'
 gem 'nokogiri', '>= 1.10.4'
 gem 'rails', '5.1.6.2'
 gem 'rack', '~> 2.0.6'
+gem 'rack-timeout'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'rubocop', '~> 0.66.0', require: false
