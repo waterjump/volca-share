@@ -144,8 +144,7 @@
       \|
       = form_tag patch_path(@patch), method: :delete do
         = submit_tag 'Delete', class: :link
-      \|
-    - else
+    - if !current_user.present?
       %strong
         = "To edit or delete your patches, "
         = link_to 'create an account', new_user_registration_path

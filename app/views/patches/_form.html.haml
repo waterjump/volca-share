@@ -189,7 +189,11 @@
 #save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
-    = link_to 'Cancel', patches_path
+    &nbsp;
+    - if @patch.persisted?
+      = link_to 'Cancel', user_patch_path(@patch.user.slug, @patch.slug)
+    - else
+      = link_to 'Cancel', patches_path
 .off-canvas
   =image_tag('numbers.jpg')
   =image_tag('symbols.jpg')

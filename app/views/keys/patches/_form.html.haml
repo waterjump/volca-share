@@ -183,3 +183,8 @@
 #save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
+    &nbsp;
+    - if @patch.persisted?
+      = link_to 'Cancel', user_keys_patch_path(@patch.user.slug, @patch.slug)
+    - else
+      = link_to 'Cancel', keys_patches_path
