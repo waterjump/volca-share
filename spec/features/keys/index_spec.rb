@@ -118,4 +118,28 @@ RSpec.describe 'Keys patch index page', type: :feature do
       end
     end
   end
+
+  describe 'audio previews are shown', :js do
+    let!(:patch) { create(:keys_patch, user_id: user.id) }
+
+    before do
+      visit keys_patches_path
+    end
+
+    describe 'audio preview' do
+      before { first('.speaker').click }
+
+      it 'shows preview in an iframe' do
+        expect(page).to have_selector('iframe')
+      end
+
+      it 'links to patch' do
+        click_link 'Go to Patch'
+
+        expect(page.current_path).to(
+          eq(user_keys_patch_path(user.slug, patch.slug))
+        )
+      end
+    end
+  end
 end

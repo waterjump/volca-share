@@ -7,9 +7,9 @@ $('*').on('hide.bs.modal', function() {
 $(function() {
   $('.speaker').on('click tap', function() {
     $('#preview-modal-body').html("<img class='loading' src='<%= asset_path('loading.gif') %>' alt='Loading' />");
-    const slug = $(this).data('slug');
+    const url = $(this).data('oembed-url');
     $.ajax({
-      url: `/oembed?slug=${slug}`,
+      url: url,
       data: { format: 'json' },
       error(jqXHR, textStatus, errorThrown) {
         // alert(errorThrown);

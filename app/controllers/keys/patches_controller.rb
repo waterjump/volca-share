@@ -3,7 +3,7 @@
 module Keys
   class PatchesController < ApplicationController
     before_action :format_tags, only: [:create, :update]
-    before_action :set_patch, only: [:show, :edit, :update, :destroy]
+    before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
     before_action :authenticate_user!, only: [:edit, :update, :destroy]
 
     def index
@@ -102,6 +102,19 @@ module Keys
             keys_patch_url(@patch.id),
             notice: notice_message
           )
+        end
+      end
+    end
+
+    def oembed
+      respond_to do |format|
+        return unless @patch.present? && @patch.audio_sample.present?
+        format.json do
+          render json: {
+            audio_sample_code: @patch.audio_sample_code,
+            name: @patch.name,
+            patch_location: user_keys_patch_path(@patch.user.slug, @patch.slug)
+          }
         end
       end
     end

@@ -33,6 +33,7 @@ Rails.application.routes.draw do
               param: :id
     resources :patches, only: [:index]
     post 'patch' => 'patches#create'
+    match 'oembed' => 'patches#oembed', via: :get
   end
 
   root 'welcome#index'

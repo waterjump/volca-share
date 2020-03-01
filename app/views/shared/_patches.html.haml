@@ -30,7 +30,7 @@
 
       .patch
         - if patch.audio_sample.present?
-          .speaker{ data: { slug: patch.slug, toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
+          .speaker{ data: { oembed_url: "/oembed?slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
         - if patch.user.present?
           = link_to patch.name, user_patch_path(patch.user.slug, patch.slug), { class: :title }
         - else
