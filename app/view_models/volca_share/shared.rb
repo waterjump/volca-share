@@ -22,6 +22,11 @@ module VolcaShare
       tags.map(&:downcase).join(', ')
     end
 
+    def index_classes
+      return [] unless audio_sample.present?
+      %w(has-audio)
+    end
+
     def audio_sample_code
       return unless audio_sample.present?
 

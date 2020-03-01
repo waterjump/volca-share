@@ -17,12 +17,6 @@ module VolcaShare
       vco_group == 'three'
     end
 
-    def index_classes
-      classes = []
-      classes << 'secret' if secret
-      classes << 'has-audio' if audio_sample.present?
-    end
-
     def username
       user.try(:username)
     end

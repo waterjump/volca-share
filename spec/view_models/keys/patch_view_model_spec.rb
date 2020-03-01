@@ -73,24 +73,6 @@ module VolcaShare
           end
         end
       end
-
-      describe '#index_classes' do
-        context 'when patch has no audio sample' do
-          it 'returns an empty array' do
-            view_model = PatchViewModel.wrap(build(:keys_patch, audio_sample: ''))
-
-            expect(view_model.index_classes).to eq([])
-          end
-        end
-
-        context 'when patch has an audio sample' do
-          it 'returns array with "has-audio" string' do
-            view_model = PatchViewModel.wrap(build(:keys_patch))
-
-            expect(view_model.index_classes).to include('has-audio')
-          end
-        end
-      end
     end
   end
 end

@@ -45,8 +45,8 @@ RSpec.describe 'shared/_keys_patches.html.haml', type: :view do
           [user.keys_patches.create(attributes_for(:keys_patch, secret: true))]
         end
 
-        it 'shows [SECRET] label' do
-          expect(rendered).to have_content('[SECRET]')
+        it 'shows lock icon' do
+          expect(rendered).to have_css('.lock.glyph')
         end
       end
     end

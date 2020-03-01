@@ -29,6 +29,8 @@
             .image.bass{ class: patch.index_classes }
 
       .patch
+        - if patch.secret?
+          .lock.glyph{ title: 'Secret' }
         - if patch.audio_sample.present?
           .speaker{ data: { oembed_url: "/oembed?slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
         - if patch.user.present?
@@ -37,8 +39,6 @@
           = link_to patch.name, patch_path(patch.id), { class: :title }
         %br/
         .description= patch.description
-        - if patch.secret?
-          .secret= "[SECRET]"
         .tags
           - patch.tags.each do |tag|
             = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag

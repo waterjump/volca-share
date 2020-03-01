@@ -86,9 +86,34 @@ RSpec.describe VolcaShare::Shared do
 
   describe '#formatted_tags' do
     it 'returns a string of tags in lowercase' do
-      allow(view_model).to receive(:model).and_return(double(tags: %w(Larry CURLY moe)))
+      allow(view_model).to(
+        receive(:model).and_return(double(tags: %w(Larry CURLY moe)))
+      )
+
       expect(view_model.formatted_tags).to eq('larry, curly, moe')
       expect(view_model.formatted_tags).not_to match(/[A-Z]+/)
+    end
+  end
+
+  describe '#index_classes' do
+    context 'when patch has no audio sample' do
+      it 'returns an empty array' do
+        allow(view_model).to(
+          receive(:model).and_return(double(audio_sample: ''))
+        )
+
+        expect(view_model.index_classes).to eq([])
+      end
+    end
+
+    context 'when patch has an audio sample' do
+      it 'returns array with "has-audio" string' do
+        allow(view_model).to(
+          receive(:model).and_return(double(audio_sample: 'foo'))
+        )
+
+        expect(view_model.index_classes).to include('has-audio')
+      end
     end
   end
 

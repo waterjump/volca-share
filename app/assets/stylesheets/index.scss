@@ -60,10 +60,6 @@
       }
     }
 
-    .secret {
-      opacity: 0.5;
-    }
-
     .patch {
       max-width: 700px;
       min-width: 200px;
@@ -106,6 +102,10 @@
 
 .edit {
   background-image: image_url('edit.png');
+}
+
+.lock {
+  background-image: image_url('lock.png');
 }
 
 .glyph {

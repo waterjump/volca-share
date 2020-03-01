@@ -67,32 +67,6 @@ module VolcaShare
       end
     end
 
-    describe '#index_classes' do
-      context 'when patch is not secret and doesn\'t have audio' do
-        subject do
-          PatchViewModel.wrap(
-            FactoryBot.build(:patch, audio_sample: nil)
-          )
-        end
-        it 'returns nil' do
-          expect(subject.index_classes).to be_nil
-        end
-      end
-      context 'when the patch is secret' do
-        subject do
-          PatchViewModel.wrap(FactoryBot.build(:patch, secret: true))
-        end
-        it 'returns an array with a string \'secret\'' do
-          expect(subject.index_classes).to include('secret')
-        end
-      end
-      context 'when patch has and audio sample' do
-        it 'returns and array with a string \'has-audio\'' do
-          expect(subject.index_classes).to include('has-audio')
-        end
-      end
-    end
-
     describe '#username' do
       context 'when patch has a user' do
         subject do

@@ -17,11 +17,6 @@ module VolcaShare
       def lfo_shape_square
         model.lfo_shape == 'square'
       end
-
-      def index_classes
-        return [] unless audio_sample.present?
-        %w(has-audio)
-      end
     end
   end
 end
