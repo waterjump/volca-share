@@ -124,6 +124,23 @@
             .light{ id: 'tempo_delay_light',
                     class: @patch.lit?(:tempo_delay) }
 
+  = range_field_tag 'patch[voice]', (@patch.voice || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[octave]', (@patch.octave || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[detune]', (@patch.detune || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[portamento]', (@patch.portamento || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vco_eg_int]', (@patch.vco_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[peak]', (@patch.peak || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vcf_eg_int]', (@patch.vcf_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_pitch_int]', (@patch.lfo_pitch_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_cutoff_int]', (@patch.lfo_cutoff_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[attack]', (@patch.attack || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[sustain]', (@patch.sustain || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
+
 .col-lg-3.col-md-9#patch-metadata
   %fieldset
     .field.mb-3
@@ -148,24 +165,6 @@
                       class: 'form-control',
                       placeholder: 'Description'
 
-
-  = range_field_tag 'patch[voice]', (@patch.voice || 57), in: 0..127, class: :hidden
-  = range_field_tag 'patch[octave]', (@patch.octave || 57), in: 0..127, class: :hidden
-  = range_field_tag 'patch[detune]', (@patch.detune || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[portamento]', (@patch.portamento || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[vco_eg_int]', (@patch.vco_eg_int || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[peak]', (@patch.peak || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[vcf_eg_int]', (@patch.vcf_eg_int || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[lfo_pitch_int]', (@patch.lfo_pitch_int || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[lfo_cutoff_int]', (@patch.lfo_cutoff_int || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[attack]', (@patch.attack || 0), in: 0..127, class: :hidden
-  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
-  = range_field_tag 'patch[sustain]', (@patch.sustain || 127), in: 0..127, class: :hidden
-  = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
-  = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
-
   - if current_user.present?
     .field
       = label_tag :audio_sample, 'Audio Sample URL'
@@ -180,6 +179,11 @@
       .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
   - if current_user.nil? && Rails.env.production?
     = recaptcha_tags
+
+  - if current_user.nil?
+    %strong
+      = "To edit or delete your patches, "
+      = link_to 'create an account', new_user_registration_path
 #save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
