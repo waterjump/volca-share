@@ -1,5 +1,4 @@
 .patches {
-
   .loading {
     position: absolute;
     left: 45%;
@@ -16,8 +15,22 @@
       font-size: 14px;
     }
   }
+
+  @media (min-width: 990px) {
+    .col-md-6 {
+      width: 49%;
+    }
+
+    .wrapper {
+      margin: 10px 1% 10px 0;
+    }
+  }
+
   .wrapper {
     overflow: hidden;
+    min-height: 100px;
+    height: 120px;
+
     .image, .patch, .info, .speaker {
       display: inline-block;
       vertical-align: top;
@@ -84,10 +97,6 @@
         font-size: 0.8em;
       }
     }
-
-    min-height: 100px;
-    margin: 10px 0 10px 0;
-    height: 120px
   }
 }
 
