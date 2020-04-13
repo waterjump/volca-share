@@ -14,6 +14,7 @@ module Keys
     field :audio_sample, type: String
     field :notes, type: String
     field :slug, type: String
+    field :quality, type: Float
 
     field :voice, type: Integer, default: 70
     field :octave, type: Integer, default: 70
@@ -72,6 +73,12 @@ module Keys
 
     scope :browsable, -> { where(secret: false) }
 
+    after_save :persist_quality
+
+    def persist_quality
+      set(quality: calculate_quality)
+    end
+
     private
 
     def patch_is_not_default
@@ -98,6 +105,25 @@ module Keys
         tempo_delay_changed_from_default?
 
       errors.add(:patch, 'is not valid.') unless not_default
+    end
+
+    def calculate_quality
+      qual = 1
+      qual += 3 if audio_sample.present?
+      qual += 1 if tags.any?
+      qual += 0.5 if notes.present?
+      qual += 2 if notes.length > 30
+
+      base_score = Math.log([qual, 1].max)
+
+      time_difference = (Time.now - created_at) / 2.years.to_f
+
+      if time_difference > 1
+        x = time_difference - 1
+        base_score = base_score * Math.exp(-8*x*x)
+      end
+
+      base_score
     end
   end
 end

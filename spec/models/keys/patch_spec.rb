@@ -326,5 +326,22 @@ RSpec.describe Keys::Patch do
         expect(non_default_patch).to be_valid
       end
     end
+
+    describe '#persist_quality' do
+      it 'persists quality as database field' do
+        patch = create(:keys_patch)
+        patch.update!(quality: nil)
+        patch.persist_quality
+        expect(patch.read_attribute(:quality)).to be_present
+      end
+
+      it 'updates quality value when patch is updated' do
+        patch = create(:keys_patch)
+        initial_quality = patch.quality
+        patch.update!(notes: '', audio_sample: nil)
+
+        expect(patch.read_attribute(:quality)).to be < initial_quality
+      end
+    end
   end
 end
