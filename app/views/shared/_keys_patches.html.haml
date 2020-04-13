@@ -40,7 +40,7 @@
         .description= patch.description
         .tags
           - patch.tags.each do |tag|
-            = link_to "\##{tag}", '#', class: :tag
+            = link_to "\##{tag}", keys_tags_show_path(tag: tag), class: :tag
       .info
         - if patch.user.present?
           = link_to patch.user&.username, user_path(patch.user&.slug), { class: :username }

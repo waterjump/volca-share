@@ -12,7 +12,7 @@ module Keys
       @keys_patches =
         Kaminari.paginate_array(
           VolcaShare::Keys::PatchViewModel.wrap(
-            Patch.browsable.includes(:user).desc(@sort)
+            Keys::Patch.browsable.includes(:user).desc(@sort)
           )
         ).page(params[:page].to_i)
       @title = 'Browse Keys Patches'
