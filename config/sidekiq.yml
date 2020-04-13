@@ -1,0 +1,4 @@
+:schedule:
+  update_patch_quality_job:
+    cron: '0 0 0 * * *' # Runs once a day
+    class: UpdatePatchQualityJob

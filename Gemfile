@@ -31,6 +31,8 @@ gem 'ruby-oembed'
 gem 'sass-rails', '~> 5.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'sendgrid-ruby'
+gem 'sidekiq', '6.0.6'
+gem 'sidekiq-scheduler', '3.0.1'
 gem 'sinatra', '~> 2.0.2'
 gem 'sprockets', '4.0.0.beta8'
 gem 'uglifier', '>= 1.3.0'

@@ -81,16 +81,5 @@ RSpec.describe Patch, 'validations' do
 
       expect(patch.read_attribute(:quality)).to be < initial_quality
     end
-
-    it 'updates quality for all patches' do
-      old_patch = nil
-      Timecop.freeze(3.years.ago) do
-        old_patch = FactoryBot.create(:patch)
-        expect(old_patch.quality).to be > 1
-      end
-      new_patch = FactoryBot.create(:patch)
-      old_patch.reload
-      expect(old_patch.quality).to be < 1
-    end
   end
 end

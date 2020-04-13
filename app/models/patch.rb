@@ -103,15 +103,11 @@ class Patch
     errors.add(:patch, 'is not valid.') unless not_default
   end
 
-  # NOTE: Fine for now but needs to be a cron eventually.
   def persist_quality
     set(quality: calculate_quality)
-    Patch.all.each do |patch|
-      patch.set(quality: patch.calculate_quality)
-    end
   end
 
-  protected
+  private
 
   def calculate_quality
     qual = 1
