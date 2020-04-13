@@ -9,14 +9,15 @@
         .h4
           Sort by:
           - if @sort == :quality
-            = link_to 'Date Created', patches_path(sort: :newest)
+            = link_to 'Date Created', keys_patches_path(sort: :newest)
           - else
             Date Created
           &nbsp;|&nbsp;
           - if @sort == :created_at
-            = link_to 'Quality', patches_path
+            = link_to 'Quality', keys_patches_path
           - else
             Quality
+
   - @keys_patches.each do |patch|
     .wrapper.col-md-6.well.well-sm.patch-holder
       .image-holder

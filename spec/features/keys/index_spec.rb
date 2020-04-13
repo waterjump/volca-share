@@ -14,6 +14,44 @@ RSpec.describe 'Keys patch index page', type: :feature do
     expect(current_path).to eq(keys_patches_path)
   end
 
+  it 'is sorted by quality' do
+    okay_patch = create(:keys_patch, name: 'okay', audio_sample: '')
+    complete_patch = create(:keys_patch, name: 'complete')
+    minimal_patch = create(
+      :keys_patch,
+      tags: [],
+      notes: '',
+      audio_sample: '',
+      name: 'minimal'
+    )
+
+    visit keys_patches_path
+
+    expect(all('.patch')[0]).to have_link('complete')
+    expect(all('.patch')[1]).to have_link('okay')
+    expect(all('.patch')[2]).to have_link('minimal')
+  end
+
+  it 'can be sorted to show newest' do
+    okay_patch = create(:keys_patch, name: 'okay', audio_sample: '')
+    complete_patch = create(:keys_patch, name: 'complete')
+    minimal_patch = create(
+      :keys_patch,
+      tags: [],
+      notes: '',
+      audio_sample: '',
+      name: 'minimal'
+    )
+
+    visit keys_patches_path
+
+    click_link 'Date Created'
+
+    expect(all('.patch')[0]).to have_link('minimal')
+    expect(all('.patch')[1]).to have_link('complete')
+    expect(all('.patch')[2]).to have_link('okay')
+  end
+
   context 'when user is logged in' do
     it 'allows user to delete their own patches', js: true do
       create(:keys_patch, user_id: user.id)

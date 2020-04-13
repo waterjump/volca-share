@@ -7,10 +7,12 @@ module Keys
     before_action :authenticate_user!, only: [:edit, :update, :destroy]
 
     def index
+      @sort = :quality
+      @sort = :created_at if params['sort'] == 'newest'
       @keys_patches =
         Kaminari.paginate_array(
           VolcaShare::Keys::PatchViewModel.wrap(
-            Patch.browsable.includes(:user).desc(:created_at)
+            Patch.browsable.includes(:user).desc(@sort)
           )
         ).page(params[:page].to_i)
       @title = 'Browse Keys Patches'
