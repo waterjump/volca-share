@@ -29,4 +29,19 @@ module AudioSample
         nil
       end
   end
+
+  private
+
+  def audio_sample_available_validation
+    return unless audio_sample.present?
+
+    return if audio_sample.present? && audio_sample_available
+
+    errors.add(:audio_sample, "is not available.")
+  end
+
+  def set_audio_sample_available
+    self.audio_sample_available =
+      audio_sample.present? ? audio_sample_code.present? : nil
+  end
 end

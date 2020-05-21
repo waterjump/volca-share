@@ -111,21 +111,6 @@ module Keys
       errors.add(:patch, 'is not valid.') unless not_default
     end
 
-    # TODO: Move this to audio sample validator
-    def audio_sample_available_validation
-      return unless audio_sample.present?
-
-      return if audio_sample.present? && audio_sample_available
-
-      errors.add(:audio_sample, "is not available.")
-    end
-
-    # TODO: Move this to audio sample validator
-    def set_audio_sample_available
-      self.audio_sample_available =
-        audio_sample.present? ? audio_sample_code.present? : nil
-    end
-
     def calculate_quality
       qual = 1
       qual += 3 if audio_sample.present?
