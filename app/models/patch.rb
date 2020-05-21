@@ -40,6 +40,7 @@ class Patch
   field :secret, type: Mongoid::Boolean, default: false
   field :notes, type: String
   field :audio_sample, type: String
+  field :audio_sample_available, type: Boolean
   field :slug, type: String
   field :quality, type: Float
   field :quality_updated_at, type: Time
