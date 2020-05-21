@@ -3,7 +3,16 @@
 require 'rails_helper'
 
 class DummyModel
+  # NOTE: I tried to include the same modules used in the models but I couldn't
+  #  do it without including Mongoid::Document, so I stubbed the methods.
+  def self.validate(args)
+  end
+
+  def self.before_validation(args)
+  end
+
   include AudioSample
+
   def audio_sample; end
 end
 

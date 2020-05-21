@@ -72,11 +72,9 @@ module Keys
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
     validates :audio_sample, audio_sample: true
     validate :patch_is_not_default
-    validate :audio_sample_available_validation
 
     scope :browsable, -> { where(secret: false) }
 
-    before_validation :set_audio_sample_available
     after_save :persist_quality
 
     def persist_quality
