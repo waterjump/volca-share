@@ -157,27 +157,44 @@ RSpec.describe 'Keys patch index page', type: :feature do
     end
   end
 
-  describe 'audio previews are shown', :js do
-    let!(:patch) { create(:keys_patch, user_id: user.id) }
+  context 'when audio sample is available' do
+    describe 'audio previews are shown', :js do
+      let!(:patch) { create(:keys_patch, user_id: user.id) }
 
-    before do
-      visit keys_patches_path
+      before do
+        visit keys_patches_path
+      end
+
+      describe 'audio preview' do
+        before { first('.speaker').click }
+
+        it 'shows preview in an iframe' do
+          expect(page).to have_selector('iframe')
+        end
+
+        it 'links to patch' do
+          click_link 'Go to Patch'
+
+          expect(page.current_path).to(
+            eq(user_keys_patch_path(user.slug, patch.slug))
+          )
+        end
+      end
+    end
+  end
+
+  context 'when audio sample is unavailable' do
+    let!(:patch) do
+      create(:keys_patch, user_id: user.id).tap do |patch|
+        patch.audio_sample_available = false
+        patch.save(validate: false)
+      end
     end
 
-    describe 'audio preview' do
-      before { first('.speaker').click }
+    it 'does not show audio preview' do
+      visit keys_patches_path
 
-      it 'shows preview in an iframe' do
-        expect(page).to have_selector('iframe')
-      end
-
-      it 'links to patch' do
-        click_link 'Go to Patch'
-
-        expect(page.current_path).to(
-          eq(user_keys_patch_path(user.slug, patch.slug))
-        )
-      end
+      expect(page).not_to have_selector('.speaker')
     end
   end
 end
