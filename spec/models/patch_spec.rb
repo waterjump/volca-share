@@ -66,6 +66,25 @@ RSpec.describe Patch  do
         end
       end
     end
+
+    context 'when audio_sample is nil' do
+      it 'sets that audio_sample_available to nil' do
+        patch = create(:patch, audio_sample: nil, audio_sample_available: true)
+        expect(patch.audio_sample_available).to be_nil
+      end
+    end
+
+    context 'when audio_sample is not nil' do
+      it 'validates that audio_sample_available is true' do
+        patch = build(
+          :patch,
+          audio_sample: 'https://soundcloud.com/squidbrain/fake-track'
+        )
+
+        expect(patch).not_to be_valid
+        expect(patch.errors.full_messages).to eq(['Audio sample is not available.'])
+      end
+    end
   end
 
   describe 'fields' do

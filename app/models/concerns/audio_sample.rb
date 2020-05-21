@@ -3,6 +3,12 @@
 module AudioSample
   extend ActiveSupport::Concern
 
+  included do
+    validate :audio_sample_available_validation
+
+    before_validation :set_audio_sample_available
+  end
+
   def audio_sample_code
     return unless audio_sample.present?
 
