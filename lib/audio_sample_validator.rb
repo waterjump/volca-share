@@ -2,6 +2,7 @@
 
 class AudioSampleValidator < ActiveModel::EachValidator
   include AudioRegex
+
   def self.kind
     :custom
   end
