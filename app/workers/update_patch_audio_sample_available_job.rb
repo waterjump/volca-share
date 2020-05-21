@@ -14,6 +14,8 @@ class UpdatePatchAudioSampleAvailableJob
       puts "Correcting audio sample availibility for '#{patch.name}'"
       patch.set(audio_sample_available: patch.send(:set_audio_sample_available))
     end
+
+    nil
   end
 end
 
