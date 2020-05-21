@@ -96,20 +96,20 @@ RSpec.describe VolcaShare::Shared do
   end
 
   describe '#index_classes' do
-    context 'when patch has no audio sample' do
+    context 'when patch has no audio sample available' do
       it 'returns an empty array' do
         allow(view_model).to(
-          receive(:model).and_return(double(audio_sample: ''))
+          receive(:model).and_return(double(audio_sample_available?: false))
         )
 
         expect(view_model.index_classes).to eq([])
       end
     end
 
-    context 'when patch has an audio sample' do
+    context 'when patch has an audio sample available' do
       it 'returns array with "has-audio" string' do
         allow(view_model).to(
-          receive(:model).and_return(double(audio_sample: 'foo'))
+          receive(:model).and_return(double(audio_sample_available?: true))
         )
 
         expect(view_model.index_classes).to include('has-audio')

@@ -23,7 +23,7 @@ module VolcaShare
     end
 
     def index_classes
-      return [] unless audio_sample.present?
+      return [] unless model.audio_sample_available?
       %w(has-audio)
     end
   end
