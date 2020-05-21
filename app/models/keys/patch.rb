@@ -8,6 +8,7 @@ module Keys
     include Mongoid::Timestamps
     include Mongoid::Document::Taggable
     include ActiveModel::Validations
+    include AudioSample
 
     field :name, type: String
     field :secret, type: Boolean, default: false
@@ -122,11 +123,7 @@ module Keys
     # TODO: Move this to audio sample validator
     def set_audio_sample_available
       self.audio_sample_available =
-        if audio_sample.present?
-          VolcaShare::Keys::PatchViewModel.wrap(self).audio_sample_code.present?
-        else
-          nil
-        end
+        audio_sample.present? ? audio_sample_code.present? : nil
     end
 
     def calculate_quality
