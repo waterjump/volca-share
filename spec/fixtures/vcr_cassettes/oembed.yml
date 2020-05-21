@@ -254,3 +254,59 @@ http_interactions:
       string: Not Found
     http_version:
   recorded_at: Sat, 22 Feb 2020 14:27:16 GMT
+- request:
+    method: get
+    uri: https://soundcloud.com/oembed?format=json&maxheight=81&url=https://soundcloud.com/squidbrain/fake-track
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Mozilla/5.0 (compatible; ruby-oembed/0.12.0)
+  response:
+    status:
+      code: 404
+      message: Not Found
+    headers:
+      Content-Type:
+      - text/html; charset=utf-8
+      Content-Length:
+      - '1'
+      Connection:
+      - keep-alive
+      Status:
+      - 404 Not Found
+      Access-Control-Allow-Headers:
+      - Accept, Authorization, Content-Type, Origin
+      Cache-Control:
+      - no-cache
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - GET, PUT, POST, DELETE
+      Access-Control-Expose-Headers:
+      - Date
+      Date:
+      - Thu, 21 May 2020 07:44:22 GMT
+      Strict-Transport-Security:
+      - max-age=63072000
+      Server:
+      - am/2
+      X-Cache:
+      - Error from cloudfront
+      Via:
+      - 1.1 9d11c99c18949c4780bf1400ceca8369.cloudfront.net (CloudFront)
+      X-Amz-Cf-Pop:
+      - TXL52-C1
+      X-Amz-Cf-Id:
+      - NA91py9Nrt6PSGMsysm5d94G_PVCMzoJzjG1M0Is1txsz4YDawULNQ==
+    body:
+      encoding: UTF-8
+      string: " "
+    http_version:
+  recorded_at: Thu, 21 May 2020 07:44:22 GMT
+recorded_with: VCR 4.0.0

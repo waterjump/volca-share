@@ -150,6 +150,14 @@ RSpec.describe Keys::Patch do
           .with_default_value_of(nil)
       )
     end
+
+    it do
+      is_expected.to(
+        have_field(:audio_sample_available)
+          .of_type(Mongoid::Boolean)
+          .with_default_value_of(nil)
+      )
+    end
   end
 
   describe 'validations' do
@@ -327,21 +335,40 @@ RSpec.describe Keys::Patch do
       end
     end
 
-    describe '#persist_quality' do
-      it 'persists quality as database field' do
-        patch = create(:keys_patch)
-        patch.update!(quality: nil)
-        patch.persist_quality
-        expect(patch.read_attribute(:quality)).to be_present
+    context 'when audio_sample is nil' do
+      it 'sets that audio_sample_available to nil' do
+        patch = create(:keys_patch, audio_sample: nil, audio_sample_available: true)
+        expect(patch.audio_sample_available).to be_nil
       end
+    end
 
-      it 'updates quality value when patch is updated' do
-        patch = create(:keys_patch)
-        initial_quality = patch.quality
-        patch.update!(notes: '', audio_sample: nil)
+    context 'when audio_sample is not nil' do
+      it 'validates that audio_sample_available is true' do
+        patch = build(
+          :keys_patch,
+          audio_sample: 'https://soundcloud.com/squidbrain/fake-track'
+        )
 
-        expect(patch.read_attribute(:quality)).to be < initial_quality
+        expect(patch).not_to be_valid
+        expect(patch.errors.full_messages).to eq(['Audio sample is not available.'])
       end
+    end
+  end
+
+  describe '#persist_quality' do
+    it 'persists quality as database field' do
+      patch = create(:keys_patch)
+      patch.update!(quality: nil)
+      patch.persist_quality
+      expect(patch.read_attribute(:quality)).to be_present
+    end
+
+    it 'updates quality value when patch is updated' do
+      patch = create(:keys_patch)
+      initial_quality = patch.quality
+      patch.update!(notes: '', audio_sample: nil)
+
+      expect(patch.read_attribute(:quality)).to be < initial_quality
     end
   end
 end
