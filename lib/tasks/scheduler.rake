@@ -6,7 +6,7 @@ task :update_patch_quality => :environment do
 end
 
 desc 'This task checks for audio sample availability and marks the record'
-task :update_patch_quality => :environment do
+task :update_patch_audio_sample_availability => :environment do
   puts "Updating patch audio sample availability..."
   UpdatePatchAudioSampleAvailableJob.new.perform
   puts "done."
