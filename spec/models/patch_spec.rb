@@ -97,6 +97,23 @@ RSpec.describe Patch  do
     end
   end
 
+  describe 'quality' do
+    context 'when a legacy record has audio_sample that is no longer available' do
+      it 'has less quality than the same patch with available audio sample' do
+        legacy_patch = create(:patch).tap do |patch|
+          patch.audio_sample_available = false
+          patch.save(validate: false)
+        end
+
+        patch_with_available_audio_sample = create(:patch)
+
+        expect(legacy_patch.quality).to(
+          be < patch_with_available_audio_sample.quality
+        )
+      end
+    end
+  end
+
   describe '#persist_quality' do
     it 'persists quality as database field' do
       patch = FactoryBot.create(:patch)

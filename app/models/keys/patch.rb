@@ -111,7 +111,7 @@ module Keys
 
     def calculate_quality
       qual = 1
-      qual += 3 if audio_sample.present?
+      qual += 3 if audio_sample_available?
       qual += 1 if tags.any?
       qual += 0.5 if notes.present?
       qual += 2 if notes.length > 30
