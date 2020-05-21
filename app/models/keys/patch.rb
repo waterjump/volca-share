@@ -12,6 +12,7 @@ module Keys
     field :name, type: String
     field :secret, type: Boolean, default: false
     field :audio_sample, type: String
+    field :audio_sample_available, type: Boolean
     field :notes, type: String
     field :slug, type: String
     field :quality, type: Float
@@ -70,9 +71,11 @@ module Keys
     validates :lfo_shape, inclusion: { in: %w(saw triangle square) }
     validates :audio_sample, audio_sample: true
     validate :patch_is_not_default
+    validate :audio_sample_available_validation
 
     scope :browsable, -> { where(secret: false) }
 
+    before_validation :set_audio_sample_available
     after_save :persist_quality
 
     def persist_quality
@@ -107,6 +110,25 @@ module Keys
       errors.add(:patch, 'is not valid.') unless not_default
     end
 
+    # TODO: Move this to audio sample validator
+    def audio_sample_available_validation
+      return unless audio_sample.present?
+
+      return if audio_sample.present? && audio_sample_available
+
+      errors.add(:audio_sample, "is not available.")
+    end
+
+    # TODO: Move this to audio sample validator
+    def set_audio_sample_available
+      self.audio_sample_available =
+        if audio_sample.present?
+          VolcaShare::Keys::PatchViewModel.wrap(self).audio_sample_code.present?
+        else
+          nil
+        end
+    end
+
     def calculate_quality
       qual = 1
       qual += 3 if audio_sample.present?
@@ -127,4 +149,3 @@ module Keys
     end
   end
 end
-

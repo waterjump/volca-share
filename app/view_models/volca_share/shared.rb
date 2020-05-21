@@ -27,6 +27,7 @@ module VolcaShare
       %w(has-audio)
     end
 
+    # TODO: consider moving to model level now that this is used for validations
     def audio_sample_code
       return unless audio_sample.present?
 
