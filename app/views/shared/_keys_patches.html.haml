@@ -1,9 +1,11 @@
+- locals ||= {}
 - if @keys_patches.empty?
   .well No patches to show.
 - else
   .col-sm-12.clearfix
-    .pagination-holder.col-sm-6
-      = paginate @keys_patches
+    - unless locals[:hide_pagination]
+      .pagination-holder.col-sm-6
+        = paginate @keys_patches
     .sort.col-sm-6
       - if @sort.present?
         .h4

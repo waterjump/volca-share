@@ -6,7 +6,7 @@
     = render 'shared/audio_preview'
     - if show_subheaders
       %h2= 'Volca Bass Patches'
-    = render 'shared/patches'
+    = render 'shared/patches', locals: { hide_pagination: true }
     - if show_subheaders
       %h2.col-sm-12= 'Volca Keys Patches'
-      = render 'shared/keys_patches'
+      = render 'shared/keys_patches', locals: { hide_pagination: true }

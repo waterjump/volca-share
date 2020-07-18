@@ -44,6 +44,15 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_content(keys_patch.name)
   end
 
+  it 'does not have pagination' do
+    bass_patches = create_list(:patch, 40, user_id: user.id)
+    keys_patches = create_list(:keys_patch, 40, user_id: user.id)
+
+    visit user_path(user.slug)
+    expect(page).not_to have_selector('.pagination')
+    expect(page).to have_selector('.patch', 80)
+  end
+
   it 'shows user created patches' do
     patch1 = FactoryBot.create(:patch, user_id: user.id)
     patch2 = FactoryBot.create(:patch, user_id: user.id, secret: true)

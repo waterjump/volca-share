@@ -5,23 +5,19 @@ require 'rails_helper'
 RSpec.describe 'users/show.html.haml', type: :view do
   let(:user) { create(:user) }
   let(:bass_patches) do
-    Kaminari.paginate_array(
-      VolcaShare::PatchViewModel.wrap(create_list(:patch, 5, user: user))
-    ).page(1)
+    VolcaShare::PatchViewModel.wrap(create_list(:patch, 5, user: user))
   end
 
   let(:keys_patches) do
-    Kaminari.paginate_array(
-      VolcaShare::Keys::PatchViewModel.wrap(
-        create_list(:keys_patch, 5, user: user)
-      )
-    ).page(1)
+    VolcaShare::Keys::PatchViewModel.wrap(
+      create_list(:keys_patch, 5, user: user)
+    )
   end
 
   it 'shows the name of the user' do
     @user = user
     @patches = bass_patches
-    @keys_patches = Kaminari.paginate_array([]).page(1)
+    @keys_patches = []
 
     render
 
@@ -32,7 +28,7 @@ RSpec.describe 'users/show.html.haml', type: :view do
     before do
       @user = user
       @patches = bass_patches
-      @keys_patches = Kaminari.paginate_array([]).page(1)
+      @keys_patches = []
 
       render
     end

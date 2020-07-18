@@ -13,7 +13,6 @@ class UsersController < ApplicationController
           @user.patches.browsable.order_by(created_at: 'desc')
         )
       end
-    @patches = Kaminari.paginate_array(@patches).page(params[:page].to_i)
 
     @keys_patches =
       if current_user == @user
@@ -25,8 +24,6 @@ class UsersController < ApplicationController
           @user.keys_patches.browsable.order_by(created_at: 'desc')
         )
       end
-    @keys_patches =
-      Kaminari.paginate_array(@keys_patches).page(params[:page].to_i)
     @title = "Patches by #{@user.try(:username)}"
   end
 end
