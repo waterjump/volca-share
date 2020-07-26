@@ -8,4 +8,7 @@ $(function() {
   VS.display = new VS.Display($('#led'));
   VS.sequences = new VS.Sequences;
   VS.form = new VS.Form;
+  if ($('.simulation').length > 0) {
+    VS.bassSimulator = new VS.BassSimulator;
+  }
 });
