@@ -1,15 +1,17 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc1 = new p5.Oscillator('sawtooth');
+    const osc2 = new p5.Oscillator('sawtooth');
+
     let octave = 3;
-    let vco1 = {
-      shape: 'sawtooth',
-      amp: 1,
-      pitchMidi: 63
-    }
+
+    let vco1 = { shape: 'sawtooth', amp: 1, pitchMidi: 63 }
+    let vco2 = { shape: 'sawtooth', amp: 1, pitchMidi: 63 }
+
     let notePlaying;
 
     let filter;
+
     const keyMap = {
       65: 130.81, // C
       87: 138.59, // C#
@@ -65,23 +67,37 @@ VS.BassSimulator = function() {
     p.setup = function() {
       console.log('p5 is running :-]');
       osc1.amp(vco1.amp);
+      osc2.amp(vco2.amp);
+
       filter = new p5.Filter();
       filter.freq(2517.5);
       filter.res(0);
       osc1.disconnect();
       osc1.connect(filter);
+      osc2.disconnect();
+      osc2.connect(filter);
     };
 
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
         notePlaying = p.keyCode;
+
+        // VCO 1
         osc1.freq(
           keyMap[notePlaying] *
           octaveMap[octave].frequencyFactor *
           1.05946309435 ** pitchMap[vco1.pitchMidi]
         );
         osc1.start();
+
+        // VCO 2
+        osc2.freq(
+          keyMap[notePlaying] *
+          octaveMap[octave].frequencyFactor *
+          1.05946309435 ** pitchMap[vco2.pitchMidi]
+        );
+        osc2.start();
       }
 
       // OCTAVE DOWN (Z KEY)
@@ -104,9 +120,10 @@ VS.BassSimulator = function() {
     p.keyReleased = function() {
       if (p.keyIsPressed) { return; }
       osc1.stop();
+      osc2.stop();
     };
 
-    // OSC WAVE
+    // VCO1  WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
        if (vco1.shape == 'sawtooth') {
          vco1.shape = 'square';
@@ -114,6 +131,16 @@ VS.BassSimulator = function() {
          vco1.shape = 'sawtooth';
       }
       osc1.setType(vco1.shape);
+    });
+
+    // VCO2  WAVE
+    $('label[for="patch_vco2_wave"]').on('click tap', function() {
+       if (vco2.shape == 'sawtooth') {
+         vco2.shape = 'square';
+       } else {
+         vco2.shape = 'sawtooth';
+      }
+      osc2.setType(vco2.shape);
     });
 
     // VCO1 ON/OFF
@@ -124,6 +151,16 @@ VS.BassSimulator = function() {
         vco1.amp = 1;
       }
       osc1.amp(vco1.amp);
+    });
+
+    // VCO2 ON/OFF
+    $('#vco2_active_button').on('click tap', function(){
+      if (vco2.amp == 1) {
+        vco2.amp = 0;
+      } else {
+        vco2.amp = 1;
+      }
+      osc2.amp(vco2.amp);
     });
 
     $(document).on('mousemove touchmove', function(e) {
@@ -175,6 +212,24 @@ VS.BassSimulator = function() {
           1.05946309435 ** pitchMap[vco1.pitchMidi];
 
         osc1.freq(newFrequency);
+      }
+
+      // VCO2 PITCH
+      if (VS.activeKnob.element.id == 'vco2_pitch') {
+        let vco2Pitch, midiValue, newFrequency;
+
+        vco2Pitch = VS.activeKnob
+
+        midiValue = $(vco2Pitch.element).data('midi');
+        if (midiValue == undefined) { return; }
+
+        vco2.pitchMidi = midiValue;
+        newFrequency =
+          keyMap[notePlaying] *
+          octaveMap[octave].frequencyFactor *
+          1.05946309435 ** pitchMap[vco2.pitchMidi]
+
+        osc2.freq(newFrequency);
       }
     });
   });
