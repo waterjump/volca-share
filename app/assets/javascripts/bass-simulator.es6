@@ -1,7 +1,7 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
-    const osc = new p5.Oscillator('sawtooth');
-    let osc1 = {
+    const osc1 = new p5.Oscillator('sawtooth');
+    let vco1 = {
       shape: 'sawtooth',
       amp: 1
     }
@@ -27,44 +27,44 @@ VS.BassSimulator = function() {
 
     p.setup = function() {
       console.log('p5 is running :-]');
-      osc.amp(osc1.amp);
+      osc1.amp(vco1.amp);
       filter = new p5.Filter();
       filter.freq(2517.5);
       filter.res(0);
-      osc.disconnect();
-      osc.connect(filter);
+      osc1.disconnect();
+      osc1.connect(filter);
     };
 
     p.keyPressed = function() {
       if (keyCodes.includes(p.keyCode)) {
-        osc.freq(keyMap[p.keyCode]);
-        osc.start();
+        osc1.freq(keyMap[p.keyCode] / 2.0);
+        osc1.start();
       }
     };
 
     p.keyReleased = function() {
       if (p.keyIsPressed) { return; }
-      osc.stop();
+      osc1.stop();
     };
 
     // OSC WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
-       if (osc1.shape == 'sawtooth') {
-         osc1.shape = 'square';
+       if (vco1.shape == 'sawtooth') {
+         vco1.shape = 'square';
        } else {
-         osc1.shape = 'sawtooth';
+         vco1.shape = 'sawtooth';
       }
-      osc.setType(osc1.shape);
+      osc1.setType(vco1.shape);
     });
 
     // VCO1 ON/OFF
     $('#vco1_active_button').on('click tap', function(){
-      if (osc1.amp == 1) {
-        osc1.amp = 0;
+      if (vco1.amp == 1) {
+        vco1.amp = 0;
       } else {
-        osc1.amp = 1;
+        vco1.amp = 1;
       }
-      osc.amp(osc1.amp);
+      osc1.amp(vco1.amp);
     });
 
     // FILTER CUTOFF
