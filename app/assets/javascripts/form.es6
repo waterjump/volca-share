@@ -220,6 +220,7 @@ VS.Form = function() {
         midi = midi_map[degree];
       } else {
         midi = Math.round(((63.5 / limit) * degree) + 63.5);
+        trueMidi = ((63.5 / limit) * degree) + 63.5
       }
 
       if (midiOut.ready()) {
@@ -229,6 +230,8 @@ VS.Form = function() {
           midiOut.channel
         );
       }
+      $(VS.activeKnob.element).data('midi', midi);
+      $(VS.activeKnob.element).data('trueMidi', trueMidi);
       VS.activeKnob.inputElement.val(midi);
       display.update(midi, VS.activeKnob.displayStyle);
     }
