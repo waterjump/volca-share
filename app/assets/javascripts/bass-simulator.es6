@@ -1,6 +1,7 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc = new p5.Oscillator('sawtooth');
+    let osc1Shape = 'sawtooth';
     const keyMap = {
       65: 130.81, // C
       87: 138.59, // C#
@@ -35,5 +36,15 @@ VS.BassSimulator = function() {
       if (p.keyIsPressed) { return; }
       osc.stop();
     };
+
+    // OSC WAVE
+    $('label[for="patch_vco1_wave"]').on('click tap', function() {
+       if (osc1Shape == 'sawtooth') {
+         osc1Shape = 'square';
+       } else {
+         osc1Shape = 'sawtooth';
+      }
+      osc.setType(osc1Shape);
+    })
   });
 };
