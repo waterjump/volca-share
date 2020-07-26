@@ -1,7 +1,11 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc = new p5.Oscillator('sawtooth');
-    let osc1Shape = 'sawtooth';
+    let osc1 = {
+      shape: 'sawtooth',
+      amp: 1
+    }
+
     let filter;
     const keyMap = {
       65: 130.81, // C
@@ -23,7 +27,7 @@ VS.BassSimulator = function() {
 
     p.setup = function() {
       console.log('p5 is running :-]');
-      osc.amp(1);
+      osc.amp(osc1.amp);
       filter = new p5.Filter();
       filter.freq(2517.5);
       filter.res(0);
@@ -45,13 +49,23 @@ VS.BassSimulator = function() {
 
     // OSC WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
-       if (osc1Shape == 'sawtooth') {
-         osc1Shape = 'square';
+       if (osc1.shape == 'sawtooth') {
+         osc1.shape = 'square';
        } else {
-         osc1Shape = 'sawtooth';
+         osc1.shape = 'sawtooth';
       }
-      osc.setType(osc1Shape);
-    })
+      osc.setType(osc1.shape);
+    });
+
+    // VCO1 ON/OFF
+    $('#vco1_active_button').on('click tap', function(){
+      if (osc1.amp == 1) {
+        osc1.amp = 0;
+      } else {
+        osc1.amp = 1;
+      }
+      osc.amp(osc1.amp);
+    });
 
     // FILTER CUTOFF
     $(document).on('mousemove touchmove', function(e) {
