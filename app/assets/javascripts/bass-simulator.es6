@@ -4,8 +4,10 @@ VS.BassSimulator = function() {
     let octave = 3;
     let vco1 = {
       shape: 'sawtooth',
-      amp: 1
+      amp: 1,
+      pitchMidi: 63
     }
+    let notePlaying;
 
     let filter;
     const keyMap = {
@@ -73,7 +75,12 @@ VS.BassSimulator = function() {
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
-        osc1.freq(keyMap[p.keyCode] * octaveMap[octave].frequencyFactor);
+        notePlaying = p.keyCode;
+        osc1.freq(
+          keyMap[notePlaying] *
+          octaveMap[octave].frequencyFactor *
+          1.05946309435 ** pitchMap[vco1.pitchMidi]
+        );
         osc1.start();
       }
 
@@ -150,6 +157,24 @@ VS.BassSimulator = function() {
         peakAmount = (percentage * 30.0);
 
         filter.res(peakAmount);
+      }
+
+      // VCO1 PITCH
+      if (VS.activeKnob.element.id == 'vco1_pitch') {
+        let vco1Pitch, midiValue, newFrequency;
+
+        vco1Pitch = VS.activeKnob
+
+        midiValue = $(vco1Pitch.element).data('midi');
+        if (midiValue == undefined) { return; }
+
+        vco1.pitchMidi = midiValue;
+        newFrequency =
+          keyMap[notePlaying] *
+          octaveMap[octave].frequencyFactor *
+          1.05946309435 ** pitchMap[vco1.pitchMidi];
+
+        osc1.freq(newFrequency);
       }
     });
   });
