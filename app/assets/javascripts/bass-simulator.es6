@@ -103,10 +103,10 @@ VS.BassSimulator = function() {
       osc1.amp(vco1.amp);
     });
 
-    // FILTER CUTOFF
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
 
+      // FILTER CUTOFF
       if (VS.activeKnob.element.id == 'cutoff') {
         let cutoff, midiValue, percentage, frequency;
 
@@ -119,6 +119,21 @@ VS.BassSimulator = function() {
         frequency = 20 + (percentage**3 * 19980.0);
 
         filter.freq(frequency);
+      }
+
+      // FILTER PEAK (RESONANCE)
+      if (VS.activeKnob.element.id == 'peak') {
+        let peak, midiValue, percentage, peakAmount;
+
+        peak = VS.activeKnob
+
+        midiValue = $(peak.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        peakAmount = (percentage * 30.0);
+
+        filter.res(peakAmount);
       }
     });
   });
