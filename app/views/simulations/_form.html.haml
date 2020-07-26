@@ -1,0 +1,202 @@
+
+.field
+  = label_tag :name, 'Patch name', class: 'sr-only'
+  = text_field_tag 'patch[name]', @patch.name, class: 'form-control-lg col-lg-12', required: true, placeholder: 'Patch name'
+#interface.col-lg-9.form
+  .stretchy
+    .volca.bass
+      .small.knob.eg.midi-enabled.lit#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
+        .notch
+      .small.knob.eg.midi-enabled.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
+        .notch
+      .small.knob.eg.midi-enabled.lit#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
+        .notch
+      #led
+        .digit#thousands
+        .digit#hundreds
+        .digit#tens
+        .digit#ones
+      .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+        .notch
+      .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
+        .notch
+      .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
+        .notch
+      .medium.knob.lfo.midi-enabled#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
+        .notch
+      .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
+        .notch
+      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
+        .notch
+      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 }, class: @patch.lit?(:vco2_active) }
+        .notch
+      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 }, class: @patch.lit?(:vco3_active) }
+        .notch
+      .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' }, class: @patch.lit?(:vco1_active) }
+      .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
+      .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' }, class: @patch.lit?(:vco3_active) }
+      .bottom-row
+        = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
+        = label_tag('patch[vco_group_one]') do
+          %span.multi
+            .note-light.note-0.lit
+            .light{ id: 'vco_group_one_light', data: { radio: true }, class: @patch.vco_group_one ? 'lit' : '' }
+
+        = radio_button_tag 'patch[vco_group]', 'two', @patch.vco_group_two, class: :control
+        = label_tag('patch[vco_group_two]') do
+          %span.multi
+            .note-light.note-1.lit
+            .light{ id: 'vco_group_two_light', data: { radio: true }, class: @patch.vco_group_two ? 'lit' : '' }
+
+        = radio_button_tag 'patch[vco_group]', 'three', @patch.vco_group_three, class: :control
+        = label_tag('patch[vco_group_three]') do
+          %span.multi
+            .note-light.note-2.lit
+            .light{ id: 'vco_group_three_light', data: { radio: true }, class: @patch.vco_group_three ? 'lit' : '' }
+
+        = check_box :patch, :lfo_target_amp, @patch.checked?('lfo_target_amp'), 'true', 'false'
+        = label_tag('patch[lfo_target_amp]') do
+          %span.on-off
+            .note-light.note-3.lit
+            .light{ id: 'lfo_target_amp_light', class: @patch.lit?(:lfo_target_amp) }
+
+        = check_box :patch, :lfo_target_pitch, @patch.checked?('lfo_target_pitch'), 'true', 'false'
+        = label_tag('patch[lfo_target_pitch]') do
+          %span.on-off
+            .note-light.note-4.lit
+            .light{ id: 'lfo_target_pitch_light', class: @patch.lit?(:lfo_target_pitch) }
+
+        = check_box :patch, :lfo_target_cutoff, @patch.checked?('lfo_target_cutoff'), 'true', 'false'
+        = label_tag('patch[lfo_target_cutoff]') do
+          %span.on-off
+            .note-light.note-5.lit
+            .light{ id: 'lfo_target_cutoff_light', class: @patch.lit?(:lfo_target_cutoff) }
+
+        = check_box :patch, :lfo_wave, @patch.checked?('lfo_wave'), 'true', 'false'
+        = label_tag('patch[lfo_wave]') do
+          %span.on-off
+            .note-light.note-6.lit
+            .light{ id: 'lfo_wave_light', class: @patch.lit?(:lfo_wave) }
+
+        = check_box :patch, :vco1_wave, @patch.checked?('vco1_wave'), 'true', 'false'
+        = label_tag('patch[vco1_wave]') do
+          %span.on-off
+            .note-light.note-7.lit
+            .light{ id: 'vco1_wave_light', class: @patch.lit?(:vco1_wave) }
+
+        = check_box :patch, :vco2_wave, @patch.checked?('vco2_wave'), 'true', 'false'
+        = label_tag('patch[vco2_wave]') do
+          %span.on-off
+            .note-light.note-8.lit
+            .light{ id: 'vco2_wave_light', class: @patch.lit?(:vco2_wave) }
+
+        = check_box :patch, :vco3_wave, @patch.checked?('vco3_wave'), 'true', 'false'
+        = label_tag('patch[vco3_wave]') do
+          %span.on-off
+            .note-light.note-9.lit
+            .light{ id: 'vco3_wave_light', class: @patch.lit?(:vco3_wave) }
+
+        = check_box :patch, :sustain_on, @patch.checked?('sustain_on'), 'true', 'false'
+        = label_tag('patch[sustain_on]') do
+          %span.on-off
+            .note-light.note-10.lit
+            .light{ id: 'sustain_on_light', class: @patch.lit?(:sustain_on) }
+
+        = check_box :patch, :amp_eg_on, @patch.checked?('amp_eg_on'), 'true', 'false'
+        = label_tag('patch[amp_eg_on]') do
+          %span.on-off
+            .note-light.note-11.lit
+            .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
+
+  = range_field_tag 'patch[attack]', (@patch.attack || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[cutoff_eg_int]', (@patch.cutoff_eg_int || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[octave]', (@patch.octave || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[peak]', (@patch.peak || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_int]', (@patch.lfo_int || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vco1_pitch]', (@patch.vco1_pitch || 63), in: 0..127, class: :hidden
+  = check_box :patch, :vco1_active, { class: :hidden }.merge(@patch.checked?('vco1_active')), 'true', 'false'
+  = range_field_tag 'patch[vco2_pitch]', (@patch.vco2_pitch || 63), in: 0..127, class: :hidden
+  = check_box :patch, :vco2_active, { class: :hidden }.merge(@patch.checked?('vco2_active')), 'true', 'false'
+  = range_field_tag 'patch[vco3_pitch]', (@patch.vco3_pitch || 63), in: 0..127, class: :hidden
+  = check_box :patch, :vco3_active, { class: :hidden }.merge(@patch.checked?('vco3_active')), 'true', 'false'
+  = range_field_tag 'patch[slide_time]', (@patch.slide_time || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[expression]', (@patch.expression || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[gate_time]', (@patch.gate_time || 127), in: 0..127, class: :hidden
+
+  %fieldset
+    .field.sequence-area
+      - if @patch.sequences.present?
+        = link_to 'Remove sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
+        .sequence-holder
+          .sequence-message Use the VCO Group selector to change the number of sequences.
+          - @patch.sequences.each_with_index do |sequence, seq_num|
+            = render partial: 'sequences/new', locals: { sequence: sequence, seq_num: seq_num }
+      - else
+        = link_to 'Add sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
+        .sequence-holder
+          .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
+
+.col-lg-3.col-md-9#patch-metadata
+  #midi-only-panel.hidden
+    #midi-only-title
+      .h5 MIDI-only controls
+    .stretchy2
+      #midi-only-controls.clearfix
+        .knob.medium#slide_time{ data: { midi: @patch.slide_time || 63, control_number: 5 } }
+          .notch
+        .knob.medium#expression{ data: { midi: @patch.expression || 127 , control_number: 11 } }
+          .notch
+        .knob.medium#gate_time{ data: { midi: @patch.gate_time || 127, control_number: 49 } }
+          .notch
+  %fieldset
+    .field.mb-3
+      = render 'shared/midi_button'
+      = render 'patches/randomize'
+
+    - if current_user.present?
+      .field
+        = label_tag :privacy, 'Secret?'
+        = check_box :patch, :secret, @patch.checked?('secret'), 'true', 'false'
+    - else
+      = hidden_field_tag 'patch[secret]', 'false'
+
+    .field
+      = label_tag 'patch[tags]', 'Tags', class: 'sr-only'
+      = text_field_tag 'patch[tags]', @patch.formatted_tags, size: '50x1', class: 'form-control wtf', data: { role: 'tagsinput' }, placeholder: 'tags, separated, by, commas'
+      .easy-tags
+        .p Suggested Tags
+        .easy-tags-lead #lead
+
+    .field
+      = label_tag 'patch[notes]', 'Notes', class: 'sr-only'
+      = text_area_tag 'patch[notes]', @patch.notes, size: '30x5', class: 'form-control', placeholder: 'Description'
+
+    - if current_user.present?
+      .field
+        = label_tag :audio_sample, 'Audio Sample URL'
+        = render 'shared/audio_sample', button_text: '?'
+        = text_field_tag 'patch[audio_sample]', @patch.audio_sample, class: 'form-control', required: false, placeholder: 'http://www.soundcloud.com/artist-name/track-name', pattern: @patch.audio_sample_regex
+      - if @patch.audio_sample.present?
+        .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
+
+    - if current_user.nil? && Rails.env.production?
+      = recaptcha_tags
+
+    - if current_user.nil?
+      %strong
+        = "To edit or delete your patches, "
+        = link_to 'create an account', new_user_registration_path
+#save_or_cancel.col-sm-12
+  .actions
+    = submit_tag 'Save', class: 'btn btn-primary'
+    &nbsp;
+    - if @patch.persisted?
+      = link_to 'Cancel', user_patch_path(@patch.user.slug, @patch.slug)
+    - else
+      = link_to 'Cancel', patches_path
+.off-canvas
+  =image_tag('numbers.jpg')
+  =image_tag('symbols.jpg')
