@@ -2,6 +2,7 @@ VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc = new p5.Oscillator('sawtooth');
     let osc1Shape = 'sawtooth';
+    let filter;
     const keyMap = {
       65: 130.81, // C
       87: 138.59, // C#
@@ -23,6 +24,11 @@ VS.BassSimulator = function() {
     p.setup = function() {
       console.log('p5 is running :-]');
       osc.amp(1);
+      filter = new p5.Filter();
+      filter.freq(2517.5);
+      filter.res(0);
+      osc.disconnect();
+      osc.connect(filter);
     };
 
     p.keyPressed = function() {
@@ -46,5 +52,24 @@ VS.BassSimulator = function() {
       }
       osc.setType(osc1Shape);
     })
+
+    // FILTER CUTOFF
+    $(document).on('mousemove touchmove', function(e) {
+      if (VS.activeKnob === null) { return; }
+
+      if (VS.activeKnob.element.id == 'cutoff') {
+        let cutoff, midiValue, percentage, frequency;
+
+        cutoff = VS.activeKnob
+
+        midiValue = $(cutoff.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        frequency = 20 + (percentage**3 * 19980.0);
+
+        filter.freq(frequency);
+      }
+    });
   });
 };
