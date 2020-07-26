@@ -7,7 +7,7 @@ RSpec.describe 'Volca Bass Emulation', type: :feature  do
     visit new_simulation_path
 
     save_and_open_page
-    expect(page).to have_content('Simulation')
-    expect(page).to have_css('.volca.bass')
+    expect(page).to have_content('Simulator')
+    expect(page).to have_css('.volca.bass.simulation')
   end
 end
