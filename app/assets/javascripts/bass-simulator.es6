@@ -1,6 +1,7 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc1 = new p5.Oscillator('sawtooth');
+    let octave = 3;
     let vco1 = {
       shape: 'sawtooth',
       amp: 1
@@ -23,6 +24,24 @@ VS.BassSimulator = function() {
       75: 261.63, // C
       76: 277.18 // C#
     }
+
+    const zKeyCode = 90;
+    const xKeyCode = 88;
+
+    const octaveMap = {
+      "-1": 8,
+      0: 9,
+      1: 21,
+      2: 33,
+      3: 45,
+      4: 57,
+      5: 69,
+      6: 81,
+      7: 93,
+      8: 105,
+      9: 118
+    }
+
     const keyCodes = Object.keys(keyMap).map(Number);
 
     p.setup = function() {
@@ -36,9 +55,26 @@ VS.BassSimulator = function() {
     };
 
     p.keyPressed = function() {
+      // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
         osc1.freq(keyMap[p.keyCode] / 2.0);
         osc1.start();
+      }
+
+      // OCTAVE DOWN (Z KEY)
+      if (zKeyCode == p.keyCode) {
+        if (octave > -1) {
+          octave -= 1;
+        }
+        VS.display.update(octaveMap[octave], 'noteString');
+      }
+
+      // OCTAVE UP (X KEY)
+      if (xKeyCode == p.keyCode) {
+        if (octave < 9) {
+          octave += 1;
+        }
+        VS.display.update(octaveMap[octave], 'noteString');
       }
     };
 
