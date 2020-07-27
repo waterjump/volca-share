@@ -39,6 +39,7 @@
     %script{:src => "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"}
     - # TODO: Requiring p5 from a CDN makes this network dependent :-[
     %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/p5.min.js"}
-    %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/addons/p5.sound.min.js"}
+    - if request.env['ORIGINAL_FULLPATH'].include?('simulation/new')
+      %script{:src => "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.1.9/addons/p5.sound.min.js"}
     :javascript
       window.jQuery || document.write('<\/script>')
