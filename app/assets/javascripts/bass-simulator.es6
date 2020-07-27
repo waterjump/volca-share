@@ -2,7 +2,7 @@ VS.BassSimulator = function() {
   const myp = new p5(function(p) {
     const osc1 = new p5.Oscillator('sawtooth');
     const osc2 = new p5.Oscillator('sawtooth');
-    const osc3 = new p5.Oscillator('sawtooth');
+    const osc3 = new p5.Oscillator('square');
 
     let octave = 3;
 
@@ -138,64 +138,52 @@ VS.BassSimulator = function() {
       osc3.stop();
     };
 
+    const toggleVcoWave = function(osc, vco) {
+       if (vco.shape == 'sawtooth') {
+         vco.shape = 'square';
+       } else {
+         vco.shape = 'sawtooth';
+      }
+      osc.setType(vco.shape);
+    };
+
     // VCO1 WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
-       if (vco1.shape == 'sawtooth') {
-         vco1.shape = 'square';
-       } else {
-         vco1.shape = 'sawtooth';
-      }
-      osc1.setType(vco1.shape);
+      toggleVcoWave(osc1, vco1);
     });
 
     // VCO2 WAVE
     $('label[for="patch_vco2_wave"]').on('click tap', function() {
-       if (vco2.shape == 'sawtooth') {
-         vco2.shape = 'square';
-       } else {
-         vco2.shape = 'sawtooth';
-      }
-      osc2.setType(vco2.shape);
+      toggleVcoWave(osc2, vco2);
     });
 
     // VCO3 WAVE
     $('label[for="patch_vco3_wave"]').on('click tap', function() {
-       if (vco3.shape == 'sawtooth') {
-         vco3.shape = 'square';
-       } else {
-         vco3.shape = 'sawtooth';
-      }
-      osc3.setType(vco3.shape);
+      toggleVcoWave(osc3, vco3);
     });
+
+    const toggleVcoAmp = function(osc, vco) {
+      if (vco.amp == 1) {
+        vco.amp = 0;
+      } else {
+        vco.amp = 1;
+      }
+      osc.amp(vco.amp);
+    };
 
     // VCO1 ON/OFF
     $('#vco1_active_button').on('click tap', function(){
-      if (vco1.amp == 1) {
-        vco1.amp = 0;
-      } else {
-        vco1.amp = 1;
-      }
-      osc1.amp(vco1.amp);
+      toggleVcoAmp(osc1, vco1);
     });
 
     // VCO2 ON/OFF
     $('#vco2_active_button').on('click tap', function(){
-      if (vco2.amp == 1) {
-        vco2.amp = 0;
-      } else {
-        vco2.amp = 1;
-      }
-      osc2.amp(vco2.amp);
+      toggleVcoAmp(osc2, vco2);
     });
 
     // VCO3 ON/OFF
     $('#vco3_active_button').on('click tap', function(){
-      if (vco3.amp == 1) {
-        vco3.amp = 0;
-      } else {
-        vco3.amp = 1;
-      }
-      osc3.amp(vco3.amp);
+      toggleVcoAmp(osc3, vco3);
     });
 
     $(document).on('mousemove touchmove', function(e) {
