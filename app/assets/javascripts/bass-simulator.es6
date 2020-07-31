@@ -11,7 +11,15 @@ VS.BassSimulator = function() {
     let vco1 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
     let vco2 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
     let vco3 = { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440 }
-    let lfo = { shape: 'triangle', targetAmp: false, targetPitch: false, targetCutoff: true }
+    let lfo = {
+      shape: 'triangle',
+      targetAmp: false,
+      targetPitch: false,
+      targetCutoff: true,
+      ampValue: 69, // TODO: Change me
+      pitchValue: 100,
+      cutoffValue: 2500
+    }
     let filterData = { cutoff: 20000 }
 
     let notePlaying;
@@ -173,17 +181,15 @@ VS.BassSimulator = function() {
       lfo.targetPitch = !lfo.targetPitch;
       // FIXME: pitch LFO on the lowest octave causes frequency
       //   to go up for some reason.
-      // FIXME: Because oscillators can be turned on and off separate, the LFOs
-      //   can get out of sync.
       if (lfo.targetPitch) {
         // Affect pitch
-        oscLfoPitch.start();
+        oscLfoPitch.amp(lfo.pitchValue);
         osc1.freq(oscLfoPitch);
         osc2.freq(oscLfoPitch);
         osc3.freq(oscLfoPitch);
       } else {
         // Do not affect pitch
-        oscLfoPitch.stop();
+        oscLfoPitch.amp(0);
         osc1.freq(vco1.frequency);
         osc2.freq(vco2.frequency);
         osc3.freq(vco3.frequency);
@@ -195,11 +201,11 @@ VS.BassSimulator = function() {
       lfo.targetCutoff = !lfo.targetCutoff;
       if (lfo.targetCutoff) {
         // Affect filter cutoff
-        oscLfoCutoff.start();
+        oscLfoCutoff.amp(lfo.cutoffValue);
         filter.freq(oscLfoCutoff);
       } else {
         // Do not affect filter cutoff
-        oscLfoCutoff.stop();
+        oscLfoCutoff.amp(0);
         filter.freq(filterData.cutoff);
       }
     });
@@ -313,12 +319,12 @@ VS.BassSimulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        lfoIntPitchValue = percentage * 200;
+        lfo.pitchValue = percentage * 200;
         // TODO: Try to make audio not clip when filter cutoff is low
-        lfoIntCutoffValue = percentage**2 * 5000;
+        lfo.cutoffValue = percentage**2 * 5000;
 
-        oscLfoPitch.amp(lfoIntPitchValue);
-        oscLfoCutoff.amp(lfoIntCutoffValue);
+        oscLfoPitch.amp(lfo.pitchValue);
+        oscLfoCutoff.amp(lfo.cutoffValue);
       }
 
       // VCO1 PITCH
