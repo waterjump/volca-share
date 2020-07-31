@@ -80,7 +80,7 @@ VS.BassSimulator = function() {
       oscLfo.disconnect();
 
       filter = new p5.Filter();
-      filter.freq(2517.5);
+      filter.freq(22000);
       filter.res(0);
 
       osc1.disconnect();
