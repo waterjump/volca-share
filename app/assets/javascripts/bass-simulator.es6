@@ -3,12 +3,14 @@ VS.BassSimulator = function() {
     const osc1 = new p5.Oscillator('sawtooth');
     const osc2 = new p5.Oscillator('sawtooth');
     const osc3 = new p5.Oscillator('square');
+    const oscLfo = new p5.Oscillator('triangle');
 
     let octave = 3;
 
-    let vco1 = { shape: 'sawtooth', amp: 1, pitchMidi: 63 }
-    let vco2 = { shape: 'sawtooth', amp: 1, pitchMidi: 63 }
-    let vco3 = { shape: 'square', amp: 1, pitchMidi: 63 }
+    let vco1 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
+    let vco2 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
+    let vco3 = { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440 }
+    let lfo = { shape: 'triangle', targetAmp: false, targetPitch: false, targetCutoff: true }
 
     let notePlaying;
 
@@ -72,17 +74,28 @@ VS.BassSimulator = function() {
       osc2.amp(vco2.amp);
       osc3.amp(vco3.amp);
 
+      oscLfo.amp(200);
+      oscLfo.freq(1);
+      oscLfo.start();
+      oscLfo.disconnect();
+
       filter = new p5.Filter();
       filter.freq(2517.5);
       filter.res(0);
 
       osc1.disconnect();
       osc1.connect(filter);
+
       osc2.disconnect();
       osc2.connect(filter);
+
       osc3.disconnect();
       osc3.connect(filter);
     };
+
+    p.draw = function() {
+      // Keeping this for debugging purposes
+    }
 
     p.keyPressed = function() {
       // PLAY NOTES
@@ -90,27 +103,27 @@ VS.BassSimulator = function() {
         notePlaying = p.keyCode;
 
         // VCO 1
-        osc1.freq(
+        vco1.frequency =
           keyMap[notePlaying] *
           octaveMap[octave].frequencyFactor *
           1.05946309435 ** pitchMap[vco1.pitchMidi]
-        );
+        osc1.freq(vco1.frequency);
         osc1.start();
 
         // VCO 2
-        osc2.freq(
+        vco2.frequency =
           keyMap[notePlaying] *
           octaveMap[octave].frequencyFactor *
           1.05946309435 ** pitchMap[vco2.pitchMidi]
-        );
+        osc2.freq(vco2.frequency);
         osc2.start();
 
         // VCO 3
-        osc3.freq(
+        vco3.frequency =
           keyMap[notePlaying] *
           octaveMap[octave].frequencyFactor *
           1.05946309435 ** pitchMap[vco3.pitchMidi]
-        );
+        osc3.freq(vco3.frequency);
         osc3.start();
       }
 
@@ -146,6 +159,36 @@ VS.BassSimulator = function() {
       }
       osc.setType(vco.shape);
     };
+
+    // LFO TARGET PITCH
+    $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
+      lfo.targetPitch = !lfo.targetPitch;
+      // FIXME: pitch LFO on the lowest octave causes frequency
+      //   to go up for some reason.
+      if (lfo.targetPitch) {
+        // Affect pitch
+        oscLfo.start();
+        osc1.freq(oscLfo);
+        osc2.freq(oscLfo);
+        osc3.freq(oscLfo);
+      } else {
+        // Do not affect pitch
+        oscLfo.stop();
+        osc1.freq(vco1.frequency);
+        osc2.freq(vco2.frequency);
+        osc3.freq(vco3.frequency);
+      }
+    });
+
+    // LFO WAVE
+    $('label[for="patch_lfo_wave"]').on('click tap', function() {
+       if (lfo.shape == 'triangle') {
+         lfo.shape = 'square';
+       } else {
+         lfo.shape = 'triangle';
+      }
+      oscLfo.setType(lfo.shape);
+    });
 
     // VCO1 WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
@@ -217,6 +260,36 @@ VS.BassSimulator = function() {
         peakAmount = (percentage * 30.0);
 
         filter.res(peakAmount);
+      }
+
+      // LFO RATE
+      if (VS.activeKnob.element.id == 'lfo_rate') {
+        let lfoRate, midiValue, percentage, peakAmount;
+
+        lfoRate = VS.activeKnob
+
+        midiValue = $(lfoRate.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        lfoRateValue = (percentage**3 * 35) + 0.1;
+
+        oscLfo.freq(lfoRateValue);
+      }
+
+      // LFO INT
+      if (VS.activeKnob.element.id == 'lfo_int') {
+        let lfoInt, midiValue, percentage, peakAmount;
+
+        lfoInt = VS.activeKnob
+
+        midiValue = $(lfoInt.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        lfoIntValue = percentage * 200;
+
+        oscLfo.amp(lfoIntValue);
       }
 
       // VCO1 PITCH
