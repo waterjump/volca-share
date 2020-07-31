@@ -167,116 +167,8 @@ VS.BassSimulator = function() {
       osc3.stop();
     };
 
-    const toggleVcoWave = function(osc, vco) {
-       if (vco.shape == 'sawtooth') {
-         vco.shape = 'square';
-       } else {
-         vco.shape = 'sawtooth';
-      }
-      osc.setType(vco.shape);
-    };
-
-    // LFO TARGET PITCH
-    $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
-      lfo.targetPitch = !lfo.targetPitch;
-      // FIXME: pitch LFO on the lowest octave causes frequency
-      //   to go up for some reason.
-      if (lfo.targetPitch) {
-        // Affect pitch
-        oscLfoPitch.amp(lfo.pitchValue);
-        osc1.freq(oscLfoPitch);
-        osc2.freq(oscLfoPitch);
-        osc3.freq(oscLfoPitch);
-      } else {
-        // Do not affect pitch
-        oscLfoPitch.amp(0);
-        osc1.freq(vco1.frequency);
-        osc2.freq(vco2.frequency);
-        osc3.freq(vco3.frequency);
-      }
-    });
-
-    // LFO TARGET CUTOFF
-    $('label[for="patch_lfo_target_cutoff"]').on('click tap', function() {
-      lfo.targetCutoff = !lfo.targetCutoff;
-      if (lfo.targetCutoff) {
-        // Affect filter cutoff
-        oscLfoCutoff.amp(lfo.cutoffValue);
-        filter.freq(oscLfoCutoff);
-      } else {
-        // Do not affect filter cutoff
-        oscLfoCutoff.amp(0);
-        filter.freq(filterData.cutoff);
-      }
-    });
-
-    // LFO WAVE
-    $('label[for="patch_lfo_wave"]').on('click tap', function() {
-       if (lfo.shape == 'triangle') {
-         lfo.shape = 'square';
-       } else {
-         lfo.shape = 'triangle';
-      }
-      oscLfoPitch.setType(lfo.shape);
-      oscLfoCutoff.setType(lfo.shape);
-    });
-
-    // VCO1 WAVE
-    $('label[for="patch_vco1_wave"]').on('click tap', function() {
-      toggleVcoWave(osc1, vco1);
-    });
-
-    // VCO2 WAVE
-    $('label[for="patch_vco2_wave"]').on('click tap', function() {
-      toggleVcoWave(osc2, vco2);
-    });
-
-    // VCO3 WAVE
-    $('label[for="patch_vco3_wave"]').on('click tap', function() {
-      toggleVcoWave(osc3, vco3);
-    });
-
-    const toggleVcoAmp = function(osc, vco) {
-      if (vco.amp == 1) {
-        vco.amp = 0;
-      } else {
-        vco.amp = 1;
-      }
-      osc.amp(vco.amp);
-    };
-
-    // VCO1 ON/OFF
-    $('#vco1_active_button').on('click tap', function(){
-      toggleVcoAmp(osc1, vco1);
-    });
-
-    // VCO2 ON/OFF
-    $('#vco2_active_button').on('click tap', function(){
-      toggleVcoAmp(osc2, vco2);
-    });
-
-    // VCO3 ON/OFF
-    $('#vco3_active_button').on('click tap', function(){
-      toggleVcoAmp(osc3, vco3);
-    });
-
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
-
-      // FILTER CUTOFF
-      if (VS.activeKnob.element.id == 'cutoff') {
-        let cutoff, midiValue, percentage;
-
-        cutoff = VS.activeKnob
-
-        midiValue = $(cutoff.element).data('trueMidi');
-        if (midiValue == undefined) { return; }
-
-        percentage = midiValue / 127.0;
-        filterData.cutoff = 20 + (percentage**3 * 19980.0);
-
-        filter.freq(filterData.cutoff);
-      }
 
       // FILTER PEAK (RESONANCE)
       if (VS.activeKnob.element.id == 'peak') {
@@ -291,6 +183,21 @@ VS.BassSimulator = function() {
         peakAmount = (percentage * 30.0);
 
         filter.res(peakAmount);
+      }
+
+      // FILTER CUTOFF
+      if (VS.activeKnob.element.id == 'cutoff') {
+        let cutoff, midiValue, percentage;
+
+        cutoff = VS.activeKnob
+
+        midiValue = $(cutoff.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        filterData.cutoff = 20 + (percentage**3 * 19980.0);
+
+        filter.freq(filterData.cutoff);
       }
 
       // LFO RATE
@@ -380,6 +287,99 @@ VS.BassSimulator = function() {
 
         osc3.freq(newFrequency);
       }
+    });
+
+    const toggleVcoAmp = function(osc, vco) {
+      if (vco.amp == 1) {
+        vco.amp = 0;
+      } else {
+        vco.amp = 1;
+      }
+      osc.amp(vco.amp);
+    };
+
+    // VCO1 ON/OFF
+    $('#vco1_active_button').on('click tap', function(){
+      toggleVcoAmp(osc1, vco1);
+    });
+
+    // VCO2 ON/OFF
+    $('#vco2_active_button').on('click tap', function(){
+      toggleVcoAmp(osc2, vco2);
+    });
+
+    // VCO3 ON/OFF
+    $('#vco3_active_button').on('click tap', function(){
+      toggleVcoAmp(osc3, vco3);
+    });
+
+    // LFO TARGET PITCH
+    $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
+      lfo.targetPitch = !lfo.targetPitch;
+      // FIXME: pitch LFO on the lowest octave causes frequency
+      //   to go up for some reason.
+      if (lfo.targetPitch) {
+        // Affect pitch
+        oscLfoPitch.amp(lfo.pitchValue);
+        osc1.freq(oscLfoPitch);
+        osc2.freq(oscLfoPitch);
+        osc3.freq(oscLfoPitch);
+      } else {
+        // Do not affect pitch
+        oscLfoPitch.amp(0);
+        osc1.freq(vco1.frequency);
+        osc2.freq(vco2.frequency);
+        osc3.freq(vco3.frequency);
+      }
+    });
+
+    // LFO TARGET CUTOFF
+    $('label[for="patch_lfo_target_cutoff"]').on('click tap', function() {
+      lfo.targetCutoff = !lfo.targetCutoff;
+      if (lfo.targetCutoff) {
+        // Affect filter cutoff
+        oscLfoCutoff.amp(lfo.cutoffValue);
+        filter.freq(oscLfoCutoff);
+      } else {
+        // Do not affect filter cutoff
+        oscLfoCutoff.amp(0);
+        filter.freq(filterData.cutoff);
+      }
+    });
+
+    // LFO WAVE
+    $('label[for="patch_lfo_wave"]').on('click tap', function() {
+       if (lfo.shape == 'triangle') {
+         lfo.shape = 'square';
+       } else {
+         lfo.shape = 'triangle';
+      }
+      oscLfoPitch.setType(lfo.shape);
+      oscLfoCutoff.setType(lfo.shape);
+    });
+
+    const toggleVcoWave = function(osc, vco) {
+       if (vco.shape == 'sawtooth') {
+         vco.shape = 'square';
+       } else {
+         vco.shape = 'sawtooth';
+      }
+      osc.setType(vco.shape);
+    };
+
+    // VCO1 WAVE
+    $('label[for="patch_vco1_wave"]').on('click tap', function() {
+      toggleVcoWave(osc1, vco1);
+    });
+
+    // VCO2 WAVE
+    $('label[for="patch_vco2_wave"]').on('click tap', function() {
+      toggleVcoWave(osc2, vco2);
+    });
+
+    // VCO3 WAVE
+    $('label[for="patch_vco3_wave"]').on('click tap', function() {
+      toggleVcoWave(osc3, vco3);
     });
   });
 };
