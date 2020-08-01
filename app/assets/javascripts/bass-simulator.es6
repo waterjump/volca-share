@@ -47,7 +47,7 @@ VS.BassSimulator = function() {
       targetPitch: false,
       targetCutoff: true,
       ampValue: 69, // TODO: Change me
-      pitchValue: 100,
+      pitchValue: 500,
       cutoffValue: 2500
     }
     let filterData = { cutoff: 20000 }
@@ -266,11 +266,11 @@ VS.BassSimulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        lfo.pitchValue = percentage * 200;
+        lfo.pitchValue = percentage * 1000;
         // TODO: Try to make audio not clip when filter cutoff is low
         lfo.cutoffValue = percentage**2 * 5000;
 
-        oscLfoPitch.amp(lfo.pitchValue);
+        ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
         oscLfoCutoff.amp(lfo.cutoffValue);
       }
 
@@ -355,10 +355,10 @@ VS.BassSimulator = function() {
       lfo.targetPitch = !lfo.targetPitch;
       if (lfo.targetPitch) {
         // Affect pitch
-        ampLfoPitch.gain.value = 1000;
+        ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
       } else {
         // Do not affect pitch
-        ampLfoPitch.gain.value = 0;
+        ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
       }
     });
 
