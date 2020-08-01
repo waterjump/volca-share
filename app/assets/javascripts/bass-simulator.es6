@@ -24,13 +24,16 @@ VS.BassSimulator = function() {
     const ampLfoPitch = audioCtx.createGain()
     ampLfoPitch.gain.value = 0;
 
-    const oscLfoPitch = audioCtx.createOscillator();
-    oscLfoPitch.type = 'triangle';
-    oscLfoPitch.frequency.setValueAtTime(1, audioCtx.currentTime);
-    oscLfoPitch.connect(ampLfoPitch);
-    oscLfoPitch.start();
+    const ampLfoCutoff = audioCtx.createGain()
+    ampLfoCutoff.gain.value = 2500;
+    ampLfoCutoff.connect(filter.frequency);
 
-    const oscLfoCutoff = new p5.Oscillator('triangle');
+    const oscLfo = audioCtx.createOscillator();
+    oscLfo.type = 'triangle';
+    oscLfo.frequency.setValueAtTime(1, audioCtx.currentTime);
+    oscLfo.connect(ampLfoPitch);
+    oscLfo.connect(ampLfoCutoff);
+    oscLfo.start();
 
     let octave = 3;
 
@@ -109,11 +112,6 @@ VS.BassSimulator = function() {
 
     p.setup = function() {
       console.log('p5 is running :-]');
-
-      oscLfoCutoff.amp(1000);
-      oscLfoCutoff.freq(1);
-      oscLfoCutoff.start();
-      oscLfoCutoff.disconnect();
 
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
 
@@ -252,8 +250,7 @@ VS.BassSimulator = function() {
         percentage = midiValue / 127.0;
         lfoRateValue = (percentage**3 * 35) + 0.1;
 
-        oscLfoPitch.frequency.setValueAtTime(lfoRateValue, audioCtx.currentTime);
-        oscLfoCutoff.freq(lfoRateValue);
+        oscLfo.frequency.setValueAtTime(lfoRateValue, audioCtx.currentTime);
       }
 
       // LFO INT
@@ -271,7 +268,7 @@ VS.BassSimulator = function() {
         lfo.cutoffValue = percentage**2 * 5000;
 
         ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
-        oscLfoCutoff.amp(lfo.cutoffValue);
+        ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
       }
 
       // VCO1 PITCH
@@ -367,12 +364,10 @@ VS.BassSimulator = function() {
       lfo.targetCutoff = !lfo.targetCutoff;
       if (lfo.targetCutoff) {
         // Affect filter cutoff
-        oscLfoCutoff.amp(lfo.cutoffValue);
-        filter.freq(oscLfoCutoff);
+        ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
       } else {
         // Do not affect filter cutoff
-        oscLfoCutoff.amp(0);
-        filter.freq(filterData.cutoff);
+        ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
       }
     });
 
@@ -383,8 +378,7 @@ VS.BassSimulator = function() {
        } else {
          lfo.shape = 'triangle';
       }
-      oscLfoPitch.type = lfo.shape;
-      oscLfoCutoff.setType(lfo.shape);
+      oscLfo.type = lfo.shape;
     });
 
     const toggleVcoWave = function(osc, vco) {
