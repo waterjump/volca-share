@@ -383,7 +383,7 @@ VS.BassSimulator = function() {
        } else {
          lfo.shape = 'triangle';
       }
-      oscLfoPitch.setType(lfo.shape);
+      oscLfoPitch.type = lfo.shape;
       oscLfoCutoff.setType(lfo.shape);
     });
 
