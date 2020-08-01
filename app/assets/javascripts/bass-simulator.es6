@@ -392,7 +392,8 @@ VS.BassSimulator = function() {
          vco.shape = 'square';
        } else {
          vco.shape = 'sawtooth';
-      }
+       }
+       osc.type = vco.shape;
     };
 
     // VCO1 WAVE
