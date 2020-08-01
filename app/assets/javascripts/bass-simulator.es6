@@ -1,6 +1,23 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
-    const osc1 = new p5.Oscillator('sawtooth');
+    // const osc1 = new p5.Oscillator('sawtooth');
+    const audioCtx = new AudioContext();
+
+    let masterAmp = audioCtx.createGain();
+    masterAmp.connect(audioCtx.destination);
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.connect(masterAmp);
+
+    let osc1Amp = audioCtx.createGain()
+    osc1Amp.connect(filter);
+
+    const oscAmp = [null, osc1Amp];
+
+    let osc = [null, null, null, null];
+
+
     const osc2 = new p5.Oscillator('sawtooth');
     const osc3 = new p5.Oscillator('square');
     const oscLfoPitch = new p5.Oscillator('triangle');
@@ -8,9 +25,13 @@ VS.BassSimulator = function() {
 
     let octave = 3;
 
-    let vco1 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
-    let vco2 = { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 }
-    let vco3 = { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440 }
+    let vco = [
+      null,
+      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 },
+      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 },
+      { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440 }
+    ];
+
     let lfo = {
       shape: 'triangle',
       targetAmp: false,
@@ -24,7 +45,6 @@ VS.BassSimulator = function() {
 
     let notePlaying;
 
-    let filter;
 
     const keyMap = {
       65: 130.81, // C
@@ -80,9 +100,9 @@ VS.BassSimulator = function() {
 
     p.setup = function() {
       console.log('p5 is running :-]');
-      osc1.amp(vco1.amp);
-      osc2.amp(vco2.amp);
-      osc3.amp(vco3.amp);
+      // osc1.amp(vco1.amp);
+      // osc2.amp(vco2.amp);
+      // osc3.amp(vco3.amp);
 
       oscLfoPitch.amp(200);
       oscLfoPitch.freq(1);
@@ -94,53 +114,73 @@ VS.BassSimulator = function() {
       oscLfoCutoff.start();
       oscLfoCutoff.disconnect();
 
-      filter = new p5.Filter();
-      filter.freq(filterData.cutoff);
-      filter.res(0);
-      filter.freq(oscLfoCutoff);
+      // filter = new p5.Filter();
+      filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
 
-      osc1.disconnect();
-      osc1.connect(filter);
+      filter.Q.value = 0;
+      // filter.freq(oscLfoCutoff);
+
+      // osc1.disconnect();
 
       osc2.disconnect();
-      osc2.connect(filter);
+      // osc2.connect(filter);
 
       osc3.disconnect();
-      osc3.connect(filter);
+      // osc3.connect(filter);
     };
 
     p.draw = function() {
       // Keeping this for debugging purposes
     }
 
+    const playNote = function(oscNumber){
+      let oscillator = audioCtx.createOscillator();
+      oscillator.type = vco[oscNumber].shape;
+      oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime); // value in hertz
+      osc[oscNumber] = oscillator;
+      osc[oscNumber].connect(oscAmp[oscNumber]);
+      osc[oscNumber].start();
+    };
+
+    const killNotes = function() {
+      osc.forEach(function(oscillator, index) {
+        if (oscillator !== null) {
+          osc[index].stop();
+          osc[index] = null;
+        }
+      });
+    };
+
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
         notePlaying = p.keyCode;
 
+        // stop other oscillators
+        killNotes();
         // VCO 1
-        vco1.frequency =
+        vco[1].frequency =
           keyMap[notePlaying] *
           octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco1.pitchMidi]
-        osc1.freq(vco1.frequency);
-        osc1.start();
+          1.05946309435 ** pitchMap[vco[1].pitchMidi]
+        // osc[1].frequency.value = vco[1].frequency;
+        playNote(1);
 
         // VCO 2
-        vco2.frequency =
-          keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco2.pitchMidi]
-        osc2.freq(vco2.frequency);
-        osc2.start();
+        // vco2.frequency =
+        //   keyMap[notePlaying] *
+        //   octaveMap[octave].frequencyFactor *
+        //   1.05946309435 ** pitchMap[vco2.pitchMidi]
+        // osc2.freq(vco2.frequency);
+        // osc2.start();
 
-        // VCO 3
-        vco3.frequency =
-          keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco3.pitchMidi]
-        osc3.freq(vco3.frequency);
-        osc3.start();
+        // // VCO 3
+        // vco3.frequency =
+        //   keyMap[notePlaying] *
+        //   octaveMap[octave].frequencyFactor *
+        //   1.05946309435 ** pitchMap[vco3.pitchMidi]
+        // osc3.freq(vco3.frequency);
+        // osc3.start();
       }
 
       // OCTAVE DOWN (Z KEY)
@@ -162,9 +202,7 @@ VS.BassSimulator = function() {
 
     p.keyReleased = function() {
       if (p.keyIsPressed) { return; }
-      osc1.stop();
-      osc2.stop();
-      osc3.stop();
+      killNotes();
     };
 
     $(document).on('mousemove touchmove', function(e) {
@@ -197,7 +235,7 @@ VS.BassSimulator = function() {
         percentage = midiValue / 127.0;
         filterData.cutoff = 20 + (percentage**3 * 19980.0);
 
-        filter.freq(filterData.cutoff);
+        filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
       }
 
       // LFO RATE
@@ -364,12 +402,11 @@ VS.BassSimulator = function() {
        } else {
          vco.shape = 'sawtooth';
       }
-      osc.setType(vco.shape);
     };
 
     // VCO1 WAVE
     $('label[for="patch_vco1_wave"]').on('click tap', function() {
-      toggleVcoWave(osc1, vco1);
+      toggleVcoWave(osc[1], vco[1]);
     });
 
     // VCO2 WAVE
