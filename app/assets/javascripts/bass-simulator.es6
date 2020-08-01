@@ -267,8 +267,13 @@ VS.BassSimulator = function() {
         // TODO: Try to make audio not clip when filter cutoff is low
         lfo.cutoffValue = percentage**2 * 5000;
 
-        ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
-        ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
+        if (lfo.targetPitch) {
+          ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
+        }
+
+        if (lfo.targetCutoff) {
+          ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
+        }
       }
 
       // VCO1 PITCH
