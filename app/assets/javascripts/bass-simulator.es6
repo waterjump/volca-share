@@ -327,18 +327,18 @@ VS.BassSimulator = function() {
       }
     });
 
-    const toggleVcoAmp = function(osc, vco) {
-      if (vco.amp == 1) {
-        vco.amp = 0;
+    const toggleVcoAmp = function(oscNumber) {
+      if (vco[oscNumber].amp == 1) {
+        vco[oscNumber].amp = 0;
       } else {
-        vco.amp = 1;
+        vco[oscNumber].amp = 1;
       }
-      osc.amp(vco.amp);
+      oscAmp[oscNumber].gain.setValueAtTime(vco[oscNumber].amp, audioCtx.currentTime);
     };
 
     // VCO1 ON/OFF
     $('#vco1_active_button').on('click tap', function(){
-      toggleVcoAmp(osc1, vco1);
+      toggleVcoAmp(1);
     });
 
     // VCO2 ON/OFF
