@@ -222,7 +222,7 @@ VS.BassSimulator = function() {
         percentage = midiValue / 127.0;
         peakAmount = (percentage * 30.0);
 
-        filter.res(peakAmount);
+        filter.Q.value = peakAmount;
       }
 
       // FILTER CUTOFF
