@@ -20,7 +20,16 @@ VS.BassSimulator = function() {
 
     const osc2 = new p5.Oscillator('sawtooth');
     const osc3 = new p5.Oscillator('square');
-    const oscLfoPitch = new p5.Oscillator('triangle');
+
+    const ampLfoPitch = audioCtx.createGain()
+    ampLfoPitch.gain.value = 0;
+
+    const oscLfoPitch = audioCtx.createOscillator();
+    oscLfoPitch.type = 'triangle';
+    oscLfoPitch.frequency.setValueAtTime(1, audioCtx.currentTime);
+    oscLfoPitch.connect(ampLfoPitch);
+    oscLfoPitch.start();
+
     const oscLfoCutoff = new p5.Oscillator('triangle');
 
     let octave = 3;
@@ -100,25 +109,15 @@ VS.BassSimulator = function() {
 
     p.setup = function() {
       console.log('p5 is running :-]');
-      // osc1.amp(vco1.amp);
-      // osc2.amp(vco2.amp);
-      // osc3.amp(vco3.amp);
-
-      oscLfoPitch.amp(200);
-      oscLfoPitch.freq(1);
-      oscLfoPitch.start();
-      oscLfoPitch.disconnect();
 
       oscLfoCutoff.amp(1000);
       oscLfoCutoff.freq(1);
       oscLfoCutoff.start();
       oscLfoCutoff.disconnect();
 
-      // filter = new p5.Filter();
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
 
       filter.Q.value = 0;
-      // filter.freq(oscLfoCutoff);
 
       // osc1.disconnect();
 
@@ -141,6 +140,7 @@ VS.BassSimulator = function() {
 
       osc[oscNumber] = oscillator;
       osc[oscNumber].connect(oscAmp[oscNumber]);
+      ampLfoPitch.connect(osc[oscNumber].detune);
       osc[oscNumber].start();
     };
 
@@ -353,20 +353,12 @@ VS.BassSimulator = function() {
     // LFO TARGET PITCH
     $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
       lfo.targetPitch = !lfo.targetPitch;
-      // FIXME: pitch LFO on the lowest octave causes frequency
-      //   to go up for some reason.
       if (lfo.targetPitch) {
         // Affect pitch
-        oscLfoPitch.amp(lfo.pitchValue);
-        osc1.freq(oscLfoPitch);
-        osc2.freq(oscLfoPitch);
-        osc3.freq(oscLfoPitch);
+        ampLfoPitch.gain.value = 1000;
       } else {
         // Do not affect pitch
-        oscLfoPitch.amp(0);
-        osc1.freq(vco1.frequency);
-        osc2.freq(vco2.frequency);
-        osc3.freq(vco3.frequency);
+        ampLfoPitch.gain.value = 0;
       }
     });
 
