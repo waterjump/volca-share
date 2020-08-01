@@ -27,9 +27,9 @@ VS.BassSimulator = function() {
 
     let vco = [
       null,
-      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 },
-      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440 },
-      { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440 }
+      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 }
     ];
 
     let lfo = {
@@ -137,6 +137,8 @@ VS.BassSimulator = function() {
       let oscillator = audioCtx.createOscillator();
       oscillator.type = vco[oscNumber].shape;
       oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime); // value in hertz
+      oscillator.detune.setValueAtTime(vco[oscNumber].detune, audioCtx.currentTime);
+
       osc[oscNumber] = oscillator;
       osc[oscNumber].connect(oscAmp[oscNumber]);
       osc[oscNumber].start();
@@ -158,12 +160,11 @@ VS.BassSimulator = function() {
 
         // stop other oscillators
         killNotes();
+
         // VCO 1
         vco[1].frequency =
           keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco[1].pitchMidi]
-        // osc[1].frequency.value = vco[1].frequency;
+          octaveMap[octave].frequencyFactor
         playNote(1);
 
         // VCO 2
@@ -207,6 +208,7 @@ VS.BassSimulator = function() {
 
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
+      if (VS.dragging === false) { return; }
 
       // FILTER PEAK (RESONANCE)
       if (VS.activeKnob.element.id == 'peak') {
@@ -281,13 +283,10 @@ VS.BassSimulator = function() {
         midiValue = $(vco1Pitch.element).data('midi');
         if (midiValue == undefined) { return; }
 
-        vco1.pitchMidi = midiValue;
-        newFrequency =
-          keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco1.pitchMidi];
+        vco[1].pitchMidi = midiValue;
+        vco[1].detune = pitchMap[vco[1].pitchMidi] * 100;
 
-        osc1.freq(newFrequency);
+        if (osc[1] !== null) { osc[1].detune.setValueAtTime(vco[1].detune, audioCtx.currentTime); }
       }
 
       // VCO2 PITCH
