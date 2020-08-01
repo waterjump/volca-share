@@ -252,7 +252,7 @@ VS.BassSimulator = function() {
         percentage = midiValue / 127.0;
         lfoRateValue = (percentage**3 * 35) + 0.1;
 
-        oscLfoPitch.freq(lfoRateValue);
+        oscLfoPitch.frequency.setValueAtTime(lfoRateValue, audioCtx.currentTime);
         oscLfoCutoff.freq(lfoRateValue);
       }
 
