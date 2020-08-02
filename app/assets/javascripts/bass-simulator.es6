@@ -1,6 +1,5 @@
 VS.BassSimulator = function() {
   const myp = new p5(function(p) {
-    // const osc1 = new p5.Oscillator('sawtooth');
     const audioCtx = new AudioContext();
 
     let masterAmp = audioCtx.createGain();
@@ -124,8 +123,6 @@ VS.BassSimulator = function() {
     }
 
     const playNote = function(oscNumber){
-      // FIXME: Sounds like all the oscillator use either square or sawtooth
-      //  all at the same time
       let oscillator = audioCtx.createOscillator();
       oscillator.type = vco[oscNumber].shape;
       oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime); // value in hertz
