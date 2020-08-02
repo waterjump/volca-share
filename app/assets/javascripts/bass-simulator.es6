@@ -129,6 +129,9 @@ VS.BassSimulator = function() {
     const keyCodes = Object.keys(keyMap).map(Number);
 
     p.setup = function() {
+      // Place a tiny canvas so it doesn't default to a 100x100 one.
+      p.createCanvas(1, 1);
+
       console.log('p5 is running :-]');
 
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
