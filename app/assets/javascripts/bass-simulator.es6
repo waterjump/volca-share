@@ -58,7 +58,7 @@ VS.BassSimulator = function() {
       pitchValue: 500,
       cutoffValue: 2500
     }
-    let filterData = { cutoff: 20000 }
+    let filterData = { cutoff: 20000, peak: 0}
 
     let notePlaying;
 
@@ -142,7 +142,7 @@ VS.BassSimulator = function() {
     const playNote = function(oscNumber){
       let oscillator = audioCtx.createOscillator();
       oscillator.type = vco[oscNumber].shape;
-      oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime); // value in hertz
+      oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime);
       oscillator.detune.setValueAtTime(vco[oscNumber].detune, audioCtx.currentTime);
 
       osc[oscNumber] = oscillator;
@@ -227,14 +227,14 @@ VS.BassSimulator = function() {
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
       if (VS.dragging === false) { return; }
-      let midiValue;
+      let midiValue, percentage;
 
       // EG ATTACK
       if (VS.activeKnob.element.id == 'attack') {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        let percentage = midiValue / 127.0;
+        percentage = midiValue / 127.0;
         envelope.attack = percentage**3;
       }
 
@@ -243,7 +243,7 @@ VS.BassSimulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        let percentage = midiValue / 127.0;
+        percentage = midiValue / 127.0;
         envelope.cutoffEgInt = percentage**2 * 10000;
       }
 
@@ -251,26 +251,18 @@ VS.BassSimulator = function() {
 
       // FILTER PEAK (RESONANCE)
       if (VS.activeKnob.element.id == 'peak') {
-        let peak, percentage, peakAmount;
-
-        peak = VS.activeKnob
-
-        midiValue = $(peak.element).data('trueMidi');
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        peakAmount = (percentage * 30.0);
+        filterData.peak = (percentage * 30.0);
 
-        filter.Q.value = peakAmount;
+        filter.Q.value = filterData.peak;
       }
 
       // FILTER CUTOFF
       if (VS.activeKnob.element.id == 'cutoff') {
-        let cutoff, percentage;
-
-        cutoff = VS.activeKnob
-
-        midiValue = $(cutoff.element).data('trueMidi');
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
@@ -282,11 +274,7 @@ VS.BassSimulator = function() {
 
       // LFO RATE
       if (VS.activeKnob.element.id == 'lfo_rate') {
-        let lfoRate, percentage, peakAmount;
-
-        lfoRate = VS.activeKnob
-
-        midiValue = $(lfoRate.element).data('trueMidi');
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
@@ -297,11 +285,7 @@ VS.BassSimulator = function() {
 
       // LFO INT
       if (VS.activeKnob.element.id == 'lfo_int') {
-        let lfoInt, percentage, peakAmount;
-
-        lfoInt = VS.activeKnob
-
-        midiValue = $(lfoInt.element).data('trueMidi');
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
