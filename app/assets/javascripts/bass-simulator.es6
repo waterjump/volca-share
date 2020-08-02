@@ -158,7 +158,7 @@ VS.BassSimulator = function() {
         [1, 2, 3].forEach(function(oscNumber) {
           vco[oscNumber].frequency =
             keyMap[notePlaying] *
-            octaveMap[octave].frequencyFactor
+            octaveMap[octave].frequencyFactor;
           playNote(oscNumber);
         });
       }
@@ -173,6 +173,17 @@ VS.BassSimulator = function() {
         }
 
         VS.display.update(octaveMap[octave].displayNumber, 'noteString');
+        osc.forEach(function(oscillator, oscNumber) {
+          if (oscillator !== null) {
+            vco[oscNumber].frequency =
+              keyMap[notePlaying] *
+              octaveMap[octave].frequencyFactor;
+
+            osc[oscNumber].frequency.setValueAtTime(
+              vco[oscNumber].frequency, audioCtx.currentTime
+            );
+          }
+        });
       }
     };
 
