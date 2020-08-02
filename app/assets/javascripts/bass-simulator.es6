@@ -12,13 +12,13 @@ VS.BassSimulator = function() {
 
     let osc1Amp = audioCtx.createGain()
     osc1Amp.connect(filter);
+    let osc2Amp = audioCtx.createGain()
+    osc2Amp.connect(filter);
 
-    const oscAmp = [null, osc1Amp];
+    const oscAmp = [null, osc1Amp, osc2Amp];
 
     let osc = [null, null, null, null];
 
-
-    const osc2 = new p5.Oscillator('sawtooth');
     const osc3 = new p5.Oscillator('square');
 
     const ampLfoPitch = audioCtx.createGain()
@@ -117,11 +117,6 @@ VS.BassSimulator = function() {
 
       filter.Q.value = 0;
 
-      // osc1.disconnect();
-
-      osc2.disconnect();
-      // osc2.connect(filter);
-
       osc3.disconnect();
       // osc3.connect(filter);
     };
@@ -160,18 +155,12 @@ VS.BassSimulator = function() {
         killNotes();
 
         // VCO 1
-        vco[1].frequency =
-          keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor
-        playNote(1);
-
-        // VCO 2
-        // vco2.frequency =
-        //   keyMap[notePlaying] *
-        //   octaveMap[octave].frequencyFactor *
-        //   1.05946309435 ** pitchMap[vco2.pitchMidi]
-        // osc2.freq(vco2.frequency);
-        // osc2.start();
+        [1, 2].forEach(function(oscNumber) {
+          vco[oscNumber].frequency =
+            keyMap[notePlaying] *
+            octaveMap[octave].frequencyFactor
+          playNote(oscNumber);
+        });
 
         // // VCO 3
         // vco3.frequency =
