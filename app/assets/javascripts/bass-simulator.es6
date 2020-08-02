@@ -126,6 +126,8 @@ VS.BassSimulator = function() {
     }
 
     const playNote = function(oscNumber){
+      // FIXME: Sounds like all the oscillator use either square or sawtooth
+      //  all at the same time
       let oscillator = audioCtx.createOscillator();
       oscillator.type = vco[oscNumber].shape;
       oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime); // value in hertz
@@ -393,7 +395,7 @@ VS.BassSimulator = function() {
 
     // VCO2 WAVE
     $('label[for="patch_vco2_wave"]').on('click tap', function() {
-      toggleVcoWave(osc2, vco2);
+      toggleVcoWave(osc[2], vco[2]);
     });
 
     // VCO3 WAVE
