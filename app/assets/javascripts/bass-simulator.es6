@@ -324,7 +324,7 @@ VS.BassSimulator = function() {
 
     // VCO3 ON/OFF
     $('#vco3_active_button').on('click tap', function(){
-      toggleVcoAmp(osc3, vco3);
+      toggleVcoAmp(3);
     });
 
     // LFO TARGET PITCH
