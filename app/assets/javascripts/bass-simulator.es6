@@ -342,18 +342,10 @@ VS.BassSimulator = function() {
     };
 
     // VCO1 WAVE
-    $('label[for="patch_vco1_wave"]').on('click tap', function() {
-      toggleVcoWave(osc[1], vco[1]);
-    });
-
-    // VCO2 WAVE
-    $('label[for="patch_vco2_wave"]').on('click tap', function() {
-      toggleVcoWave(osc[2], vco[2]);
-    });
-
-    // VCO3 WAVE
-    $('label[for="patch_vco3_wave"]').on('click tap', function() {
-      toggleVcoWave(osc[3], vco[3]);
+    [1, 2, 3].forEach(function(oscNumber){
+      $(`label[for="patch_vco${oscNumber}_wave"]`).on('click tap', function() {
+        toggleVcoWave(osc[oscNumber], vco[oscNumber]);
+      });
     });
   });
 };
