@@ -227,6 +227,39 @@ VS.BassSimulator = function() {
       killNotes();
     };
 
+    // TOOLTIPS
+    const itemsComingSoon = [
+      '#decay_release',
+      'label[for="patch_vco_group_one"]',
+      'label[for="patch_vco_group_two"]',
+      'label[for="patch_lfo_target_amp"]',
+      'label[for="patch_sustain_on"]',
+      'label[for="patch_amp_eg_on"]'
+    ];
+
+    itemsComingSoon.forEach(function(selector) {
+      $(selector).mouseenter(function() {
+        if (VS.dragging) { return; }
+        $('.cooltip').text("Coming soon!");
+        $('.cooltip').show();
+      });
+    });
+
+    itemsComingSoon.forEach(function(selector) {
+      $(selector).mouseleave(function() {
+        $('.cooltip').hide();
+      });
+    });
+
+    $('#octave').mouseenter(function() {
+      $('.cooltip').text("Press 'Z' or 'X' to change octaves");
+      $('.cooltip').show();
+    });
+
+    $('#octave').mouseleave(function() {
+      $('.cooltip').hide();
+    });
+
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
       if (VS.dragging === false) { return; }
