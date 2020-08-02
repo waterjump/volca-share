@@ -258,8 +258,6 @@ VS.BassSimulator = function() {
       // VCO PITCH KNOBS
       [1, 2, 3].forEach(function(oscNumber) {
         if (VS.activeKnob.element.id == `vco${oscNumber}_pitch`) {
-          let newFrequency;
-
           midiValue = $(VS.activeKnob.element).data('midi');
           if (midiValue == undefined) { return; }
 
