@@ -255,50 +255,24 @@ VS.BassSimulator = function() {
         }
       }
 
-      // VCO1 PITCH
-      if (VS.activeKnob.element.id == 'vco1_pitch') {
-        let vco1Pitch, newFrequency;
+      // VCO PITCH KNOBS
+      [1, 2, 3].forEach(function(oscNumber) {
+        if (VS.activeKnob.element.id == `vco${oscNumber}_pitch`) {
+          let newFrequency;
 
-        vco1Pitch = VS.activeKnob
+          midiValue = $(VS.activeKnob.element).data('midi');
+          if (midiValue == undefined) { return; }
 
-        midiValue = $(vco1Pitch.element).data('midi');
-        if (midiValue == undefined) { return; }
+          vco[oscNumber].pitchMidi = midiValue;
+          vco[oscNumber].detune = pitchMap[vco[oscNumber].pitchMidi] * 100;
 
-        vco[1].pitchMidi = midiValue;
-        vco[1].detune = pitchMap[vco[1].pitchMidi] * 100;
-
-        if (osc[1] !== null) { osc[1].detune.setValueAtTime(vco[1].detune, audioCtx.currentTime); }
-      }
-
-      // VCO2 PITCH
-      if (VS.activeKnob.element.id == 'vco2_pitch') {
-        let vco2Pitch, newFrequency;
-
-        vco2Pitch = VS.activeKnob
-
-        midiValue = $(vco2Pitch.element).data('midi');
-        if (midiValue == undefined) { return; }
-
-        vco[2].pitchMidi = midiValue;
-        vco[2].detune = pitchMap[vco[2].pitchMidi] * 100;
-
-        if (osc[2] !== null) { osc[2].detune.setValueAtTime(vco[2].detune, audioCtx.currentTime); }
-      }
-
-      // VCO3 PITCH
-      if (VS.activeKnob.element.id == 'vco3_pitch') {
-        let vco3Pitch, newFrequency;
-
-        vco3Pitch = VS.activeKnob
-
-        midiValue = $(vco3Pitch.element).data('midi');
-        if (midiValue == undefined) { return; }
-
-        vco[3].pitchMidi = midiValue;
-        vco[3].detune = pitchMap[vco[3].pitchMidi] * 100;
-
-        if (osc[3] !== null) { osc[3].detune.setValueAtTime(vco[3].detune, audioCtx.currentTime); }
-      }
+          if (osc[oscNumber] !== null) {
+            osc[oscNumber].detune.setValueAtTime(
+              vco[oscNumber].detune, audioCtx.currentTime
+            );
+          }
+        }
+      });
     });
 
     const toggleVcoAmp = function(oscNumber) {
