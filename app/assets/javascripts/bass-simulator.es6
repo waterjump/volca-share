@@ -11,10 +11,13 @@ VS.BassSimulator = function() {
     filter.connect(masterAmp);
 
     let osc1Amp = audioCtx.createGain()
+    osc1Amp.gain.value = 0.33;
     osc1Amp.connect(filter);
     let osc2Amp = audioCtx.createGain()
+    osc2Amp.gain.value = 0.33;
     osc2Amp.connect(filter);
     let osc3Amp = audioCtx.createGain()
+    osc3Amp.gain.value = 0.33;
     osc3Amp.connect(filter);
 
     const oscAmp = [null, osc1Amp, osc2Amp, osc3Amp];
