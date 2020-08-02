@@ -218,6 +218,8 @@ VS.BassSimulator = function() {
       if (VS.dragging === false) { return; }
       let midiValue;
 
+      // TODO: Change octave when octave knob is turn via interface
+
       // FILTER PEAK (RESONANCE)
       if (VS.activeKnob.element.id == 'peak') {
         let peak, percentage, peakAmount;
