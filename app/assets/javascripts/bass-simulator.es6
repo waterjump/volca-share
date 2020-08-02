@@ -291,13 +291,10 @@ VS.BassSimulator = function() {
         midiValue = $(vco2Pitch.element).data('midi');
         if (midiValue == undefined) { return; }
 
-        vco2.pitchMidi = midiValue;
-        newFrequency =
-          keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor *
-          1.05946309435 ** pitchMap[vco2.pitchMidi]
+        vco[2].pitchMidi = midiValue;
+        vco[2].detune = pitchMap[vco[2].pitchMidi] * 100;
 
-        osc2.freq(newFrequency);
+        if (osc[2] !== null) { osc[2].detune.setValueAtTime(vco[2].detune, audioCtx.currentTime); }
       }
 
       // VCO3 PITCH
