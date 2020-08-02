@@ -185,10 +185,11 @@ VS.BassSimulator = function() {
     $(document).on('mousemove touchmove', function(e) {
       if (VS.activeKnob === null) { return; }
       if (VS.dragging === false) { return; }
+      let midiValue;
 
       // FILTER PEAK (RESONANCE)
       if (VS.activeKnob.element.id == 'peak') {
-        let peak, midiValue, percentage, peakAmount;
+        let peak, percentage, peakAmount;
 
         peak = VS.activeKnob
 
@@ -203,7 +204,7 @@ VS.BassSimulator = function() {
 
       // FILTER CUTOFF
       if (VS.activeKnob.element.id == 'cutoff') {
-        let cutoff, midiValue, percentage;
+        let cutoff, percentage;
 
         cutoff = VS.activeKnob
 
@@ -218,7 +219,7 @@ VS.BassSimulator = function() {
 
       // LFO RATE
       if (VS.activeKnob.element.id == 'lfo_rate') {
-        let lfoRate, midiValue, percentage, peakAmount;
+        let lfoRate, percentage, peakAmount;
 
         lfoRate = VS.activeKnob
 
@@ -233,7 +234,7 @@ VS.BassSimulator = function() {
 
       // LFO INT
       if (VS.activeKnob.element.id == 'lfo_int') {
-        let lfoInt, midiValue, percentage, peakAmount;
+        let lfoInt, percentage, peakAmount;
 
         lfoInt = VS.activeKnob
 
@@ -256,7 +257,7 @@ VS.BassSimulator = function() {
 
       // VCO1 PITCH
       if (VS.activeKnob.element.id == 'vco1_pitch') {
-        let vco1Pitch, midiValue, newFrequency;
+        let vco1Pitch, newFrequency;
 
         vco1Pitch = VS.activeKnob
 
@@ -271,7 +272,7 @@ VS.BassSimulator = function() {
 
       // VCO2 PITCH
       if (VS.activeKnob.element.id == 'vco2_pitch') {
-        let vco2Pitch, midiValue, newFrequency;
+        let vco2Pitch, newFrequency;
 
         vco2Pitch = VS.activeKnob
 
@@ -286,7 +287,7 @@ VS.BassSimulator = function() {
 
       // VCO3 PITCH
       if (VS.activeKnob.element.id == 'vco3_pitch') {
-        let vco3Pitch, midiValue, newFrequency;
+        let vco3Pitch, newFrequency;
 
         vco3Pitch = VS.activeKnob
 
