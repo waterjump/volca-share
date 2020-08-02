@@ -309,19 +309,11 @@ VS.BassSimulator = function() {
       oscAmp[oscNumber].gain.setValueAtTime(vco[oscNumber].amp, audioCtx.currentTime);
     };
 
-    // VCO1 ON/OFF
-    $('#vco1_active_button').on('click tap', function(){
-      toggleVcoAmp(1);
-    });
-
-    // VCO2 ON/OFF
-    $('#vco2_active_button').on('click tap', function(){
-      toggleVcoAmp(2);
-    });
-
-    // VCO3 ON/OFF
-    $('#vco3_active_button').on('click tap', function(){
-      toggleVcoAmp(3);
+    // VCO MUTE BUTTONS
+    [1, 2, 3].forEach(function(oscNumber) {
+      $(`#vco${oscNumber}_active_button`).on('click tap', function(){
+        toggleVcoAmp(oscNumber);
+      });
     });
 
     // LFO TARGET PITCH
