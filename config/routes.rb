@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   end
 
   resources :patch, param: :id, controller: 'patches', except: [:index]
-  resources :simulation, controller: 'simulations', only: [:new]
+  get 'bass/emulator' => 'emulators#new', as: :bass_emulator
   post 'patch' => 'patches#create'
   resources :patches, only: [:index]
   get 'about' => 'welcome#index'
