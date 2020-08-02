@@ -9,6 +9,8 @@ VS.BassSimulator = function() {
     filter.type = 'lowpass';
     filter.connect(masterAmp);
 
+    let envelope = { attack: 0.2, decayRelease: 0, cutoffEgInt: 10000 };
+
     const defaultVcoAmp = 0.33;
     let vco = [
       null,
@@ -147,6 +149,11 @@ VS.BassSimulator = function() {
       osc[oscNumber].connect(oscAmp[oscNumber]);
       ampLfoPitch.connect(osc[oscNumber].detune);
       osc[oscNumber].start();
+
+      filter.frequency.linearRampToValueAtTime(
+        filterData.cutoff + envelope.cutoffEgInt,
+        audioCtx.currentTime + envelope.attack
+      );
     };
 
     const killNotes = function() {
@@ -156,6 +163,9 @@ VS.BassSimulator = function() {
           osc[index] = null;
         }
       });
+
+      // FIXME: Keep resonance from causing notes to thump on note stop
+      filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
     };
 
     p.keyPressed = function() {
@@ -217,6 +227,24 @@ VS.BassSimulator = function() {
       if (VS.activeKnob === null) { return; }
       if (VS.dragging === false) { return; }
       let midiValue;
+
+      // EG ATTACK
+      if (VS.activeKnob.element.id == 'attack') {
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        let percentage = midiValue / 127.0;
+        envelope.attack = percentage**3;
+      }
+
+      // CUTOFF EG INT
+      if (VS.activeKnob.element.id == 'cutoff_eg_int') {
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        let percentage = midiValue / 127.0;
+        envelope.cutoffEgInt = percentage**2 * 10000;
+      }
 
       // TODO: Change octave when octave knob is turn via interface
 
