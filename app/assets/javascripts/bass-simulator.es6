@@ -333,7 +333,7 @@ VS.BassSimulator = function() {
 
     // VCO2 ON/OFF
     $('#vco2_active_button').on('click tap', function(){
-      toggleVcoAmp(osc2, vco2);
+      toggleVcoAmp(2);
     });
 
     // VCO3 ON/OFF
