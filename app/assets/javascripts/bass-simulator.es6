@@ -384,7 +384,7 @@ VS.BassSimulator = function() {
 
     // VCO3 WAVE
     $('label[for="patch_vco3_wave"]').on('click tap', function() {
-      toggleVcoWave(osc3, vco3);
+      toggleVcoWave(osc[3], vco[3]);
     });
   });
 };
