@@ -1,4 +1,4 @@
-VS.BassSimulator = function() {
+VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
 
