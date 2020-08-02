@@ -165,6 +165,7 @@ VS.BassSimulator = function() {
       });
 
       // FIXME: Keep resonance from causing notes to thump on note stop
+      filter.frequency.cancelScheduledValues(0);
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
     };
 
@@ -275,6 +276,7 @@ VS.BassSimulator = function() {
         percentage = midiValue / 127.0;
         filterData.cutoff = 20 + (percentage**3 * 19980.0);
 
+        filter.frequency.cancelScheduledValues(0);
         filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
       }
 
