@@ -9,14 +9,22 @@ VS.BassSimulator = function() {
     filter.type = 'lowpass';
     filter.connect(masterAmp);
 
+    const defaultVcoAmp = 0.33;
+    let vco = [
+      null,
+      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
+    ];
+
     let osc1Amp = audioCtx.createGain()
-    osc1Amp.gain.value = 0.33;
+    osc1Amp.gain.value = vco[1].amp;
     osc1Amp.connect(filter);
     let osc2Amp = audioCtx.createGain()
-    osc2Amp.gain.value = 0.33;
+    osc2Amp.gain.value = vco[2].amp;
     osc2Amp.connect(filter);
     let osc3Amp = audioCtx.createGain()
-    osc3Amp.gain.value = 0.33;
+    osc3Amp.gain.value = vco[3].amp;
     osc3Amp.connect(filter);
 
     const oscAmp = [null, osc1Amp, osc2Amp, osc3Amp];
@@ -38,13 +46,6 @@ VS.BassSimulator = function() {
     oscLfo.start();
 
     let octave = 3;
-
-    let vco = [
-      null,
-      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'sawtooth', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'square', amp: 1, pitchMidi: 63, frequency: 440, detune: 0 }
-    ];
 
     let lfo = {
       shape: 'triangle',
@@ -281,10 +282,10 @@ VS.BassSimulator = function() {
     });
 
     const toggleVcoAmp = function(oscNumber) {
-      if (vco[oscNumber].amp == 1) {
+      if (vco[oscNumber].amp == defaultVcoAmp) {
         vco[oscNumber].amp = 0;
       } else {
-        vco[oscNumber].amp = 1;
+        vco[oscNumber].amp = defaultVcoAmp;
       }
       oscAmp[oscNumber].gain.setValueAtTime(vco[oscNumber].amp, audioCtx.currentTime);
     };
