@@ -9,7 +9,7 @@ VS.BassEmulator = function() {
     filter.type = 'lowpass';
     filter.connect(masterAmp);
 
-    let envelope = { attack: 0.2, decayRelease: 0, cutoffEgInt: 10000 };
+    let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
 
     const defaultVcoAmp = 0.33;
     let vco = [
@@ -37,7 +37,7 @@ VS.BassEmulator = function() {
     ampLfoPitch.gain.value = 0;
 
     const ampLfoCutoff = audioCtx.createGain()
-    ampLfoCutoff.gain.value = 2500;
+    ampLfoCutoff.gain.value = 0;
     ampLfoCutoff.connect(filter.frequency);
 
     const oscLfo = audioCtx.createOscillator();
@@ -55,8 +55,8 @@ VS.BassEmulator = function() {
       targetPitch: false,
       targetCutoff: true,
       ampValue: 69, // TODO: Change me
-      pitchValue: 500,
-      cutoffValue: 2500
+      pitchValue: 0,
+      cutoffValue: 0
     }
     let filterData = { cutoff: 20000, peak: 0}
 
