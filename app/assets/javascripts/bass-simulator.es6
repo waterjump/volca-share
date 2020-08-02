@@ -163,19 +163,15 @@ VS.BassSimulator = function() {
         });
       }
 
-      // OCTAVE DOWN (Z KEY)
-      if (zKeyCode == p.keyCode) {
-        if (octave > -1) {
+      // CHANGE OCTAVE
+      if ([zKeyCode, xKeyCode].includes(p.keyCode)) {
+        if (p.keyCode == zKeyCode && octave > -1) {
           octave -= 1;
         }
-        VS.display.update(octaveMap[octave].displayNumber, 'noteString');
-      }
-
-      // OCTAVE UP (X KEY)
-      if (xKeyCode == p.keyCode) {
-        if (octave < 9) {
+        if (p.keyCode == xKeyCode && octave < 9) {
           octave += 1;
         }
+
         VS.display.update(octaveMap[octave].displayNumber, 'noteString');
       }
     };
