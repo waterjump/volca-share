@@ -108,7 +108,21 @@ VS.BassSimulator = function() {
       7: { displayNumber: 93, frequencyFactor: 16 },
       8: { displayNumber: 105, frequencyFactor: 32 },
       9: { displayNumber: 118, frequencyFactor: 64 }
-    }
+    };
+
+    const octaveKnobMidiMap = {
+      '-1': 0,
+      0: 0,
+      1: 0,
+      2: 33,
+      3: 55,
+      4: 77,
+      5: 99,
+      6: 127,
+      7: 127,
+      8: 127,
+      9: 127
+    };
 
     const keyCodes = Object.keys(keyMap).map(Number);
 
@@ -171,6 +185,15 @@ VS.BassSimulator = function() {
         }
 
         VS.display.update(octaveMap[octave].displayNumber, 'noteString');
+
+        // Turn octave knob
+        jOctave = $('#octave');
+        jOctave.data('midi', octaveKnobMidiMap[octave]);
+        let octaveKnob = new VS.Knob(jOctave);
+        let degree = octaveKnob.degreeForMidi(jOctave.data('midi'), 140);
+        jOctave.data('rotation', degree);
+        octaveKnob.autoRotate(degree);
+
         osc.forEach(function(oscillator, oscNumber) {
           if (oscillator !== null) {
             vco[oscNumber].frequency =
