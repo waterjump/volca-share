@@ -14,12 +14,12 @@ VS.BassSimulator = function() {
     osc1Amp.connect(filter);
     let osc2Amp = audioCtx.createGain()
     osc2Amp.connect(filter);
+    let osc3Amp = audioCtx.createGain()
+    osc3Amp.connect(filter);
 
-    const oscAmp = [null, osc1Amp, osc2Amp];
+    const oscAmp = [null, osc1Amp, osc2Amp, osc3Amp];
 
     let osc = [null, null, null, null];
-
-    const osc3 = new p5.Oscillator('square');
 
     const ampLfoPitch = audioCtx.createGain()
     ampLfoPitch.gain.value = 0;
@@ -56,7 +56,6 @@ VS.BassSimulator = function() {
     let filterData = { cutoff: 20000 }
 
     let notePlaying;
-
 
     const keyMap = {
       65: 130.81, // C
@@ -114,11 +113,7 @@ VS.BassSimulator = function() {
       console.log('p5 is running :-]');
 
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
-
       filter.Q.value = 0;
-
-      osc3.disconnect();
-      // osc3.connect(filter);
     };
 
     p.draw = function() {
@@ -156,21 +151,13 @@ VS.BassSimulator = function() {
         // stop other oscillators
         killNotes();
 
-        // VCO 1
-        [1, 2].forEach(function(oscNumber) {
+        // VCOs 1, 2, and 3
+        [1, 2, 3].forEach(function(oscNumber) {
           vco[oscNumber].frequency =
             keyMap[notePlaying] *
             octaveMap[octave].frequencyFactor
           playNote(oscNumber);
         });
-
-        // // VCO 3
-        // vco3.frequency =
-        //   keyMap[notePlaying] *
-        //   octaveMap[octave].frequencyFactor *
-        //   1.05946309435 ** pitchMap[vco3.pitchMidi]
-        // osc3.freq(vco3.frequency);
-        // osc3.start();
       }
 
       // OCTAVE DOWN (Z KEY)
