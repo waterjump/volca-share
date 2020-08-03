@@ -42,7 +42,7 @@ VS.BassEmulator = function() {
 
     const oscLfo = audioCtx.createOscillator();
     oscLfo.type = 'triangle';
-    oscLfo.frequency.setValueAtTime(1, audioCtx.currentTime);
+    oscLfo.frequency.setValueAtTime(0.1, audioCtx.currentTime);
     oscLfo.connect(ampLfoPitch);
     oscLfo.connect(ampLfoCutoff);
     oscLfo.start();
