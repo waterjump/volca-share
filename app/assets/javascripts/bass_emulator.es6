@@ -38,7 +38,7 @@ VS.BassEmulator = function() {
 
     const ampLfoCutoff = audioCtx.createGain()
     ampLfoCutoff.gain.value = 0;
-    ampLfoCutoff.connect(filter.frequency);
+    ampLfoCutoff.connect(filter.detune);
 
     const oscLfo = audioCtx.createOscillator();
     oscLfo.type = 'triangle';
@@ -327,8 +327,7 @@ VS.BassEmulator = function() {
 
         percentage = midiValue / 127.0;
         lfo.pitchValue = percentage * 1000;
-        // TODO: Try to make audio not clip when filter cutoff is low
-        lfo.cutoffValue = percentage**2 * 5000;
+        lfo.cutoffValue = percentage**2 * 4800;
 
         if (lfo.targetPitch) {
           ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
