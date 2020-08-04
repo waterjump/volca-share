@@ -31,6 +31,8 @@
       .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' }, class: @patch.lit?(:vco1_active) }
       .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
       .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' }, class: @patch.lit?(:vco3_active) }
+      .medium.knob#volume{ data: { midi: 127 } }
+        .notch
       .cooltip
       .bottom-row
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control

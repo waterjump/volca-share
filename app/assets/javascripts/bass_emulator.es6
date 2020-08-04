@@ -354,6 +354,15 @@ VS.BassEmulator = function() {
           }
         }
       });
+
+      // VOLUME
+      if (VS.activeKnob.element.id == 'volume') {
+        midiValue = $(VS.activeKnob.element).data('midi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        masterAmp.gain.setValueAtTime(percentage, audioCtx.currentTime);
+      }
     });
 
     const toggleVcoAmp = function(oscNumber) {
