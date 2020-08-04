@@ -40,15 +40,6 @@ VS.BassEmulator = function() {
     ampLfoCutoff.gain.value = 0;
     ampLfoCutoff.connect(filter.detune);
 
-    const oscLfo = audioCtx.createOscillator();
-    oscLfo.type = 'triangle';
-    oscLfo.frequency.setValueAtTime(0.1, audioCtx.currentTime);
-    oscLfo.connect(ampLfoPitch);
-    oscLfo.connect(ampLfoCutoff);
-    oscLfo.start();
-
-    let octave = 3;
-
     let lfo = {
       shape: 'triangle',
       targetAmp: false,
@@ -56,8 +47,25 @@ VS.BassEmulator = function() {
       targetCutoff: true,
       ampValue: 69, // TODO: Change me
       pitchValue: 0,
-      cutoffValue: 0
+      cutoffValue: 0,
+      frequency: 0.1
     }
+
+    let oscLfo;
+
+    const setupOscLfo = function() {
+      oscLfo = audioCtx.createOscillator();
+      oscLfo.type = lfo.shape;
+      oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
+      oscLfo.connect(ampLfoPitch);
+      oscLfo.connect(ampLfoCutoff);
+      oscLfo.start();
+    }
+
+    setupOscLfo();
+
+    let octave = 3;
+
     let filterData = { cutoff: 20000, peak: 0}
 
     let notePlaying;
@@ -153,6 +161,13 @@ VS.BassEmulator = function() {
       osc[oscNumber].connect(oscAmp[oscNumber]);
       ampLfoPitch.connect(osc[oscNumber].detune);
       osc[oscNumber].start();
+
+      // Retrigger LFO if it's square
+      if (lfo.shape == 'square') {
+        oscLfo.disconnect();
+        oscLfo = null;
+        setupOscLfo();
+      }
 
       if (envelope.cutoffEgInt > 0) {
         // Envelope attack
@@ -333,9 +348,9 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        lfoRateValue = (percentage**3 * 35) + 0.1;
+        lfo.frequency = (percentage**3 * 35) + 0.1;
 
-        oscLfo.frequency.setValueAtTime(lfoRateValue, audioCtx.currentTime);
+        oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
       }
 
       // LFO INT
