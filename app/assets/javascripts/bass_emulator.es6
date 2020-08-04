@@ -154,10 +154,20 @@ VS.BassEmulator = function() {
       ampLfoPitch.connect(osc[oscNumber].detune);
       osc[oscNumber].start();
 
-      filter.frequency.linearRampToValueAtTime(
-        filterData.cutoff + envelope.cutoffEgInt,
-        audioCtx.currentTime + envelope.attack
-      );
+      if (envelope.cutoffEgInt > 0) {
+        // Envelope attack
+        t = audioCtx.currentTime;
+        attackEndTime = t + envelope.attack;
+        topCutoff = filterData.cutoff + envelope.cutoffEgInt;
+        filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
+
+        // Envelope decay
+        decayEndTime = t + envelope.decayRelease;
+        filter.frequency.setTargetAtTime(
+          filterData.cutoff,
+          attackEndTime,
+          envelope.decayRelease / 7);
+      }
     };
 
     const killNotes = function() {
@@ -230,7 +240,6 @@ VS.BassEmulator = function() {
 
     // TOOLTIPS
     const itemsComingSoon = [
-      '#decay_release',
       'label[for="patch_vco_group_one"]',
       'label[for="patch_vco_group_two"]',
       'label[for="patch_lfo_target_amp"]',
@@ -273,6 +282,15 @@ VS.BassEmulator = function() {
 
         percentage = midiValue / 127.0;
         envelope.attack = percentage**3;
+      }
+
+      // EG DECAY/RELEASE
+      if (VS.activeKnob.element.id == 'decay_release') {
+        midiValue = $(VS.activeKnob.element).data('trueMidi');
+        if (midiValue == undefined) { return; }
+
+        percentage = midiValue / 127.0;
+        envelope.decayRelease = percentage**3;
       }
 
       // CUTOFF EG INT
