@@ -486,5 +486,26 @@ VS.BassEmulator = function() {
         toggleVcoWave(osc[oscNumber], vco[oscNumber]);
       });
     });
+
+    // MOBILE KEY
+    $('.mobile-key').on('mousedown touchstart', function() {
+      // TODO: This code is repeated.  DRY up!
+      notePlaying = 65;
+
+      // stop other oscillators
+      killNotes();
+
+      // VCOs 1, 2, and 3
+      [1, 2, 3].forEach(function(oscNumber) {
+        vco[oscNumber].frequency =
+          keyMap[notePlaying] *
+          octaveMap[octave].frequencyFactor;
+        playNote(oscNumber);
+      });
+    });
+
+    $('.mobile-key').on('mouseup touchend', function() {
+      killNotes();
+    });
   });
 };
