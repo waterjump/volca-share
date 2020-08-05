@@ -40,12 +40,16 @@ VS.BassEmulator = function() {
     ampLfoCutoff.gain.value = 0;
     ampLfoCutoff.connect(filter.detune);
 
+    const ampLfoAmp = audioCtx.createGain()
+    ampLfoAmp.gain.value = 0;
+    ampLfoAmp.connect(masterAmp.gain);
+
     let lfo = {
       shape: 'triangle',
       targetAmp: false,
       targetPitch: false,
       targetCutoff: true,
-      ampValue: 69, // TODO: Change me
+      ampValue: 0,
       pitchValue: 0,
       cutoffValue: 0,
       frequency: 0.1
@@ -59,6 +63,7 @@ VS.BassEmulator = function() {
       oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
       oscLfo.connect(ampLfoPitch);
       oscLfo.connect(ampLfoCutoff);
+      oscLfo.connect(ampLfoAmp);
       oscLfo.start();
     }
 
@@ -257,7 +262,6 @@ VS.BassEmulator = function() {
     const itemsComingSoon = [
       'label[for="patch_vco_group_one"]',
       'label[for="patch_vco_group_two"]',
-      'label[for="patch_lfo_target_amp"]',
       'label[for="patch_sustain_on"]',
       'label[for="patch_amp_eg_on"]'
     ];
@@ -361,6 +365,7 @@ VS.BassEmulator = function() {
         percentage = midiValue / 127.0;
         lfo.pitchValue = percentage * 1000;
         lfo.cutoffValue = percentage**2 * 4800;
+        lfo.ampValue = percentage;
 
         if (lfo.targetPitch) {
           ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
@@ -368,6 +373,10 @@ VS.BassEmulator = function() {
 
         if (lfo.targetCutoff) {
           ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
+        }
+
+        if (lfo.targetAmp) {
+          ampLfoAmp.gain.setValueAtTime(lfo.ampValue, audioCtx.currentTime);
         }
       }
 
@@ -412,6 +421,18 @@ VS.BassEmulator = function() {
       $(`#vco${oscNumber}_active_button`).on('click tap', function(){
         toggleVcoAmp(oscNumber);
       });
+    });
+
+    // LFO TARGET AMP
+    $('label[for="patch_lfo_target_amp"]').on('click tap', function() {
+      lfo.targetAmp = !lfo.targetAmp;
+      if (lfo.targetAmp) {
+        // Affect amp
+        ampLfoAmp.gain.setValueAtTime(lfo.ampValue, audioCtx.currentTime);
+      } else {
+        // Do not affect amp
+        ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
     });
 
     // LFO TARGET PITCH
