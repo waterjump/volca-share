@@ -15,7 +15,7 @@ module AudioSample
     @audio_sample_code ||=
       begin
         if audio_sample.include?('soundcloud')
-          ::OEmbed::Providers::SoundCloud.get(audio_sample, maxheight: 81).html
+          ::OEmbed::Providers::SoundCloud.get(audio_sample, maxheight: 200).html
         elsif /youtu\.?be/ === audio_sample
           video_id = audio_sample.match(/[a-zA-Z0-9]{11}/)
           return unless video_id.present?

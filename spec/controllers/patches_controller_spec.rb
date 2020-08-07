@@ -54,10 +54,10 @@ RSpec.describe PatchesController, type: :controller do
       expect(json).to include(
         {
           'audio_sample_code' =>
-            '<iframe width="100%" height="81" scrolling="no"'\
+            '<iframe width="100%" height="200" scrolling="no"'\
             ' frameborder="no" src="https://w.soundcloud.com/player/'\
             '?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks'\
-            '%2F258722704&show_artwork=true&maxheight=81"></iframe>',
+            '%2F258722704&show_artwork=true&maxheight=200"></iframe>',
           'name' => patch.name,
           'patch_location' => "/patch/#{patch.id}"
         }
