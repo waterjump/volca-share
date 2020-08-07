@@ -203,6 +203,30 @@ VS.BassEmulator = function() {
       filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
     };
 
+    const changeOctave = function() {
+      VS.display.update(octaveMap[octave].displayNumber, 'noteString');
+
+      // Turn octave knob
+      jOctave = $('#octave');
+      jOctave.data('midi', octaveKnobMidiMap[octave]);
+      let octaveKnob = new VS.Knob(jOctave);
+      let degree = octaveKnob.degreeForMidi(jOctave.data('midi'), 140);
+      jOctave.data('rotation', degree);
+      octaveKnob.autoRotate(degree);
+
+      osc.forEach(function(oscillator, oscNumber) {
+        if (oscillator !== null) {
+          vco[oscNumber].frequency =
+            keyMap[notePlaying] *
+            octaveMap[octave].frequencyFactor;
+
+          osc[oscNumber].frequency.setValueAtTime(
+            vco[oscNumber].frequency, audioCtx.currentTime
+          );
+        }
+      });
+    }
+
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
@@ -228,28 +252,7 @@ VS.BassEmulator = function() {
         if (p.keyCode == xKeyCode && octave < 9) {
           octave += 1;
         }
-
-        VS.display.update(octaveMap[octave].displayNumber, 'noteString');
-
-        // Turn octave knob
-        jOctave = $('#octave');
-        jOctave.data('midi', octaveKnobMidiMap[octave]);
-        let octaveKnob = new VS.Knob(jOctave);
-        let degree = octaveKnob.degreeForMidi(jOctave.data('midi'), 140);
-        jOctave.data('rotation', degree);
-        octaveKnob.autoRotate(degree);
-
-        osc.forEach(function(oscillator, oscNumber) {
-          if (oscillator !== null) {
-            vco[oscNumber].frequency =
-              keyMap[notePlaying] *
-              octaveMap[octave].frequencyFactor;
-
-            osc[oscNumber].frequency.setValueAtTime(
-              vco[oscNumber].frequency, audioCtx.currentTime
-            );
-          }
-        });
+        changeOctave();
       }
     };
 
@@ -487,10 +490,27 @@ VS.BassEmulator = function() {
       });
     });
 
+    // MOBILE OCTAVE UP
+    $('#octave-up').on('click tap', function(){
+      if (octave < 9) {
+        octave += 1;
+      }
+      changeOctave();
+    });
+
+    // MOBILE OCTAVE DOWN
+    $('#octave-down').on('click tap', function(){
+      if (octave > -1) {
+        octave -= 1;
+      }
+      changeOctave();
+    });
+
     // MOBILE KEY
-    $('.mobile-key').on('mousedown touchstart', function() {
+    $('.mobile-control.key').on('mousedown touchstart', function(e) {
       // TODO: This code is repeated.  DRY up!
-      notePlaying = 65;
+
+      notePlaying = $(this).data('keycode');
 
       // stop other oscillators
       killNotes();
@@ -504,7 +524,7 @@ VS.BassEmulator = function() {
       });
     });
 
-    $('.mobile-key').on('mouseup touchend', function() {
+    $('.mobile-control.key').on('mouseup touchend', function() {
       killNotes();
     });
   });

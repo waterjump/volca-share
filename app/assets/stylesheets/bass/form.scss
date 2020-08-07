@@ -184,3 +184,79 @@
     }
   }
 }
+
+#mobile-keyboard {
+  position: relative;
+  background: #bbb;
+  width: 100%;
+  max-width: 829px;
+  min-height: 150px;
+
+  .top {
+    top: 6%;
+    background: #333
+  }
+  .bottom {
+    top: 53%;
+    background: #eee;
+  }
+  .mobile-control {
+    position: absolute;
+    height: 41%;
+    width: 8.9%;
+  }
+  .octave-button {
+    left: 1%;
+    background: green;
+    padding: 12px 5px;
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+  }
+  #w {
+    left: 15.8%;
+  }
+  #e {
+    left: 25.7%;
+  }
+  #t {
+    left: 45.5%;
+  }
+  #y {
+    left: 55.4%;
+  }
+  #u {
+    left: 65.3%;
+  }
+  #o {
+    left: 85.1%;
+  }
+
+  #a {
+    left: 10.9%;
+  }
+  #s {
+    left: 20.8%;
+  }
+  #d {
+    left: 30.7%;
+  }
+  #f {
+    left: 40.6%;
+  }
+  #g {
+    left: 50.5%;
+  }
+  #h {
+    left: 60.4%;
+  }
+  #j {
+    left: 70.3%;
+  }
+  #k {
+    left: 80.2%;
+  }
+  #l {
+    left: 90.1%;
+  }
+}

@@ -106,16 +106,33 @@
           %span.on-off
             .note-light.note-11.lit
             .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
+  - if params['mobile']
+    #mobile-keyboard
+      #octave-up.mobile-control.octave-button.top Oct. ⬆️
+      #octave-down.mobile-control.octave-button.bottom Oct. ⬇️
+      #w.mobile-control.key.top{ data: { keyCode: 87 } }
+      #e.mobile-control.key.top{ data: { keyCode: 69 } }
+      #t.mobile-control.key.top{ data: { keyCode: 84 } }
+      #y.mobile-control.key.top{ data: { keyCode: 89 } }
+      #u.mobile-control.key.top{ data: { keyCode: 85 } }
+      #o.mobile-control.key.top{ data: { keyCode: 79 } }
+      #a.mobile-control.key.bottom{ data: { keyCode: 65 } }
+      #s.mobile-control.key.bottom{ data: { keyCode: 83 } }
+      #d.mobile-control.key.bottom{ data: { keyCode: 68 } }
+      #f.mobile-control.key.bottom{ data: { keyCode: 70 } }
+      #g.mobile-control.key.bottom{ data: { keyCode: 71 } }
+      #h.mobile-control.key.bottom{ data: { keyCode: 72 } }
+      #j.mobile-control.key.bottom{ data: { keyCode: 74 } }
+      #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
+      #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
-  Use computer keyboard to play notes
-  = image_tag('computer-midi-keyboard-small.png')
-#disclaimer.col-md-9.col-lg-3
-  %h3 Disclaimer
-  %p
-    This is a <b>fan-made emulator</b>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
-- if params['mobile']
-  .col-md-12.col-lg-12
-    .mobile-key{ style: 'background: red; width: 100px; height: 50px;' }
+  - unless params['mobile']
+    Use computer keyboard to play notes
+    = image_tag('computer-midi-keyboard-small.png')
+  #disclaimer
+    %h3 Disclaimer
+    %p
+      This is a <b>fan-made emulator</b>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
 .off-canvas
   =image_tag('numbers.jpg')
   =image_tag('symbols.jpg')
