@@ -11,7 +11,10 @@ class UpdatePatchAudioSampleAvailableJob
 
       next if original_availability == patch.send(:set_audio_sample_available)
 
-      puts "Correcting audio sample availibility for '#{patch.name}'"
+      unless Rails.env.test?
+        puts "Correcting audio sample availibility for '#{patch.name}'"
+      end
+
       patch.set(audio_sample_available: patch.send(:set_audio_sample_available))
     end
 
