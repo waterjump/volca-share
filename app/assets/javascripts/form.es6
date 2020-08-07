@@ -141,6 +141,7 @@ VS.Form = function() {
     if (VS.clicked) { VS.dragging = true; }
     if (!VS.dragging) { return; }
     e.preventDefault();
+    e.stopPropagation();
     $('body').css('cursor', 'ns-resize');
     VS.currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
     turnKnob(e);
