@@ -348,7 +348,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        filterData.peak = (percentage * 30.0);
+        filterData.peak = (percentage**2.5 * 30.0);
 
         filter.Q.value = filterData.peak;
       }
