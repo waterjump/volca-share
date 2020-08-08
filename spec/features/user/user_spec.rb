@@ -38,9 +38,9 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     bass_patch = user.patches.create(attributes_for(:patch))
 
     visit user_path(user.slug)
-    expect(page).to have_selector('h2', text: 'Volca Bass Patches')
+    expect(page).to have_selector('h3', text: 'Volca Bass Patches')
     expect(page).to have_content(bass_patch.name)
-    expect(page).to have_selector('h2', text: 'Volca Keys Patches')
+    expect(page).to have_selector('h3', text: 'Volca Keys Patches')
     expect(page).to have_content(keys_patch.name)
   end
 
@@ -63,12 +63,14 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
 
+    # TODO: move to view spec for index
     visit patches_path
     click_link user.username
     expect(page).to have_title("Patches by #{user.username} | VolcaShare")
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
 
+    # TODO: move to view spec for patch show
     visit patch_path(patch1)
     click_link user.username
     expect(page).to have_title("Patches by #{user.username} | VolcaShare")

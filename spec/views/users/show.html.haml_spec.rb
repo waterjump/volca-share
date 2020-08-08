@@ -34,7 +34,7 @@ RSpec.describe 'users/show.html.haml', type: :view do
     expect(rendered).to have_content('Member since June 9, 2020')
   end
 
-  context 'when user has no keys patches' do
+  context 'when user has only bass patches' do
     before do
       @user = user
       @patches = bass_patches
@@ -43,8 +43,8 @@ RSpec.describe 'users/show.html.haml', type: :view do
       render
     end
 
-    it 'does not show "Volca Bass Patches" subheader' do
-      expect(rendered).not_to have_content('Volca Bass Patches')
+    it 'shows "Volca Bass Patches" subheader' do
+      expect(rendered).to have_content('Volca Bass Patches')
     end
 
     it 'does not show "Volca Keys Patches" subheader' do
@@ -52,17 +52,17 @@ RSpec.describe 'users/show.html.haml', type: :view do
     end
   end
 
-  context 'when user has keys patches' do
+  context 'when user only has keys patches' do
     before do
       @user = user
-      @patches = bass_patches
+      @patches = []
       @keys_patches = keys_patches
 
       render
     end
 
-    it 'shows "Volca Bass Patches" subheader' do
-      expect(rendered).to have_content('Volca Bass Patches')
+    it 'does not show "Volca Bass Patches" subheader' do
+      expect(rendered).not_to have_content('Volca Bass Patches')
     end
 
     it 'shows "Volca Keys Patches" subheader' do

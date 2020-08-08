@@ -1,12 +1,13 @@
 .container
   %h1= "Patches by #{@user.username}"
   %p= "Member since #{@user.created_at.strftime("%B %-d, %Y" )}"
-  - show_subheaders = @keys_patches.any?
   .patches
     = render 'shared/audio_preview'
-    - if show_subheaders
-      %h2= 'Volca Bass Patches'
-    = render 'shared/patches', locals: { hide_pagination: true }
-    - if show_subheaders
-      %h2.col-sm-12= 'Volca Keys Patches'
+    - if @patches.empty? && @keys_patches.empty?
+      No patches to show.
+    - if @patches.any?
+      %h3= "Volca Bass Patches (#{@patches.count})"
+      = render 'shared/patches', locals: { hide_pagination: true }
+    - if @keys_patches.any?
+      %h3.col-sm-12= "Volca Keys Patches (#{@keys_patches.count})"
       = render 'shared/keys_patches', locals: { hide_pagination: true }
