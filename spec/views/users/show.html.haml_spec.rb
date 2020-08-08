@@ -14,14 +14,24 @@ RSpec.describe 'users/show.html.haml', type: :view do
     )
   end
 
-  it 'shows the name of the user' do
+  before do
     @user = user
     @patches = bass_patches
     @keys_patches = []
+  end
 
+  it 'shows the name of the user' do
     render
 
     expect(rendered).to have_content("Patches by #{@user.username}")
+  end
+
+  it "shows the user's join date" do
+    @user.update(created_at: Time.new(2020, 6, 9, 12))
+
+    render
+
+    expect(rendered).to have_content('Member since June 9, 2020')
   end
 
   context 'when user has no keys patches' do

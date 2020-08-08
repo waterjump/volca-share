@@ -1,6 +1,6 @@
 .container
   %h1= "Patches by #{@user.username}"
-  %p= pluralize(@patches.count, 'patch')
+  %p= "Member since #{@user.created_at.strftime("%B %-d, %Y" )}"
   - show_subheaders = @keys_patches.any?
   .patches
     = render 'shared/audio_preview'
