@@ -1,6 +1,7 @@
 VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
+    let portamento = false;
 
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
@@ -159,8 +160,14 @@ VS.BassEmulator = function() {
     const playNote = function(oscNumber){
       let oscillator = audioCtx.createOscillator();
       oscillator.type = vco[oscNumber].shape;
-      oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime);
       oscillator.detune.setValueAtTime(vco[oscNumber].detune, audioCtx.currentTime);
+
+      if (portamento) {
+        oscillator.frequency.setValueAtTime(vco[oscNumber].lastFrequency, audioCtx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime + 0.1);
+      } else {
+        oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime);
+      }
 
       osc[oscNumber] = oscillator;
       osc[oscNumber].connect(oscAmp[oscNumber]);
@@ -174,7 +181,8 @@ VS.BassEmulator = function() {
         setupOscLfo();
       }
 
-      if (envelope.cutoffEgInt > 0) {
+      // TODO: Check if envelope triggers or not w/ portamento.  Assuming it doesn't.
+      if (envelope.cutoffEgInt > 0 && !portamento) {
         // Envelope attack
         t = audioCtx.currentTime;
         attackEndTime = t + envelope.attack;
@@ -230,6 +238,13 @@ VS.BassEmulator = function() {
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
+        // PORTAMENTO
+        let otherKeys = keyCodes.slice();
+        otherKeys.splice(keyCodes.indexOf(p.keyCode), 1);
+        portamento = otherKeys.some(function(otherKey) {
+          return p.keyIsDown(otherKey);
+        });
+
         notePlaying = p.keyCode;
 
         // stop other oscillators
@@ -237,6 +252,7 @@ VS.BassEmulator = function() {
 
         // VCOs 1, 2, and 3
         [1, 2, 3].forEach(function(oscNumber) {
+          vco[oscNumber].lastFrequency = vco[oscNumber].frequency;
           vco[oscNumber].frequency =
             keyMap[notePlaying] *
             octaveMap[octave].frequencyFactor;
