@@ -359,7 +359,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        filterData.cutoff = 20 + (percentage**3 * 19980.0);
+        filterData.cutoff = 20 + (percentage**4 * 19980.0);
 
         filter.frequency.cancelScheduledValues(0);
         filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
