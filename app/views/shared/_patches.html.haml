@@ -51,7 +51,7 @@
         - else
           ¯\_(ツ)_/¯
         %br/
-        .date= patch.created_at.strftime("%B #{patch.created_at.day.ordinalize}, %Y" )
+        .date= patch.created_at.strftime("%B %-d, %Y" )
         .icons
           - if current_user.present? && patch.user == current_user
             = link_to edit_patch_path(patch) do

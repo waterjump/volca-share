@@ -94,11 +94,7 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
 
   it 'shows date the patch was created' do
     expect(rendered).to(
-      have_content(
-        patches.first.created_at.strftime(
-          "%B #{patches.first.created_at.day.ordinalize}, %Y"
-        )
-      )
+      have_content(patches.first.created_at.strftime("%B %-d, %Y"))
     )
   end
 
