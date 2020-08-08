@@ -25,9 +25,21 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
     let(:patches) { create_list(:patch, 1, user: user) }
 
     it 'links to the user patch path twice' do
+      expect(rendered).to(
+        have_selector(
+          :css, "a[href='#{user_patch_path(user.slug, patches.first.slug)}']"
+        )
+      )
+    end
+
+    it 'does not link to the anonymous patch path twice' do
       expect(rendered).not_to(
         have_selector(:css, "a[href='#{patch_path(patches.first)}']")
       )
+    end
+
+    it 'links to the user profile page of patch author' do
+      expect(rendered).to have_link(user.username, href: user_path(user.slug))
     end
   end
 

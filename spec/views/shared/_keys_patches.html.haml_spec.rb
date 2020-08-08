@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'shared/_keys_patches.html.haml', type: :view do
   let(:user) { create(:user) }
-  let(:patches) { create_list(:keys_patch, 5) }
+  let(:patches) { create_list(:keys_patch, 5, user: create(:user)) }
 
   let(:render_options) do
     {
@@ -62,9 +62,22 @@ RSpec.describe 'shared/_keys_patches.html.haml', type: :view do
     end
   end
 
-  it 'links to the patch show page by name' do
+  it 'links to the user profile page of patch author' do
     expect(rendered).to(
-      have_link(patches.first.name, href: keys_patch_path(patches.first))
+      have_link(patches.first.user.username, href: user_path(patches.first.user.slug))
+    )
+  end
+
+  it 'links to the user patch show page by name' do
+    expect(rendered).to(
+      have_link(
+        patches.first.name,
+        href:
+          user_keys_patch_path(
+            patches.first.user.slug,
+            patches.first.slug
+          )
+      )
     )
   end
 
