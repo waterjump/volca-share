@@ -62,12 +62,5 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_title("Patches by #{user.username} | VolcaShare")
     expect(page).to have_content(patch1.name)
     expect(page).not_to have_content(patch2.name)
-
-    # TODO: move to view spec for patch show
-    visit patch_path(patch1)
-    click_link user.username
-    expect(page).to have_title("Patches by #{user.username} | VolcaShare")
-    expect(page).to have_content(patch1.name)
-    expect(page).not_to have_content(patch2.name)
   end
 end

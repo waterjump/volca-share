@@ -31,8 +31,8 @@ RSpec.describe 'patches/show.html.haml', type: :view do
       )
     end
 
-    it 'displays author name' do
-      expect(rendered).to have_content("by #{@patch.user.username}")
+    it 'shows link to author profile page' do
+      expect(rendered).to have_link(@patch.user.username, href: user_path(user.slug))
     end
   end
 
