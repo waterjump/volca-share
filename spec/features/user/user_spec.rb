@@ -50,7 +50,7 @@ RSpec.describe 'User profile page', type: :feature, js: true do
 
     visit user_path(user.slug)
     expect(page).not_to have_selector('.pagination')
-    expect(page).to have_selector('.patch', 80)
+    expect(page).to have_selector('.patch', count: 80)
   end
 
   it 'shows user created patches' do
