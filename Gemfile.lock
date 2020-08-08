@@ -198,7 +198,8 @@ GEM
       websocket-driver (>= 0.2.0)
     psych (3.1.0)
     public_suffix (3.0.2)
-    puma (3.11.2)
+    puma (4.3.5)
+      nio4r (~> 2.0)
     rack (2.1.4)
     rack-protection (2.0.3)
       rack
@@ -385,7 +386,7 @@ DEPENDENCIES
   mongoid-simple-tags
   nokogiri (>= 1.10.4)
   poltergeist
-  puma
+  puma (>= 3.12.5)
   rack (~> 2.1.4)
   rack-timeout
   rails (= 5.1.6.2)
