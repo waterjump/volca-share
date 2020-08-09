@@ -2,6 +2,25 @@ VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
     let portamento = false;
+    let filterData = { cutoff: 20000, peak: 0}
+    let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
+    const defaultVcoAmp = 0.33;
+    let vco = [
+      null,
+      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+      { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
+    ];
+    let lfo = {
+      shape: 'triangle',
+      targetAmp: false,
+      targetPitch: false,
+      targetCutoff: true,
+      ampValue: 0,
+      pitchValue: 0,
+      cutoffValue: 0,
+      frequency: 0.1
+    }
 
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
@@ -11,23 +30,11 @@ VS.BassEmulator = function() {
     let preAmp = audioCtx.createGain();
     preAmp.connect(masterAmp);
 
-    let filterData = { cutoff: 20000, peak: 0}
-
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
     filter.Q.value = filterData.peak;
     filter.connect(preAmp);
-
-    let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
-
-    const defaultVcoAmp = 0.33;
-    let vco = [
-      null,
-      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
-    ];
 
     let osc1Amp = audioCtx.createGain()
     osc1Amp.gain.value = vco[1].amp;
@@ -69,17 +76,6 @@ VS.BassEmulator = function() {
 
     lfoAmpWaveShaper.connect(ampLfoAmp);
     ampLfoAmp.connect(preAmp.gain);
-
-    let lfo = {
-      shape: 'triangle',
-      targetAmp: false,
-      targetPitch: false,
-      targetCutoff: true,
-      ampValue: 0,
-      pitchValue: 0,
-      cutoffValue: 0,
-      frequency: 0.1
-    }
 
     let oscLfo;
 
