@@ -2,6 +2,7 @@ VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
     const patch = {
+      envelope: { attack: 0, decayRelease: 0, cutoffEgInt: 0 },
       octave: 3,
       filter: { cutoff: 20000, peak: 0 },
       lfo: {
@@ -17,7 +18,6 @@ VS.BassEmulator = function() {
     };
 
     let portamento = false;
-    let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
     const defaultVcoAmp = 0.33;
     let vco = [
       null,
@@ -200,19 +200,19 @@ VS.BassEmulator = function() {
       }
 
       // TODO: Check if envelope triggers or not w/ portamento.  Assuming it doesn't.
-      if (envelope.cutoffEgInt > 0 && !portamento) {
+      if (patch.envelope.cutoffEgInt > 0 && !portamento) {
         // Envelope attack
         t = audioCtx.currentTime;
-        attackEndTime = t + envelope.attack;
-        topCutoff = patch.filter.cutoff + envelope.cutoffEgInt;
+        attackEndTime = t + patch.envelope.attack;
+        topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
         filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
         // Envelope decay
-        decayEndTime = t + envelope.decayRelease;
+        decayEndTime = t + patch.envelope.decayRelease;
         filter.frequency.setTargetAtTime(
           patch.filter.cutoff,
           attackEndTime,
-          envelope.decayRelease / 7);
+          patch.envelope.decayRelease / 7);
       }
     };
 
@@ -337,7 +337,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        envelope.attack = percentage**3;
+        patch.envelope.attack = percentage**3;
       }
 
       // EG DECAY/RELEASE
@@ -346,7 +346,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        envelope.decayRelease = percentage**3;
+        patch.envelope.decayRelease = percentage**3;
       }
 
       // CUTOFF EG INT
@@ -355,7 +355,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        envelope.cutoffEgInt = percentage**2 * 10000;
+        patch.envelope.cutoffEgInt = percentage**2 * 10000;
       }
 
       // TODO: Change octave when octave knob is turn via interface
