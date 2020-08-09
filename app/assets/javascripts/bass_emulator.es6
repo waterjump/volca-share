@@ -1,6 +1,7 @@
 VS.BassEmulator = function() {
   const myp = new p5(function(p) {
-    const audioCtx = new AudioContext();
+    const defaultVcoAmp = 0.33;
+
     const patch = {
       envelope: { attack: 0, decayRelease: 0, cutoffEgInt: 0 },
       octave: 3,
@@ -14,17 +15,19 @@ VS.BassEmulator = function() {
         pitchValue: 0,
         cutoffValue: 0,
         frequency: 0.1
-      }
+      },
+      vco:
+        [
+          null,
+          { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+          { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
+          { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
+        ]
     };
 
     let portamento = false;
-    const defaultVcoAmp = 0.33;
-    let vco = [
-      null,
-      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-      { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
-    ];
+
+    const audioCtx = new AudioContext();
 
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
@@ -41,13 +44,13 @@ VS.BassEmulator = function() {
     filter.connect(preAmp);
 
     let osc1Amp = audioCtx.createGain()
-    osc1Amp.gain.value = vco[1].amp;
+    osc1Amp.gain.value = patch.vco[1].amp;
     osc1Amp.connect(filter);
     let osc2Amp = audioCtx.createGain()
-    osc2Amp.gain.value = vco[2].amp;
+    osc2Amp.gain.value = patch.vco[2].amp;
     osc2Amp.connect(filter);
     let osc3Amp = audioCtx.createGain()
-    osc3Amp.gain.value = vco[3].amp;
+    osc3Amp.gain.value = patch.vco[3].amp;
     osc3Amp.connect(filter);
 
     const oscAmp = [null, osc1Amp, osc2Amp, osc3Amp];
@@ -177,14 +180,14 @@ VS.BassEmulator = function() {
 
     const playNote = function(oscNumber){
       let oscillator = audioCtx.createOscillator();
-      oscillator.type = vco[oscNumber].shape;
-      oscillator.detune.setValueAtTime(vco[oscNumber].detune, audioCtx.currentTime);
+      oscillator.type = patch.vco[oscNumber].shape;
+      oscillator.detune.setValueAtTime(patch.vco[oscNumber].detune, audioCtx.currentTime);
 
       if (portamento) {
-        oscillator.frequency.setValueAtTime(vco[oscNumber].lastFrequency, audioCtx.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(patch.vco[oscNumber].lastFrequency, audioCtx.currentTime);
+        oscillator.frequency.linearRampToValueAtTime(patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.1);
       } else {
-        oscillator.frequency.setValueAtTime(vco[oscNumber].frequency, audioCtx.currentTime);
+        oscillator.frequency.setValueAtTime(patch.vco[oscNumber].frequency, audioCtx.currentTime);
       }
 
       osc[oscNumber] = oscillator;
@@ -242,12 +245,12 @@ VS.BassEmulator = function() {
 
       osc.forEach(function(oscillator, oscNumber) {
         if (oscillator !== null) {
-          vco[oscNumber].frequency =
+          patch.vco[oscNumber].frequency =
             keyMap[notePlaying] *
             octaveMap[patch.octave].frequencyFactor;
 
           osc[oscNumber].frequency.setValueAtTime(
-            vco[oscNumber].frequency, audioCtx.currentTime
+            patch.vco[oscNumber].frequency, audioCtx.currentTime
           );
         }
       });
@@ -270,8 +273,8 @@ VS.BassEmulator = function() {
 
         // VCOs 1, 2, and 3
         [1, 2, 3].forEach(function(oscNumber) {
-          vco[oscNumber].lastFrequency = vco[oscNumber].frequency;
-          vco[oscNumber].frequency =
+          patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+          patch.vco[oscNumber].frequency =
             keyMap[notePlaying] *
             octaveMap[patch.octave].frequencyFactor;
           playNote(oscNumber);
@@ -423,12 +426,12 @@ VS.BassEmulator = function() {
           midiValue = $(VS.activeKnob.element).data('midi');
           if (midiValue == undefined) { return; }
 
-          vco[oscNumber].pitchMidi = midiValue;
-          vco[oscNumber].detune = pitchMap[vco[oscNumber].pitchMidi] * 100;
+          patch.vco[oscNumber].pitchMidi = midiValue;
+          patch.vco[oscNumber].detune = pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
 
           if (osc[oscNumber] !== null) {
             osc[oscNumber].detune.setValueAtTime(
-              vco[oscNumber].detune, audioCtx.currentTime
+              patch.vco[oscNumber].detune, audioCtx.currentTime
             );
           }
         }
@@ -445,12 +448,12 @@ VS.BassEmulator = function() {
     });
 
     const toggleVcoAmp = function(oscNumber) {
-      if (vco[oscNumber].amp == defaultVcoAmp) {
-        vco[oscNumber].amp = 0;
+      if (patch.vco[oscNumber].amp == defaultVcoAmp) {
+        patch.vco[oscNumber].amp = 0;
       } else {
-        vco[oscNumber].amp = defaultVcoAmp;
+        patch.vco[oscNumber].amp = defaultVcoAmp;
       }
-      oscAmp[oscNumber].gain.setValueAtTime(vco[oscNumber].amp, audioCtx.currentTime);
+      oscAmp[oscNumber].gain.setValueAtTime(patch.vco[oscNumber].amp, audioCtx.currentTime);
     };
 
     // VCO MUTE BUTTONS
@@ -520,7 +523,7 @@ VS.BassEmulator = function() {
     // VCO1 WAVE
     [1, 2, 3].forEach(function(oscNumber){
       $(`label[for="patch_vco${oscNumber}_wave"]`).on('click tap', function() {
-        toggleVcoWave(osc[oscNumber], vco[oscNumber]);
+        toggleVcoWave(osc[oscNumber], patch.vco[oscNumber]);
       });
     });
 
@@ -551,7 +554,7 @@ VS.BassEmulator = function() {
 
       // VCOs 1, 2, and 3
       [1, 2, 3].forEach(function(oscNumber) {
-        vco[oscNumber].frequency =
+        patch.vco[oscNumber].frequency =
           keyMap[notePlaying] *
           octaveMap[patch.octave].frequencyFactor;
         playNote(oscNumber);
