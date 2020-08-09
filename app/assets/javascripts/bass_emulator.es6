@@ -195,13 +195,23 @@ VS.BassEmulator = function() {
     const playNote = function(oscNumber){
       let oscillator = audioCtx.createOscillator();
       oscillator.type = patch.vco[oscNumber].shape;
-      oscillator.detune.setValueAtTime(patch.vco[oscNumber].detune, audioCtx.currentTime);
+      oscillator.detune.setValueAtTime(
+        patch.vco[oscNumber].detune,
+        audioCtx.currentTime
+      );
 
       if (portamento) {
-        oscillator.frequency.setValueAtTime(patch.vco[oscNumber].lastFrequency, audioCtx.currentTime);
-        oscillator.frequency.linearRampToValueAtTime(patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.1);
+        oscillator.frequency.setValueAtTime(
+          patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
+        );
+        oscillator.frequency.linearRampToValueAtTime(
+          patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.1
+        );
       } else {
-        oscillator.frequency.setValueAtTime(patch.vco[oscNumber].frequency, audioCtx.currentTime);
+        oscillator.frequency.setValueAtTime(
+          patch.vco[oscNumber].frequency,
+          audioCtx.currentTime
+        );
       }
 
       osc[oscNumber] = oscillator;
@@ -467,7 +477,9 @@ VS.BassEmulator = function() {
       } else {
         patch.vco[oscNumber].amp = defaultVcoAmp;
       }
-      oscAmp[oscNumber].gain.setValueAtTime(patch.vco[oscNumber].amp, audioCtx.currentTime);
+      oscAmp[oscNumber].gain.setValueAtTime(
+        patch.vco[oscNumber].amp, audioCtx.currentTime
+      );
     };
 
     // VCO MUTE BUTTONS
