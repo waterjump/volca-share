@@ -6,13 +6,18 @@ VS.BassEmulator = function() {
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
 
+    // An amp used for modulating amplitude without overriding
+    //  the master Amp level
+    let preAmp = audioCtx.createGain();
+    preAmp.connect(masterAmp);
+
     let filterData = { cutoff: 20000, peak: 0}
 
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
     filter.Q.value = filterData.peak;
-    filter.connect(masterAmp);
+    filter.connect(preAmp);
 
     let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
 
@@ -45,9 +50,25 @@ VS.BassEmulator = function() {
     ampLfoCutoff.gain.value = 0;
     ampLfoCutoff.connect(filter.detune);
 
+    // Creates a curve that goes from -1, -1 to 1, 0.
+    const makeLfoAmpCurve = function() {
+      let n_samples = 44100;
+      let curve = new Float32Array(n_samples)
+      let i = 0;
+      for ( ; i < n_samples; ++i ) {
+        curve[i] = i / (n_samples - 1) - 1;
+      }
+      return curve;
+    };
+
+    const lfoAmpWaveShaper = audioCtx.createWaveShaper();
+    lfoAmpWaveShaper.curve = makeLfoAmpCurve();
+
     const ampLfoAmp = audioCtx.createGain()
     ampLfoAmp.gain.value = 0;
-    ampLfoAmp.connect(masterAmp.gain);
+
+    lfoAmpWaveShaper.connect(ampLfoAmp);
+    ampLfoAmp.connect(preAmp.gain);
 
     let lfo = {
       shape: 'triangle',
@@ -68,7 +89,7 @@ VS.BassEmulator = function() {
       oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
       oscLfo.connect(ampLfoPitch);
       oscLfo.connect(ampLfoCutoff);
-      oscLfo.connect(ampLfoAmp);
+      oscLfo.connect(lfoAmpWaveShaper);
       oscLfo.start();
     }
 
