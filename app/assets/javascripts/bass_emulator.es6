@@ -1,8 +1,11 @@
 VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
+    const patch = {
+      filter: { cutoff: 20000, peak: 0 }
+    };
+
     let portamento = false;
-    let filterData = { cutoff: 20000, peak: 0}
     let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
     const defaultVcoAmp = 0.33;
     let vco = [
@@ -32,8 +35,8 @@ VS.BassEmulator = function() {
 
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
-    filter.Q.value = filterData.peak;
+    filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+    filter.Q.value = patch.filter.peak;
     filter.connect(preAmp);
 
     let osc1Amp = audioCtx.createGain()
@@ -202,13 +205,13 @@ VS.BassEmulator = function() {
         // Envelope attack
         t = audioCtx.currentTime;
         attackEndTime = t + envelope.attack;
-        topCutoff = filterData.cutoff + envelope.cutoffEgInt;
+        topCutoff = patch.filter.cutoff + envelope.cutoffEgInt;
         filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
         // Envelope decay
         decayEndTime = t + envelope.decayRelease;
         filter.frequency.setTargetAtTime(
-          filterData.cutoff,
+          patch.filter.cutoff,
           attackEndTime,
           envelope.decayRelease / 7);
       }
@@ -224,7 +227,7 @@ VS.BassEmulator = function() {
 
       // FIXME: Keep resonance from causing notes to thump on note stop
       filter.frequency.cancelScheduledValues(0);
-      filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
+      filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
     };
 
     const changeOctave = function() {
@@ -364,9 +367,9 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        filterData.peak = (percentage**2.5 * 30.0);
+        patch.filter.peak = (percentage**2.5 * 30.0);
 
-        filter.Q.value = filterData.peak;
+        filter.Q.value = patch.filter.peak;
       }
 
       // FILTER CUTOFF
@@ -375,10 +378,10 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        filterData.cutoff = 20 + (percentage**4 * 19980.0);
+        patch.filter.cutoff = 20 + (percentage**4 * 19980.0);
 
         filter.frequency.cancelScheduledValues(0);
-        filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
+        filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
       }
 
       // LFO RATE
