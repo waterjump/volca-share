@@ -2,6 +2,7 @@ VS.BassEmulator = function() {
   const myp = new p5(function(p) {
     const audioCtx = new AudioContext();
     const patch = {
+      octave: 3,
       filter: { cutoff: 20000, peak: 0 }
     };
 
@@ -93,8 +94,6 @@ VS.BassEmulator = function() {
     }
 
     setupOscLfo();
-
-    let octave = 3;
 
     let notePlaying;
 
@@ -231,11 +230,11 @@ VS.BassEmulator = function() {
     };
 
     const changeOctave = function() {
-      VS.display.update(octaveMap[octave].displayNumber, 'noteString');
+      VS.display.update(octaveMap[patch.octave].displayNumber, 'noteString');
 
       // Turn octave knob
       jOctave = $('#octave');
-      jOctave.data('midi', octaveKnobMidiMap[octave]);
+      jOctave.data('midi', octaveKnobMidiMap[patch.octave]);
       let octaveKnob = new VS.Knob(jOctave);
       let degree = octaveKnob.degreeForMidi(jOctave.data('midi'), 140);
       jOctave.data('rotation', degree);
@@ -245,7 +244,7 @@ VS.BassEmulator = function() {
         if (oscillator !== null) {
           vco[oscNumber].frequency =
             keyMap[notePlaying] *
-            octaveMap[octave].frequencyFactor;
+            octaveMap[patch.octave].frequencyFactor;
 
           osc[oscNumber].frequency.setValueAtTime(
             vco[oscNumber].frequency, audioCtx.currentTime
@@ -274,18 +273,18 @@ VS.BassEmulator = function() {
           vco[oscNumber].lastFrequency = vco[oscNumber].frequency;
           vco[oscNumber].frequency =
             keyMap[notePlaying] *
-            octaveMap[octave].frequencyFactor;
+            octaveMap[patch.octave].frequencyFactor;
           playNote(oscNumber);
         });
       }
 
       // CHANGE OCTAVE
       if ([zKeyCode, xKeyCode].includes(p.keyCode)) {
-        if (p.keyCode == zKeyCode && octave > -1) {
-          octave -= 1;
+        if (p.keyCode == zKeyCode && patch.octave > -1) {
+          patch.octave -= 1;
         }
-        if (p.keyCode == xKeyCode && octave < 9) {
-          octave += 1;
+        if (p.keyCode == xKeyCode && patch.octave < 9) {
+          patch.octave += 1;
         }
         changeOctave();
       }
@@ -527,16 +526,16 @@ VS.BassEmulator = function() {
 
     // MOBILE OCTAVE UP
     $('#octave-up').on('click tap', function(){
-      if (octave < 9) {
-        octave += 1;
+      if (patch.octave < 9) {
+        patch.octave += 1;
       }
       changeOctave();
     });
 
     // MOBILE OCTAVE DOWN
     $('#octave-down').on('click tap', function(){
-      if (octave > -1) {
-        octave -= 1;
+      if (patch.octave > -1) {
+        patch.octave -= 1;
       }
       changeOctave();
     });
@@ -554,7 +553,7 @@ VS.BassEmulator = function() {
       [1, 2, 3].forEach(function(oscNumber) {
         vco[oscNumber].frequency =
           keyMap[notePlaying] *
-          octaveMap[octave].frequencyFactor;
+          octaveMap[patch.octave].frequencyFactor;
         playNote(oscNumber);
       });
     });
