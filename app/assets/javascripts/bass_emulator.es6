@@ -3,7 +3,17 @@ VS.BassEmulator = function() {
     const audioCtx = new AudioContext();
     const patch = {
       octave: 3,
-      filter: { cutoff: 20000, peak: 0 }
+      filter: { cutoff: 20000, peak: 0 },
+      lfo: {
+        shape: 'triangle',
+        targetAmp: false,
+        targetPitch: false,
+        targetCutoff: true,
+        ampValue: 0,
+        pitchValue: 0,
+        cutoffValue: 0,
+        frequency: 0.1
+      }
     };
 
     let portamento = false;
@@ -15,16 +25,6 @@ VS.BassEmulator = function() {
       { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
       { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
     ];
-    let lfo = {
-      shape: 'triangle',
-      targetAmp: false,
-      targetPitch: false,
-      targetCutoff: true,
-      ampValue: 0,
-      pitchValue: 0,
-      cutoffValue: 0,
-      frequency: 0.1
-    }
 
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
@@ -85,8 +85,8 @@ VS.BassEmulator = function() {
 
     const setupOscLfo = function() {
       oscLfo = audioCtx.createOscillator();
-      oscLfo.type = lfo.shape;
-      oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
+      oscLfo.type = patch.lfo.shape;
+      oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
       oscLfo.connect(ampLfoPitch);
       oscLfo.connect(ampLfoCutoff);
       oscLfo.connect(lfoAmpWaveShaper);
@@ -193,7 +193,7 @@ VS.BassEmulator = function() {
       osc[oscNumber].start();
 
       // Retrigger LFO if it's square
-      if (lfo.shape == 'square') {
+      if (patch.lfo.shape == 'square') {
         oscLfo.disconnect();
         oscLfo = null;
         setupOscLfo();
@@ -389,9 +389,9 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        lfo.frequency = (percentage**3 * 35) + 0.1;
+        patch.lfo.frequency = (percentage**3 * 35) + 0.1;
 
-        oscLfo.frequency.setValueAtTime(lfo.frequency, audioCtx.currentTime);
+        oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
       }
 
       // LFO INT
@@ -400,20 +400,20 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        lfo.pitchValue = percentage * 1000;
-        lfo.cutoffValue = percentage**2 * 4800;
-        lfo.ampValue = percentage;
+        patch.lfo.pitchValue = percentage * 1000;
+        patch.lfo.cutoffValue = percentage**2 * 4800;
+        patch.lfo.ampValue = percentage;
 
-        if (lfo.targetPitch) {
-          ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
+        if (patch.lfo.targetPitch) {
+          ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
         }
 
-        if (lfo.targetCutoff) {
-          ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
+        if (patch.lfo.targetCutoff) {
+          ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
         }
 
-        if (lfo.targetAmp) {
-          ampLfoAmp.gain.setValueAtTime(lfo.ampValue, audioCtx.currentTime);
+        if (patch.lfo.targetAmp) {
+          ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
         }
       }
 
@@ -462,10 +462,10 @@ VS.BassEmulator = function() {
 
     // LFO TARGET AMP
     $('label[for="patch_lfo_target_amp"]').on('click tap', function() {
-      lfo.targetAmp = !lfo.targetAmp;
-      if (lfo.targetAmp) {
+      patch.lfo.targetAmp = !patch.lfo.targetAmp;
+      if (patch.lfo.targetAmp) {
         // Affect amp
-        ampLfoAmp.gain.setValueAtTime(lfo.ampValue, audioCtx.currentTime);
+        ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
       } else {
         // Do not affect amp
         ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -474,10 +474,10 @@ VS.BassEmulator = function() {
 
     // LFO TARGET PITCH
     $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
-      lfo.targetPitch = !lfo.targetPitch;
-      if (lfo.targetPitch) {
+      patch.lfo.targetPitch = !patch.lfo.targetPitch;
+      if (patch.lfo.targetPitch) {
         // Affect pitch
-        ampLfoPitch.gain.setValueAtTime(lfo.pitchValue, audioCtx.currentTime);
+        ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
       } else {
         // Do not affect pitch
         ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -486,10 +486,10 @@ VS.BassEmulator = function() {
 
     // LFO TARGET CUTOFF
     $('label[for="patch_lfo_target_cutoff"]').on('click tap', function() {
-      lfo.targetCutoff = !lfo.targetCutoff;
-      if (lfo.targetCutoff) {
+      patch.lfo.targetCutoff = !patch.lfo.targetCutoff;
+      if (patch.lfo.targetCutoff) {
         // Affect filter cutoff
-        ampLfoCutoff.gain.setValueAtTime(lfo.cutoffValue, audioCtx.currentTime);
+        ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
       } else {
         // Do not affect filter cutoff
         ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -498,12 +498,12 @@ VS.BassEmulator = function() {
 
     // LFO WAVE
     $('label[for="patch_lfo_wave"]').on('click tap', function() {
-       if (lfo.shape == 'triangle') {
-         lfo.shape = 'square';
+       if (patch.lfo.shape == 'triangle') {
+         patch.lfo.shape = 'square';
        } else {
-         lfo.shape = 'triangle';
+         patch.lfo.shape = 'triangle';
       }
-      oscLfo.type = lfo.shape;
+      oscLfo.type = patch.lfo.shape;
     });
 
     const toggleVcoWave = function(osc, vco) {
