@@ -6,8 +6,12 @@ VS.BassEmulator = function() {
     let masterAmp = audioCtx.createGain();
     masterAmp.connect(audioCtx.destination);
 
+    let filterData = { cutoff: 20000, peak: 0}
+
     const filter = audioCtx.createBiquadFilter();
     filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
+    filter.Q.value = filterData.peak;
     filter.connect(masterAmp);
 
     let envelope = { attack: 0, decayRelease: 0, cutoffEgInt: 0 };
@@ -71,8 +75,6 @@ VS.BassEmulator = function() {
     setupOscLfo();
 
     let octave = 3;
-
-    let filterData = { cutoff: 20000, peak: 0}
 
     let notePlaying;
 
@@ -148,9 +150,6 @@ VS.BassEmulator = function() {
       p.createCanvas(1, 1);
 
       console.log('p5 is running :-]');
-
-      filter.frequency.setValueAtTime(filterData.cutoff, audioCtx.currentTime);
-      filter.Q.value = 0;
     };
 
     p.draw = function() {
