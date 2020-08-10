@@ -427,7 +427,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        patch.lfo.pitchValue = percentage * 1000;
+        patch.lfo.pitchValue = percentage * 900;
         patch.lfo.cutoffValue = percentage**2 * 4800;
         patch.lfo.ampValue = percentage;
 
