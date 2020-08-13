@@ -80,7 +80,7 @@ VS.BassEmulator = function() {
     const defaultVcoAmp = 0.33;
 
     const patch = {
-      envelope: { attack: 0, decayRelease: 0, cutoffEgInt: 0 },
+      envelope: { attack: 0, decayRelease: 0.05, cutoffEgInt: 0 },
       octave: 3,
       filter: { cutoff: 20000, peak: 0 },
       lfo: {
@@ -226,8 +226,7 @@ VS.BassEmulator = function() {
         setupOscLfo();
       }
 
-      // TODO: Check if envelope triggers or not w/ portamento.  Assuming it doesn't.
-      if (patch.envelope.cutoffEgInt > 0 && !portamento) {
+      if (!portamento) {
         // Envelope attack
         t = audioCtx.currentTime;
         attackEndTime = t + patch.envelope.attack;
@@ -239,7 +238,7 @@ VS.BassEmulator = function() {
         filter.frequency.setTargetAtTime(
           patch.filter.cutoff,
           attackEndTime,
-          patch.envelope.decayRelease / 7);
+          patch.envelope.decayRelease / 5);
       }
     };
 
@@ -373,7 +372,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        patch.envelope.decayRelease = percentage**3;
+        patch.envelope.decayRelease = percentage**3 + 0.05;
       }
 
       // CUTOFF EG INT
