@@ -104,6 +104,7 @@ VS.BassEmulator = function() {
 
     let portamento = false;
     let notePlaying;
+    const builtInDecay = 0.1;
 
 
     // =====================================
@@ -242,17 +243,27 @@ VS.BassEmulator = function() {
       }
     };
 
-    const killNotes = function() {
+    const killNotes = function(immediately = false) {
       osc.forEach(function(oscillator, index) {
         if (oscillator !== null) {
-          osc[index].stop();
-          osc[index] = null;
+          if (immediately) {
+            osc[index].stop();
+            osc[index] = null;
+            oscAmp[index].gain.setValueAtTime(
+              patch.vco[index].amp,
+              audioCtx.currentTime
+            );
+          } else {
+            osc[index].stop(audioCtx.currentTime + 0.1);
+          }
         }
       });
 
       // FIXME: Keep resonance from causing notes to thump on note stop
-      filter.frequency.cancelScheduledValues(0);
-      filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+      if (immediately && !portamento) {
+        filter.frequency.cancelScheduledValues(0);
+        filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+      }
     };
 
     const changeOctave = function() {
@@ -292,7 +303,7 @@ VS.BassEmulator = function() {
         notePlaying = p.keyCode;
 
         // stop other oscillators
-        killNotes();
+        killNotes(true);
 
         // VCOs 1, 2, and 3
         [1, 2, 3].forEach(function(oscNumber) {
@@ -318,6 +329,15 @@ VS.BassEmulator = function() {
 
     p.keyReleased = function() {
       if (p.keyIsPressed) { return; }
+
+      // Small built in decay on osc amp
+      let t = audioCtx.currentTime;
+      oscAmp.forEach(function(oscAmp) {
+        if (oscAmp !== null) {
+          oscAmp.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
+        }
+      });
+
       killNotes();
     };
 
