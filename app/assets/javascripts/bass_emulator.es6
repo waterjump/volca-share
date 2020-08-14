@@ -206,7 +206,7 @@ VS.BassEmulator = function() {
           patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
         );
         oscillator.frequency.linearRampToValueAtTime(
-          patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.1
+          patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
         );
       } else {
         oscillator.frequency.setValueAtTime(
