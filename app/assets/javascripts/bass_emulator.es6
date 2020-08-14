@@ -402,8 +402,9 @@ VS.BassEmulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        percentage = midiValue / 127.0;
-        patch.filter.cutoff = 20 + (percentage**4 * 19980.0);
+        // Note: Curve calculated using audacity data from actual synth, and
+        //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
+        patch.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
 
         filter.frequency.cancelScheduledValues(0);
         filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
