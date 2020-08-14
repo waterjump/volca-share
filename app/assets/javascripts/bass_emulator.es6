@@ -392,7 +392,7 @@ VS.BassEmulator = function() {
         if (midiValue == undefined) { return; }
 
         percentage = midiValue / 127.0;
-        patch.envelope.decayRelease = percentage**3 + 0.05;
+        patch.envelope.decayRelease = 5 * percentage**3 + 0.05;
       }
 
       // CUTOFF EG INT
