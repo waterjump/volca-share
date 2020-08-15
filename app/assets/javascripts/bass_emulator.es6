@@ -104,6 +104,7 @@ VS.BassEmulator = function() {
 
     let portamento = false;
     let notePlaying;
+    let keysDown = [];
     const builtInDecay = 0.1;
 
 
@@ -291,6 +292,8 @@ VS.BassEmulator = function() {
     }
 
     const keyboardDown = function(){
+      keysDown.push(notePlaying);
+
       // stop other oscillators
       killNotes(true);
 
@@ -344,7 +347,29 @@ VS.BassEmulator = function() {
     };
 
     p.keyReleased = function() {
-      if (p.keyIsPressed) { return; }
+      keysDown = keysDown.filter(key => key !== p.keyCode);
+
+      if (keysDown.length > 0) {
+        notePlaying = keysDown[keysDown.length - 1];
+
+        [1, 2, 3].forEach(function(oscNumber) {
+          patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+          patch.vco[oscNumber].frequency =
+            keyMap[notePlaying] *
+            octaveMap[patch.octave].frequencyFactor;
+
+          osc[oscNumber].frequency.setValueAtTime(
+            patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
+          );
+          osc[oscNumber].frequency.linearRampToValueAtTime(
+            patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
+          );
+        });
+
+        return;
+      }
+
+      notePlaying = null;
 
       keyboardUp();
     };
