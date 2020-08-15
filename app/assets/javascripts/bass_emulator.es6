@@ -102,7 +102,6 @@ VS.BassEmulator = function() {
         ]
     };
 
-    let portamento = false;
     let notePlaying;
     let keysDown = [];
     const builtInDecay = 0.1;
@@ -194,54 +193,71 @@ VS.BassEmulator = function() {
       // Keeping this for debugging purposes
     }
 
-    const playNote = function(oscNumber){
-      let oscillator = audioCtx.createOscillator();
-      oscillator.type = patch.vco[oscNumber].shape;
-      oscillator.detune.setValueAtTime(
-        patch.vco[oscNumber].detune,
-        audioCtx.currentTime
-      );
+    const playNewNote = function(){
+      // stop other oscillators
+      killNotes(true);
 
-      if (portamento) {
-        oscillator.frequency.setValueAtTime(
-          patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
+      // VCOs 1, 2, and 3
+      [1, 2, 3].forEach(function(oscNumber) {
+        patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+        patch.vco[oscNumber].frequency =
+          keyMap[notePlaying] *
+          octaveMap[patch.octave].frequencyFactor;
+
+        let oscillator = audioCtx.createOscillator();
+        oscillator.type = patch.vco[oscNumber].shape;
+        oscillator.detune.setValueAtTime(
+          patch.vco[oscNumber].detune,
+          audioCtx.currentTime
         );
-        oscillator.frequency.linearRampToValueAtTime(
-          patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
-        );
-      } else {
+
         oscillator.frequency.setValueAtTime(
           patch.vco[oscNumber].frequency,
           audioCtx.currentTime
         );
-      }
 
-      osc[oscNumber] = oscillator;
-      osc[oscNumber].connect(oscAmp[oscNumber]);
-      ampLfoPitch.connect(osc[oscNumber].detune);
-      osc[oscNumber].start();
+        osc[oscNumber] = oscillator;
+        osc[oscNumber].connect(oscAmp[oscNumber]);
+        ampLfoPitch.connect(osc[oscNumber].detune);
+        osc[oscNumber].start();
 
-      // Retrigger LFO if it's square
-      if (patch.lfo.shape == 'square') {
-        oscLfo.disconnect();
-        oscLfo = null;
-        setupOscLfo();
-      }
+        // Retrigger LFO if it's square
+        if (patch.lfo.shape == 'square') {
+          oscLfo.disconnect();
+          oscLfo = null;
+          setupOscLfo();
+        }
 
-      if (!portamento) {
-        // Envelope attack
+        // Retrigger envelope
+        // Attack
         t = audioCtx.currentTime;
         attackEndTime = t + patch.envelope.attack;
         topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
         filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
-        // Envelope decay
+        // Decay
         decayEndTime = t + patch.envelope.decayRelease;
         filter.frequency.setTargetAtTime(
           patch.filter.cutoff,
           attackEndTime,
           patch.envelope.decayRelease / 5);
-      }
+      });
+    };
+
+    const changeCurrentNote = function() {
+      [1, 2, 3].forEach(function(oscNumber) {
+        patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+        patch.vco[oscNumber].frequency =
+          keyMap[notePlaying] *
+          octaveMap[patch.octave].frequencyFactor;
+
+        osc[oscNumber].frequency.setValueAtTime(
+          patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
+        );
+        osc[oscNumber].frequency.linearRampToValueAtTime(
+          patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
+        );
+      });
     };
 
     const killNotes = function(immediately = false) {
@@ -261,7 +277,7 @@ VS.BassEmulator = function() {
       });
 
       // FIXME: Keep resonance from causing notes to thump on note stop
-      if (immediately && !portamento) {
+      if (immediately) {
         filter.frequency.cancelScheduledValues(0);
         filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
       }
@@ -294,17 +310,11 @@ VS.BassEmulator = function() {
     const keyboardDown = function(){
       keysDown.push(notePlaying);
 
-      // stop other oscillators
-      killNotes(true);
-
-      // VCOs 1, 2, and 3
-      [1, 2, 3].forEach(function(oscNumber) {
-        patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-        patch.vco[oscNumber].frequency =
-          keyMap[notePlaying] *
-          octaveMap[patch.octave].frequencyFactor;
-        playNote(oscNumber);
-      });
+      if (keysDown.length === 1) {
+        playNewNote();
+      } else {
+        changeCurrentNote();
+      }
     };
 
     const keyboardUp = function() {
@@ -322,13 +332,6 @@ VS.BassEmulator = function() {
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
-        // PORTAMENTO
-        let otherKeys = keyCodes.slice();
-        otherKeys.splice(keyCodes.indexOf(p.keyCode), 1);
-        portamento = otherKeys.some(function(otherKey) {
-          return p.keyIsDown(otherKey);
-        });
-
         notePlaying = p.keyCode;
 
         keyboardDown();
@@ -352,24 +355,10 @@ VS.BassEmulator = function() {
       if (keysDown.length > 0) {
         notePlaying = keysDown[keysDown.length - 1];
 
-        [1, 2, 3].forEach(function(oscNumber) {
-          patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-          patch.vco[oscNumber].frequency =
-            keyMap[notePlaying] *
-            octaveMap[patch.octave].frequencyFactor;
-
-          osc[oscNumber].frequency.setValueAtTime(
-            patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
-          );
-          osc[oscNumber].frequency.linearRampToValueAtTime(
-            patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
-          );
-        });
+        changeCurrentNote();
 
         return;
       }
-
-      notePlaying = null;
 
       keyboardUp();
     };
