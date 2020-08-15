@@ -618,7 +618,9 @@ VS.BassEmulator = function() {
       keyboardDown();
     });
 
-    $('.mobile-control.key').on('mouseup touchend', function() {
+    $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
+      keysDown = keysDown.filter(key => key !== $(this).data('keycode'));
+
       keyboardUp();
     });
   });
