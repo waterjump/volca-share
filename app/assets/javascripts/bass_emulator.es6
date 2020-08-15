@@ -99,7 +99,8 @@ VS.BassEmulator = function() {
           { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
           { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
           { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
-        ]
+        ],
+      sustainOn: false
     };
 
     let notePlaying;
@@ -193,7 +194,16 @@ VS.BassEmulator = function() {
       // Keeping this for debugging purposes
     }
 
-    const playNewNote = function(){
+    const triggerDecay = function() {
+      decayEndTime = t + patch.envelope.decayRelease;
+      filter.frequency.setTargetAtTime(
+        patch.filter.cutoff,
+        attackEndTime,
+        patch.envelope.decayRelease / 5
+      );
+    };
+
+    const playNewNote = function() {
       // stop other oscillators
       killNotes(true);
 
@@ -236,11 +246,9 @@ VS.BassEmulator = function() {
         filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
         // Decay
-        decayEndTime = t + patch.envelope.decayRelease;
-        filter.frequency.setTargetAtTime(
-          patch.filter.cutoff,
-          attackEndTime,
-          patch.envelope.decayRelease / 5);
+        if (!patch.sustainOn) {
+          triggerDecay();
+        }
       });
     };
 
@@ -367,7 +375,6 @@ VS.BassEmulator = function() {
     const itemsComingSoon = [
       'label[for="patch_vco_group_one"]',
       'label[for="patch_vco_group_two"]',
-      'label[for="patch_sustain_on"]',
       'label[for="patch_amp_eg_on"]'
     ];
 
@@ -588,11 +595,15 @@ VS.BassEmulator = function() {
        }
     };
 
-    // VCO1 WAVE
+    // VCO WAVE
     [1, 2, 3].forEach(function(oscNumber){
       $(`label[for="patch_vco${oscNumber}_wave"]`).on('click tap', function() {
         toggleVcoWave(osc[oscNumber], patch.vco[oscNumber]);
       });
+    });
+
+    $('label[for="patch_sustain_on"]').on('click tap', function() {
+      patch.sustainOn = !patch.sustainOn;
     });
 
     // MOBILE OCTAVE UP
