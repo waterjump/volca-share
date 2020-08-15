@@ -1,32 +1,32 @@
 #interface.col-lg-9.form
   .stretchy
     .volca.bass.emulator
-      .small.knob.eg.midi-enabled.lit#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
+      .small.knob.eg.lit#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
         .notch
-      .small.knob.eg.midi-enabled.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
+      .small.knob.eg.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
         .notch
-      .small.knob.eg.midi-enabled.lit#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
+      .small.knob.eg.lit#cutoff_eg_int{ data: { midi: @patch.cutoff_eg_int || 63, control_number: 48 } }
         .notch
       #led
         .digit#thousands
         .digit#hundreds
         .digit#tens
         .digit#ones
-      .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+      .medium.knob#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
         .notch
       .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
         .notch
       .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
         .notch
-      .medium.knob.lfo.midi-enabled#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
+      .medium.knob.lfo#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
         .notch
-      .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
+      .medium.knob.lfo#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
         .notch
-      .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
+      .small.knob.vco#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 }, class: @patch.lit?(:vco2_active) }
+      .small.knob.vco#vco2_pitch{ data: { midi: @patch.vco2_pitch || 63, control_number: 44 }, class: @patch.lit?(:vco2_active) }
         .notch
-      .small.knob.vco.midi-enabled#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 }, class: @patch.lit?(:vco3_active) }
+      .small.knob.vco#vco3_pitch{ data: { midi: @patch.vco3_pitch || 63, control_number: 45 }, class: @patch.lit?(:vco3_active) }
         .notch
       .button#vco1_active_button{ data: { active: @patch.vco1_active.to_s || 'true' }, class: @patch.lit?(:vco1_active) }
       .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
