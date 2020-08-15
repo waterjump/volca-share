@@ -290,6 +290,32 @@ VS.BassEmulator = function() {
       });
     }
 
+    const keyboardDown = function(){
+      // stop other oscillators
+      killNotes(true);
+
+      // VCOs 1, 2, and 3
+      [1, 2, 3].forEach(function(oscNumber) {
+        patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+        patch.vco[oscNumber].frequency =
+          keyMap[notePlaying] *
+          octaveMap[patch.octave].frequencyFactor;
+        playNote(oscNumber);
+      });
+    };
+
+    const keyboardUp = function() {
+      // Small built in decay on osc amp
+      let t = audioCtx.currentTime;
+      oscAmp.forEach(function(oscAmp) {
+        if (oscAmp !== null) {
+          oscAmp.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
+        }
+      });
+
+      killNotes();
+    };
+
     p.keyPressed = function() {
       // PLAY NOTES
       if (keyCodes.includes(p.keyCode)) {
@@ -302,17 +328,7 @@ VS.BassEmulator = function() {
 
         notePlaying = p.keyCode;
 
-        // stop other oscillators
-        killNotes(true);
-
-        // VCOs 1, 2, and 3
-        [1, 2, 3].forEach(function(oscNumber) {
-          patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-          patch.vco[oscNumber].frequency =
-            keyMap[notePlaying] *
-            octaveMap[patch.octave].frequencyFactor;
-          playNote(oscNumber);
-        });
+        keyboardDown();
       }
 
       // CHANGE OCTAVE
@@ -330,15 +346,7 @@ VS.BassEmulator = function() {
     p.keyReleased = function() {
       if (p.keyIsPressed) { return; }
 
-      // Small built in decay on osc amp
-      let t = audioCtx.currentTime;
-      oscAmp.forEach(function(oscAmp) {
-        if (oscAmp !== null) {
-          oscAmp.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
-        }
-      });
-
-      killNotes();
+      keyboardUp();
     };
 
     // TOOLTIPS
@@ -591,24 +599,13 @@ VS.BassEmulator = function() {
 
     // MOBILE KEY
     $('.mobile-control.key').on('mousedown touchstart', function(e) {
-      // TODO: This code is repeated.  DRY up!
-
       notePlaying = $(this).data('keycode');
 
-      // stop other oscillators
-      killNotes();
-
-      // VCOs 1, 2, and 3
-      [1, 2, 3].forEach(function(oscNumber) {
-        patch.vco[oscNumber].frequency =
-          keyMap[notePlaying] *
-          octaveMap[patch.octave].frequencyFactor;
-        playNote(oscNumber);
-      });
+      keyboardDown();
     });
 
     $('.mobile-control.key').on('mouseup touchend', function() {
-      killNotes();
+      keyboardUp();
     });
   });
 };
