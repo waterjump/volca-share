@@ -369,7 +369,7 @@ module Keys
         patch = create(:user_keys_patch, user: user)
 
         get :oembed,
-            params: { slug: patch.slug, format: :json },
+            params: { user_slug: user.slug, slug: patch.slug, format: :json },
             session: valid_session
 
         json = JSON.parse(response.body)
