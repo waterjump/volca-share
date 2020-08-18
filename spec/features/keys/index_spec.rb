@@ -16,7 +16,7 @@ RSpec.describe 'Keys patch index page', type: :feature do
 
   it 'is sorted by quality' do
     okay_patch = create(:keys_patch, name: 'okay', audio_sample: '')
-    complete_patch = create(:keys_patch, name: 'complete')
+    complete_patch = create(:user_keys_patch, name: 'complete')
     minimal_patch = create(
       :keys_patch,
       tags: [],
@@ -107,7 +107,7 @@ RSpec.describe 'Keys patch index page', type: :feature do
       )
     end
 
-    let(:last_patch) { create(:keys_patch, user_id: user.id) }
+    let(:last_patch) { create(:user_keys_patch, user_id: user.id) }
 
     before do
       first_patch
@@ -159,7 +159,7 @@ RSpec.describe 'Keys patch index page', type: :feature do
 
   context 'when audio sample is available' do
     describe 'audio previews are shown', :js do
-      let!(:patch) { create(:keys_patch, user_id: user.id) }
+      let!(:patch) { create(:user_keys_patch, user: user) }
 
       before do
         visit keys_patches_path

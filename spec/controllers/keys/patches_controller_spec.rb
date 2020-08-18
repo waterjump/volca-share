@@ -366,7 +366,7 @@ module Keys
     describe 'GET #oembed' do
       it 'returns patch info and embed code as JSON' do
         user = create(:user)
-        patch = user.keys_patches.create(attributes_for(:keys_patch))
+        patch = create(:user_keys_patch, user: user)
 
         get :oembed,
             params: { slug: patch.slug, format: :json },

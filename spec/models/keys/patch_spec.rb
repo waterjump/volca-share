@@ -345,7 +345,7 @@ RSpec.describe Keys::Patch do
     context 'when audio_sample is not nil' do
       it 'validates that audio_sample_available is true' do
         patch = build(
-          :keys_patch,
+          :user_keys_patch,
           audio_sample: 'https://soundcloud.com/squidbrain/fake-track'
         )
 
@@ -358,12 +358,12 @@ RSpec.describe Keys::Patch do
   describe 'quality' do
     context 'when a legacy record has audio_sample that is no longer available' do
       it 'has less quality than the same patch with available audio sample' do
-        legacy_patch = create(:keys_patch).tap do |patch|
+        legacy_patch = create(:user_keys_patch).tap do |patch|
           patch.audio_sample_available = false
           patch.save(validate: false)
         end
 
-        patch_with_available_audio_sample = create(:keys_patch)
+        patch_with_available_audio_sample = create(:user_keys_patch)
 
         expect(legacy_patch.quality).to(
           be < patch_with_available_audio_sample.quality

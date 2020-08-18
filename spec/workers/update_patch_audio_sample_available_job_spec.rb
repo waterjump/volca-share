@@ -79,11 +79,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
       context 'and it is also available' do
         context 'and it is marked as available' do
           it 'does not change the record' do
-            patch =
-              create(
-                :keys_patch,
-                audio_sample: 'https://soundcloud.com/69bot/shallow'
-              )
+            patch = create(:user_keys_patch)
 
             expect { UpdatePatchAudioSampleAvailableJob.new.perform }.not_to(
               change { patch.reload }
@@ -93,7 +89,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
 
         context 'and it is marked as unavailable' do
           it 'changes audio_sample_available to true' do
-            patch = create(:keys_patch)
+            patch = create(:user_keys_patch)
             patch.set(audio_sample_available: false)
 
             expect { UpdatePatchAudioSampleAvailableJob.new.perform }.to(
