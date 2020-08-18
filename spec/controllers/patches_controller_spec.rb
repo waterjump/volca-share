@@ -46,7 +46,7 @@ RSpec.describe PatchesController, type: :controller do
       patch = create(:user_patch)
 
       get :oembed,
-          params: { id: patch.to_param, format: :json },
+          params: { user_slug: patch.user.slug, slug: patch.slug, format: :json },
           session: valid_session
 
       json = JSON.parse(response.body)
