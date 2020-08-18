@@ -43,7 +43,7 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #oembed' do
     it 'returns patch info and embed code as JSON' do
-      patch = create(:patch)
+      patch = create(:user_patch)
 
       get :oembed,
           params: { id: patch.to_param, format: :json },
@@ -59,7 +59,7 @@ RSpec.describe PatchesController, type: :controller do
             '?visual=true&url=https%3A%2F%2Fapi.soundcloud.com%2Ftracks'\
             '%2F258722704&show_artwork=true&maxheight=200"></iframe>',
           'name' => patch.name,
-          'patch_location' => "/patch/#{patch.id}"
+          'patch_location' => user_patch_path(patch.user.slug, patch.slug)
         }
       )
     end

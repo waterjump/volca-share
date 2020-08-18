@@ -27,9 +27,11 @@ RSpec.describe 'User profile page', type: :feature, js: true do
   end
 
   it 'shows patch previews in iframe' do
-    FactoryBot.create(:patch, user_id: user.id)
+    create(:user_patch, user: user)
+
     visit user_path(user.slug)
     first('.speaker').click
+
     expect(page).to have_selector('#audio-preview-modal')
   end
 

@@ -36,8 +36,7 @@ RSpec.feature 'tags', type: :feature, js: true do
     end
 
     it 'has audio preview functionality' do
-      patch1 = FactoryBot.create(:patch, user_id: user.id, tag_list: 'cool')
-      patch2 = FactoryBot.create(:patch, tag_list: 'cool')
+      create(:user_patch, user: user, tag_list: 'cool')
 
       visit tags_show_path(tag: :cool)
       page.find('.speaker', match: :first).trigger('click')

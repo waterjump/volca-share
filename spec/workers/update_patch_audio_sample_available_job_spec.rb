@@ -7,7 +7,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
         it 'sets audio_sample_available to false' do
           patch =
             build(
-              :patch,
+              :user_patch,
               audio_sample: 'https://soundcloud.com/squidbrain/fake-track'
             )
           patch.save(validate: false)
@@ -24,7 +24,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
           it 'does not change the record' do
             patch =
               create(
-                :patch,
+                :user_patch,
                 audio_sample: 'https://soundcloud.com/69bot/shallow'
               )
 
@@ -36,7 +36,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
 
         context 'and it is marked as unavailable' do
           it 'changes audio_sample_available to true' do
-            patch = create(:patch)
+            patch = create(:user_patch)
             patch.set(audio_sample_available: false)
 
             expect { UpdatePatchAudioSampleAvailableJob.new.perform }.to(
@@ -49,7 +49,7 @@ RSpec.describe UpdatePatchAudioSampleAvailableJob do
 
     context 'when patch has no audio sample' do
       it 'does not change the record' do
-        patch = create(:patch, audio_sample: '')
+        patch = create(:user_patch, audio_sample: '')
 
         expect { UpdatePatchAudioSampleAvailableJob.new.perform }.not_to(
           change { patch.reload }

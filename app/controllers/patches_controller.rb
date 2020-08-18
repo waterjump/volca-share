@@ -131,9 +131,12 @@ class PatchesController < ApplicationController
 
   def set_patch
     patch_model =
-      begin
-        Patch.find_by(slug: params[:slug])
-      rescue
+      if params[:user_slug].present? && params[:slug].present?
+        User
+          .find_by(slug: params[:user_slug])
+          .patches
+          .find_by(slug: params[:slug])
+      else
         Patch.find(params[:id])
       end
     @patch = VolcaShare::PatchViewModel.wrap(patch_model)

@@ -13,9 +13,9 @@ RSpec.describe 'Patch index page', type: :feature do
   end
 
   it 'is sorted by quality' do
-    okay_patch = FactoryBot.create(:patch, name: 'okay', audio_sample: '')
-    complete_patch = FactoryBot.create(:patch, name: 'complete')
-    minimal_patch = FactoryBot.create(
+    okay_patch = create(:patch, name: 'okay', audio_sample: '')
+    complete_patch = create(:user_patch, name: 'complete')
+    minimal_patch = create(
       :patch,
       tags: [],
       notes: '',
@@ -31,9 +31,9 @@ RSpec.describe 'Patch index page', type: :feature do
   end
 
   it 'can be sorted to show newest' do
-    okay_patch = FactoryBot.create(:patch, name: 'okay', audio_sample: '')
-    complete_patch = FactoryBot.create(:patch, name: 'complete')
-    minimal_patch = FactoryBot.create(
+    okay_patch = create(:patch, name: 'okay', audio_sample: '')
+    complete_patch = create(:user_patch, name: 'complete')
+    minimal_patch = create(
       :patch,
       tags: [],
       notes: '',
@@ -96,8 +96,8 @@ RSpec.describe 'Patch index page', type: :feature do
 
   describe 'pagination' do
     let(:first_patch) do
-      FactoryBot.create(
-        :patch,
+      create(
+        :user_patch,
         user_id: user.id,
         notes: '',
         audio_sample: '',
@@ -105,11 +105,11 @@ RSpec.describe 'Patch index page', type: :feature do
       )
     end
 
-    let(:last_patch) { create(:patch, user_id: user.id) }
+    let(:last_patch) { create(:user_patch, user_id: user.id) }
 
     before do
       first_patch
-      20.times { FactoryBot.create(:patch, user_id: user.id, audio_sample: '') }
+      20.times { create(:user_patch, user: user, audio_sample: '') }
       last_patch
 
       visit patches_path
@@ -168,7 +168,7 @@ RSpec.describe 'Patch index page', type: :feature do
 
   context 'when audio sample is available' do
     describe 'audio previews are shown', :js do
-      let!(:patch) { create(:patch, user_id: user.id) }
+      let!(:patch) { create(:user_patch, user: user) }
 
       before do
         visit patches_path

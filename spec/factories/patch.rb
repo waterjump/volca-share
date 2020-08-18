@@ -37,7 +37,8 @@ FactoryBot.define do
     slide_time midi_range.to_a.sample
     expression midi_range.to_a.sample
     gate_time midi_range.to_a.sample
-    audio_sample 'https://soundcloud.com/69bot/shallow'
+    audio_sample { '' }
+    audio_sample_available { nil }
     slug { name.parameterize }
 
     factory :patch_with_sequences do
@@ -47,6 +48,12 @@ FactoryBot.define do
       after(:build) do |patch, evaluator|
         build_list(:sequence, evaluator.sequence_count, patch: patch)
       end
+    end
+
+    factory :user_patch do
+      user
+      audio_sample 'https://soundcloud.com/69bot/shallow'
+      slug { name.parameterize }
     end
   end
 end
