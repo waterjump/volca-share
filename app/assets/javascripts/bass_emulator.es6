@@ -100,8 +100,7 @@ VS.BassEmulator = function() {
           { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
           { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
         ],
-      sustainOn: false,
-      ampEgOn: false
+      sustainOn: false
     };
 
     let notePlaying;
@@ -375,7 +374,8 @@ VS.BassEmulator = function() {
     // TOOLTIPS
     const itemsComingSoon = [
       'label[for="patch_vco_group_one"]',
-      'label[for="patch_vco_group_two"]'
+      'label[for="patch_vco_group_two"]',
+      'label[for="patch_amp_eg_on"]'
     ];
 
     itemsComingSoon.forEach(function(selector) {
@@ -604,10 +604,6 @@ VS.BassEmulator = function() {
 
     $('label[for="patch_sustain_on"]').on('click tap', function() {
       patch.sustainOn = !patch.sustainOn;
-    });
-
-    $('label[for="patch_amp_eg_on"]').on('click tap', function() {
-      patch.ampEgOn = !patch.ampEgOn;
     });
 
     // MOBILE OCTAVE UP
