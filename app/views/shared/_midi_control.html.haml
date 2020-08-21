@@ -38,5 +38,6 @@
           .modal-footer
             #dont-show-again-container
               = check_box_tag 'dont-show-again', 1, checked: nil
-              Don't show me this again.
+              = label_tag('dont-show-again') do
+                Don't show me this again.
             %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss
