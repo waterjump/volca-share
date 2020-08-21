@@ -88,6 +88,14 @@ VS.MidiOut = function() {
     scope.syncMidi();
     $('#green-check-mark').show();
     $('#green-check-mark').fadeOut(1000);
+
+    if (localStorageAvailable() && localStorage.DoNotShowMessageAgain != 'true') {
+      localStorage.DoNotShowMessageAgain = 'true';
+      setTimeout(
+        function(){ $('#sync').removeAttr('data-toggle data-target'); },
+        200
+      );
+    }
   });
 
   const localStorageAvailable = function() {
@@ -106,6 +114,8 @@ VS.MidiOut = function() {
       }
     } else {
       localStorage.DoNotShowMessageAgain = 'false';
+      $('#sync').attr('data-toggle', 'modal');
+      $('#sync').attr('data-target', '#sync-modal');
     }
   });
 
