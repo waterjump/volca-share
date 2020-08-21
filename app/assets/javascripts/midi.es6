@@ -91,6 +91,7 @@ VS.MidiOut = function() {
 
     if (localStorageAvailable() && localStorage.DoNotShowMessageAgain != 'true') {
       localStorage.DoNotShowMessageAgain = 'true';
+      $('#dont-show-again').prop('checked', 'checked');
       setTimeout(
         function(){ $('#sync').removeAttr('data-toggle data-target'); },
         200
