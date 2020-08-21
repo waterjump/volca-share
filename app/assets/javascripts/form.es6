@@ -219,6 +219,7 @@ VS.Form = function() {
           '60': 120
         };
         midi = midi_map[degree];
+        trueMidi = ((63.5 / limit) * degree) + 63.5
       } else {
         midi = Math.round(((63.5 / limit) * degree) + 63.5);
         trueMidi = ((63.5 / limit) * degree) + 63.5
