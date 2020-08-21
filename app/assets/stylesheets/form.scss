@@ -186,6 +186,25 @@ $pink: #fd9994;
   button {
     float: right;
   }
+
+  #sync-button-container {
+    float: right;
+
+    #green-check-mark {
+      display: none;
+      float: right;
+      margin: 8px 10px 7px 5px;
+      height: 20px;
+      width: 20px;
+      background-image: image_url('green-check-mark.png');
+      background-size: contain;
+    }
+
+    button {
+      float: right;
+    }
+  }
+
   #dont-show-again-container {
     float: left;
   }
