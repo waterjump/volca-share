@@ -34,4 +34,7 @@
           .modal-body
             %p Controls outlined in green have been sent to your Volca.  Please adjust the non-highlighted parameters manually on the physical Volca machine.
           .modal-footer
+            #dont-show-again-container
+              = check_box_tag 'dont-show-again', 1, checked: nil
+              Don't show me this again.
             %button.btn.btn-default{"data-dismiss" => "modal", :type => "button"} Dismiss

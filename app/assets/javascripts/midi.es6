@@ -87,4 +87,27 @@ VS.MidiOut = function() {
   $('#sync').on('click tap', function() {
     scope.syncMidi();
   });
+
+  const localStorageAvailable = function() {
+    if (typeof(Storage) !== "undefined") {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  $('#dont-show-again').click(function(){
+    if ($('#dont-show-again').prop('checked')) {
+      if (localStorageAvailable()) {
+        localStorage.DoNotShowMessageAgain = 'true';
+        $('#sync').removeAttr('data-toggle data-target');
+      }
+    } else {
+      localStorage.DoNotShowMessageAgain = 'false';
+    }
+  });
+
+  if (localStorageAvailable() && localStorage.DoNotShowMessageAgain == 'true') {
+    $('#sync').removeAttr('data-toggle data-target');
+  }
 };
