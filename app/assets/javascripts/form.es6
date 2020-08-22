@@ -38,7 +38,18 @@ VS.Form = function() {
     e.preventDefault();
 
     const assignKnobValue = function(knob) {
-      const randomValue = Math.floor(Math.random() * (127 - 1));
+      let randomValue;
+      const snapKnobMidiValues = [10, 30, 50, 70, 100, 120];
+
+      if ($(knob).hasClass('dark')) {
+        randomValue =
+          snapKnobMidiValues[
+            Math.floor(Math.random() * snapKnobMidiValues.length)
+          ];
+      } else {
+        randomValue = Math.floor(Math.random() * (127 - 1));
+      }
+
       const myKnob = new VS.Knob(knob);
       const degree = myKnob.degreeForMidi(randomValue, limit);
       knob.data('rotation', degree);
@@ -51,7 +62,9 @@ VS.Form = function() {
       $('.volca .knob').each(function() {
         assignKnobValue($(this));
       });
+
       if (!midiOut.ready()) { return; }
+
       $('#midi-only-controls .knob').each(function() {
         assignKnobValue($(this));
       });
@@ -95,10 +108,30 @@ VS.Form = function() {
       $(`label[for="patch_vco_group_${item}"]`).find('span .light').addClass('lit');
     };
 
+    const randomizeKeysLfoShape = function() {
+      const items = ['saw', 'triangle', 'square'];
+      const item = items[Math.floor(Math.random() * items.length)];
+
+      $('.light[data-radio]').each(function() {
+        $(this).removeClass('lit');
+        $(`:radio[value=${item}]`).prop('checked', false);
+      });
+      $(`:radio[value=${item}]`).prop('checked', true);
+      $(`label[for="patch_lfo_shape_${item}"]`).find('span .light').addClass('lit');
+    }
+
     randomizeKnobs();
-    randomizeVcoActive();
     randomizeCheckboxes();
-    randomizeVcoGroup();
+
+    if ($('.volca.bass').length > 0) {
+      randomizeVcoActive();
+      randomizeVcoGroup();
+    }
+
+    if ($('.volca.keys').length > 0) {
+      randomizeKeysLfoShape();
+    }
+
     midiOut.syncMidi();
   });
 

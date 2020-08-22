@@ -74,6 +74,28 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     end
   end
 
+  it 'can be randomized' do
+    default_patch = {
+      detune: '0',
+      cutoff: '63',
+      sustain: '127'
+    }
+
+    visit new_keys_patch_path
+    expect(page).to have_link('randomize')
+    click_link 'randomize'
+    fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
+    click_button 'Save'
+
+    random_patch = {
+      attack: page.find('#detune')['data-midi'],
+      cutoff: page.find('#cutoff')['data-midi'],
+      gate_time: page.find('#sustain', visible: false)['data-midi']
+    }
+
+    expect(random_patch).not_to eq(default_patch)
+  end
+
   context 'when user is not logged in' do
     let(:dummy_patch) do
       FactoryBot.build(

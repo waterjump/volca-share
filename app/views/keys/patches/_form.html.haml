@@ -145,6 +145,7 @@
   %fieldset
     .field.mb-3
       = render 'shared/midi_button'
+      = render 'shared/randomize'
     - if current_user.present?
       .field
         = label_tag :privacy, 'Secret?'
