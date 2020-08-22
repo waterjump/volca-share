@@ -20,7 +20,9 @@ VS.Knob = function(element) {
 
   const setDisplayStyle = function() {
     if ($(scope.element).attr('id').split('_')[1] === 'pitch') {
-      scope.displayStyle = 'pitchString';
+      if ($('.volca.keys').length == 0) {
+        scope.displayStyle = 'pitchString';
+      }
     } else if ($(scope.element).attr('id') === 'octave') {
       scope.displayStyle = 'octaveString';
     }
