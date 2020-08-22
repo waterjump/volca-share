@@ -3,6 +3,13 @@ $aspect: 1800 / 1072 / 100;
 .volca.keys {
   background-image: image_url('VolcaKeys-small-shopped.jpg');
 
+  #led {
+    top: 17%;
+    left: 77.2%;
+    width: 11.5%;
+    height: 8.7%;
+  }
+
   .small {
     width: 6%;
     height: percentage(6 * $aspect);

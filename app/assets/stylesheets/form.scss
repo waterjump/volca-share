@@ -70,6 +70,44 @@ $pink: #fd9994;
       border-radius: 5px;
     }
 
+    #led {
+      top: 49%;
+      left: 5.2%;
+      width: 16.5%;
+      height: 13.7%;
+      position: absolute;
+      background-color: #141414;
+    }
+
+    .digit {
+      background-image: image_url('numbers.jpg');
+      background-repeat: no-repeat;
+      width: 18.5%;
+      height: 100%;
+      display: inline-block;
+      margin: 0;
+      background-size: 1120%;
+      position: absolute;
+      top: 14%;
+      background-position: 99.5% 0;
+    }
+
+    #thousands {
+      left: 5%;
+    }
+
+    #hundreds {
+      left: 30%;
+    }
+
+    #tens {
+      left: 53%;
+    }
+
+    #ones {
+      left: 75%;
+    }
+
     .bottom-row {
       position: absolute;
       top: 69%;
