@@ -163,6 +163,8 @@ RSpec.describe Keys::Patch do
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:slug) }
+    it { is_expected.to validate_uniqueness_of(:name) }
+    it { is_expected.to validate_uniqueness_of(:slug) }
 
     it do
       is_expected.to validate_inclusion_of(:voice).to_allow(10, 30, 50, 70, 100, 120)

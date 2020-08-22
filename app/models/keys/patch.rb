@@ -53,6 +53,7 @@ module Keys
     }
 
     validates_presence_of :name, :slug
+    validates_uniqueness_of :name, :slug
     validates :voice, inclusion: { in: [10, 30, 50, 70, 100, 120] }
     validates :octave, inclusion: { in: [10, 30, 50, 70, 100, 120] }
     validates :detune, midi_validation_options
