@@ -20,6 +20,7 @@ Bundler.require(*Rails.groups)
 
 module VolcaShare
   class Application < Rails::Application
+    config.exceptions_app = self.routes
     config.autoload_paths << "#{root}/app/view_models"
     config.eager_load_paths << "#{root}/app/view_models"
     config.autoload_paths << Rails.root.join('lib')
