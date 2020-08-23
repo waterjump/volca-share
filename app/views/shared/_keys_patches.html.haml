@@ -56,3 +56,7 @@
         .tags
           - patch.tags.each do |tag|
             = link_to "\##{tag}", keys_tags_show_path(tag: tag), class: :tag
+  .col-sm-12.clearfix
+    - unless locals[:hide_pagination]
+      .pagination-holder.col-sm-6
+        = paginate @keys_patches

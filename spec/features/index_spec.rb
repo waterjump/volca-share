@@ -115,6 +115,12 @@ RSpec.describe 'Patch index page', type: :feature do
       visit patches_path
     end
 
+    describe 'control' do
+      it 'is shown at the top and bottom of the page' do
+        expect(page).to have_css('.pagination', count: 2)
+      end
+    end
+
     describe 'first page' do
       it 'shows most recent patches first' do
         expect(page).to have_content(last_patch.name)
@@ -134,7 +140,7 @@ RSpec.describe 'Patch index page', type: :feature do
     end
 
     describe 'second page' do
-      before { click_link '2' }
+      before { first('.pagination').click_link('2') }
 
       it 'doesn\'t show newest 20 patches' do
         expect(page).not_to have_content(last_patch.name)
