@@ -1,35 +1,28 @@
 .patches {
-  .loading {
-    position: absolute;
-    left: 45%;
-    top: 35%;
-  }
+  @media (max-width: 768px) {
+    .loading {
+      position: absolute;
+      left: 45%;
+      top: 35%;
+    }
 
-  .modal-body {
-    width: 100%;
-    height: 111px;
-  }
+    .modal-body {
+      width: 100%;
+      height: 111px;
+    }
 
-  .sort {
-    .h4 {
-      font-size: 14px;
+    .sort {
+      .h4 {
+        font-size: 14px;
+      }
     }
   }
 
-  @media (min-width: 990px) {
-    .col-md-6 {
-      width: 49%;
-    }
-
-    .wrapper {
-      margin: 10px 1% 10px 0;
-    }
-  }
 
   .wrapper {
     overflow: hidden;
-    min-height: 100px;
-    height: 120px;
+    height: 85px;
+    margin: 0 0 5px 0;
 
     .image, .patch, .info, .speaker {
       display: inline-block;
@@ -45,23 +38,18 @@
       cursor: pointer;
     }
 
-    .title {
-      font-size: 12pt;
-      font-weight: bold;
-    }
-
     .tags {
       overflow: hidden;
       max-height: 21px;
-      background-size: cover;
+      margin-top: 5px;
     }
 
     .image-holder {
+      display: none;
       height: 100%;
       width: 49px;
-      position: absolute;
-      top: 10px;
-      left: 10px;
+      margin-right: 10px;
+      float: left;
       .image {
         width: 100%;
         height: 100px;
@@ -79,27 +67,32 @@
     }
 
     .patch {
-      max-width: 700px;
+      width: 100%;
       min-width: 200px;
-      padding: 0 100px 0 59px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      float: left;
+      .title {
+        font-size: 12pt;
+        font-weight: bold;
+        white-space: nowrap;
+        height: 20px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       .description {
+        display: none;
         height: 57px;
         overflow: hidden;
       }
     }
 
     .info {
-      width: 100px;
-      padding: 1px 1px 1px 5px;
-      position: absolute;
-      right: 0px;
-      top: 10px;
-      border-left: 1px solid #d6d6d6;
       background-color: #f5f5f5;
       .date {
         font-size: 0.8em;
+      }
+      .icons {
+        float: right;
+        margin-left: 10px;
       }
     }
   }
@@ -173,8 +166,14 @@
 }
 
 @media (min-width: 990px) {
+  .col-md-6 {
+    width: 49%;
+  }
+
   .patches{
     .wrapper {
+      margin: 10px 1% 10px 0;
+
       .patch {
         max-width: 450px;
       }
@@ -183,7 +182,7 @@
 }
 
 @media (min-width: 1200px) {
-  .patches{
+  .patches {
     .wrapper {
       .patch {
         max-width: 550px;
