@@ -1,23 +1,20 @@
 .patches {
-  @media (max-width: 768px) {
-    .loading {
-      position: absolute;
-      left: 45%;
-      top: 35%;
-    }
-
-    .modal-body {
-      width: 100%;
-      height: 111px;
-    }
-
-    .sort {
-      .h4 {
-        font-size: 14px;
-      }
-    }
+  .loading {
+    position: absolute;
+    left: 45%;
+    top: 35%;
   }
 
+  .modal-body {
+    width: 100%;
+    height: 111px;
+  }
+
+  .sort {
+    .h4 {
+      font-size: 14px;
+    }
+  }
 
   .wrapper {
     overflow: hidden;
@@ -128,21 +125,21 @@
 }
 
 #audio-sample-button{
-	text-align: center;
-	background-color: #BCDBEA;
-	border-radius: 50%;
-	width: 16px;
-	height: 16px;
-	font-size: 12px;
-	line-height: 18px;
-	cursor: pointer;
+  text-align: center;
+  background-color: #BCDBEA;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  font-size: 12px;
+  line-height: 18px;
+  cursor: pointer;
   display: inline-block;
 }
 
 #audio-sample-button:before{
-	content:'?';
-	font-weight: bold;
-	color:#fff;
+  content:'?';
+  font-weight: bold;
+  color:#fff;
 }
 
 @media (min-width: 768px) {
