@@ -3,16 +3,31 @@
 require 'rails_helper'
 
 RSpec.describe 'keys/patches/_form.html.haml', type: :view do
-  context 'when patch has an audio sample' do
-    let!(:user) { FactoryBot.build(:user) }
+  context 'when user is logged in' do
+    let(:user) { build(:user) }
+    let(:locals) { { current_user: user } }
     let(:user_patch) do
-      VolcaShare::Keys::PatchViewModel.wrap(create(:user_keys_patch))
+      VolcaShare::Keys::PatchViewModel.wrap(create(:user_keys_patch, user: user))
     end
 
-    it 'shows a preview of the audio sample' do
+    before do
       @patch = user_patch
-      render partial: 'keys/patches/form.html.haml', locals: { current_user: user }
-      expect(rendered).to have_css('.sample')
+      render partial: 'keys/patches/form.html.haml', locals: locals
+    end
+
+    context 'when patch has an audio sample' do
+      it 'shows a preview of the audio sample' do
+        expect(rendered).to have_css('.sample')
+      end
+    end
+
+    it 'tells how to rank higher on browse page' do
+      expect(rendered).to(
+        have_content(
+          'Note: Giving your patch tags, a description, and especially an '\
+          'audio sample will help it rank higher on browse pages.'
+        )
+      )
     end
   end
 

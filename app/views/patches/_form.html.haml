@@ -186,6 +186,8 @@
       %strong
         = "To edit or delete your patches, "
         = link_to 'create an account', new_user_registration_path
+    - else
+      %strong Note: Giving your patch tags, a description, and especially an audio&nbsp;sample will help it rank higher on browse pages.
 #save_or_cancel.col-sm-12
   .actions
     = submit_tag 'Save', class: 'btn btn-primary'
