@@ -155,11 +155,23 @@
   }
   .patches{
     .wrapper {
+      height: 120px;
+
       .image-holder {
+        display: block;
         width: 100px
       }
       .patch {
-        padding: 0 100px 0 110px;
+        width: 84%;
+
+        .description {
+          display: block;
+          height: 25px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin: 5px 0;
+        }
       }
     }
   }
