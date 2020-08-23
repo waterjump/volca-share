@@ -96,11 +96,9 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
     end
   end
 
-  it 'shows the patch description' do
+  it 'shows the patch notes' do
     expect(rendered).to(
-      have_content(
-        VolcaShare::PatchViewModel.wrap(patches.first).description
-      )
+      have_content(VolcaShare::PatchViewModel.wrap(patches.first).notes)
     )
   end
 

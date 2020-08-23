@@ -7,12 +7,6 @@ module VolcaShare
       {}
     end
 
-    def description
-      return unless notes.present?
-      return notes.squish if notes.squish.length <= 100
-      "#{notes.squish[0..96].split(' ')[0..-2].join(' ')}..."
-    end
-
     def lit?(field)
       return 'lit' if model.send(field)
       'unlit'

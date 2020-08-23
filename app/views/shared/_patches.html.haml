@@ -56,7 +56,7 @@
                 class: :delete_form,
                 data: { confirm: 'Are you sure you want to delete that patch?' } do
                 = submit_tag 'Delete', class: 'delete glyph'
-        .description= patch.description
+        .description= patch.notes
         .tags
           - patch.tags.each do |tag|
             = link_to "\##{tag}", tags_show_path(tag: tag), class: :tag
