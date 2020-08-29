@@ -66,7 +66,11 @@ VS.Form = function() {
       if (!midiOut.ready()) { return; }
 
       $('#midi-only-controls .knob').each(function() {
-        assignKnobValue($(this));
+        if ($(this).attr('id') == 'expression') {
+          // skip
+        } else {
+          assignKnobValue($(this));
+        }
       });
     };
 
