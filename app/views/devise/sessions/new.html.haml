@@ -41,6 +41,8 @@
         = f.label :password_confirmation
         %br/
         = f.password_field :password_confirmation, autocomplete: "off", class: 'form-control'
+      .recaptcha-container
+        = recaptcha_tags
       .actions
         = f.submit "Sign up", class: 'btn btn-default'
     = render "devise/shared/links"

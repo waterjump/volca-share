@@ -11,8 +11,13 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   def create
-    params['user'][:slug] = params['user']['username'].parameterize
-    super
+    if verify_recaptcha
+      params['user'][:slug] = params['user']['username'].parameterize
+
+      super
+    else
+      redirect_to new_user_session_path, notice: 'You must complete the ReCAPTCHA'
+    end
   end
 
   # GET /resource/edit
