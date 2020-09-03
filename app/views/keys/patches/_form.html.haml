@@ -183,6 +183,11 @@
                        pattern: @patch.audio_sample_regex
     - if @patch.audio_sample.present?
       .sample{ data: { embed_code: @patch.audio_sample_code.try(:html_safe) }}
+  .field
+    %audio{ id: :player, controls: true }
+      %source#source
+    #record.btn 🔴
+    #stop.btn ◼️
   - if current_user.nil? && Rails.env.production?
     = recaptcha_tags
 
