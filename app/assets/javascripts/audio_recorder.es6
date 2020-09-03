@@ -17,6 +17,7 @@ $(function() {
       if(shouldStop === true && stopped === false) {
         mediaRecorder.stop();
         stopped = true;
+        stream.getTracks()[0].stop();
       }
     }
 
