@@ -25,9 +25,24 @@ $(function() {
       console.log('stopped!');
       shouldStop = false
 
-      console.log(URL.createObjectURL(new Blob(recordedChunks)));
-      $('#source').attr('src', URL.createObjectURL(new Blob(recordedChunks, { type: 'audio/webm' })));
+      blob = new Blob(recordedChunks, { type: 'audio/webm' });
+
+      let blobUrl =  URL.createObjectURL(blob);
+      $('#source').attr('src', blobUrl);
       $("#player")[0].load();
+
+      let xhr = new XMLHttpRequest();
+      xhr.responseType = 'json';
+      xhr.open("POST", '/keys/audio_clip_upload', true);
+      xhr.onload = function (oEvent) {
+        $('#patch_audio_clip').val(xhr.response.path);
+      };
+
+      let formData = new FormData();
+      formData.append("authenticity_token", $('input[name=authenticity_token]').val());
+      formData.append("audio_clip", blob);
+
+      xhr.send(formData);
     });
 
     mediaRecorder.start(100);

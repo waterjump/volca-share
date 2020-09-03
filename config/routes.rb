@@ -37,6 +37,7 @@ Rails.application.routes.draw do
               param: :id
     resources :patches, only: [:index]
     post 'patch' => 'patches#create'
+    post 'audio_clip_upload' => 'patches#audio_clip_upload'
     match 'tags/show' => 'tags#show', via: :get
     match 'oembed' => 'patches#oembed', via: :get
   end

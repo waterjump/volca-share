@@ -121,6 +121,20 @@ module Keys
       end
     end
 
+    def audio_clip_upload
+      respond_to do |format|
+        format.json do
+          puts request.params[:audio_clip]
+          uploaded_file = request.params[:audio_clip]
+          file_name = "#{Time.now.to_i}.webm"
+          File.open(Rails.root.join('public', 'uploads', file_name), 'wb') do |file|
+            file.write(uploaded_file.read)
+          end
+          render json: { path: "/public/uploads/#{file_name}" }
+        end
+      end
+    end
+
     private
 
     def set_patch
