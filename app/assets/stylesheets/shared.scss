@@ -100,6 +100,13 @@ body {
   }
 }
 
+a.unstyled {
+  color: inherit;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 @media(min-width: 990px) {
   #sign-up {
     border-left: 1px solid #d8d8d8;

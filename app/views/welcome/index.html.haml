@@ -6,15 +6,17 @@
       %a.btn.btn-primary.btn-lg{href: new_patch_url, role: 'button'} Make a Volca Bass patch &raquo;
       %a.btn.btn-primary.btn-lg{href: new_keys_patch_url, role: 'button'} Make a Volca Keys patch &raquo;
 
-.patches
+.patches.clearfix
   = render '/shared/audio_preview'
   .col-md-6
-    %h2 Bass Patches
+    %a{ href: patches_path, class: 'unstyled' }
+      %h2 Bass Patches
     - @patches.each do |patch|
       = render partial: 'shared/patch_card', locals: { patch: patch }
     = link_to 'Browse more »', patches_path, style: 'float: right'
   .col-md-6
-    %h2 Keys Patches
+    %a{ href: keys_patches_path, class: 'unstyled' }
+      %h2 Keys Patches
     - @keys_patches.each do |patch|
       = render partial: 'shared/keys_patch_card', locals: { patch: patch }
     = link_to 'Browse more »', keys_patches_path, style: 'float: right'

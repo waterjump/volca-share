@@ -1,5 +1,7 @@
 .home_page {
   .patches {
+    margin-bottom: 20px;
+
     .wrapper {
       .patch {
         max-width: 393px;
@@ -236,6 +238,15 @@
 }
 
 @media (min-width: 1200px) {
+  .home_page {
+    .patches {
+      .wrapper {
+        .patch {
+          max-width: 393px;
+        }
+      }
+    }
+  }
   .patches {
     .wrapper {
       .patch {
