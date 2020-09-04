@@ -24,10 +24,11 @@ class PatchesController < ApplicationController
     @title = 'Browse Patches'
   end
 
-  # GET /patches/1
-  # GET /patches/1.json
   def show
     @body_class = :show
+    if params[:user_slug].blank? && params[:slug].blank? && @patch.user.present?
+      redirect_to user_patch_path(@patch.user.slug, @patch.slug), status: 301
+    end
   end
 
   # GET /patches/new

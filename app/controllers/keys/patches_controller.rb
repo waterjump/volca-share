@@ -55,6 +55,11 @@ module Keys
 
     def show
       @body_class = 'show'
+      if params[:user_slug].blank? && params[:slug].blank? && @patch.user.present?
+        redirect_to(
+          user_keys_patch_path(@patch.user.slug, @patch.slug), status: 301
+        )
+      end
     end
 
     def edit

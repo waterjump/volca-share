@@ -34,5 +34,20 @@ module Keys
         end
       end
     end
+
+    describe 'getting a user patch by patch id' do
+      let(:user_patch) { create(:user_keys_patch) }
+      before { get "/keys/patch/#{user_patch.id}" }
+
+      it 'redirects to path that uses slugs' do
+        expect(response.location).to(
+          include(user_keys_patch_path(user_patch.user.slug, user_patch.slug))
+        )
+      end
+
+      it 'has a 301 Moved Permanently status' do
+        expect(response.status).to eq(301)
+      end
+    end
   end
 end
