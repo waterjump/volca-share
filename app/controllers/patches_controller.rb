@@ -13,8 +13,8 @@ class PatchesController < ApplicationController
 
   # GET /patches
   def index
-    @sort = :quality
-    @sort = :created_at if params['sort'] == 'newest'
+    @sort = params['sort'] == 'newest' ? :created_at : :quality
+    @body_class = :index
     @patches =
       Kaminari.paginate_array(
         VolcaShare::PatchViewModel.wrap(

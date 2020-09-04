@@ -25,6 +25,15 @@ RSpec.describe 'Home page', type: :feature, js: true do
     expect(page).to have_link('Sign Up')
   end
 
+  it 'show three top patches from volca bass' do
+    create_list(:user_patch, 3)
+    visit root_path
+
+    expect(page).to have_css('.patch', count: 3)
+  end
+
+  it 'show three top patches from volca keys'
+
   it 'shows footer' do
     expect(page).to have_css('.footer')
   end

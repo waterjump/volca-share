@@ -1,3 +1,12 @@
+.home_page {
+  .patches {
+    .wrapper {
+      .patch {
+        max-width: 393px;
+      }
+    }
+  }
+}
 .patches {
   .loading {
     position: absolute;
@@ -172,6 +181,31 @@
       }
     }
   }
+  .home_page {
+    .patches{
+      .wrapper {
+        height: 120px;
+
+        .image-holder {
+          display: block;
+          width: 100px
+        }
+        .patch {
+          width: 84%;
+          max-width: 560px;
+
+          .description {
+            display: block;
+            height: 25px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin: 5px 0;
+          }
+        }
+      }
+    }
+  }
 }
 
 @media (min-width: 990px) {
@@ -185,6 +219,17 @@
 
       .patch {
         max-width: 330px;
+      }
+    }
+  }
+  .home_page {
+    .patches{
+      .wrapper {
+        margin: 5px 1% 5px 0;
+
+        .patch {
+          max-width: 296px;
+        }
       }
     }
   }

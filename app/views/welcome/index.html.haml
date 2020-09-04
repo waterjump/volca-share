@@ -5,6 +5,17 @@
     %p
       %a.btn.btn-primary.btn-lg{href: new_patch_url, role: 'button'} Make a Volca Bass patch &raquo;
       %a.btn.btn-primary.btn-lg{href: new_keys_patch_url, role: 'button'} Make a Volca Keys patch &raquo;
+.patches
+  .col-md-6
+    %h2 Bass Patches
+    - @patches.each do |patch|
+      = render partial: 'shared/patch_card', locals: { patch: patch }
+    = link_to "Browse all Bass patches", patches_path
+  .col-md-6
+    %h2 Keys Patches
+    - @keys_patches.each do |patch|
+      = render partial: 'shared/keys_patch_card', locals: { patch: patch }
+    = link_to "Browse all Keys patches", keys_patches_path
 .container
   .row
     .col-md-4

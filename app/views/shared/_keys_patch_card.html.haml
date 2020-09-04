@@ -1,0 +1,35 @@
+.wrapper.well.well-sm.patch-holder
+  .image-holder
+    - if patch.user.present?
+      = link_to user_keys_patch_path(patch.user.slug, patch.slug), { class: :title } do
+        .image.keys{ class: patch.index_classes }
+    - else
+      = link_to keys_patch_path(patch.id), { class: :title } do
+        .image.keys{ class: patch.index_classes }
+  .patch
+    - if patch.secret?
+      .lock.glyph{ title: 'Secret' }
+    - if patch.audio_sample_available?
+      .speaker{ data: { oembed_url: "/keys/oembed?user_slug=#{patch.user.slug}&slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
+    .title
+      - if patch.user.present?
+        = link_to patch.name, user_keys_patch_path(patch.user.slug, patch.slug), { class: :title }
+      - else
+        = link_to patch.name, keys_patch_path(patch.id), { class: :title }
+    .info
+      by
+      - if patch.user.present?
+        = link_to patch.user&.username, user_path(patch.user&.slug), { class: :username }
+      - else
+        ¯\_(ツ)_/¯
+      %span.date= "on #{patch.created_at.strftime("%B %-d, %Y" )}"
+      .icons
+        - if current_user.present? && patch.user == current_user
+          = link_to edit_user_keys_patch_path(current_user.slug, patch.slug) do
+            .edit.glyph
+          = form_tag keys_patch_path(patch.id), method: :delete, class: :delete_form, data: { confirm: 'Are you sure you want to delete that patch?' } do
+            = submit_tag 'Delete', class: 'delete glyph'
+    .description= patch.notes
+    .tags
+      - patch.tags.each do |tag|
+        = link_to "\##{tag}", keys_tags_show_path(tag: tag), class: :tag
