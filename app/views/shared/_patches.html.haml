@@ -7,18 +7,25 @@
       .pagination-holder.col-sm-6
         = paginate @patches
     .sort.col-sm-6
-      = check_box_tag :audio_only, false, params[:audio_only] == 'true'
+      - audio_only = params[:audio_only] == 'true'
+      = check_box_tag :audio_only, false, audio_only
       = label_tag 'audio_only'
       - if @sort.present?
         .h4
           Sort by:
           - if @sort == :quality
-            = link_to 'Date Created', patches_path(sort: :newest)
+            - if audio_only
+              = link_to 'Date Created', patches_path(sort: :newest, audio_only: true)
+            - else
+              = link_to 'Date Created', patches_path(sort: :newest)
           - else
             Date Created
           &nbsp;|&nbsp;
           - if @sort == :created_at
-            = link_to 'Quality', patches_path
+            - if audio_only
+              = link_to 'Quality', patches_path(audio_only: true)
+            - else
+              = link_to 'Quality', patches_path
           - else
             Quality
 
