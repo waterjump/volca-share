@@ -55,6 +55,13 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_selector('.patch', count: 80)
   end
 
+  it 'does not have audio_only filter' do
+    create(:patch, user_id: user.id)
+
+    visit user_path(user.slug)
+    expect(page).not_to have_css('#audio_only')
+  end
+
   it 'shows user created patches' do
     patch1 = FactoryBot.create(:patch, user_id: user.id)
     patch2 = FactoryBot.create(:patch, user_id: user.id, secret: true)

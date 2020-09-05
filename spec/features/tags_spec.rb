@@ -35,6 +35,13 @@ RSpec.feature 'tags', type: :feature, js: true do
       expect(page).to have_content(patch1.name)
     end
 
+    it 'does not have audio_only filter' do
+      create(:patch, user_id: nil, tag_list: 'cool')
+
+      visit tags_show_path(tag: :cool)
+      expect(page).not_to have_css('#audio_only')
+    end
+
     it 'has audio preview functionality' do
       create(:user_patch, user: user, tag_list: 'cool')
 

@@ -9,15 +9,16 @@
     .sort.col-sm-6
       .h4
         - audio_only = params[:audio_only] == 'true'
-        = check_box_tag :audio_only, false, audio_only
-        = label_tag 'audio_only', id: :audio_sample_label  do
-          Has audio
-          &nbsp;
-          &nbsp;
+        - if @show_audio_filter
+          = check_box_tag :audio_only, false, audio_only
+          = label_tag 'audio_only', id: :audio_sample_label  do
+            Has audio
+            &nbsp;
+            &nbsp;
         - if @sort.present?
           Sort by:
           - if @sort == :quality
-            - if audio_only
+            - if audio_only && @show_audio_filter
               = link_to 'Date Created', patches_path(sort: :newest, audio_only: true)
             - else
               = link_to 'Date Created', patches_path(sort: :newest)
@@ -25,7 +26,7 @@
             Date Created
           &nbsp;|&nbsp;
           - if @sort == :created_at
-            - if audio_only
+            - if audio_only && @show_audio_filter
               = link_to 'Quality', patches_path(audio_only: true)
             - else
               = link_to 'Quality', patches_path

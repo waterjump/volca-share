@@ -14,6 +14,7 @@ class PatchesController < ApplicationController
   # GET /patches
   def index
     @sort = params['sort'] == 'newest' ? :created_at : :quality
+    @show_audio_filter = true
     @body_class = :index
 
     patch_models =

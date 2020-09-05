@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'shared/_patches.html.haml', type: :view do
   let(:user) { create(:user) }
   let(:sort) { :quality }
+  let(:show_audio_filter) { false }
   let(:params) { {} }
 
   let(:render_options) do
@@ -16,6 +17,7 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
 
   before do
     @sort = sort
+    @show_audio_filter = show_audio_filter
     @patches = Kaminari.paginate_array(
       VolcaShare::PatchViewModel.wrap(patches)
     ).page(1)
@@ -32,6 +34,7 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
   end
 
   context 'when audio only filter is on' do
+    let(:show_audio_filter) { true }
     let(:patches) { [create(:patch)] }
     let(:params) { { audio_only: 'true' } }
 
