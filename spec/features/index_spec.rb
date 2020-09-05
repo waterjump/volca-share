@@ -100,6 +100,31 @@ RSpec.describe 'Patch index page', type: :feature do
         expect(page).to have_content(patch_with_audio_sample.name)
       end
     end
+
+    context 'when paginating audio only patches' do
+      let(:oldest_patch_with_audio) do
+        create(:user_patch, created_at: 1.day.ago)
+      end
+
+      before do
+        oldest_patch_with_audio
+        create_list(:user_patch, 22)
+      end
+
+      it 'shows oldest audio only user patch on second page' do
+        visit patches_path
+
+        click_link 'Date Created'
+
+        find('#audio_only').click
+
+        within first('.pagination') do
+          click_link '2'
+        end
+
+        expect(page).to have_content(oldest_patch_with_audio.name)
+      end
+    end
   end
 
   context 'when user is logged in' do
