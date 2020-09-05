@@ -37,4 +37,36 @@ $(function() {
       }
     });
   });
+
+  $('#audio_only').on('click tap', function() {
+    let currentLocation = window.location.href;
+    let newLocation;
+    let splitLocation = currentLocation.split('?');
+    let hasQueryString = splitLocation.length > 1;
+
+    if (hasQueryString) {
+      let basePath = splitLocation[0];
+      let queryParams = splitLocation[1];
+
+      if (queryParams.indexOf('audio_only') !== -1) {
+        queryParams = queryParams.replace('audio_only=true', '');
+      } else {
+        queryParams = `${queryParams}&audio_only=true`;
+
+        // Reset pagination
+        if(queryParams.indexOf('page=') !== -1) {
+          queryParams = queryParams.replace(/page=\d+/g, '');
+        }
+      }
+      newLocation = `${basePath}?${queryParams}`;
+    } else {
+      newLocation = `${currentLocation}?audio_only=true`;
+    }
+
+    // Remove repeated delimiters
+    newLocation = newLocation.replace(/&+/g, '&');
+    newLocation = newLocation.replace('?&', '?');
+
+    window.location.href = newLocation;
+  });
 });

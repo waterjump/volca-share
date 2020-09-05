@@ -15,11 +15,21 @@ class PatchesController < ApplicationController
   def index
     @sort = params['sort'] == 'newest' ? :created_at : :quality
     @body_class = :index
+
+    patch_models =
+      if params[:audio_only] == 'true'
+        Patch
+          .browsable
+          .where(audio_sample_available: true)
+          .includes(:user)
+          .desc(@sort)
+      else
+        Patch.browsable.includes(:user).desc(@sort)
+      end
+
     @patches =
       Kaminari.paginate_array(
-        VolcaShare::PatchViewModel.wrap(
-          Patch.browsable.includes(:user).desc(@sort)
-        )
+        VolcaShare::PatchViewModel.wrap(patch_models)
       ).page(params[:page].to_i)
     @title = 'Browse Patches'
   end

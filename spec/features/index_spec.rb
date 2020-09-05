@@ -50,6 +50,58 @@ RSpec.describe 'Patch index page', type: :feature do
     expect(all('.patch')[2]).to have_link('okay')
   end
 
+  context 'when filtering by audio sample', js: true do
+    it 'can filter by patches with audio samples only' do
+      patch_with_audio_sample = create(:user_patch)
+      patch_without_audio_sample = create(:patch)
+
+      visit patches_path
+
+      find('#audio_only').click
+
+      expect(page).to have_content(patch_with_audio_sample.name)
+      expect(page).not_to have_content(patch_without_audio_sample.name)
+      expect(page).to have_css('#audio_only[checked=checked]')
+    end
+
+    it 'can be unchecked to show patches without audio samples' do
+      patch_with_audio_sample = create(:user_patch)
+      patch_without_audio_sample = create(:patch)
+
+      visit patches_path(audio_only: true)
+
+      # NOTE: Could remove since these expectations are covered in last test
+      expect(page).to have_content(patch_with_audio_sample.name)
+      expect(page).not_to have_content(patch_without_audio_sample.name)
+      expect(page).to have_css('#audio_only[checked=checked]')
+
+      find('#audio_only').click
+
+      expect(page).to have_content(patch_with_audio_sample.name)
+      expect(page).to have_content(patch_without_audio_sample.name)
+      expect(page).not_to have_css('#audio_only[checked=checked]')
+    end
+
+    context 'when on page 2' do
+      let!(:patch_with_audio_sample) { create(:user_patch) }
+      before do
+        create_list(:patch, 22)
+      end
+
+      it 'resets pagination' do
+        visit patches_path
+
+        within first('.pagination') do
+          click_link '2'
+        end
+
+        find('#audio_only').click
+
+        expect(page).to have_content(patch_with_audio_sample.name)
+      end
+    end
+  end
+
   context 'when user is logged in' do
     it 'allows user to delete their own patches', js: true do
       FactoryBot.create(:patch, user_id: user.id)
