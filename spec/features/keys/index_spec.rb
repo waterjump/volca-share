@@ -32,6 +32,22 @@ RSpec.describe 'Keys patch index page', type: :feature do
     expect(all('.patch')[2]).to have_link('minimal')
   end
 
+  context 'when two patches have the same quality but different age' do
+    it 'shows newer patch of same quality first' do
+      older_equal_patch = create(:user_keys_patch, created_at: 2.days.ago)
+      new_equal_patch = create(:user_keys_patch, created_at: 1.day.ago)
+      newest_low_qual_patch = create(:keys_patch)
+
+      visit keys_patches_path
+
+      expect(older_equal_patch.quality).to eq(new_equal_patch.quality)
+
+      expect(all('.patch')[0]).to have_link(new_equal_patch.name)
+      expect(all('.patch')[1]).to have_link(older_equal_patch.name)
+      expect(all('.patch')[2]).to have_link(newest_low_qual_patch.name)
+    end
+  end
+
   it 'can be sorted to show newest' do
     okay_patch = create(:keys_patch, name: 'okay', audio_sample: '')
     complete_patch = create(:keys_patch, name: 'complete')

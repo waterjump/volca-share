@@ -24,8 +24,9 @@ class PatchesController < ApplicationController
           .where(audio_sample_available: true)
           .includes(:user)
           .desc(@sort)
+          .desc(:created_at)
       else
-        Patch.browsable.includes(:user).desc(@sort)
+        Patch.browsable.includes(:user).desc(@sort).desc(:created_at)
       end
 
     @patches =
