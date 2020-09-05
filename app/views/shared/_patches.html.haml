@@ -7,11 +7,14 @@
       .pagination-holder.col-sm-6
         = paginate @patches
     .sort.col-sm-6
-      - audio_only = params[:audio_only] == 'true'
-      = check_box_tag :audio_only, false, audio_only
-      = label_tag 'audio_only'
-      - if @sort.present?
-        .h4
+      .h4
+        - audio_only = params[:audio_only] == 'true'
+        = check_box_tag :audio_only, false, audio_only
+        = label_tag 'audio_only', id: :audio_sample_label  do
+          Has audio
+          &nbsp;
+          &nbsp;
+        - if @sort.present?
           Sort by:
           - if @sort == :quality
             - if audio_only
