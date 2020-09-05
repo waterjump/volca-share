@@ -6,11 +6,11 @@ class WelcomeController < ApplicationController
     @body_class = :home_page
     @patches =
       VolcaShare::PatchViewModel.wrap(
-        Patch.browsable.order_by(quality: :desc).limit(3)
+        Patch.browsable.desc(:quality).desc(:created_at).limit(3)
       )
     @keys_patches =
       VolcaShare::Keys::PatchViewModel.wrap(
-        Keys::Patch.browsable.order_by(quality: :desc).limit(3)
+        Keys::Patch.browsable.desc(:quality).desc(:created_at).limit(3)
       )
   end
 end
