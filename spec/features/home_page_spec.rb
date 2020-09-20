@@ -25,6 +25,11 @@ RSpec.describe 'Home page', type: :feature, js: true do
     expect(page).to have_link('Sign Up')
   end
 
+  it 'shows link to bass emulator' do
+    click_link('Bass')
+    expect(page).to have_link('Emulator')
+  end
+
   it 'show three top patches from volca bass' do
     create_list(:user_patch, 3)
     visit root_path
