@@ -33,7 +33,7 @@ class PatchesController < ApplicationController
       Kaminari.paginate_array(
         VolcaShare::PatchViewModel.wrap(patch_models)
       ).page(params[:page].to_i)
-    @title = 'Browse Patches'
+    @title = 'Volca Bass Patches'
   end
 
   def show
@@ -47,7 +47,7 @@ class PatchesController < ApplicationController
   def new
     @body_class = :form
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
-    @title = 'New Patch'
+    @title = 'New Bass Patch'
   end
 
   # GET /patches/1/edit

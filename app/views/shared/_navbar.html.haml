@@ -13,14 +13,14 @@
           = link_to 'Bass', '#', class: 'dropdown-toggle', id: 'dropdownMenuLink', data: { toggle: 'dropdown' }
           .dropdown-menu{ aria: { labelledby: 'dropdownMenuLink' } }
             %ul
-              %li= link_to 'Browse', patches_path, class: 'dropdown-item'
+              %li= link_to 'Patches', patches_path, class: 'dropdown-item'
               %li= link_to 'New patch', new_patch_path, class: 'dropdown-item'
               %li= link_to 'Emulator', bass_emulator_path, class: 'dropdown-item'
         %li
           = link_to 'Keys', '#', class: 'dropdown-toggle', id: 'dropdownMenuLink', data: { toggle: 'dropdown' }
           .dropdown-menu.keys{ aria: { labelledby: 'dropdownMenuLink' } }
             %ul
-              %li= link_to 'Browse', keys_patches_path, class: 'dropdown-item'
+              %li= link_to 'Patches', keys_patches_path, class: 'dropdown-item'
               %li= link_to 'New patch', new_keys_patch_path, class: 'dropdown-item'
       %ul.nav.navbar-nav.navbar-right
         - if current_user.present?

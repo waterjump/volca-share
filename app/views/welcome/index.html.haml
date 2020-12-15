@@ -13,13 +13,13 @@
       %h2 Bass Patches
     - @patches.each do |patch|
       = render partial: 'shared/patch_card', locals: { patch: patch }
-    = link_to 'Browse more »', patches_path, style: 'float: right'
+    = link_to 'More patches »', patches_path, style: 'float: right'
   .col-md-6
     %a{ href: keys_patches_path, class: 'unstyled' }
       %h2 Keys Patches
     - @keys_patches.each do |patch|
       = render partial: 'shared/keys_patch_card', locals: { patch: patch }
-    = link_to 'Browse more »', keys_patches_path, style: 'float: right'
+    = link_to 'More patches »', keys_patches_path, style: 'float: right'
 
 .container
   .row

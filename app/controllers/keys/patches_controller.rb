@@ -15,7 +15,7 @@ module Keys
             Keys::Patch.browsable.includes(:user).desc(@sort).desc(:created_at)
           )
         ).page(params[:page].to_i)
-      @title = 'Browse Keys Patches'
+      @title = 'Volca Keys Patches'
     end
 
     def new

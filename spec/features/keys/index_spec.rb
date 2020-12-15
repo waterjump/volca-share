@@ -9,7 +9,7 @@ RSpec.describe 'Keys patch index page', type: :feature do
     visit root_path
     click_link('Keys')
     within '.dropdown-menu.keys' do
-      page.find(:link, 'Browse').click
+      page.find(:link, 'Patches').click
     end
     expect(current_path).to eq(keys_patches_path)
   end

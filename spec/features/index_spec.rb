@@ -2,13 +2,13 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Patch index page', type: :feature do
+RSpec.describe 'Patch index page', type: :feature, js: true do
   let(:user) { FactoryBot.create(:user) }
 
   it 'can be accessed by link in header' do
     visit root_path
     click_link('Bass')
-    first(:link, 'Browse').click
+    first(:link, 'Patches').click
     expect(current_path).to eq(patches_path)
   end
 
