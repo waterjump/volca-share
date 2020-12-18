@@ -87,7 +87,8 @@
         font-size: 12pt;
         font-weight: bold;
         white-space: nowrap;
-        height: 20px;
+        height: 21px;
+        margin-bottom: -1px;
         overflow: hidden;
         text-overflow: ellipsis;
       }
@@ -99,7 +100,6 @@
     }
 
     .info {
-      background-color: #f5f5f5;
       .date {
         font-size: 0.8em;
       }
