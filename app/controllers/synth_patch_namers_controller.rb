@@ -9,7 +9,7 @@ class SynthPatchNamersController < ApplicationController
   def name
     respond_to do |format|
       format.json do
-        render json: { name: 'Foo' }
+        render json: { name: PatchNamer.new.call }
       end
     end
   end
