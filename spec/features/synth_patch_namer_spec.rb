@@ -9,12 +9,11 @@ RSpec.describe 'Synth patch namer', type: :feature do
     expect(page).to have_selector('h1', text: 'Synth Patch Namer')
   end
 
-  xit 'shows a generated patch name' do
+  it 'shows a generated patch name', js: true do
     visit synth_patch_namer_path
 
-    click 'Gimme a patch name'
-    within '#name' do
-      expect(page).to have_content
-    end
+    click_link 'Gimme a patch name'
+
+    expect(find('#name').text).not_to be_blank
   end
 end

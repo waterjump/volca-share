@@ -25,6 +25,7 @@ Rails.application.routes.draw do
   resources :patch, param: :id, controller: 'patches', except: [:index]
   get 'bass/emulator' => 'emulators#new', as: :bass_emulator
   get 'synth_patch_namer' => 'synth_patch_namers#show'
+  get 'synth_patch_name' => 'synth_patch_namers#name'
   post 'patch' => 'patches#create'
   resources :patches, only: [:index]
   get 'about' => 'welcome#index'
