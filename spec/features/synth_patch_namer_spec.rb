@@ -38,4 +38,26 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
       expect(find('#patch_name').value).to eq(patch_name)
     end
   end
+
+  describe 'creating a keys patch with the generated name' do
+    before do
+      visit synth_patch_namer_path
+
+      click_link 'Gimme a patch name'
+    end
+
+    it 'leads to the new keys patch page' do
+      click_link 'Make a keys patch with this name'
+
+      expect(current_path).to eq(new_keys_patch_path)
+    end
+
+    it 'prefills the patch name field with generated name' do
+      patch_name = find('#name').text
+
+      click_link 'Make a keys patch with this name'
+
+      expect(find('#patch_name').value).to eq(patch_name)
+    end
+  end
 end

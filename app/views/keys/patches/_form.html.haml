@@ -3,7 +3,7 @@
   = label_tag :name, 'Patch name', class: 'sr-only'
 
   = text_field_tag 'patch[name]',
-                   @patch.name,
+                   @patch.name || request.parameters[:name],
                    class: 'form-control-lg col-lg-12',
                    required: true,
                    placeholder: 'Patch name'
