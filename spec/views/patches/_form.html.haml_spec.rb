@@ -13,6 +13,16 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
     )
   end
 
+  context 'when name is provided in the query string' do
+    it 'prefills patch name' do
+      @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
+      name = FFaker::Lorem.words(3).join(' ')
+      render partial: 'patches/form.html.haml',
+             locals: { request: double(parameters: { name: name }) }
+      expect(rendered).to have_selector("#patch_name[value='#{name}']")
+    end
+  end
+
   context 'when user is logged in' do
     let(:user) { build(:user) }
     let(:locals) { { current_user: user } }
