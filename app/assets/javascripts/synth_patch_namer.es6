@@ -12,7 +12,9 @@ $(function() {
         },
         success(data) {
           $('#name').text(data['name']);
-          console.log(data);
+
+          urlSafePatchName = encodeURIComponent(data['name']);
+          $('a#new_bass_patch').attr('href', `patch/new?name=${urlSafePatchName}`);
         }
       });
     }
