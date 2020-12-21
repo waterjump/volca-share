@@ -15,6 +15,7 @@ $(function() {
 
           urlSafePatchName = encodeURIComponent(data['name']);
           $('a#new_bass_patch').attr('href', `patch/new?name=${urlSafePatchName}`);
+          $('a#new_keys_patch').attr('href', `keys/patch/new?name=${urlSafePatchName}`);
         }
       });
     }
