@@ -12,7 +12,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
   it 'shows a generated patch name' do
     visit synth_patch_namer_path
 
-    click_link 'Gimme a patch name'
+    find('#synth_name_button').click
 
     expect(find('#name').text).not_to be_blank
   end
@@ -21,7 +21,9 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     before do
       visit synth_patch_namer_path
 
-      click_link 'Gimme a patch name'
+      find('#synth_name_button').click
+
+      sleep(1)
     end
 
     it 'leads to the new bass patch page' do
@@ -43,7 +45,9 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     before do
       visit synth_patch_namer_path
 
-      click_link 'Gimme a patch name'
+      find('#synth_name_button').click
+
+      sleep(1)
     end
 
     it 'leads to the new keys patch page' do
