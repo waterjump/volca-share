@@ -4,13 +4,13 @@ class PatchNamer
   ADJECTIVES =
     %w[
       Squishy Cheap Broken Jaded Sad Aromatic Dumb Awful Lousy
-      Gyrating Catatonic Scary Holy Precise Rejected Court-appointed
+      Gyrating Catatonic Scary Holy Precise Rejected Court-Ordered
       Hermetically\ Sealed Chaotic Underwhelming
       Uncertified Pro\ Bono K-Mart\ Brand Tiny Obligatory Muscular
       Unpopular Unwanted Unwashed OG Recalled Obnoxious Failure-prone Discount
       Second-story Failed Polluted British Hairy Geriatric Minimum\ Wage
       Boring Corporate North\ Korean Sizzling Top\ 10 Pathetic Unauthorized
-      Non-Union Double-Glazed Yesterday's
+      Non-Union Double-Glazed Yesterday's Desperate Farty
     ].freeze
 
   NOUNS = [
@@ -30,6 +30,7 @@ class PatchNamer
     Bass Lead FX Drone Notes Thump Notes Noise Rumble Vibes Rhythms Loop Squelch
     Aura Bloops Plonks Donks Buzz Slapper Pad Stabs Rage Whooshes Reese Farts
     Stab Hit Blast Knocker Bumper Banger Banjo Riser Bomb Chords Bings Pings Muzak
+    Fire Pence\ 2020
   ].freeze
 
   SUFFIXES = ['(FINAL)', '(revised)', '(Try #3)', '(Good version)'].freeze
