@@ -13,15 +13,20 @@
           = link_to 'Bass', '#', class: 'dropdown-toggle', id: 'dropdownMenuLink', data: { toggle: 'dropdown' }
           .dropdown-menu{ aria: { labelledby: 'dropdownMenuLink' } }
             %ul
-              %li= link_to 'Patches', patches_path, class: 'dropdown-item'
-              %li= link_to 'New patch', new_patch_path, class: 'dropdown-item'
-              %li= link_to 'Emulator', bass_emulator_path, class: 'dropdown-item'
+              = link_to patches_path, class: 'dropdown-item' do
+                %li Patches
+              = link_to new_patch_path, class: 'dropdown-item' do
+                %li New patch
+              = link_to bass_emulator_path, class: 'dropdown-item' do
+                %li Emulator
         %li
           = link_to 'Keys', '#', class: 'dropdown-toggle', id: 'dropdownMenuLink', data: { toggle: 'dropdown' }
           .dropdown-menu.keys{ aria: { labelledby: 'dropdownMenuLink' } }
             %ul
-              %li= link_to 'Patches', keys_patches_path, class: 'dropdown-item'
-              %li= link_to 'New patch', new_keys_patch_path, class: 'dropdown-item'
+              = link_to keys_patches_path, class: 'dropdown-item' do
+                %li Patches
+              = link_to new_keys_patch_path, class: 'dropdown-item' do
+                %li New patch
       %ul.nav.navbar-nav.navbar-right
         - if current_user.present?
           %li= link_to 'My Patches', user_path(current_user.slug)

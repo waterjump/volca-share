@@ -14,6 +14,15 @@ RSpec.describe 'Keys patch index page', type: :feature do
     expect(current_path).to eq(keys_patches_path)
   end
 
+  it 'can be accessed by link row in header', js: true do
+    visit root_path
+    click_link('Keys')
+    within '.dropdown-menu.keys' do
+      first('li').click
+    end
+    expect(current_path).to eq(keys_patches_path)
+  end
+
   it 'is sorted by quality' do
     okay_patch = create(:keys_patch, name: 'okay', audio_sample: '')
     complete_patch = create(:user_keys_patch, name: 'complete')

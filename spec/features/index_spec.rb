@@ -12,6 +12,15 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     expect(current_path).to eq(patches_path)
   end
 
+  it 'can be accessed by link row in header' do
+    visit root_path
+    click_link('Bass')
+    within first('.dropdown-menu') do
+      first('li').click
+    end
+    expect(current_path).to eq(patches_path)
+  end
+
   it 'is sorted by quality' do
     okay_patch = create(:patch, name: 'okay', audio_sample: '')
     complete_patch = create(:user_patch, name: 'complete')
