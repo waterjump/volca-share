@@ -10,7 +10,7 @@ class PatchNamer
       Unpopular Unwanted Unwashed OG Recalled Obnoxious Failure-prone Discount
       Second-story Failed Polluted British Hairy Geriatric Minimum\ Wage
       Boring Corporate North\ Korean Sizzling Top\ 10 Pathetic Unauthorized
-      Non-Union Double-Glazed Yesterday's Desperate Farty
+      Non-Union Double-Glazed Yesterday's Desperate Farty Annoying
     ].freeze
 
   NOUNS = [
