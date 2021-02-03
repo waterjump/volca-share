@@ -38,17 +38,6 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
   config.action_mailer.default_url_options = { host: 'https://www.volcashare.com/' }
-
-  # TODO: Remove this once sendgrid_actionmailer is verified as working
-  ActionMailer::Base.smtp_settings = {
-    address: 'smtp.sendgrid.net',
-    port: '25',
-    authentication: :plain,
-    user_name: ENV['SENDGRID_USERNAME'],
-    password: ENV['SENDGRID_PASSWORD'],
-    domain: ENV['SENDGRID_DOMAIN']
-  }
-
   config.action_mailer.delivery_method = :sendgrid_actionmailer
   config.action_mailer.sendgrid_actionmailer_settings = {
     api_key: ENV['SENDGRID_API_KEY'],

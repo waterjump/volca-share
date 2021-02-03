@@ -31,7 +31,6 @@ gem 'ruby-oembed'
 gem 'sass-rails', '~> 5.0'
 gem 'sdoc', '~> 0.4.0', group: :doc
 gem 'sendgrid-actionmailer'
-gem 'sendgrid-ruby'
 gem 'sinatra', '~> 2.0.2'
 gem 'sprockets', '4.0.0.beta8'
 gem 'uglifier', '>= 1.3.0'

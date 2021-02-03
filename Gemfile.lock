@@ -401,7 +401,6 @@ DEPENDENCIES
   sass-rails (~> 5.0)
   sdoc (~> 0.4.0)
   sendgrid-actionmailer
-  sendgrid-ruby
   simplecov
   sinatra (~> 2.0.2)
   sprockets (= 4.0.0.beta8)
