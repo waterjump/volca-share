@@ -3,7 +3,7 @@
 class ErrorsController < ApplicationController
   def not_found
     @title = 'Ya blew it.'
-    render status: 404
+    render status: 404, formats: :html
   end
 
   def internal_server_error

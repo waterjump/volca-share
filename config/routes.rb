@@ -42,4 +42,9 @@ Rails.application.routes.draw do
   end
 
   root 'welcome#index'
+
+  unless Rails.application.config.consider_all_requests_local
+    # Return 404 for all non-conforming paths
+    get '*path', to: 'errors#not_found', via: :all
+  end
 end
