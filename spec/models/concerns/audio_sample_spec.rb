@@ -110,7 +110,7 @@ RSpec.describe AudioSample do
         expect(model.audio_sample_code)
           .to eq(
             "<iframe frameborder='0' scrolling='no'"\
-            " src='http://www.freesound.org/embed/sound/iframe/11/simple/small/'"\
+            " src='https://www.freesound.org/embed/sound/iframe/11/simple/small/'"\
             " width='375' height='30'></iframe>"
           )
       end
@@ -125,7 +125,7 @@ RSpec.describe AudioSample do
         expect(model.audio_sample_code)
           .to eq(
             "<iframe frameborder='0' scrolling='no'"\
-            " src='http://www.freesound.org/embed/sound/iframe/371855/simple/small/'"\
+            " src='https://www.freesound.org/embed/sound/iframe/371855/simple/small/'"\
             " width='375' height='30'></iframe>"
           )
       end
