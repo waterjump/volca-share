@@ -43,33 +43,51 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     end
 
     describe 'audio samples' do
-      it 'accepts valid soundcloud URLS' do
-        fill_in 'patch[audio_sample]',
-                with: 'https://soundcloud.com/69bot/take-it-to-the-streets'
-        click_button 'Save'
-        expect(page.body).to have_content('Patch saved successfully.')
+      describe 'submitting audio samples' do
+        it 'accepts valid soundcloud URLS' do
+          fill_in 'patch[audio_sample]',
+                  with: 'https://soundcloud.com/69bot/take-it-to-the-streets'
+          click_button 'Save'
+          expect(page.body).to have_content('Patch saved successfully.')
+        end
+
+        it 'accepts valid youtube URLS' do
+          fill_in 'patch[audio_sample]',
+                  with: 'https://youtube.com/watch?v=GF60Iuh643I'
+          click_button 'Save'
+          expect(page.body).to have_content('Patch saved successfully.')
+        end
+
+        it 'accepts valid freesound URLS' do
+          fill_in 'patch[audio_sample]',
+                  with: 'https://freesound.org/people/volcashare/sounds/123456'
+          click_button 'Save'
+          expect(page.body).to have_content('Patch saved successfully.')
+        end
+
+        it 'rejects invalid URLS' do
+          fill_in 'patch[audio_sample]', with: 'https://foo.edu/69bot/shallow'
+          click_button 'Save'
+          expect(page).to have_content(
+            'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
+          )
+        end
       end
 
-      it 'accepts valid youtube URLS' do
-        fill_in 'patch[audio_sample]',
-                with: 'https://youtube.com/watch?v=GF60Iuh643I'
-        click_button 'Save'
-        expect(page.body).to have_content('Patch saved successfully.')
-      end
+      describe 'showing audio sample' do
+        context 'when audio sample is from freesound.org' do
+          let!(:patch) do
+            create(
+              :user_keys_patch,
+              audio_sample: 'https://freesound.org/people/volcashare/sounds/123456'
+            )
+          end
 
-      it 'accepts valid freesound URLS' do
-        fill_in 'patch[audio_sample]',
-                with: 'https://freesound.org/people/volcashare/sounds/123456'
-        click_button 'Save'
-        expect(page.body).to have_content('Patch saved successfully.')
-      end
-
-      it 'rejects invalid URLS' do
-        fill_in 'patch[audio_sample]', with: 'https://foo.edu/69bot/shallow'
-        click_button 'Save'
-        expect(page).to have_content(
-          'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
-        )
+          it 'shows iframe on patch detail page' do
+            visit keys_patch_path(patch.id)
+            expect(page).to have_selector('iframe')
+          end
+        end
       end
     end
   end
