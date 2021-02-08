@@ -204,10 +204,11 @@ RSpec.describe 'Keys patch index page', type: :feature do
         end
 
         it 'links to patch' do
-          click_link 'Go to Patch'
-
-          expect(page.current_path).to(
-            eq(user_keys_patch_path(user.slug, patch.slug))
+          expect(page).to(
+            have_link(
+              'Go to Patch',
+              href: user_keys_patch_path(user.slug, patch.slug)
+            )
           )
         end
       end
