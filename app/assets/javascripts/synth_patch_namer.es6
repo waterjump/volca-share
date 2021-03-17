@@ -4,6 +4,8 @@ $(function() {
     {
       e.preventDefault();
       $('#name').html('<span class="thinking">Thinking...</span>');
+      $('#new_bass_patch').css('color', '#ffffff');
+      $('#new_keys_patch').css('color', '#ffffff');
       setTimeout(
         function() {
           $.ajax({
@@ -16,6 +18,8 @@ $(function() {
               $('#name').text(data['name']);
 
               urlSafePatchName = encodeURIComponent(data['name']);
+              $('#new_bass_patch').css('color', '#666666');
+              $('#new_keys_patch').css('color', '#666666');
               $('a#new_bass_patch').attr('href', `patch/new?name=${urlSafePatchName}`);
               $('a#new_keys_patch').attr('href', `keys/patch/new?name=${urlSafePatchName}`);
             }
