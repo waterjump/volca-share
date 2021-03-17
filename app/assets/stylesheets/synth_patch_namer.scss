@@ -5,15 +5,28 @@
   display: block;
 }
 
-#name {
+.name-container {
+  border: 1px solid #999;
+  width: 60%;
+  min-height: 112px;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  padding: 10px;
   text-align: center;
 }
- #new_bass_patch, #new_keys_patch {
-     background: #b0b0b0;
- }
+
+#links {
+  .link {
+    display: inline-block;
+    float: right;
+    margin-left: 20px;
+  }
+}
+
+#new_bass_patch, #new_keys_patch {
+  color: #fff;
+}
 
 .thinking {
   color: #999;

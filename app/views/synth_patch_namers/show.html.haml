@@ -3,8 +3,10 @@
 = link_to '#', id: 'synth_name_button' do
   .generate_name
 .col-md-12
-  #name.h1
-.col-sm-6
-  = link_to 'Make a bass patch with this name', new_patch_path, id: 'new_bass_patch', class: 'btn btn-primary btn-lg'
-.col-sm-6
-  = link_to 'Make a keys patch with this name', new_keys_patch_path, id: 'new_keys_patch', class: 'btn btn-primary btn-lg'
+  .name-container
+    #name.h1
+    #links.clearfix
+      .link
+        = link_to 'Name a keys patch »', new_keys_patch_path, id: 'new_keys_patch'
+      .link
+        = link_to 'Name a bass patch »', new_patch_path, id: 'new_bass_patch'
