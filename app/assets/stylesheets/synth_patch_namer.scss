@@ -1,7 +1,7 @@
 #synth_name_button {
   margin-left: auto;
   margin-right: auto;
-  width: 150px;
+  width: 400px;
   display: block;
 }
 
@@ -11,6 +11,9 @@
   margin-right: auto;
   text-align: center;
 }
+ #new_bass_patch, #new_keys_patch {
+     background: #b0b0b0;
+ }
 
 .thinking {
   color: #999;
@@ -19,8 +22,8 @@
 
 .generate_name {
   background-image: image_url('generate-button.png');
-  width: 150px;
-  height: 112px;
+  width: 400px;
+  height: 300px;
   background-size: contain;
   background-repeat: no-repeat;
 }
