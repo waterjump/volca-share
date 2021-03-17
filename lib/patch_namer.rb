@@ -10,7 +10,7 @@ class PatchNamer
       Unpopular Unwanted Unwashed OG Recalled Obnoxious Failure-prone Discount
       Second-story Failed Polluted British Hairy Geriatric Minimum\ Wage
       Boring Corporate North\ Korean Sizzling Top\ 10 Pathetic Unauthorized
-      Non-Union Double-Glazed Yesterday's Desperate Farty Annoying
+      Non-Union Double-Glazed Yesterday's Desperate Farty Annoying Tainted
     ].freeze
 
   NOUNS = [
@@ -23,7 +23,7 @@ class PatchNamer
     'Fidget Spinner', 'Gangnam Style', 'Cosby', 'Funeral Home', 'Orthodontist',
     'Deportation', 'Eviction', 'ALF Pog', 'Dumpster', 'Dunning-Kruger', 'Cotton Eye Joe',
     'Hanukkah', 'Christmas', 'Kwanzaa', 'Landlord', 'Jet Ski', 'On Hold',
-    'Internet Celebrity',
+    'Internet Celebrity', 'On Hold'
   ].freeze
 
   SOUNDS = %w[
