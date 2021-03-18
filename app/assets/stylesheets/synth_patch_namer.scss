@@ -1,13 +1,22 @@
 #synth_name_button {
   margin-left: auto;
   margin-right: auto;
-  width: 400px;
+  width: 100%;
   display: block;
+}
+
+.generate_name {
+  background-image: image_url('generate-button.png');
+  width: 100%;
+  height: 270px;
+  margin-bottom: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .name-container {
   border: 1px solid #999;
-  width: 60%;
+  width: 100%;
   min-height: 112px;
   display: block;
   margin-left: auto;
@@ -33,10 +42,29 @@
   font-size: 24px;
 }
 
-.generate_name {
-  background-image: image_url('generate-button.png');
-  width: 400px;
-  height: 300px;
-  background-size: contain;
-  background-repeat: no-repeat;
+@media (min-width: 440px) {
+  #synth_name_button {
+    width: 400px;
+  }
+
+  .generate_name {
+    width: 400px;
+    height: 300px;
+  }
+}
+
+@media (min-width: 768px) {
+  .name-container {
+    width: 100%;
+  }
+}
+@media (min-width: 992px) {
+  .name-container {
+    width: 80%;
+  }
+}
+@media (min-width: 1200px) {
+  .name-container {
+    width: 60%;
+  }
 }
