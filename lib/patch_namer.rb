@@ -23,7 +23,7 @@ class PatchNamer
     'Fidget Spinner', 'Gangnam Style', 'Cosby', 'Funeral Home', 'Orthodontist',
     'Deportation', 'Eviction', 'ALF Pog', 'Dumpster', 'Dunning-Kruger', 'Cotton Eye Joe',
     'Hanukkah', 'Christmas', 'Kwanzaa', 'Landlord', 'Jet Ski', 'On Hold',
-    'Internet Celebrity', 'On Hold'
+    'Internet Celebrity', 'On Hold', 'Uncle'
   ].freeze
 
   SOUNDS = %w[
