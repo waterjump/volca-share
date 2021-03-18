@@ -27,7 +27,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     end
 
     it 'leads to the new bass patch page' do
-      click_link 'Make a bass patch with this name'
+      click_link 'Name a bass patch »'
 
       expect(current_path).to eq(new_patch_path)
     end
@@ -35,7 +35,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     it 'prefills the patch name field with generated name' do
       patch_name = find('#name').text
 
-      click_link 'Make a bass patch with this name'
+      click_link 'Name a bass patch »'
 
       expect(find('#patch_name').value).to eq(patch_name)
     end
@@ -51,7 +51,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     end
 
     it 'leads to the new keys patch page' do
-      click_link 'Make a keys patch with this name'
+      click_link 'Name a keys patch »'
 
       expect(current_path).to eq(new_keys_patch_path)
     end
@@ -59,7 +59,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     it 'prefills the patch name field with generated name' do
       patch_name = find('#name').text
 
-      click_link 'Make a keys patch with this name'
+      click_link 'Name a keys patch »'
 
       expect(find('#patch_name').value).to eq(patch_name)
     end
