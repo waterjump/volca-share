@@ -25,6 +25,30 @@ RSpec.describe 'Home page', type: :feature, js: true do
     expect(page).to have_link('Sign Up')
   end
 
+  context 'when patch namer feature is enabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_PATCH_NAMER: 'true' do
+        example.run
+      end
+    end
+
+    it 'shows link to patch namer in header' do
+      expect(page).to have_link('Synth Patch Namer')
+    end
+  end
+
+  context 'when patch namer feature is not enabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_PATCH_NAMER: 'false' do
+        example.run
+      end
+    end
+
+    it 'does not show link to patch namer in header' do
+      expect(page).not_to have_link('Synth Patch Namer')
+    end
+  end
+
   it 'shows link to bass emulator' do
     click_link('Bass')
     expect(page).to have_link('Emulator')
