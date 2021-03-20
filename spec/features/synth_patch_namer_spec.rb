@@ -9,6 +9,13 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
     expect(page).to have_selector('h1', text: 'Synth Patch Namer')
   end
 
+  it 'does not link to itself in the nav bar' do
+    with_modified_env FEATURE_ENABLED_PATCH_NAMER: 'true' do
+      visit synth_patch_namer_path
+      expect(page).to have_link('Synth Patch Namer', href: '#')
+    end
+  end
+
   it 'shows a generated patch name' do
     visit synth_patch_namer_path
 
