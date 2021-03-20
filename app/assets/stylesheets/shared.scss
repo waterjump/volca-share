@@ -112,3 +112,43 @@ a.unstyled {
     border-left: 1px solid #d8d8d8;
   }
 }
+
+/* SYNTH PATCH NAMER begin */
+#synth_patch_namer a {
+  float: left;
+}
+
+.speech {
+  background: #a53d38;
+  border-radius: 6px;
+  color: white;
+  position: relative;
+  float: left;
+  padding: 6px;
+  margin-top: 0.5em;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+@media(min-width: 768px) {
+  .speech {
+    margin-top: 0.8em;
+  }
+}
+
+.speech::after {
+  position: absolute;
+  content: '';
+  border: 7px solid transparent;
+}
+
+.left.speech::after {
+  border-right-color: #a53d38;
+  border-left: 0;
+  left: -7px;
+  top: 50%;
+  margin-top: -7px;
+}
+/* SYNTH PATCH NAMER end */
