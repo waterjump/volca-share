@@ -11,6 +11,7 @@ class PatchNamer
       Second-story Failed Polluted British Hairy Geriatric Minimum\ Wage
       Boring Corporate North\ Korean Sizzling Top\ 10 Pathetic Unauthorized
       Non-Union Double-Glazed Yesterday's Desperate Farty Annoying Tainted
+      Delightful Dainty Atomic
     ].freeze
 
   NOUNS = [
@@ -23,14 +24,14 @@ class PatchNamer
     'Fidget Spinner', 'Gangnam Style', 'Cosby', 'Funeral Home', 'Orthodontist',
     'Deportation', 'Eviction', 'ALF Pog', 'Dumpster', 'Dunning-Kruger', 'Cotton Eye Joe',
     'Hanukkah', 'Christmas', 'Kwanzaa', 'Landlord', 'Jet Ski', 'On Hold',
-    'Internet Celebrity', 'On Hold', 'Uncle'
+    'Internet Celebrity', 'On Hold', 'Uncle', 'Egg'
   ].freeze
 
   SOUNDS = %w[
     Bass Lead FX Drone Notes Thump Notes Noise Rumble Vibes Rhythms Loop Squelch
     Aura Bloops Plonks Donks Buzz Slapper Pad Stabs Rage Whooshes Reese Farts
-    Stab Hit Blast Knocker Bumper Banger Banjo Riser Bomb Chords Bings Pings Muzak
-    Fire Pence\ 2020
+    Stab Hit Blast Knocker Bumper Banger Banjo Riser Bomb Chords Bings Pings Muzak™
+    Fire /\ Pence\ 2020 Boi Wheeze Womps
   ].freeze
 
   SUFFIXES = ['(FINAL)', '(revised)', '(Try #3)', '(Good version)'].freeze
