@@ -28,6 +28,12 @@ $(function() {
               $('a#new_bass_patch').attr('href', `patch/new?name=${urlSafePatchName}`);
               $('a#new_keys_patch').attr('href', `keys/patch/new?name=${urlSafePatchName}`);
               canClick = true;
+              try {
+                ga('send', 'event', 'Synth Patch Namer', 'generate');
+              }
+              catch (err) {
+                console.log('GA not working');
+              }
             }
           });
         }, 800
