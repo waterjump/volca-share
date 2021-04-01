@@ -11,7 +11,7 @@ class PatchNamer
       Second-story Failed Polluted British Hairy Geriatric Minimum\ Wage
       Boring Corporate North\ Korean Sizzling Top\ 10 Pathetic Unauthorized
       Non-Union Double-Glazed Yesterday's Desperate Farty Annoying Tainted
-      Delightful Dainty Atomic
+      Delightful Dainty Atomic Sensitive Rotten Delicate Sweaty
     ].freeze
 
   NOUNS = [
@@ -19,19 +19,19 @@ class PatchNamer
     'Fist', 'Dominatrix', 'Fairy', 'Laundromat',
     'Toilet', 'Truck Stop', 'Burn Ward', 'Tinkle', 'Trash', 'DMV',
     'Bodybuilder', 'COVID', 'Diarrhea', 'Prostitute', 'Divorce Lawyer', 'Dog Show',
-    'Flat Earth Conference', 'Bankruptcy', 'Fyre Fest', 'Nostril', 'Mike Huckabee',
+    'Flat Earth Conference', 'Bankruptcy', 'Fyre Fest', 'Nostril',
     'Motel 6', 'Piss', 'Barf', 'Shart', 'Kindergartner', 'N64', 'Beanie Baby',
     'Fidget Spinner', 'Gangnam Style', 'Cosby', 'Funeral Home', 'Orthodontist',
     'Deportation', 'Eviction', 'ALF Pog', 'Dumpster', 'Dunning-Kruger', 'Cotton Eye Joe',
     'Hanukkah', 'Christmas', 'Kwanzaa', 'Landlord', 'Jet Ski', 'On Hold',
-    'Internet Celebrity', 'On Hold', 'Uncle', 'Egg'
+    'Internet Celebrity', 'On Hold', 'Uncle', 'Egg', 'Tanning Booth'
   ].freeze
 
   SOUNDS = %w[
     Bass Lead FX Drone Notes Thump Notes Noise Rumble Vibes Rhythms Loop Squelch
     Aura Bloops Plonks Donks Buzz Slapper Pad Stabs Rage Whooshes Reese Farts
     Stab Hit Blast Knocker Bumper Banger Banjo Riser Bomb Chords Bings Pings Muzak™
-    Fire /\ Pence\ 2020 Boi Wheeze Womps
+    Fire /\ Pence\ 2020 Boi Wheeze Womps Smooches Beats
   ].freeze
 
   SUFFIXES = ['(FINAL)', '(revised)', '(Try #3)', '(Good version)'].freeze
