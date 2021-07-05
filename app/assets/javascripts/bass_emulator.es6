@@ -79,9 +79,16 @@ VS.BassEmulator = function() {
 
     const defaultVcoAmp = 0.33;
 
+    // Get querystring params
+    let urlParams = new URLSearchParams(window.location.search);
+    let qsOctave = urlParams.get('octave');
+    if (!(qsOctave in octaveMap)) {
+      qsOctave = null;
+    }
+
     const patch = {
       envelope: { attack: 0, decayRelease: 0.05, cutoffEgInt: 0 },
-      octave: 3,
+      octave: parseInt(qsOctave) || 3,
       filter: { cutoff: 20000, peak: 0 },
       lfo: {
         shape: 'triangle',
@@ -314,6 +321,7 @@ VS.BassEmulator = function() {
         }
       });
     }
+    changeOctave();
 
     const keyboardDown = function(){
       keysDown.push(notePlaying);
