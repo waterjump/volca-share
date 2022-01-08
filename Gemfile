@@ -36,6 +36,7 @@ gem 'sendgrid-actionmailer'
 gem 'sinatra', '~> 2.0.2'
 gem 'sprockets', '~> 4.0'
 gem 'uglifier', '>= 1.3.0'
+gem 'websocket-extensions', '>= 0.1.5'
 
 group :development, :test do
   gem 'better_errors'
