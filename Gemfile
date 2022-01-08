@@ -20,7 +20,9 @@ gem 'kaminari-actionview'
 gem 'kaminari-mongoid'
 gem 'loofah', '~> 2.2.3'
 gem 'mongoid'
-gem 'mongoid-simple-tags'
+gem 'mongoid-simple-tags',
+    git: 'https://github.com/simplificator/mongoid-simple-tags.git',
+    ref: '940c575'
 gem 'nokogiri', '>= 1.10.4'
 gem 'rails', '5.1.6.2'
 gem 'rack', '~> 2.1.4'
