@@ -4,6 +4,7 @@ ruby '2.6.5'
 
 source 'https://rubygems.org'
 
+gem 'addressable', '>= 2.8.0'
 gem 'babel-transpiler'
 gem 'bootstrap-sass', '>= 3.4.1'
 gem 'bootstrap-tagsinput-rails'
