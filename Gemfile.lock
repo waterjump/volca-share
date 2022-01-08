@@ -246,7 +246,6 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
-    rdoc (4.3.0)
     recaptcha (4.1.0)
       json
     responders (3.0.0)
@@ -297,9 +296,6 @@ GEM
     sassc (2.0.1)
       ffi (~> 1.9)
       rake
-    sdoc (0.4.2)
-      json (~> 1.7, >= 1.7.7)
-      rdoc (~> 4.0)
     sendgrid-actionmailer (2.0.1)
       mail (~> 2.5)
       sendgrid-ruby (~> 5.2)
@@ -402,7 +398,6 @@ DEPENDENCIES
   rubocop (~> 0.66.0)
   ruby-oembed
   sass-rails (~> 5.0)
-  sdoc (~> 0.4.0)
   sendgrid-actionmailer
   simplecov
   sinatra (~> 2.0.2)
