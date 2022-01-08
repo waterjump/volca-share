@@ -125,7 +125,7 @@ GEM
       factory_bot (~> 4.8.2)
       railties (>= 3.0.0)
     ffaker (2.8.1)
-    ffi (1.9.25)
+    ffi (1.15.4)
     fuubar (2.3.2)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
@@ -374,7 +374,7 @@ DEPENDENCIES
   dotenv-rails
   factory_bot_rails (~> 4.0)
   ffaker
-  ffi (~> 1.9.24)
+  ffi (~> 1.15.4)
   fuubar
   haml-rails
   jbuilder (~> 2.0)
