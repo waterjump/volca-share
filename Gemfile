@@ -67,6 +67,6 @@ end
 
 group :production do
   gem 'bson_ext'
-  gem 'puma', '>= 3.12.5'
+  gem 'puma', '>= 4.3.9'
   gem 'rails_12factor'
 end
