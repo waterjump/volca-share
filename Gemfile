@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '2.6.5'
+ruby '2.7.5'
 
 source 'https://rubygems.org'
 
@@ -31,10 +31,10 @@ gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'rubocop', '~> 0.66.0', require: false
 gem 'ruby-oembed'
-gem 'sass-rails', '~> 5.0'
+gem 'sass-rails'
 gem 'sendgrid-actionmailer'
 gem 'sinatra', '~> 2.0.2'
-gem 'sprockets', '4.0.0.beta8'
+gem 'sprockets', '~> 4.0'
 gem 'uglifier', '>= 1.3.0'
 
 group :development, :test do
