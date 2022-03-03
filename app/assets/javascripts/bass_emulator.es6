@@ -107,8 +107,33 @@ VS.BassEmulator = function() {
           { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
           { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
         ],
-      sustainOn: false
+      sustainOn: false,
+      setcutoff:
+        function(midiValue) {
+          // Note: Curve calculated using audacity data from actual synth, and
+          //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
+          this.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
+        }
     };
+
+    ['cutoff'].forEach(function(qsParam) {
+      console.log(`I'm processing the querystring param for ${qsParam}! :-]`);
+      let rawValue = urlParams.get(qsParam);
+      let parsedValue = parseInt(rawValue);
+      if ( 0 <= parsedValue && parsedValue <= 127) {
+        // set in memory patch value
+        patch[`set${qsParam}`](parsedValue);
+
+        let jElement = $(`#${qsParam}`);
+        jElement.data('midi', parsedValue);
+        // NOTE: It would be great if the knob object handled
+        //  all this stuff in one action.
+        let paramKnob = new VS.Knob(jElement);
+        let degree = paramKnob.degreeForMidi(jElement.data('midi'), 140);
+        jElement.data('rotation', degree);
+        paramKnob.autoRotate(degree);
+      }
+    });
 
     let notePlaying;
     let keysDown = [];
@@ -459,9 +484,7 @@ VS.BassEmulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        // Note: Curve calculated using audacity data from actual synth, and
-        //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
-        patch.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
+        patch.setcutoff(midiValue);
 
         filter.frequency.cancelScheduledValues(0);
         filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
