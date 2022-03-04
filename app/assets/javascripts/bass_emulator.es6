@@ -127,10 +127,26 @@ VS.BassEmulator = function() {
         this.lfo.pitchValue = percentage * 900;
         this.lfo.cutoffValue = percentage**2 * 4800;
         this.lfo.ampValue = percentage;
-      }
+      },
+      setvco_pitch: function(oscNumber, midiValue) {
+        this.vco[oscNumber].pitchMidi = midiValue;
+        this.vco[oscNumber].detune = pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
+      },
+      setvco1_pitch: function(midiValue) {
+        this.setvco_pitch(1, midiValue);
+      },
+      setvco2_pitch: function(midiValue) {
+        this.setvco_pitch(2, midiValue);
+      },
+      setvco3_pitch: function(midiValue) {
+        this.setvco_pitch(3, midiValue);
+      },
     };
 
-    qsKnobs = ['peak', 'cutoff', 'lfo_rate', 'lfo_int'];
+    qsKnobs = [
+      'peak', 'cutoff', 'lfo_rate', 'lfo_int', 'vco1_pitch', 'vco2_pitch',
+      'vco3_pitch'
+    ];
 
     qsKnobs.forEach(function(qsParam) {
       let rawValue = urlParams.get(qsParam);
@@ -568,8 +584,7 @@ VS.BassEmulator = function() {
           midiValue = $(VS.activeKnob.element).data('midi');
           if (midiValue == undefined) { return; }
 
-          patch.vco[oscNumber].pitchMidi = midiValue;
-          patch.vco[oscNumber].detune = pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
+          patch[`setvco${oscNumber}_pitch`](midiValue);
 
           if (osc[oscNumber] !== null) {
             osc[oscNumber].detune.setValueAtTime(
