@@ -115,6 +115,9 @@ VS.BassEmulator = function() {
       setattack: function(midiValue) {
         this.envelope.attack = this.getPercentage(midiValue)**3;
       },
+      setdecay_release: function(midiValue) {
+        this.envelope.decayRelease = 5 * this.getPercentage(midiValue)**3 + 0.05;
+      },
       setpeak: function(midiValue) {
         this.filter.peak = (this.getPercentage(midiValue)**2.5 * 30.0);
       },
@@ -148,8 +151,8 @@ VS.BassEmulator = function() {
     };
 
     qsKnobs = [
-      'attack', 'peak', 'cutoff', 'lfo_rate', 'lfo_int', 'vco1_pitch',
-      'vco2_pitch', 'vco3_pitch'
+      'attack', 'decay_release', 'peak', 'cutoff', 'lfo_rate', 'lfo_int',
+      'vco1_pitch','vco2_pitch', 'vco3_pitch'
     ];
 
     qsKnobs.forEach(function(qsParam) {
@@ -514,8 +517,7 @@ VS.BassEmulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        percentage = midiValue / 127.0;
-        patch.envelope.decayRelease = 5 * percentage**3 + 0.05;
+        patch.setdecay_release(midiValue);
       }
 
       // CUTOFF EG INT
