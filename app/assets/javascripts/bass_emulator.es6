@@ -121,10 +121,16 @@ VS.BassEmulator = function() {
       },
       setlfo_rate: function(midiValue) {
         this.lfo.frequency = (this.getPercentage(midiValue)**3 * 35) + 0.1;
+      },
+      setlfo_int: function(midiValue) {
+        percentage = this.getPercentage(midiValue);
+        this.lfo.pitchValue = percentage * 900;
+        this.lfo.cutoffValue = percentage**2 * 4800;
+        this.lfo.ampValue = percentage;
       }
     };
 
-    qsKnobs = ['peak', 'cutoff', 'lfo_rate'];
+    qsKnobs = ['peak', 'cutoff', 'lfo_rate', 'lfo_int'];
 
     qsKnobs.forEach(function(qsParam) {
       let rawValue = urlParams.get(qsParam);
@@ -184,10 +190,28 @@ VS.BassEmulator = function() {
     let osc = [null, null, null, null];
 
     const ampLfoPitch = audioCtx.createGain()
-    ampLfoPitch.gain.value = 0;
+    const setAmpLfoPitchGain = function() {
+      if (patch.lfo.targetPitch) {
+        // Affect pitch
+        ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+      } else {
+        // Do not affect pitch
+        ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+    }
+    setAmpLfoPitchGain();
 
     const ampLfoCutoff = audioCtx.createGain()
-    ampLfoCutoff.gain.value = 0;
+    const setAmpLfoCutoffGain = function() {
+      if (patch.lfo.targetCutoff) {
+        // Affect filter cutoff
+        ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
+      } else {
+        // Do not affect filter cutoff
+        ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+    }
+    setAmpLfoCutoffGain();
     ampLfoCutoff.connect(filter.detune);
 
     // Creates a curve that goes from -1, -1 to 1, 0.
@@ -205,7 +229,16 @@ VS.BassEmulator = function() {
     lfoAmpWaveShaper.curve = makeLfoAmpCurve();
 
     const ampLfoAmp = audioCtx.createGain()
-    ampLfoAmp.gain.value = 0;
+    const setAmpLfoAmpGain = function() {
+      if (patch.lfo.targetAmp) {
+        // Affect amp
+        ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
+      } else {
+        // Do not affect amp
+        ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
+    }
+    setAmpLfoAmpGain();
 
     lfoAmpWaveShaper.connect(ampLfoAmp);
     ampLfoAmp.connect(preAmp.gain);
@@ -513,11 +546,9 @@ VS.BassEmulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        percentage = midiValue / 127.0;
-        patch.lfo.pitchValue = percentage * 900;
-        patch.lfo.cutoffValue = percentage**2 * 4800;
-        patch.lfo.ampValue = percentage;
+        patch.setlfo_int(midiValue);
 
+        // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
         if (patch.lfo.targetPitch) {
           ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
         }
@@ -579,37 +610,19 @@ VS.BassEmulator = function() {
     // LFO TARGET AMP
     $('label[for="patch_lfo_target_amp"]').on('click tap', function() {
       patch.lfo.targetAmp = !patch.lfo.targetAmp;
-      if (patch.lfo.targetAmp) {
-        // Affect amp
-        ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
-      } else {
-        // Do not affect amp
-        ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      }
+      setAmpLfoAmpGain();
     });
 
     // LFO TARGET PITCH
     $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
       patch.lfo.targetPitch = !patch.lfo.targetPitch;
-      if (patch.lfo.targetPitch) {
-        // Affect pitch
-        ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-      } else {
-        // Do not affect pitch
-        ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
-      }
+      setAmpLfoPitchGain();
     });
 
     // LFO TARGET CUTOFF
     $('label[for="patch_lfo_target_cutoff"]').on('click tap', function() {
       patch.lfo.targetCutoff = !patch.lfo.targetCutoff;
-      if (patch.lfo.targetCutoff) {
-        // Affect filter cutoff
-        ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
-      } else {
-        // Do not affect filter cutoff
-        ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
-      }
+      setAmpLfoCutoffGain();
     });
 
     // LFO WAVE
