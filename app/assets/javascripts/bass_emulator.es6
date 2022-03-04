@@ -108,16 +108,18 @@ VS.BassEmulator = function() {
           { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
         ],
       sustainOn: false,
-      setcutoff:
-        function(midiValue) {
-          // Note: Curve calculated using audacity data from actual synth, and
-          //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
-          this.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
-        }
+      setpeak: function(midiValue) {
+        percentage = midiValue / 127.0;
+        this.filter.peak = (percentage**2.5 * 30.0);
+      },
+      setcutoff: function(midiValue) {
+        // Note: Curve calculated using audacity data from actual synth, and
+        //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
+        this.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
+      }
     };
 
-    ['cutoff'].forEach(function(qsParam) {
-      console.log(`I'm processing the querystring param for ${qsParam}! :-]`);
+    ['peak', 'cutoff'].forEach(function(qsParam) {
       let rawValue = urlParams.get(qsParam);
       let parsedValue = parseInt(rawValue);
       if ( 0 <= parsedValue && parsedValue <= 127) {
@@ -473,8 +475,7 @@ VS.BassEmulator = function() {
         midiValue = $(VS.activeKnob.element).data('trueMidi');
         if (midiValue == undefined) { return; }
 
-        percentage = midiValue / 127.0;
-        patch.filter.peak = (percentage**2.5 * 30.0);
+        patch.setpeak(midiValue);
 
         filter.Q.value = patch.filter.peak;
       }
