@@ -236,15 +236,10 @@ VS.BassEmulator = function() {
     if (['triangle', 'square'].includes(rawValue)) {
       patch.setlfo_wave(rawValue);
 
-      // TODO: Use volcaInterface.lightAndCheck, etc.
-      let light = $(`#lfo_wave_light`);
-      let checkbox = $(`input#patch_lfo_wave`)
-      if (rawValue == 'triangle') {
-        if (light.hasClass('lit')) { light.toggleClass('lit') }
-        if (checkbox.prop('checked')) { checkbox.prop('checked', false) }
-      } else if (rawValue == 'square') {
-        if (!(light.hasClass('lit'))) { light.toggleClass('lit') }
-        if (!(checkbox.prop('checked'))) { checkbox.prop('checked', true) }
+      if (rawValue == 'square') {
+        volcaInterface.lightAndCheck('lfo_wave');
+      } else {
+        volcaInterface.unlightAndUncheck('lfo_wave');
       }
     }
 
@@ -256,14 +251,10 @@ VS.BassEmulator = function() {
       if (['square', 'sawtooth'].includes(rawValue)) {
         patch[`set${qsParam}`](rawValue);
 
-        let light = $(`#${qsParam}_light`);
-        let checkbox = $(`input#patch_${qsParam}`)
-        if (rawValue == 'sawtooth') {
-          if (light.hasClass('lit')) { light.toggleClass('lit') }
-          if (checkbox.prop('checked')) { checkbox.prop('checked', false) }
-        } else if (rawValue == 'square') {
-          if (!(light.hasClass('lit'))) { light.toggleClass('lit') }
-          if (!(checkbox.prop('checked'))) { checkbox.prop('checked', true) }
+        if (rawValue == 'square') {
+          volcaInterface.lightAndCheck(qsParam);
+        } else {
+          volcaInterface.unlightAndUncheck(qsParam);
         }
       }
     });
