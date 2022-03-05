@@ -105,7 +105,7 @@ module VolcaShare
           attack: patch.attack,
           decay_release: patch.decay_release,
           cutoff_eg_int: patch.cutoff_eg_int,
-          # octave:
+          octave: patch.octave,
           peak: patch.peak,
           cutoff: patch.cutoff,
           lfo_rate: patch.lfo_rate,

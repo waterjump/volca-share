@@ -25,6 +25,7 @@ VS.BassEmulator = function() {
       76: 293.66  // D
     }
 
+    // Key is vco pitch MIDI value.  Value is detune value in semitones.
     const pitchMap = {
        0: -12,    1: -12,    2: -11,    3: -10,    4: -9,     5: -8,     6: -7,     7: -6,     8: -5,     9: -4,
       10: -3,    11: -2,    12: -1,    13: -0.96, 14: -0.92, 15: -0.88, 16: -0.84, 17: -0.80, 18: -0.78, 19: -0.76,
@@ -44,9 +45,6 @@ VS.BassEmulator = function() {
     const zKeyCode = 90;
     const xKeyCode = 88;
 
-    // TODO: Limit octave range to physical machine range so we can pass
-    //   midi values (0-127) from actual patches instead of octave numbber in
-    //   the query string params.
     const octaveMap = {
       "-1": { displayNumber: 8, frequencyFactor: 0.0625 },
       0: { displayNumber: 9, frequencyFactor: 0.125 },
@@ -84,16 +82,9 @@ VS.BassEmulator = function() {
 
     const defaultVcoAmp = 0.33;
 
-    // Get querystring params
-    let urlParams = new URLSearchParams(window.location.search);
-    let qsOctave = urlParams.get('octave');
-    if (!(qsOctave in octaveMap)) {
-      qsOctave = null;
-    }
-
     const patch = {
       envelope: { attack: 0, decayRelease: 0.05, cutoffEgInt: 0 },
-      octave: parseInt(qsOctave) || 3,
+      octave: 3,
       filter: { cutoff: 20000, peak: 0 },
       lfo: {
         shape: 'triangle',
@@ -125,6 +116,9 @@ VS.BassEmulator = function() {
       },
       setcutoff_eg_int: function(midiValue) {
         this.envelope.cutoffEgInt = this.getPercentage(midiValue)**2 * 10000;
+      },
+      setoctave: function(midiValue) {
+        this.octave = parseInt(VS.display.octaveString(midiValue)[3]);
       },
       setpeak: function(midiValue) {
         this.filter.peak = (this.getPercentage(midiValue)**2.5 * 30.0);
@@ -213,9 +207,16 @@ VS.BassEmulator = function() {
       }
     }
 
+    // TODO: Put this in a class?
+    // ==============================
+    // Accept query string parameters
+    // ==============================
+
+    let urlParams = new URLSearchParams(window.location.search);
+
     qsKnobs = [
-      'attack', 'decay_release', 'cutoff_eg_int', 'peak', 'cutoff', 'lfo_rate',
-      'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch'
+      'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
+      'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch'
     ];
 
     qsKnobs.forEach(function(qsParam) {
@@ -309,6 +310,10 @@ VS.BassEmulator = function() {
         }
       }
     });
+
+    // =======================
+    // END query string params
+    // =======================
 
 
 

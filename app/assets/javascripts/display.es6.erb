@@ -86,6 +86,8 @@ VS.Display = function(element) {
   };
 
   this.noteString = function(value) {
+    // NOTE: Values are NOTE midi values, not octave knob midi values.
+    //   E.g. - 0 is lowest musical note, 127 is highest.
     let ones = undefined;
     const thousands = 'o';
     const hundreds = 'c';

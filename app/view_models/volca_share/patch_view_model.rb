@@ -30,7 +30,7 @@ module VolcaShare
         attack: attack,
         decay_release: decay_release,
         cutoff_eg_int: cutoff_eg_int,
-        # octave:
+        octave: octave,
         peak: peak,
         cutoff: cutoff,
         lfo_rate: lfo_rate,
