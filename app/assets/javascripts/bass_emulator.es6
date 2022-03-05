@@ -156,6 +156,22 @@ VS.BassEmulator = function() {
       setvco3_pitch: function(midiValue) {
         this.setvco_pitch(3, midiValue);
       },
+      setvco_active: function(oscNumber, value) {
+        if (value === 'true') {
+          this.vco[oscNumber].amp = defaultVcoAmp;
+        } else {
+          this.vco[oscNumber].amp = 0;
+        }
+      },
+      setvco1_active: function(value) {
+        this.setvco_active(1, value);
+      },
+      setvco2_active: function(value) {
+        this.setvco_active(2, value);
+      },
+      setvco3_active: function(value) {
+        this.setvco_active(3, value);
+      },
       setlfo_target_amp: function(value) {
         this.lfo.targetAmp = (value === 'true');
       },
@@ -218,6 +234,37 @@ VS.BassEmulator = function() {
         paramKnob.autoRotate(degree);
       }
     });
+
+    let qsVcoActiveParams = ['vco1_active', 'vco2_active', 'vco3_active'];
+
+    qsVcoActiveParams.forEach(function(qsParam) {
+      let rawValue = urlParams.get(qsParam);
+      if (['true', 'false'].includes(rawValue)) {
+        patch[`set${qsParam}`](rawValue);
+
+        // NOTE: Might be able to trigger the event in form.es6 if it differs
+        //   from default.  That way the data attributes and css classes will
+        //   be handled there and I can removed a lot of this stuff.  Maybe.
+        let button = $(`#${qsParam}_button`);
+        let vcoKnob = function() {
+          let number = qsParam.charAt(3);
+          return $(`#vco${number}_pitch`);
+        }();
+
+        button.data('active', (rawValue === 'true'));
+
+        if (rawValue === 'true') {
+          if (!(button.hasClass('lit'))) { button.toggleClass('lit') }
+          if (!(vcoKnob.hasClass('lit'))) { vcoKnob.toggleClass('lit') }
+          if (vcoKnob.hasClass('unlit')) { vcoKnob.toggleClass('unlit') }
+        } else {
+          if (button.hasClass('lit')) { button.toggleClass('lit') }
+          if (vcoKnob.hasClass('lit')) { vcoKnob.toggleClass('lit') }
+          if (!(vcoKnob.hasClass('unlit'))) { vcoKnob.toggleClass('unlit') }
+        }
+      }
+    });
+
 
     let qsBooleanParameters = [
       'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on'
