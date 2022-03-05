@@ -156,6 +156,15 @@ VS.BassEmulator = function() {
       setvco3_pitch: function(midiValue) {
         this.setvco_pitch(3, midiValue);
       },
+      setlfo_target_amp: function(value) {
+        this.lfo.targetAmp = (value === 'true');
+      },
+      setlfo_target_pitch: function(value) {
+        this.lfo.targetPitch = (value === 'true');
+      },
+      setlfo_target_cutoff: function(value) {
+        this.lfo.targetCutoff = (value === 'true');
+      },
       setlfo_wave: function(shape) {
         this.lfo.shape = shape;
       },
@@ -169,6 +178,21 @@ VS.BassEmulator = function() {
         this.vco[3].shape = shape;
       }
     };
+
+    const volcaInterface = {
+      lightAndCheck: function(paramName) {
+        let light = $(`#${paramName}_light`);
+        let checkbox = $(`input#patch_${paramName}`)
+        if (!(light.hasClass('lit'))) { light.toggleClass('lit') }
+        if (!(checkbox.prop('checked'))) { checkbox.prop('checked', true) }
+      },
+      unlightAndUncheck: function(paramName) {
+        let light = $(`#${paramName}_light`);
+        let checkbox = $(`input#patch_${paramName}`)
+        if (light.hasClass('lit')) { light.toggleClass('lit') }
+        if (checkbox.prop('checked')) { checkbox.prop('checked', false) }
+      }
+    }
 
     qsKnobs = [
       'attack', 'decay_release', 'cutoff_eg_int', 'peak', 'cutoff', 'lfo_rate',
@@ -193,11 +217,26 @@ VS.BassEmulator = function() {
       }
     });
 
+    let lfoTargets = ['lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff'];
+    lfoTargets.forEach(function(qsParam) {
+      let rawValue = urlParams.get(qsParam);
+      if (['true', 'false'].includes(rawValue)) {
+        patch[`set${qsParam}`](rawValue);
+
+        if (rawValue === 'true') {
+          volcaInterface.lightAndCheck(qsParam);
+        } else {
+          volcaInterface.unlightAndUncheck(qsParam);
+        }
+      }
+    });
+
     // LFO wave from query string
     let rawValue = urlParams.get('lfo_wave')
     if (['triangle', 'square'].includes(rawValue)) {
       patch.setlfo_wave(rawValue);
 
+      // TODO: Use volcaInterface.lightAndCheck, etc.
       let light = $(`#lfo_wave_light`);
       let checkbox = $(`input#patch_lfo_wave`)
       if (rawValue == 'triangle') {
