@@ -1,4 +1,6 @@
 VS.BassEmulator = function() {
+  // NOTE: Logic within this p5 constructor can't be tested in rspec because
+  //   headless browser doesn't seem to support it.  :-[
   const myp = new p5(function(p) {
 
     // =====================
@@ -42,6 +44,9 @@ VS.BassEmulator = function() {
     const zKeyCode = 90;
     const xKeyCode = 88;
 
+    // TODO: Limit octave range to physical machine range so we can pass
+    //   midi values (0-127) from actual patches instead of octave numbber in
+    //   the query string params.
     const octaveMap = {
       "-1": { displayNumber: 8, frequencyFactor: 0.0625 },
       0: { displayNumber: 9, frequencyFactor: 0.125 },
@@ -151,6 +156,15 @@ VS.BassEmulator = function() {
       setvco3_pitch: function(midiValue) {
         this.setvco_pitch(3, midiValue);
       },
+      setvco1_wave: function(shape) {
+        this.vco[1].shape = shape;
+      },
+      setvco2_wave: function(shape) {
+        this.vco[2].shape = shape;
+      },
+      setvco3_wave: function(shape) {
+        this.vco[3].shape = shape;
+      }
     };
 
     qsKnobs = [
@@ -173,6 +187,26 @@ VS.BassEmulator = function() {
         let degree = paramKnob.degreeForMidi(jElement.data('midi'), 140);
         jElement.data('rotation', degree);
         paramKnob.autoRotate(degree);
+      }
+    });
+
+    qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
+
+    qsVcoWaves.forEach(function(qsParam) {
+      let rawValue = urlParams.get(qsParam);
+
+      if (['square', 'sawtooth'].includes(rawValue)) {
+        patch[`set${qsParam}`](rawValue);
+
+        let light = $(`#${qsParam}_light`);
+        let checkbox = $(`input#patch_${qsParam}`)
+        if (rawValue == 'sawtooth') {
+          if (light.hasClass('lit')) { light.toggleClass('lit') }
+          if (checkbox.prop('checked')) { checkbox.prop('checked', false) }
+        } else if (rawValue == 'square') {
+          if (!(light.hasClass('lit'))) { light.toggleClass('lit') }
+          if (!(checkbox.prop('checked'))) { checkbox.prop('checked', true) }
+        }
       }
     });
 
