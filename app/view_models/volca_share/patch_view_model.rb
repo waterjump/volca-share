@@ -24,5 +24,32 @@ module VolcaShare
     def show_midi_only_knobs?
       slide_time != 63 || expression != 127 || gate_time != 127
     end
+
+    def emulator_query_string
+      {
+        attack: attack,
+        decay_release: decay_release,
+        cutoff_eg_int: cutoff_eg_int,
+        # octave:
+        peak: peak,
+        cutoff: cutoff,
+        lfo_rate: lfo_rate,
+        lfo_int: lfo_int,
+        vco1_pitch: vco1_pitch,
+        vco2_pitch: vco2_pitch,
+        vco3_pitch: vco3_pitch,
+        vco1_active: vco1_active,
+        vco2_active: vco2_active,
+        vco3_active: vco3_active,
+        lfo_target_amp: lfo_target_amp,
+        lfo_target_pitch: lfo_target_pitch,
+        lfo_target_cutoff: lfo_target_cutoff,
+        lfo_wave: lfo_wave ? 'square' : 'triangle',
+        vco1_wave: vco1_wave ? 'square' : 'sawtooth',
+        vco2_wave: vco2_wave ? 'square' : 'sawtooth',
+        vco3_wave: vco3_wave ? 'square' : 'sawtooth',
+        sustain_on: sustain_on
+      }
+    end
   end
 end

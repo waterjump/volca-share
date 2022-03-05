@@ -123,6 +123,11 @@
             .notch
 
   .mb-3
+
+    -# TODO: Enable emulation link when the time comes. :-]
+      .h3
+        = link_to 'Emulation (experimental)',
+                  bass_emulator_path(@patch.emulator_query_string)
     = render 'shared/midi_button', button_text: 'Send this patch to your Volca', new_form: false
 
   - if @patch.tags.any?

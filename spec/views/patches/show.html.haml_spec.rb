@@ -34,6 +34,15 @@ RSpec.describe 'patches/show.html.haml', type: :view do
     it 'shows link to author profile page' do
       expect(rendered).to have_link(@patch.user.username, href: user_path(user.slug))
     end
+
+    xit 'shows a link to emulator preview' do
+      expect(rendered).to(
+        have_link(
+          'Emulation (experimental)',
+          href: bass_emulator_path(@patch.emulator_query_string)
+        )
+      )
+    end
   end
 
   context 'when user is logged in' do
