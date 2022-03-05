@@ -176,6 +176,9 @@ VS.BassEmulator = function() {
       },
       setvco3_wave: function(shape) {
         this.vco[3].shape = shape;
+      },
+      setsustain_on: function(value) {
+        this.sustainOn = (value === 'true')
       }
     };
 
@@ -203,7 +206,6 @@ VS.BassEmulator = function() {
       let rawValue = urlParams.get(qsParam);
       let parsedValue = parseInt(rawValue);
       if ( 0 <= parsedValue && parsedValue <= 127) {
-        // set in memory patch value
         patch[`set${qsParam}`](parsedValue);
 
         let jElement = $(`#${qsParam}`);
@@ -217,8 +219,10 @@ VS.BassEmulator = function() {
       }
     });
 
-    let lfoTargets = ['lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff'];
-    lfoTargets.forEach(function(qsParam) {
+    let qsBooleanParameters = [
+      'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on'
+    ];
+    qsBooleanParameters.forEach(function(qsParam) {
       let rawValue = urlParams.get(qsParam);
       if (['true', 'false'].includes(rawValue)) {
         patch[`set${qsParam}`](rawValue);
