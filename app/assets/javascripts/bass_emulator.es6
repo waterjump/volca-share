@@ -156,6 +156,9 @@ VS.BassEmulator = function() {
       setvco3_pitch: function(midiValue) {
         this.setvco_pitch(3, midiValue);
       },
+      setlfo_wave: function(shape) {
+        this.lfo.shape = shape;
+      },
       setvco1_wave: function(shape) {
         this.vco[1].shape = shape;
       },
@@ -190,6 +193,22 @@ VS.BassEmulator = function() {
       }
     });
 
+    // LFO wave from query string
+    let rawValue = urlParams.get('lfo_wave')
+    if (['triangle', 'square'].includes(rawValue)) {
+      patch.setlfo_wave(rawValue);
+
+      let light = $(`#lfo_wave_light`);
+      let checkbox = $(`input#patch_lfo_wave`)
+      if (rawValue == 'triangle') {
+        if (light.hasClass('lit')) { light.toggleClass('lit') }
+        if (checkbox.prop('checked')) { checkbox.prop('checked', false) }
+      } else if (rawValue == 'square') {
+        if (!(light.hasClass('lit'))) { light.toggleClass('lit') }
+        if (!(checkbox.prop('checked'))) { checkbox.prop('checked', true) }
+      }
+    }
+
     qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
 
     qsVcoWaves.forEach(function(qsParam) {
@@ -209,6 +228,8 @@ VS.BassEmulator = function() {
         }
       }
     });
+
+
 
     let notePlaying;
     let keysDown = [];
@@ -687,9 +708,9 @@ VS.BassEmulator = function() {
     // LFO WAVE
     $('label[for="patch_lfo_wave"]').on('click tap', function() {
        if (patch.lfo.shape == 'triangle') {
-         patch.lfo.shape = 'square';
+         patch.setlfo_wave('square');
        } else {
-         patch.lfo.shape = 'triangle';
+         patch.setlfo_wave('triangle');
       }
       oscLfo.type = patch.lfo.shape;
     });
