@@ -43,5 +43,7 @@ $(function() {
   $('#permalink-link').on('click tap', function() {
     let queryString = permalinkQueryString();
     window.history.replaceState({}, '', `${location.pathname}?${queryString}`);
+    $('#green-check-mark').show();
+    $('#green-check-mark').fadeOut(1000);
   });
 });
