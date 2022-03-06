@@ -37,17 +37,11 @@ $(function() {
         checkbox.prop('checked') ? 'square' : 'sawtooth';
     });
 
-    return Object.entries(result).map(param => param.join('=')).join('&amp;');
+    return Object.entries(result).map(param => param.join('=')).join('&');
   }
 
   $('#permalink-link').on('click tap', function() {
-    $('#permalink-value').removeClass('hidden');
-
-    let host = window.location.origin;
-    let pathname = window.location.pathname;
     let queryString = permalinkQueryString();
-    let url = `${host}${pathname}?${queryString}`;
-
-    $('#permalink-value').html(url);
+    window.history.replaceState({}, '', `${location.pathname}?${queryString}`);
   });
 });
