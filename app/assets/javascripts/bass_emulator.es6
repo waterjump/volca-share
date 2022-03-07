@@ -225,14 +225,7 @@ VS.BassEmulator = function() {
       if ( 0 <= parsedValue && parsedValue <= 127) {
         patch[`set${qsParam}`](parsedValue);
 
-        let jElement = $(`#${qsParam}`);
-        jElement.data('midi', parsedValue);
-        // NOTE: It would be great if the knob object handled
-        //  all this stuff in one action.
-        let paramKnob = new VS.Knob(jElement);
-        let degree = paramKnob.degreeForMidi(jElement.data('midi'), 140);
-        jElement.data('rotation', degree);
-        paramKnob.autoRotate(degree);
+        new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
       }
     });
 
@@ -536,12 +529,7 @@ VS.BassEmulator = function() {
       VS.display.update(octaveMap[patch.octave].displayNumber, 'noteString');
 
       // Turn octave knob
-      jOctave = $('#octave');
-      jOctave.data('midi', octaveKnobMidiMap[patch.octave]);
-      let octaveKnob = new VS.Knob(jOctave);
-      let degree = octaveKnob.degreeForMidi(jOctave.data('midi'), 140);
-      jOctave.data('rotation', degree);
-      octaveKnob.autoRotate(degree);
+      new VS.Knob($('#octave')).setKnob(octaveKnobMidiMap[patch.octave]);
 
       osc.forEach(function(oscillator, oscNumber) {
         if (oscillator !== null) {

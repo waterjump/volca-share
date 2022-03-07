@@ -1,6 +1,7 @@
 VS.Knob = function(element) {
   const scope = this;
   this.element = element;
+  this.jElement = $(this.element);
   this.midi = $(this.element).data('midi');
   this.rotation = $(this.element).data('rotation') || 0;
   this.displayStyle = 'midiString';
@@ -70,5 +71,12 @@ VS.Knob = function(element) {
   }
     );
     <% end %>
+  };
+
+  this.setKnob = function(midiValue) {
+    this.jElement.data('midi', midiValue);
+    let degree = this.degreeForMidi(midiValue, 140);
+    this.jElement.data('rotation', degree);
+    this.autoRotate(degree)
   };
 };

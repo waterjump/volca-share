@@ -16,10 +16,7 @@ VS.Form = function() {
 
   const rotateKnobs = function() {
     $('.knob').each(function() {
-      const myKnob = new VS.Knob(this);
-      const degree = myKnob.degreeForMidi($(this).data('midi'), limit);
-      $(this).data('rotation', degree);
-      myKnob.autoRotate(degree);
+      new VS.Knob(this).setKnob($(this).data('midi'));
     });
   };
 
@@ -51,10 +48,7 @@ VS.Form = function() {
       }
 
       const myKnob = new VS.Knob(knob);
-      const degree = myKnob.degreeForMidi(randomValue, limit);
-      knob.data('rotation', degree);
-      knob.data('midi', randomValue);
-      myKnob.autoRotate(degree);
+      myKnob.setKnob(randomValue);
       myKnob.inputElement.val(randomValue);
     };
 
