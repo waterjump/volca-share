@@ -1,38 +1,37 @@
 VS.Knob = function(element) {
-  const scope = this;
   this.element = element;
   this.jElement = $(this.element);
-  this.midi = $(this.element).data('midi');
-  this.rotation = $(this.element).data('rotation') || 0;
+  this.midi = this.jElement.data('midi');
+  this.rotation = this.jElement.data('rotation') || 0;
   this.displayStyle = 'midiString';
-  this.inputElement = $(`input#patch_${$(this.element).attr('id')}`);
+  this.inputElement = $(`input#patch_${this.jElement.attr('id')}`);
 
-  const setLimits = function() {
-    if ($(scope.element).hasClass('dark')) {
-      scope.leftLimit = -90;
-      scope.rightLimit = 60;
+  this.setLimits = function() {
+    if (this.jElement.hasClass('dark')) {
+      this.leftLimit = -90;
+      this.rightLimit = 60;
     } else {
-      scope.leftLimit = -140;
-      scope.rightLimit = 140;
-    }
-  }
-
-  setLimits();
-
-  const setDisplayStyle = function() {
-    if ($(scope.element).attr('id').split('_')[1] === 'pitch') {
-      if ($('.volca.keys').length == 0) {
-        scope.displayStyle = 'pitchString';
-      }
-    } else if ($(scope.element).attr('id') === 'octave') {
-      scope.displayStyle = 'octaveString';
+      this.leftLimit = -140;
+      this.rightLimit = 140;
     }
   };
 
-  setDisplayStyle();
+  this.setLimits();
+
+  this.setDisplayStyle = function() {
+    if (this.jElement.attr('id').split('_')[1] === 'pitch') {
+      if ($('.volca.keys').length == 0) {
+        this.displayStyle = 'pitchString';
+      }
+    } else if (this.jElement.attr('id') === 'octave') {
+      this.displayStyle = 'octaveString';
+    }
+  };
+
+  this.setDisplayStyle();
 
   this.rotate = function(degree) {
-    const knob = $(this.element);
+    const knob = this.jElement;
     knob.css('-moz-transform', `rotate(${degree}deg)`);
     knob.css('-moz-transform-origin', '50% 50%');
     knob.css('-webkit-transform', `rotate(${degree}deg)`);
@@ -44,7 +43,7 @@ VS.Knob = function(element) {
   };
 
   this.degreeForMidi = function(midi, limit) {
-    if ($(scope.element).hasClass('dark')) {
+    if (this.jElement.hasClass('dark')) {
       midiToAngleMap = {
         '10': -90,
         '30': -60,
@@ -61,12 +60,13 @@ VS.Knob = function(element) {
   };
 
   this.autoRotate = function(d) {
+    const scope = this;
     <% if Rails.env.test? %>
-    $(scope.element).css({transform: `rotate(${d}deg)`});
+    this.jElement.css({transform: `rotate(${d}deg)`});
     <% else %>
     const currentRotation = parseInt(this.rotation);
     $({deg: currentRotation}).animate({ deg: d }, { step(now, fx) {
-      $(scope.element).css({transform: `rotate(${now}deg)`});
+      scope.jElement.css({transform: `rotate(${now}deg)`});
     }
   }
     );
