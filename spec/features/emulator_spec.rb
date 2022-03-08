@@ -18,5 +18,21 @@ RSpec.describe 'Volca Bass Emulator', type: :feature  do
 
       reflects_patch(patch, skip_midi: true, form: true)
     end
+
+    context 'when mobile version link is clicked' do
+      it 'does not reset the patch' do
+        visit bass_emulator_path(patch.emulator_query_string)
+        click_link('mobile version')
+
+        expect(page).to(
+          have_current_path(
+            bass_emulator_path(patch.emulator_query_string)
+          )
+        )
+
+        reflects_patch(patch, skip_midi: true, form: true)
+        expect(page).to have_link('Back to desktop mode')
+      end
+    end
   end
 end
