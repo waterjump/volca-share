@@ -855,4 +855,18 @@ VS.BassEmulator = function() {
   $('#octave').mouseleave(function() {
     $('.cooltip').hide();
   });
+
+  $('#toggle-mobile').on('click tap', function(e) {
+    e.preventDefault();
+    $('#mobile-keyboard').removeClass('hidden');
+    $('#back-to-desktop').removeClass('hidden');
+    $('#desktop-instructions').hide();
+  })
+
+  $('#back-to-desktop a').on('click tap', function(e) {
+    e.preventDefault();
+    $('#mobile-keyboard').addClass('hidden');
+    $('#back-to-desktop').addClass('hidden');
+    $('#desktop-instructions').show();
+  })
 };
