@@ -116,6 +116,7 @@ module VolcaShare
           vco1_active: patch.vco1_active,
           vco2_active: patch.vco2_active,
           vco3_active: patch.vco3_active,
+          vco_group: patch.vco_group,
           lfo_target_amp: patch.lfo_target_amp,
           lfo_target_pitch: patch.lfo_target_pitch,
           lfo_target_cutoff: patch.lfo_target_cutoff,
@@ -123,7 +124,8 @@ module VolcaShare
           vco1_wave: patch.vco1_wave ? 'square' : 'sawtooth',
           vco2_wave: patch.vco2_wave ? 'square' : 'sawtooth',
           vco3_wave: patch.vco3_wave ? 'square' : 'sawtooth',
-          sustain_on: patch.sustain_on
+          sustain_on: patch.sustain_on,
+          amp_eg_on: patch.amp_eg_on
         }
 
         expect(subject.emulator_query_string).to eq(query_string)
