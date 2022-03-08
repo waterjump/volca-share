@@ -9,4 +9,14 @@ RSpec.describe 'Volca Bass Emulator', type: :feature  do
     expect(page).to have_content('Emulator')
     expect(page).to have_css('.volca.bass.emulator')
   end
+
+  context 'when query string parameters are passed', js: true do
+    let(:patch) { VolcaShare::PatchViewModel.wrap(create(:patch)) }
+
+    it 'reflects the query string parameters' do
+      visit bass_emulator_path(patch.emulator_query_string)
+
+      reflects_patch(patch, skip_midi: true, form: true)
+    end
+  end
 end

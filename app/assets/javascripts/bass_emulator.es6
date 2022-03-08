@@ -240,7 +240,7 @@ VS.BassEmulator = function() {
 
   qsVcoActiveParams.forEach(function(qsParam) {
     let rawValue = urlParams.get(qsParam);
-    if (['true', 'false'].includes(rawValue)) {
+    if (['true', 'false'].indexOf(rawValue) !== -1) {
       patch[`set${qsParam}`](rawValue);
 
       // NOTE: Might be able to trigger the event in form.es6 if it differs
@@ -272,7 +272,7 @@ VS.BassEmulator = function() {
   ];
   qsBooleanParameters.forEach(function(qsParam) {
     let rawValue = urlParams.get(qsParam);
-    if (['true', 'false'].includes(rawValue)) {
+    if (['true', 'false'].indexOf(rawValue) !== -1) {
       patch[`set${qsParam}`](rawValue);
 
       if (rawValue === 'true') {
@@ -284,8 +284,8 @@ VS.BassEmulator = function() {
   });
 
   // LFO wave from query string
-  let rawValue = urlParams.get('lfo_wave')
-  if (['triangle', 'square'].includes(rawValue)) {
+  let rawValue = urlParams.get('lfo_wave');
+  if (['triangle', 'square'].indexOf(rawValue) !== -1) {
     patch.setlfo_wave(rawValue);
 
     if (rawValue == 'square') {
@@ -295,12 +295,35 @@ VS.BassEmulator = function() {
     }
   }
 
+  let vcoGroupParam = urlParams.get('vco_group');
+  if (['one', 'two', 'three'].indexOf(vcoGroupParam) !== -1) {
+    // TODO: Set vco group on patch object when it is supported
+
+    $('.light[data-radio]').each(function() {
+      $(this).removeClass('lit');
+      $(`:radio[value=${vcoGroupParam}]`).prop('checked', false);
+    });
+    $(`:radio[value=${vcoGroupParam}]`).prop('checked', true);
+    $(`label[for="patch_vco_group_${vcoGroupParam}"]`).find('span .light').addClass('lit');
+  }
+
+  let ampEgOnParam = urlParams.get('amp_eg_on');
+  if (['true', 'false'].indexOf(ampEgOnParam) !== -1) {
+    // TODO: Set amp_eg_on on patch object when it is supported.
+
+    if (ampEgOnParam == 'true') {
+      volcaInterface.lightAndCheck('amp_eg_on');
+    } else {
+      volcaInterface.unlightAndUncheck('amp_eg_on');
+    }
+  }
+
   qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
 
   qsVcoWaves.forEach(function(qsParam) {
     let rawValue = urlParams.get(qsParam);
 
-    if (['square', 'sawtooth'].includes(rawValue)) {
+    if (['square', 'sawtooth'].indexOf(rawValue) !== -1) {
       patch[`set${qsParam}`](rawValue);
 
       if (rawValue == 'square') {
@@ -315,12 +338,9 @@ VS.BassEmulator = function() {
   // END query string params
   // =======================
 
-
-
   let notePlaying;
   let keysDown = [];
   const builtInDecay = 0.1;
-
 
   // =====================================
   // Setup web audio nodes (from here down)
@@ -597,36 +617,6 @@ VS.BassEmulator = function() {
     keyboardUp();
   };
 
-  // TOOLTIPS
-  const itemsComingSoon = [
-    'label[for="patch_vco_group_one"]',
-    'label[for="patch_vco_group_two"]',
-    'label[for="patch_amp_eg_on"]'
-  ];
-
-  itemsComingSoon.forEach(function(selector) {
-    $(selector).mouseenter(function() {
-      if (VS.dragging) { return; }
-      $('.cooltip').text("Coming soon!");
-      $('.cooltip').show();
-    });
-  });
-
-  itemsComingSoon.forEach(function(selector) {
-    $(selector).mouseleave(function() {
-      $('.cooltip').hide();
-    });
-  });
-
-  $('#octave').mouseenter(function() {
-    $('.cooltip').text("Press 'Z' or 'X' to change octaves");
-    $('.cooltip').show();
-  });
-
-  $('#octave').mouseleave(function() {
-    $('.cooltip').hide();
-  });
-
   $(document).on('mousemove touchmove', function(e) {
     if (VS.activeKnob === null) { return; }
     if (VS.dragging === false) { return; }
@@ -834,5 +824,35 @@ VS.BassEmulator = function() {
     keysDown = keysDown.filter(key => key !== $(this).data('keycode'));
 
     keyboardUp();
+  });
+
+  // TOOLTIPS
+  const itemsComingSoon = [
+    'label[for="patch_vco_group_one"]',
+    'label[for="patch_vco_group_two"]',
+    'label[for="patch_amp_eg_on"]'
+  ];
+
+  itemsComingSoon.forEach(function(selector) {
+    $(selector).mouseenter(function() {
+      if (VS.dragging) { return; }
+      $('.cooltip').text("Coming soon!");
+      $('.cooltip').show();
+    });
+  });
+
+  itemsComingSoon.forEach(function(selector) {
+    $(selector).mouseleave(function() {
+      $('.cooltip').hide();
+    });
+  });
+
+  $('#octave').mouseenter(function() {
+    $('.cooltip').text("Press 'Z' or 'X' to change octaves");
+    $('.cooltip').show();
+  });
+
+  $('#octave').mouseleave(function() {
+    $('.cooltip').hide();
   });
 };

@@ -102,22 +102,26 @@ end
 def reflects_patch(patch, options = {})
   interface = options[:interface] || page
   form = options[:form] || false
+  skip_midi_tests = options.fetch(:skip_midi, false)
   # Knobs
-  expect(interface).to have_css("#attack[data-midi='#{patch.attack}']")
-  expect(interface).to(
-    have_css("#decay_release[data-midi='#{patch.decay_release}']")
-  )
-  expect(interface).to(
-    have_css("#cutoff_eg_int[data-midi='#{patch.cutoff_eg_int}']")
-  )
-  expect(interface).to have_css("#octave[data-midi='#{patch.octave}']")
-  expect(interface).to have_css("#peak[data-midi='#{patch.peak}']")
-  expect(interface).to have_css("#cutoff[data-midi='#{patch.cutoff}']")
-  expect(interface).to have_css("#lfo_rate[data-midi='#{patch.lfo_rate}']")
-  expect(interface).to have_css("#lfo_int[data-midi='#{patch.lfo_int}']")
-  expect(interface).to have_css("#vco1_pitch[data-midi='#{patch.vco1_pitch}']")
-  expect(interface).to have_css("#vco2_pitch[data-midi='#{patch.vco2_pitch}']")
-  expect(interface).to have_css("#vco3_pitch[data-midi='#{patch.vco3_pitch}']")
+
+  unless skip_midi_tests
+    expect(interface).to have_css("#attack[data-midi='#{patch.attack}']")
+    expect(interface).to(
+      have_css("#decay_release[data-midi='#{patch.decay_release}']")
+    )
+    expect(interface).to(
+      have_css("#cutoff_eg_int[data-midi='#{patch.cutoff_eg_int}']")
+    )
+    expect(interface).to have_css("#octave[data-midi='#{patch.octave}']")
+    expect(interface).to have_css("#peak[data-midi='#{patch.peak}']")
+    expect(interface).to have_css("#cutoff[data-midi='#{patch.cutoff}']")
+    expect(interface).to have_css("#lfo_rate[data-midi='#{patch.lfo_rate}']")
+    expect(interface).to have_css("#lfo_int[data-midi='#{patch.lfo_int}']")
+    expect(interface).to have_css("#vco1_pitch[data-midi='#{patch.vco1_pitch}']")
+    expect(interface).to have_css("#vco2_pitch[data-midi='#{patch.vco2_pitch}']")
+    expect(interface).to have_css("#vco3_pitch[data-midi='#{patch.vco3_pitch}']")
+  end
 
   js_knobs_rotated(patch, page) unless options[:interface].present?
 

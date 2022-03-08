@@ -41,6 +41,7 @@ module VolcaShare
         vco1_active: vco1_active,
         vco2_active: vco2_active,
         vco3_active: vco3_active,
+        vco_group: vco_group,
         lfo_target_amp: lfo_target_amp,
         lfo_target_pitch: lfo_target_pitch,
         lfo_target_cutoff: lfo_target_cutoff,
@@ -48,7 +49,8 @@ module VolcaShare
         vco1_wave: vco1_wave ? 'square' : 'sawtooth',
         vco2_wave: vco2_wave ? 'square' : 'sawtooth',
         vco3_wave: vco3_wave ? 'square' : 'sawtooth',
-        sustain_on: sustain_on
+        sustain_on: sustain_on,
+        amp_eg_on: amp_eg_on
       }
     end
   end
