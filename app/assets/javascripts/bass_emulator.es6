@@ -207,8 +207,17 @@ VS.BassEmulator = function() {
   // ==============================
   // Accept query string parameters
   // ==============================
+  const urlParams = {
+    get: function(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+  };
 
-  let urlParams = new URLSearchParams(window.location.search);
+  // TODO: Switch to URLSearchParams when I find a web driver that supports it.
+  // let urlParams = new URLSearchParams(window.location.search);
 
   qsKnobs = [
     'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
