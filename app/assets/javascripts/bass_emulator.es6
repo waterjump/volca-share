@@ -222,6 +222,8 @@ VS.BassEmulator = function() {
       patch[`set${qsParam}`](parsedValue);
 
       new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
+    } else {
+      new VS.Knob($(`#${qsParam}`)).setKnob();
     }
   });
 

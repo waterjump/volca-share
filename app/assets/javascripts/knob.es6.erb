@@ -73,7 +73,7 @@ VS.Knob = function(element) {
     <% end %>
   };
 
-  this.setKnob = function(midiValue) {
+  this.setKnob = function(midiValue = this.midi) {
     this.jElement.data('midi', midiValue);
     let degree = this.degreeForMidi(midiValue, 140);
     this.jElement.data('rotation', degree);

@@ -3,6 +3,7 @@ VS.Form = function() {
   const foo = [1,2,3];
 
   if ($('body.form').length === 0) { return; }
+
   const scope = this;
   let midi = undefined;
   const { midiOut } = VS;
@@ -25,7 +26,9 @@ VS.Form = function() {
     sequences.init();
   };
 
-  init();
+  if ($('.emulator').length === 0) {
+    init();
+  }
 
   //
   // user actions
