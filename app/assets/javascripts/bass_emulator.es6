@@ -100,6 +100,7 @@ VS.BassEmulator = function() {
         { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
       ],
     sustainOn: false,
+    volume: 1,
 
     getPercentage: function(midiValue) {
       return midiValue / 127.0;
@@ -162,6 +163,9 @@ VS.BassEmulator = function() {
     setvco3_active: function(value) {
       this.setvco_active(3, value);
     },
+    setvolume: function(value) {
+      this.volume = this.getPercentage(value);
+    },
     setlfo_target_amp: function(value) {
       this.lfo.targetAmp = (value === 'true');
     },
@@ -221,7 +225,7 @@ VS.BassEmulator = function() {
 
   qsKnobs = [
     'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
-    'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch'
+    'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch', 'volume'
   ];
 
   qsKnobs.forEach(function(qsParam) {
@@ -724,8 +728,8 @@ VS.BassEmulator = function() {
       midiValue = $(VS.activeKnob.element).data('midi');
       if (midiValue == undefined) { return; }
 
-      percentage = midiValue / 127.0;
-      masterAmp.gain.setValueAtTime(percentage, audioCtx.currentTime);
+      patch.setvolume(midiValue);
+      masterAmp.gain.setValueAtTime(patch.volume, audioCtx.currentTime);
     }
   });
 
