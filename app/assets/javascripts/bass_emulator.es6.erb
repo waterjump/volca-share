@@ -369,17 +369,31 @@ VS.BassEmulator = function() {
   filter.Q.value = patch.filter.peak;
   filter.connect(preAmp);
 
-  let osc1Amp = audioCtx.createGain()
-  osc1Amp.gain.value = patch.vco[1].amp;
-  osc1Amp.connect(filter);
-  let osc2Amp = audioCtx.createGain()
-  osc2Amp.gain.value = patch.vco[2].amp;
-  osc2Amp.connect(filter);
-  let osc3Amp = audioCtx.createGain()
-  osc3Amp.gain.value = patch.vco[3].amp;
-  osc3Amp.connect(filter);
+  // Oscillator mute button amps (will go to gain 0 on mute button click)
+  let osc1MuteAmp = audioCtx.createGain()
+  osc1MuteAmp.gain.value = patch.vco[1].amp;
+  osc1MuteAmp.connect(filter);
+  let osc2MuteAmp = audioCtx.createGain()
+  osc2MuteAmp.gain.value = patch.vco[2].amp;
+  osc2MuteAmp.connect(filter);
+  let osc3MuteAmp = audioCtx.createGain()
+  osc3MuteAmp.gain.value = patch.vco[3].amp;
+  osc3MuteAmp.connect(filter);
 
-  const oscAmp = [null, osc1Amp, osc2Amp, osc3Amp];
+  const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
+
+  // Oscillator note amps (will go to gain 0 on note off)
+  let osc1NoteAmp = audioCtx.createGain()
+  osc1NoteAmp.gain.value = 1;
+  osc1NoteAmp.connect(oscMuteAmps[1]);
+  let osc2NoteAmp = audioCtx.createGain()
+  osc2NoteAmp.gain.value = 1;
+  osc2NoteAmp.connect(oscMuteAmps[2]);
+  let osc3NoteAmp = audioCtx.createGain()
+  osc3NoteAmp.gain.value = 1;
+  osc3NoteAmp.connect(oscMuteAmps[3]);
+
+  const oscNoteAmps = [null, osc1NoteAmp, osc2NoteAmp, osc3NoteAmp];
 
   let osc = [null, null, null, null];
 
@@ -484,7 +498,7 @@ VS.BassEmulator = function() {
       );
 
       osc[oscNumber] = oscillator;
-      osc[oscNumber].connect(oscAmp[oscNumber]);
+      osc[oscNumber].connect(oscNoteAmps[oscNumber]);
       ampLfoPitch.connect(osc[oscNumber].detune);
       osc[oscNumber].start();
 
@@ -529,9 +543,11 @@ VS.BassEmulator = function() {
     osc.forEach(function(oscillator, index) {
       if (oscillator !== null) {
         if (immediately) {
+          // TODO: Don't stop note.  Just mute it.
           osc[index].stop();
           osc[index] = null;
-          oscAmp[index].gain.setValueAtTime(
+          // TODO: I don't think we'll need to reset this?
+          oscMuteAmps[index].gain.setValueAtTime(
             patch.vco[index].amp,
             audioCtx.currentTime
           );
@@ -581,9 +597,9 @@ VS.BassEmulator = function() {
   const keyboardUp = function() {
     // Small built in decay on osc amp
     let t = audioCtx.currentTime;
-    oscAmp.forEach(function(oscAmp) {
-      if (oscAmp !== null) {
-        oscAmp.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
+    oscMuteAmps.forEach(function(oscMuteAmps) {
+      if (oscMuteAmps !== null) {
+        oscMuteAmps.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
       }
     });
 
@@ -742,7 +758,7 @@ VS.BassEmulator = function() {
     } else {
       patch.vco[oscNumber].amp = defaultVcoAmp;
     }
-    oscAmp[oscNumber].gain.setValueAtTime(
+    oscMuteAmps[oscNumber].gain.setValueAtTime(
       patch.vco[oscNumber].amp, audioCtx.currentTime
     );
   };
