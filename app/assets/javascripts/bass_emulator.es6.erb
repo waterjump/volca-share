@@ -517,7 +517,7 @@ VS.BassEmulator = function() {
     time = audioCtx.currentTime;
 
     filter.frequency.cancelScheduledValues(0);
-    filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+    filter.frequency.setValueAtTime(patch.filter.cutoff, time);
 
     lastAttackStart = time;
     attackEndTime = time + patch.envelope.attack;
@@ -607,35 +607,29 @@ VS.BassEmulator = function() {
   };
 
   const keyboardUp = function() {
-    let gainValue;
+    let currentValue;
     let time = audioCtx.currentTime;
     let timeConstant = patch.envelope.decayRelease / 7;
-
-    if (attackEndTime - lastAttackStart > 0) {
-      gainValue = (time - lastAttackStart) / (attackEndTime - lastAttackStart);
-      gainValue = gainValue > 1 ? 1 : gainValue;
-    } else {
-      gainValue = 1;
-    }
 
     oscNoteAmps.forEach(function(oscNoteAmp) {
       if (oscNoteAmp !== null) {
         if (patch.ampEgOn) {
           // Trigger release
           try {
-            // TODO: Start Filter release too.
             oscNoteAmp.gain.cancelAndHoldAtTime(time);
           } catch (error) {
             // Firefox doesn't support cancelAndHoldAtTime(); so we are calculating
             //   the approximate value of oscillator gain based on current time.
             // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-            oscNoteAmp.gain.cancelScheduledValues(time);
             if (time < attackEndTime) {
               // If note is released before attack is finished
               console.log('Manually halting attack in progress.');
-              oscNoteAmp.gain.setValueAtTime(gainValue, time);
+
+              currentValue = oscNoteAmp.gain.value;
+              oscNoteAmp.gain.cancelScheduledValues(time);
+              oscNoteAmp.gain.setValueAtTime(currentValue, time);
               // Shorted the decay time proportionally.
-              timeConstant = gainValue * patch.envelope.decayRelease / 7;
+              timeConstant = currentValue * patch.envelope.decayRelease / 7;
             }
           }
 
@@ -646,6 +640,26 @@ VS.BassEmulator = function() {
         }
       }
     });
+
+    // Filter envelope
+    if (patch.ampEgOn) {
+      try {
+        filter.frequency.gain.cancelAndHoldAtTime(time);
+      } catch (error) {
+        currentValue = filter.frequency.value;
+        filter.frequency.cancelScheduledValues(time);
+        filter.frequency.setValueAtTime(currentValue, time);
+      }
+      filter.frequency.setTargetAtTime(
+        patch.filter.cutoff,
+        time,
+        patch.envelope.decayRelease / 5
+      );
+    } else {
+      // turn cutoff down immediately
+      filter.frequency.cancelScheduledValues(time);
+      filter.frequency.setValueAtTime(patch.filter.cutoff, time);
+    }
   };
 
   window.onkeydown = function(keyDown) {
