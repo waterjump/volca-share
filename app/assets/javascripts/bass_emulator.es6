@@ -342,7 +342,7 @@ VS.BassEmulator = function() {
   // END query string params
   // =======================
 
-  let notePlaying = 69; // start with any note
+  let notePlaying;
   let keysDown = [];
   const builtInDecay = 0.1;
 
@@ -464,11 +464,6 @@ VS.BassEmulator = function() {
 
   // Setup oscilators
   [1, 2, 3].forEach(function(oscNumber) {
-    patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-    patch.vco[oscNumber].frequency =
-      keyMap[notePlaying] *
-      octaveMap[patch.octave].frequencyFactor;
-
     let oscillator = audioCtx.createOscillator();
     oscillator.type = patch.vco[oscNumber].shape;
     oscillator.detune.setValueAtTime(
@@ -564,6 +559,8 @@ VS.BassEmulator = function() {
 
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(octaveKnobMidiMap[patch.octave]);
+
+    if (notePlaying === undefined) { return; } // at init time
 
     osc.forEach(function(oscillator, oscNumber) {
       if (oscillator !== null) {
