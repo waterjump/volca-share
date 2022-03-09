@@ -497,9 +497,8 @@ VS.BassEmulator = function() {
   };
 
   const playNewNote = function() {
-    // stop other oscillators
-    killNotes(true);
-
+    filter.frequency.cancelScheduledValues(0);
+    filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
 
     // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
@@ -517,25 +516,25 @@ VS.BassEmulator = function() {
       );
 
       oscNoteAmps[oscNumber].gain.setValueAtTime(1, time);
-
-      // Retrigger LFO if it's square
-      if (patch.lfo.shape == 'square') {
-        oscLfo.disconnect();
-        oscLfo = null;
-        setupOscLfo();
-      }
-
-      // Retrigger envelope
-      // Attack
-      attackEndTime = time + patch.envelope.attack;
-      topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
-      filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
-
-      // Decay
-      if (!patch.sustainOn) {
-        triggerDecay();
-      }
     });
+
+    // Retrigger LFO if it's square
+    if (patch.lfo.shape == 'square') {
+      oscLfo.disconnect();
+      oscLfo = null;
+      setupOscLfo();
+    }
+
+    // Retrigger envelope
+    // Attack
+    attackEndTime = time + patch.envelope.attack;
+    topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
+    filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
+
+    // Decay
+    if (!patch.sustainOn) {
+      triggerDecay();
+    }
   };
 
   const changeCurrentNote = function() {
@@ -552,30 +551,6 @@ VS.BassEmulator = function() {
         patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
       );
     });
-  };
-
-  const killNotes = function(immediately = false) {
-    osc.forEach(function(oscillator, index) {
-      if (oscillator !== null) {
-        if (immediately) {
-          oscNoteAmps[index].gain.setValueAtTime(0, audioCtx.currentTime);
-          // TODO: Will not need to reset this after fixing built in release
-          //   in keyboardUp().
-          oscMuteAmps[index].gain.setValueAtTime(
-            patch.vco[index].amp,
-            audioCtx.currentTime
-          );
-        } else {
-          oscNoteAmps[index].gain.setValueAtTime(0, audioCtx.currentTime + 0.1);
-        }
-      }
-    });
-
-    // FIXME: Keep resonance from causing notes to thump on note stop
-    if (immediately) {
-      filter.frequency.cancelScheduledValues(0);
-      filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
-    }
   };
 
   const changeOctave = function() {
@@ -610,14 +585,12 @@ VS.BassEmulator = function() {
 
   const keyboardUp = function() {
     // Small built in decay on osc amp
-    let t = audioCtx.currentTime;
-    oscMuteAmps.forEach(function(oscMuteAmps) {
-      if (oscMuteAmps !== null) {
-        oscMuteAmps.gain.setTargetAtTime(0.0001, t, builtInDecay / 3);
+    let time = audioCtx.currentTime;
+    oscNoteAmps.forEach(function(oscNoteAmp) {
+      if (oscNoteAmp !== null) {
+        oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
       }
     });
-
-    killNotes();
   };
 
   window.onkeydown = function(keyDown) {
