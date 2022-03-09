@@ -100,6 +100,7 @@ VS.BassEmulator = function() {
         { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
       ],
     sustainOn: false,
+    ampEgOn: false,
     volume: 1,
 
     getPercentage: function(midiValue) {
@@ -188,7 +189,10 @@ VS.BassEmulator = function() {
       this.vco[3].shape = shape;
     },
     setsustain_on: function(value) {
-      this.sustainOn = (value === 'true')
+      this.sustainOn = (value === 'true');
+    },
+    setamp_eg_on: function(value) {
+      this.ampEgOn = (value === 'true');
     }
   };
 
@@ -272,7 +276,8 @@ VS.BassEmulator = function() {
 
 
   let qsBooleanParameters = [
-    'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on'
+    'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on',
+    'amp_eg_on'
   ];
   qsBooleanParameters.forEach(function(qsParam) {
     let rawValue = urlParams.get(qsParam);
@@ -309,17 +314,6 @@ VS.BassEmulator = function() {
     });
     $(`:radio[value=${vcoGroupParam}]`).prop('checked', true);
     $(`label[for="patch_vco_group_${vcoGroupParam}"]`).find('span .light').addClass('lit');
-  }
-
-  let ampEgOnParam = urlParams.get('amp_eg_on');
-  if (['true', 'false'].indexOf(ampEgOnParam) !== -1) {
-    // TODO: Set amp_eg_on on patch object when it is supported.
-
-    if (ampEgOnParam == 'true') {
-      volcaInterface.lightAndCheck('amp_eg_on');
-    } else {
-      volcaInterface.unlightAndUncheck('amp_eg_on');
-    }
   }
 
   qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
@@ -384,13 +378,13 @@ VS.BassEmulator = function() {
 
   // Oscillator note amps (will go to gain 0 on note off)
   let osc1NoteAmp = audioCtx.createGain()
-  osc1NoteAmp.gain.value = 0;
+  osc1NoteAmp.gain.value = 0.0001;
   osc1NoteAmp.connect(oscMuteAmps[1]);
   let osc2NoteAmp = audioCtx.createGain()
-  osc2NoteAmp.gain.value = 0;
+  osc2NoteAmp.gain.value = 0.0001;
   osc2NoteAmp.connect(oscMuteAmps[2]);
   let osc3NoteAmp = audioCtx.createGain()
-  osc3NoteAmp.gain.value = 0;
+  osc3NoteAmp.gain.value = 0.0001;
   osc3NoteAmp.connect(oscMuteAmps[3]);
 
   const oscNoteAmps = [null, osc1NoteAmp, osc2NoteAmp, osc3NoteAmp];
@@ -486,12 +480,23 @@ VS.BassEmulator = function() {
   });
 
   const triggerDecay = function() {
-    decayEndTime = t + patch.envelope.decayRelease;
     filter.frequency.setTargetAtTime(
       patch.filter.cutoff,
       attackEndTime,
       patch.envelope.decayRelease / 5
     );
+
+    if (patch.ampEgOn) {
+      oscNoteAmps.forEach(function(oscNoteAmp){
+        if (oscNoteAmp !== null) {
+          oscNoteAmp.gain.setTargetAtTime(
+            0.0001,
+            attackEndTime,
+            patch.envelope.decayRelease / 3
+          )
+        }
+      });
+    }
   };
 
   const retriggerLfo = function() {
@@ -505,13 +510,20 @@ VS.BassEmulator = function() {
     setupOscLfo();
   };
 
+  let lastAttackStart;
+  let attackEndTime;
+
   const playNewNote = function() {
+    time = audioCtx.currentTime;
+
     filter.frequency.cancelScheduledValues(0);
     filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
 
+    lastAttackStart = time;
+    attackEndTime = time + patch.envelope.attack;
+
     // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
-      time = audioCtx.currentTime;
       oscNoteAmps[oscNumber].gain.cancelScheduledValues(0);
 
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
@@ -524,14 +536,19 @@ VS.BassEmulator = function() {
         time
       );
 
-      oscNoteAmps[oscNumber].gain.setValueAtTime(1, time);
+      if (patch.ampEgOn && patch.envelope.attack > 0) {
+        // oscNoteAmps[oscNumber].gain.setTargetAtTime(1, time, patch.envelope.attack / 3);
+        oscNoteAmps[oscNumber].gain.setValueAtTime(0, time);
+        oscNoteAmps[oscNumber].gain.linearRampToValueAtTime(1, attackEndTime);
+      } else {
+        oscNoteAmps[oscNumber].gain.setValueAtTime(1, time);
+      }
     });
 
     retriggerLfo();
 
     // Retrigger envelope
     // Attack
-    attackEndTime = time + patch.envelope.attack;
     topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
     filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
@@ -590,11 +607,43 @@ VS.BassEmulator = function() {
   };
 
   const keyboardUp = function() {
-    // Small built in decay on osc amp
+    let gainValue;
     let time = audioCtx.currentTime;
+    let timeConstant = patch.envelope.decayRelease / 7;
+
+    if (attackEndTime - lastAttackStart > 0) {
+      gainValue = (time - lastAttackStart) / (attackEndTime - lastAttackStart);
+      gainValue = gainValue > 1 ? 1 : gainValue;
+    } else {
+      gainValue = 1;
+    }
+
     oscNoteAmps.forEach(function(oscNoteAmp) {
       if (oscNoteAmp !== null) {
-        oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
+        if (patch.ampEgOn) {
+          // Trigger release
+          try {
+            // TODO: Start Filter release too.
+            oscNoteAmp.gain.cancelAndHoldAtTime(time);
+          } catch (error) {
+            // Firefox doesn't support cancelAndHoldAtTime(); so we are calculating
+            //   the approximate value of oscillator gain based on current time.
+            // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
+            oscNoteAmp.gain.cancelScheduledValues(time);
+            if (time < attackEndTime) {
+              // If note is released before attack is finished
+              console.log('Manually halting attack in progress.');
+              oscNoteAmp.gain.setValueAtTime(gainValue, time);
+              // Shorted the decay time proportionally.
+              timeConstant = gainValue * patch.envelope.decayRelease / 7;
+            }
+          }
+
+          oscNoteAmp.gain.setTargetAtTime(0.0001, time, timeConstant);
+        } else {
+          // Turn amp down immediately.
+          oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
+        }
       }
     });
   };
@@ -813,6 +862,10 @@ VS.BassEmulator = function() {
     patch.sustainOn = !patch.sustainOn;
   });
 
+  $('label[for="patch_amp_eg_on"]').on('click tap', function() {
+    patch.ampEgOn = !patch.ampEgOn;
+  });
+
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function(){
     if (patch.octave < 9) {
@@ -847,8 +900,7 @@ VS.BassEmulator = function() {
   // TOOLTIPS
   const itemsComingSoon = [
     'label[for="patch_vco_group_one"]',
-    'label[for="patch_vco_group_two"]',
-    'label[for="patch_amp_eg_on"]'
+    'label[for="patch_vco_group_two"]'
   ];
 
   itemsComingSoon.forEach(function(selector) {
