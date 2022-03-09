@@ -342,7 +342,7 @@ VS.BassEmulator = function() {
   // END query string params
   // =======================
 
-  let notePlaying;
+  let notePlaying = 69; // start with any note
   let keysDown = [];
   const builtInDecay = 0.1;
 
@@ -384,13 +384,13 @@ VS.BassEmulator = function() {
 
   // Oscillator note amps (will go to gain 0 on note off)
   let osc1NoteAmp = audioCtx.createGain()
-  osc1NoteAmp.gain.value = 1;
+  osc1NoteAmp.gain.value = 0;
   osc1NoteAmp.connect(oscMuteAmps[1]);
   let osc2NoteAmp = audioCtx.createGain()
-  osc2NoteAmp.gain.value = 1;
+  osc2NoteAmp.gain.value = 0;
   osc2NoteAmp.connect(oscMuteAmps[2]);
   let osc3NoteAmp = audioCtx.createGain()
-  osc3NoteAmp.gain.value = 1;
+  osc3NoteAmp.gain.value = 0;
   osc3NoteAmp.connect(oscMuteAmps[3]);
 
   const oscNoteAmps = [null, osc1NoteAmp, osc2NoteAmp, osc3NoteAmp];
@@ -465,6 +465,31 @@ VS.BassEmulator = function() {
 
   setupOscLfo();
 
+  // Setup oscilators
+  [1, 2, 3].forEach(function(oscNumber) {
+    patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
+    patch.vco[oscNumber].frequency =
+      keyMap[notePlaying] *
+      octaveMap[patch.octave].frequencyFactor;
+
+    let oscillator = audioCtx.createOscillator();
+    oscillator.type = patch.vco[oscNumber].shape;
+    oscillator.detune.setValueAtTime(
+      patch.vco[oscNumber].detune,
+      audioCtx.currentTime
+    );
+
+    oscillator.frequency.setValueAtTime(
+      patch.vco[oscNumber].frequency,
+      audioCtx.currentTime
+    );
+
+    osc[oscNumber] = oscillator;
+    osc[oscNumber].connect(oscNoteAmps[oscNumber]);
+    ampLfoPitch.connect(osc[oscNumber].detune);
+    osc[oscNumber].start();
+  });
+
   const triggerDecay = function() {
     decayEndTime = t + patch.envelope.decayRelease;
     filter.frequency.setTargetAtTime(
@@ -478,29 +503,23 @@ VS.BassEmulator = function() {
     // stop other oscillators
     killNotes(true);
 
+
     // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
+      time = audioCtx.currentTime;
+      oscNoteAmps[oscNumber].gain.cancelScheduledValues(0);
+
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
       patch.vco[oscNumber].frequency =
         keyMap[notePlaying] *
         octaveMap[patch.octave].frequencyFactor;
 
-      let oscillator = audioCtx.createOscillator();
-      oscillator.type = patch.vco[oscNumber].shape;
-      oscillator.detune.setValueAtTime(
-        patch.vco[oscNumber].detune,
-        audioCtx.currentTime
-      );
-
-      oscillator.frequency.setValueAtTime(
+      osc[oscNumber].frequency.setValueAtTime(
         patch.vco[oscNumber].frequency,
-        audioCtx.currentTime
+        time
       );
 
-      osc[oscNumber] = oscillator;
-      osc[oscNumber].connect(oscNoteAmps[oscNumber]);
-      ampLfoPitch.connect(osc[oscNumber].detune);
-      osc[oscNumber].start();
+      oscNoteAmps[oscNumber].gain.setValueAtTime(1, time);
 
       // Retrigger LFO if it's square
       if (patch.lfo.shape == 'square') {
@@ -511,8 +530,7 @@ VS.BassEmulator = function() {
 
       // Retrigger envelope
       // Attack
-      t = audioCtx.currentTime;
-      attackEndTime = t + patch.envelope.attack;
+      attackEndTime = time + patch.envelope.attack;
       topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
       filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
 
@@ -543,16 +561,15 @@ VS.BassEmulator = function() {
     osc.forEach(function(oscillator, index) {
       if (oscillator !== null) {
         if (immediately) {
-          // TODO: Don't stop note.  Just mute it.
-          osc[index].stop();
-          osc[index] = null;
-          // TODO: I don't think we'll need to reset this?
+          oscNoteAmps[index].gain.setValueAtTime(0, audioCtx.currentTime);
+          // TODO: Will not need to reset this after fixing built in release
+          //   in keyboardUp().
           oscMuteAmps[index].gain.setValueAtTime(
             patch.vco[index].amp,
             audioCtx.currentTime
           );
         } else {
-          osc[index].stop(audioCtx.currentTime + 0.1);
+          oscNoteAmps[index].gain.setValueAtTime(0, audioCtx.currentTime + 0.1);
         }
       }
     });
