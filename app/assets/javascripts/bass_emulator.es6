@@ -496,6 +496,17 @@ VS.BassEmulator = function() {
     );
   };
 
+  const retriggerLfo = function() {
+    let lfo = patch.lfo;
+    if (lfo.shape !== 'square') { return; }
+    if (!(lfo.targetAmp) && !(lfo.targetPitch) && !(lfo.targetCutoff)) { return; }
+    if (lfo.ampValue + lfo.pitchValue + lfo.cutoffValue === 0) { return; }
+
+    oscLfo.disconnect();
+    oscLfo = null;
+    setupOscLfo();
+  };
+
   const playNewNote = function() {
     filter.frequency.cancelScheduledValues(0);
     filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
@@ -518,12 +529,7 @@ VS.BassEmulator = function() {
       oscNoteAmps[oscNumber].gain.setValueAtTime(1, time);
     });
 
-    // Retrigger LFO if it's square
-    if (patch.lfo.shape == 'square') {
-      oscLfo.disconnect();
-      oscLfo = null;
-      setupOscLfo();
-    }
+    retriggerLfo();
 
     // Retrigger envelope
     // Attack
