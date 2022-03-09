@@ -19,6 +19,14 @@ RSpec.describe 'Volca Bass Emulator', type: :feature  do
       reflects_patch(patch, skip_midi: true, form: true)
     end
 
+    it 'shows volume knob all the way up' do
+      visit bass_emulator_path(patch.emulator_query_string)
+
+      expect(page.find('span.volume', visible: false).text).to(
+        eq(rotation_from_midi(127))
+      )
+    end
+
     context 'when mobile version link is clicked' do
       it 'does not reset the patch' do
         visit bass_emulator_path(patch.emulator_query_string)
