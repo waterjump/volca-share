@@ -608,54 +608,55 @@ VS.BassEmulator = function() {
     let time = audioCtx.currentTime;
     let timeConstant = patch.envelope.decayRelease / 7;
 
-    oscNoteAmps.forEach(function(oscNoteAmp) {
-      if (oscNoteAmp !== null) {
-        if (patch.ampEgOn) {
-          // Trigger release
-          try {
-            oscNoteAmp.gain.cancelAndHoldAtTime(time);
-          } catch (error) {
-            // Firefox doesn't support cancelAndHoldAtTime(); so we are calculating
-            //   the approximate value of oscillator gain based on current time.
-            // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-            if (time < attackEndTime) {
-              // If note is released before attack is finished
-              console.log('Manually halting attack in progress.');
+    if (patch.ampEgOn) {
+      if (time < attackEndTime || patch.sustainOn) {
 
-              currentValue = oscNoteAmp.gain.value;
+        // filter envelope
+        try {
+          filter.frequency.gain.cancelAndHoldAtTime(time);
+        } catch (error) {
+          // Firefox doesn't support cancelAndHoldAtTime();
+          // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
+          currentValue = filter.frequency.value;
+          filter.frequency.cancelScheduledValues(time);
+          filter.frequency.setValueAtTime(currentValue, time);
+        }
+        filter.frequency.setTargetAtTime(
+          patch.filter.cutoff,
+          time,
+          patch.envelope.decayRelease / 5
+        );
+
+        // Amp eg
+        oscNoteAmps.forEach(function(oscNoteAmp) {
+          if (oscNoteAmp !== null) {
+            try {
+              oscNoteAmp.gain.cancelAndHoldAtTime(time);
+            } catch (error) {
+              // Firefox doesn't support cancelAndHoldAtTime();
+              // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
+              currentValue = oscNoteAmp.gain.value; // Always between 0 and 1
               oscNoteAmp.gain.cancelScheduledValues(time);
               oscNoteAmp.gain.setValueAtTime(currentValue, time);
-              // Shorted the decay time proportionally.
+              // Shorten the decay time proportionally.
               timeConstant = currentValue * patch.envelope.decayRelease / 7;
             }
+            oscNoteAmp.gain.setTargetAtTime(0.0001, time, timeConstant);
           }
-
-          oscNoteAmp.gain.setTargetAtTime(0.0001, time, timeConstant);
-        } else {
-          // Turn amp down immediately.
-          oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
-        }
+        });
       }
-    });
 
-    // Filter envelope
-    if (patch.ampEgOn) {
-      try {
-        filter.frequency.gain.cancelAndHoldAtTime(time);
-      } catch (error) {
-        currentValue = filter.frequency.value;
-        filter.frequency.cancelScheduledValues(time);
-        filter.frequency.setValueAtTime(currentValue, time);
-      }
-      filter.frequency.setTargetAtTime(
-        patch.filter.cutoff,
-        time,
-        patch.envelope.decayRelease / 5
-      );
     } else {
-      // turn cutoff down immediately
+      // Filter cutoff down immediately
       filter.frequency.cancelScheduledValues(time);
       filter.frequency.setValueAtTime(patch.filter.cutoff, time);
+
+      // Turn amp down immediately
+      oscNoteAmps.forEach(function(oscNoteAmp) {
+        if (oscNoteAmp !== null) {
+          oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
+        }
+      });
     }
   };
 
