@@ -71,6 +71,52 @@ VS.BassEmulator = function() {
 
   const keyCodes = Object.keys(keyMap).map(Number);
 
+  const decayReleaseMap = {
+    0: 0.07,
+    10: 0.075,
+    20: 0.085,
+    30: 0.091,
+    40: 0.1,
+    50: 0.11,
+    60: 0.13,
+    70: 0.15,
+    80: 0.18,
+    90: 0.215,
+    100: 0.29,
+    110: 0.44,
+    115: 0.56,
+    120: 0.84,
+    122: 1.04,
+    125: 1.65,
+    127: 2.64
+  }
+
+  const decayReleaseGainCurve = [
+    1, 0.89, 0.8, 0.73, 0.65, 0.58, 0.52, 0.46, 0.41, 0.36, 0.31, 0.26, 0.22,
+    0.18, 0.15, 0.12, 0.09, 0.07, 0.05, 0.03, 0.02, 0.01, 0.005, 0.0001
+  ];
+
+  const calculateDecayRelease = function(midiValue) {
+    midiValue = Math.round(midiValue);
+    if (decayReleaseMap[midiValue] !== undefined) {
+      return decayReleaseMap[midiValue];
+    } else {
+      let entriesDecayReleaseMap = Object.entries(decayReleaseMap);
+      for (const [index, [midi, decayTime]] of Object.entries(entriesDecayReleaseMap)) {
+        if (midiValue < midi) {
+          let [lowerMidi, lowerDecayTime] = entriesDecayReleaseMap[index - 1];
+          let slope = (decayTime - lowerDecayTime) / (parseFloat(midi) - parseFloat(lowerMidi));
+          let midiDifference = midiValue - lowerMidi;
+          let rawValue = lowerDecayTime + (midiDifference * slope);
+          let cleanValue = Number(myValue.toFixed(3));
+          decayReleaseMap[Number(midiValue)] = cleanValue;
+          return cleanValue;
+          break;
+        }
+      }
+    }
+  }
+
 
   // ===========================================
   // Setup patch object to hold parameter values
@@ -111,7 +157,9 @@ VS.BassEmulator = function() {
       this.envelope.attack = this.getPercentage(midiValue) * 0.86;
     },
     setdecay_release: function(midiValue) {
-      this.envelope.decayRelease = 5 * this.getPercentage(midiValue)**3 + 0.05;
+      // Keeping these old formulas bc I might do a before and after.
+      // let oldValue = 5 * this.getPercentage(midiValue)**3 + 0.05;
+      this.envelope.decayRelease = calculateDecayRelease(midiValue);
     },
     setcutoff_eg_int: function(midiValue) {
       this.envelope.cutoffEgInt = this.getPercentage(midiValue)**2 * 10000;
@@ -487,10 +535,11 @@ VS.BassEmulator = function() {
     if (patch.ampEgOn) {
       oscNoteAmps.forEach(function(oscNoteAmp){
         if (oscNoteAmp !== null) {
-          oscNoteAmp.gain.setTargetAtTime(
-            0.0001,
+          oscNoteAmp.gain.setValueAtTime(1, attackEndTime);
+          oscNoteAmp.gain.setValueCurveAtTime(
+            decayReleaseGainCurve,
             attackEndTime,
-            patch.envelope.decayRelease / 3
+            patch.envelope.decayRelease
           )
         }
       });
