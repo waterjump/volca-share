@@ -107,7 +107,8 @@ VS.BassEmulator = function() {
       return midiValue / 127.0;
     },
     setattack: function(midiValue) {
-      this.envelope.attack = this.getPercentage(midiValue)**3;
+      // Based on collected data from Volca Bass
+      this.envelope.attack = this.getPercentage(midiValue) * 0.86;
     },
     setdecay_release: function(midiValue) {
       this.envelope.decayRelease = 5 * this.getPercentage(midiValue)**3 + 0.05;
