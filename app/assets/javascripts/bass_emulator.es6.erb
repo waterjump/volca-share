@@ -582,6 +582,8 @@ VS.BassEmulator = function() {
 
     if (notePlaying === undefined) { return; } // at init time
 
+    if (keysDown.length === 0) { return; } // when it's amp_eg release
+
     osc.forEach(function(oscillator, oscNumber) {
       if (oscillator !== null) {
         patch.vco[oscNumber].frequency =
