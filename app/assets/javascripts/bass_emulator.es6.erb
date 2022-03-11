@@ -72,23 +72,9 @@ VS.BassEmulator = function() {
   const keyCodes = Object.keys(keyMap).map(Number);
 
   const decayReleaseMap = {
-    0: 0.07,
-    10: 0.075,
-    20: 0.085,
-    30: 0.091,
-    40: 0.1,
-    50: 0.11,
-    60: 0.13,
-    70: 0.15,
-    80: 0.18,
-    90: 0.215,
-    100: 0.29,
-    110: 0.44,
-    115: 0.56,
-    120: 0.84,
-    122: 1.04,
-    125: 1.65,
-    127: 2.64
+    0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,
+    70: 0.15, 80: 0.18, 90: 0.215, 100: 0.29, 110: 0.44, 115: 0.56, 120: 0.84,
+    122: 1.04, 125: 1.65, 127: 2.64
   }
 
   const decayReleaseGainCurve = [
@@ -96,38 +82,34 @@ VS.BassEmulator = function() {
     0.18, 0.15, 0.12, 0.09, 0.07, 0.05, 0.03, 0.02, 0.01, 0.005, 0.0001
   ];
 
+  // TODO: Could make this function generic in case we need to map other
+  //   parameters manually.
   const calculateDecayRelease = function(midiValue) {
     let entriesDecayReleaseMap, nestedEntries;
     midiValue = Math.round(midiValue);
     if (decayReleaseMap[midiValue] !== undefined) {
       return decayReleaseMap[midiValue];
     } else {
+      entriesDecayReleaseMap =
+        Object.keys(decayReleaseMap).map((key) => [key, decayReleaseMap[key]]);
 
-      // try {
-      entriesDecayReleaseMap = Object.entries(decayReleaseMap);
-      //   nestedEntries = Object.entries(entriesDecayReleaseMap);
-      // } catch (error) {
-        // This is for PhantomJS compatibility :-[
-         // entriesDecayReleaseMap =
-           // Object.keys(decayReleaseMap).map((key) => [key, decayReleaseMap[key]]);
-         // nestedEntries =
-           // Object.keys(entriesDecayReleaseMap).map(function(key) { return [key, entriesDecayReleaseMap[key]]; });
-      // }
-
-      for (const [index, [midi, decayTime]] of Object.entries(entriesDecayReleaseMap)) {
+      for (let index = 0; index < entriesDecayReleaseMap.length; index++) {
+        let midi = entriesDecayReleaseMap[index][0];
+        let decayTime = entriesDecayReleaseMap[index][1];
         if (midiValue < midi) {
-          let [lowerMidi, lowerDecayTime] = entriesDecayReleaseMap[index - 1];
+          let lowerMidi = entriesDecayReleaseMap[index - 1][0];
+          let lowerDecayTime = entriesDecayReleaseMap[index - 1][1];
           let slope = (decayTime - lowerDecayTime) / (parseFloat(midi) - parseFloat(lowerMidi));
           let midiDifference = midiValue - lowerMidi;
-          let rawValue = lowerDecayTime + (midiDifference * slope);
+          let rawValue = (midiDifference * slope) + lowerDecayTime;
           let cleanValue = Number(rawValue.toFixed(3));
+
           decayReleaseMap[Number(midiValue)] = cleanValue;
           return cleanValue;
-          break;
         }
       }
     }
-  }
+  };
 
 
   // ===========================================
