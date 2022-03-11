@@ -130,7 +130,8 @@ VS.BassEmulator = function() {
   const defaultVcoAmp = 0.33;
 
   const patch = {
-    envelope: { attack: 0, decayRelease: 0.05, cutoffEgInt: 0 },
+    envelope: { attack: 0, decayRelease: 0.07, cutoffEgInt: 0 },
+    filterEgCoefficient: 1.35,
     octave: 3,
     filter: { cutoff: 20000, peak: 0 },
     lfo: {
@@ -576,7 +577,7 @@ VS.BassEmulator = function() {
   const triggerDecay = function() {
     envelope.offset.linearRampToValueAtTime(
       0.0001,
-      attackEndTime + patch.envelope.decayRelease
+      attackEndTime + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
 
     if (patch.ampEgOn) {
@@ -721,6 +722,7 @@ VS.BassEmulator = function() {
         // filter envelope
         try {
           envelope.offset.cancelAndHoldAtTime(time);
+          currentValue = envelope.offset.value;
         } catch (error) {
           // Firefox doesn't support cancelAndHoldAtTime();
           // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
@@ -731,7 +733,7 @@ VS.BassEmulator = function() {
         // TODO: Use custom curve for filter?
         envelope.offset.linearRampToValueAtTime(
           0.0001,
-          time + patch.envelope.decayRelease
+          time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
         );
 
         // Amp eg
