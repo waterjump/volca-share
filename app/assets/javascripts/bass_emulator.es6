@@ -424,7 +424,7 @@ VS.BassEmulator = function() {
   filterEgAmp.connect(filter.detune);
 
   const envelope = audioCtx.createConstantSource();
-  envelope.offset.setValueAtTime(0.0001, audioCtx.currentTime);
+  envelope.offset.setValueAtTime(0, audioCtx.currentTime);
   envelope.connect(filterEgAmp);
   envelope.start();
 
@@ -443,13 +443,13 @@ VS.BassEmulator = function() {
 
   // Oscillator note amps (will go to gain 0 on note off)
   let osc1NoteAmp = audioCtx.createGain()
-  osc1NoteAmp.gain.value = 0.0001;
+  osc1NoteAmp.gain.value = 0;
   osc1NoteAmp.connect(oscMuteAmps[1]);
   let osc2NoteAmp = audioCtx.createGain()
-  osc2NoteAmp.gain.value = 0.0001;
+  osc2NoteAmp.gain.value = 0;
   osc2NoteAmp.connect(oscMuteAmps[2]);
   let osc3NoteAmp = audioCtx.createGain()
-  osc3NoteAmp.gain.value = 0.0001;
+  osc3NoteAmp.gain.value = 0;
   osc3NoteAmp.connect(oscMuteAmps[3]);
 
   const oscNoteAmps = [null, osc1NoteAmp, osc2NoteAmp, osc3NoteAmp];
@@ -573,7 +573,7 @@ VS.BassEmulator = function() {
 
   const triggerDecay = function() {
     envelope.offset.linearRampToValueAtTime(
-      0.0001,
+      0,
       attackEndTime + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
 
@@ -591,7 +591,7 @@ VS.BassEmulator = function() {
             )
           } else {
             oscNoteAmp.gain.linearRampToValueAtTime(
-              0.0001,
+              0,
               attackEndTime + patch.envelope.decayRelease
             )
           }
@@ -618,7 +618,7 @@ VS.BassEmulator = function() {
     time = audioCtx.currentTime;
 
     envelope.offset.cancelScheduledValues(0);
-    envelope.offset.setValueAtTime(0.0001, time);
+    envelope.offset.setValueAtTime(0, time);
 
     lastAttackStart = time;
     attackEndTime = time + patch.envelope.attack;
@@ -729,7 +729,7 @@ VS.BassEmulator = function() {
         }
         // TODO: Use custom curve for filter?
         envelope.offset.linearRampToValueAtTime(
-          0.0001,
+          0,
           time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
         );
 
@@ -756,7 +756,7 @@ VS.BassEmulator = function() {
               );
               oscNoteAmp.gain.setValueCurveAtTime(gainCurve, time, duration);
             } else {
-              oscNoteAmp.gain.linearRampToValueAtTime(0.0001, time + duration);
+              oscNoteAmp.gain.linearRampToValueAtTime(0, time + duration);
             }
           }
         });
@@ -765,12 +765,12 @@ VS.BassEmulator = function() {
     } else {
       // Filter cutoff down immediately
       envelope.offset.cancelScheduledValues(time);
-      envelope.offset.setValueAtTime(0.0001, time);
+      envelope.offset.setValueAtTime(0, time);
 
       // Turn amp down immediately
       oscNoteAmps.forEach(function(oscNoteAmp) {
         if (oscNoteAmp !== null) {
-          oscNoteAmp.gain.setTargetAtTime(0.0001, time, builtInDecay / 3);
+          oscNoteAmp.gain.setTargetAtTime(0, time, builtInDecay / 3);
         }
       });
     }
