@@ -168,7 +168,9 @@ VS.BassEmulator = function() {
         calculateMappedParameter('decayRelease', midiValue);
     },
     setcutoff_eg_int: function(midiValue) {
-      this.envelope.cutoffEgInt = this.getPercentage(midiValue)**2 * 10000;
+      // let oldValueInHz = this.getPercentage(midiValue)**2 * 10000;
+      // TODO: This needs adjusting.  NOTE: It's in cents now.  Not Hz.
+      this.envelope.cutoffEgInt = 1200 * (midiValue / 20.0);
     },
     setoctave: function(midiValue) {
       this.octave = parseInt(VS.display.octaveString(midiValue)[3]);
@@ -416,6 +418,15 @@ VS.BassEmulator = function() {
   filter.Q.value = patch.filter.peak;
   filter.connect(preAmp);
 
+  const filterEgAmp = audioCtx.createGain();
+  filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, audioCtx.currentTime);
+  filterEgAmp.connect(filter.detune);
+
+  const envelope = audioCtx.createConstantSource();
+  envelope.offset.setValueAtTime(0.0001, audioCtx.currentTime);
+  envelope.connect(filterEgAmp);
+  envelope.start();
+
   // Oscillator mute button amps (will go to gain 0 on mute button click)
   let osc1MuteAmp = audioCtx.createGain()
   osc1MuteAmp.gain.value = patch.vco[1].amp;
@@ -560,10 +571,9 @@ VS.BassEmulator = function() {
 
 
   const triggerDecay = function() {
-    filter.frequency.setTargetAtTime(
-      patch.filter.cutoff,
-      attackEndTime,
-      patch.envelope.decayRelease / 5
+    envelope.offset.linearRampToValueAtTime(
+      0.0001,
+      attackEndTime + patch.envelope.decayRelease
     );
 
     if (patch.ampEgOn) {
@@ -606,8 +616,8 @@ VS.BassEmulator = function() {
   const playNewNote = function() {
     time = audioCtx.currentTime;
 
-    filter.frequency.cancelScheduledValues(0);
-    filter.frequency.setValueAtTime(patch.filter.cutoff, time);
+    envelope.offset.cancelScheduledValues(0);
+    envelope.offset.setValueAtTime(0.0001, time);
 
     lastAttackStart = time;
     attackEndTime = time + patch.envelope.attack;
@@ -638,8 +648,7 @@ VS.BassEmulator = function() {
 
     // Retrigger envelope
     // Attack
-    topCutoff = patch.filter.cutoff + patch.envelope.cutoffEgInt;
-    filter.frequency.exponentialRampToValueAtTime(topCutoff, attackEndTime);
+    envelope.offset.linearRampToValueAtTime(1, attackEndTime);
 
     // Decay
     if (!patch.sustainOn) {
@@ -708,18 +717,18 @@ VS.BassEmulator = function() {
 
         // filter envelope
         try {
-          filter.frequency.gain.cancelAndHoldAtTime(time);
+          envelope.offset.cancelAndHoldAtTime(time);
         } catch (error) {
           // Firefox doesn't support cancelAndHoldAtTime();
           // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-          currentValue = filter.frequency.value;
-          filter.frequency.cancelScheduledValues(time);
-          filter.frequency.setValueAtTime(currentValue, time);
+          currentValue = envelope.offset.value;
+          envelope.offset.cancelScheduledValues(time);
+          envelope.offset.setValueAtTime(currentValue, time);
         }
-        filter.frequency.setTargetAtTime(
-          patch.filter.cutoff,
-          time,
-          patch.envelope.decayRelease / 5
+        // TODO: Use custom curve for filter?
+        envelope.offset.linearRampToValueAtTime(
+          0.0001,
+          time + patch.envelope.decayRelease
         );
 
         // Amp eg
@@ -753,8 +762,8 @@ VS.BassEmulator = function() {
 
     } else {
       // Filter cutoff down immediately
-      filter.frequency.cancelScheduledValues(time);
-      filter.frequency.setValueAtTime(patch.filter.cutoff, time);
+      envelope.offset.cancelScheduledValues(time);
+      envelope.offset.setValueAtTime(0.0001, time);
 
       // Turn amp down immediately
       oscNoteAmps.forEach(function(oscNoteAmp) {
@@ -829,6 +838,11 @@ VS.BassEmulator = function() {
       if (midiValue == undefined) { return; }
 
       patch.setcutoff_eg_int(midiValue);
+
+      filterEgAmp.gain.setValueAtTime(
+        patch.envelope.cutoffEgInt,
+        audioCtx.currentTime
+      );
     }
 
     // TODO: Change octave when octave knob is turn via interface
@@ -850,7 +864,6 @@ VS.BassEmulator = function() {
 
       patch.setcutoff(midiValue);
 
-      filter.frequency.cancelScheduledValues(0);
       filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
     }
 
