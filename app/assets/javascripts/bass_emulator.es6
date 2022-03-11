@@ -71,6 +71,14 @@ VS.BassEmulator = function() {
 
   const keyCodes = Object.keys(keyMap).map(Number);
 
+  const parameterMaps = {
+    lfoRateMap: {
+      0: 0.0383, 10: 0.23, 20: 0.421, 30: 0.612, 40: 0.803, 50: 1, 60: 1.186,
+      70: 1.377, 80: 1.569, 90: 1.757, 100: 6.757, 110: 20, 115: 35.71,
+      120: 60, 127: 94
+    }
+  };
+
   const decayReleaseMap = {
     0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,
     70: 0.15, 80: 0.18, 90: 0.215, 100: 0.29, 110: 0.44, 115: 0.56, 120: 0.84,
@@ -85,7 +93,7 @@ VS.BassEmulator = function() {
   // TODO: Could make this function generic in case we need to map other
   //   parameters manually.
   const calculateDecayRelease = function(midiValue) {
-    let entriesDecayReleaseMap, nestedEntries;
+    let entriesDecayReleaseMap;
     midiValue = Math.round(midiValue);
     if (decayReleaseMap[midiValue] !== undefined) {
       return decayReleaseMap[midiValue];
@@ -105,6 +113,39 @@ VS.BassEmulator = function() {
           let cleanValue = Number(rawValue.toFixed(3));
 
           decayReleaseMap[Number(midiValue)] = cleanValue;
+          return cleanValue;
+        }
+      }
+    }
+  };
+
+  const calculateMappedParameter = function(paramName, midiValue) {
+    let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
+    let midiDifference, rawValue, cleanValue;
+    let map = parameterMaps[`${paramName}Map`];
+
+    midiValue = Math.round(midiValue);
+
+    if (map[midiValue] !== undefined) {
+      return map[midiValue];
+    } else {
+      entries =
+        Object.keys(map).map((key) => [key, map[key]]);
+
+      for (let index = 0; index < entries.length; index++) {
+        midi = entries[index][0];
+        if (midiValue < midi) {
+          paramValue = entries[index][1];
+          lowerMidi = entries[index - 1][0];
+          lowerParamValue = entries[index - 1][1];
+          slope =
+            (paramValue - lowerParamValue) /
+              (parseFloat(midi) - parseFloat(lowerMidi));
+          midiDifference = midiValue - lowerMidi;
+          rawValue = (midiDifference * slope) + lowerParamValue;
+          cleanValue = Number(rawValue.toFixed(3));
+
+          map[Number(midiValue)] = cleanValue;
           return cleanValue;
         }
       }
@@ -170,7 +211,8 @@ VS.BassEmulator = function() {
       this.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
     },
     setlfo_rate: function(midiValue) {
-      this.lfo.frequency = (this.getPercentage(midiValue)**3 * 35) + 0.1;
+      // let oldValue = (this.getPercentage(midiValue)**3 * 35) + 0.1;
+      this.lfo.frequency = calculateMappedParameter('lfoRate', midiValue);
     },
     setlfo_int: function(midiValue) {
       percentage = this.getPercentage(midiValue);
