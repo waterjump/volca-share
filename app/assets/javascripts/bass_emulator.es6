@@ -72,6 +72,11 @@ VS.BassEmulator = function() {
   const keyCodes = Object.keys(keyMap).map(Number);
 
   const parameterMaps = {
+    decayReleaseMap: {
+      0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,
+      70: 0.15, 80: 0.18, 90: 0.215, 100: 0.29, 110: 0.44, 115: 0.56, 120: 0.84,
+      122: 1.04, 125: 1.65, 127: 2.64
+    },
     lfoRateMap: {
       0: 0.0383, 10: 0.23, 20: 0.421, 30: 0.612, 40: 0.803, 50: 1, 60: 1.186,
       70: 1.377, 80: 1.569, 90: 1.757, 100: 6.757, 110: 20, 115: 35.71,
@@ -79,45 +84,10 @@ VS.BassEmulator = function() {
     }
   };
 
-  const decayReleaseMap = {
-    0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,
-    70: 0.15, 80: 0.18, 90: 0.215, 100: 0.29, 110: 0.44, 115: 0.56, 120: 0.84,
-    122: 1.04, 125: 1.65, 127: 2.64
-  }
-
   const decayReleaseGainCurve = [
     1, 0.89, 0.8, 0.73, 0.65, 0.58, 0.52, 0.46, 0.41, 0.36, 0.31, 0.26, 0.22,
     0.18, 0.15, 0.12, 0.09, 0.07, 0.05, 0.03, 0.02, 0.01, 0.005, 0.0001
   ];
-
-  // TODO: Could make this function generic in case we need to map other
-  //   parameters manually.
-  const calculateDecayRelease = function(midiValue) {
-    let entriesDecayReleaseMap;
-    midiValue = Math.round(midiValue);
-    if (decayReleaseMap[midiValue] !== undefined) {
-      return decayReleaseMap[midiValue];
-    } else {
-      entriesDecayReleaseMap =
-        Object.keys(decayReleaseMap).map((key) => [key, decayReleaseMap[key]]);
-
-      for (let index = 0; index < entriesDecayReleaseMap.length; index++) {
-        let midi = entriesDecayReleaseMap[index][0];
-        let decayTime = entriesDecayReleaseMap[index][1];
-        if (midiValue < midi) {
-          let lowerMidi = entriesDecayReleaseMap[index - 1][0];
-          let lowerDecayTime = entriesDecayReleaseMap[index - 1][1];
-          let slope = (decayTime - lowerDecayTime) / (parseFloat(midi) - parseFloat(lowerMidi));
-          let midiDifference = midiValue - lowerMidi;
-          let rawValue = (midiDifference * slope) + lowerDecayTime;
-          let cleanValue = Number(rawValue.toFixed(3));
-
-          decayReleaseMap[Number(midiValue)] = cleanValue;
-          return cleanValue;
-        }
-      }
-    }
-  };
 
   const calculateMappedParameter = function(paramName, midiValue) {
     let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
@@ -194,7 +164,8 @@ VS.BassEmulator = function() {
     setdecay_release: function(midiValue) {
       // Keeping these old formulas bc I might do a before and after.
       // let oldValue = 5 * this.getPercentage(midiValue)**3 + 0.05;
-      this.envelope.decayRelease = calculateDecayRelease(midiValue);
+      this.envelope.decayRelease =
+        calculateMappedParameter('decayRelease', midiValue);
     },
     setcutoff_eg_int: function(midiValue) {
       this.envelope.cutoffEgInt = this.getPercentage(midiValue)**2 * 10000;
