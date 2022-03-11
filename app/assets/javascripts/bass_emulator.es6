@@ -97,18 +97,30 @@ VS.BassEmulator = function() {
   ];
 
   const calculateDecayRelease = function(midiValue) {
+    let entriesDecayReleaseMap, nestedEntries;
     midiValue = Math.round(midiValue);
     if (decayReleaseMap[midiValue] !== undefined) {
       return decayReleaseMap[midiValue];
     } else {
-      let entriesDecayReleaseMap = Object.entries(decayReleaseMap);
+
+      // try {
+      entriesDecayReleaseMap = Object.entries(decayReleaseMap);
+      //   nestedEntries = Object.entries(entriesDecayReleaseMap);
+      // } catch (error) {
+        // This is for PhantomJS compatibility :-[
+         // entriesDecayReleaseMap =
+           // Object.keys(decayReleaseMap).map((key) => [key, decayReleaseMap[key]]);
+         // nestedEntries =
+           // Object.keys(entriesDecayReleaseMap).map(function(key) { return [key, entriesDecayReleaseMap[key]]; });
+      // }
+
       for (const [index, [midi, decayTime]] of Object.entries(entriesDecayReleaseMap)) {
         if (midiValue < midi) {
           let [lowerMidi, lowerDecayTime] = entriesDecayReleaseMap[index - 1];
           let slope = (decayTime - lowerDecayTime) / (parseFloat(midi) - parseFloat(lowerMidi));
           let midiDifference = midiValue - lowerMidi;
           let rawValue = lowerDecayTime + (midiDifference * slope);
-          let cleanValue = Number(myValue.toFixed(3));
+          let cleanValue = Number(rawValue.toFixed(3));
           decayReleaseMap[Number(midiValue)] = cleanValue;
           return cleanValue;
           break;
@@ -525,6 +537,33 @@ VS.BassEmulator = function() {
     osc[oscNumber].start();
   });
 
+  // ==========================
+  //  get browser capabilities
+  // ==========================
+  const browserFeatures = {};
+
+  const checkCustomCurveClearing = function() {
+    let dummyGain = audioCtx.createGain();
+    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
+    try {
+      dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
+      dummyGain.gain.setValueAtTime(1, audioCtx.currentTime + 0.2);
+      browserFeatures['customCurveClearing'] = true;
+    } catch (error) {
+      browserFeatures['customCurveClearing'] = false;
+    }
+  }
+
+  const testBrowserFeatures = function() {
+    checkCustomCurveClearing();
+    console.log(browserFeatures);
+  }
+
+  testBrowserFeatures();
+
+  // END get browser capabilities
+
+
   const triggerDecay = function() {
     filter.frequency.setTargetAtTime(
       patch.filter.cutoff,
@@ -536,11 +575,20 @@ VS.BassEmulator = function() {
       oscNoteAmps.forEach(function(oscNoteAmp){
         if (oscNoteAmp !== null) {
           oscNoteAmp.gain.setValueAtTime(1, attackEndTime);
-          oscNoteAmp.gain.setValueCurveAtTime(
-            decayReleaseGainCurve,
-            attackEndTime,
-            patch.envelope.decayRelease
-          )
+
+          if (browserFeatures['customCurveClearing']) {
+            // use custom curve
+            oscNoteAmp.gain.setValueCurveAtTime(
+              decayReleaseGainCurve,
+              attackEndTime,
+              patch.envelope.decayRelease
+            )
+          } else {
+            oscNoteAmp.gain.linearRampToValueAtTime(
+              0.0001,
+              attackEndTime + patch.envelope.decayRelease
+            )
+          }
         }
       });
     }
@@ -571,7 +619,7 @@ VS.BassEmulator = function() {
 
     // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
-      oscNoteAmps[oscNumber].gain.cancelScheduledValues(0);
+      oscNoteAmps[oscNumber].gain.cancelScheduledValues(time);
 
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
       patch.vco[oscNumber].frequency =
@@ -584,7 +632,6 @@ VS.BassEmulator = function() {
       );
 
       if (patch.ampEgOn && patch.envelope.attack > 0) {
-        // oscNoteAmps[oscNumber].gain.setTargetAtTime(1, time, patch.envelope.attack / 3);
         oscNoteAmps[oscNumber].gain.setValueAtTime(0, time);
         oscNoteAmps[oscNumber].gain.linearRampToValueAtTime(1, attackEndTime);
       } else {
@@ -658,7 +705,8 @@ VS.BassEmulator = function() {
   const keyboardUp = function() {
     let currentValue;
     let time = audioCtx.currentTime;
-    let timeConstant = patch.envelope.decayRelease / 7;
+    let gainCurve = decayReleaseGainCurve;
+    let duration = patch.envelope.decayRelease;
 
     if (patch.ampEgOn) {
       if (time < attackEndTime || patch.sustainOn) {
@@ -684,16 +732,26 @@ VS.BassEmulator = function() {
           if (oscNoteAmp !== null) {
             try {
               oscNoteAmp.gain.cancelAndHoldAtTime(time);
+              currentValue = oscNoteAmp.gain.value; // Always between 0 and 1
             } catch (error) {
               // Firefox doesn't support cancelAndHoldAtTime();
               // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
               currentValue = oscNoteAmp.gain.value; // Always between 0 and 1
               oscNoteAmp.gain.cancelScheduledValues(time);
               oscNoteAmp.gain.setValueAtTime(currentValue, time);
-              // Shorten the decay time proportionally.
-              timeConstant = currentValue * patch.envelope.decayRelease / 7;
             }
-            oscNoteAmp.gain.setTargetAtTime(0.0001, time, timeConstant);
+
+            duration = currentValue * patch.envelope.decayRelease;
+
+            if (browserFeatures['customCurveClearing']) {
+              // adjust gain curve
+              gainCurve = decayReleaseGainCurve.map(
+                function(value) { return value * currentValue }
+              );
+              oscNoteAmp.gain.setValueCurveAtTime(gainCurve, time, duration);
+            } else {
+              oscNoteAmp.gain.linearRampToValueAtTime(0.0001, time + duration);
+            }
           }
         });
       }
