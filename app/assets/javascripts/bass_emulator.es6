@@ -524,16 +524,21 @@ VS.BassEmulator = function() {
       audioCtx.currentTime
     );
 
-    oscillator.frequency.setValueAtTime(
-      patch.vco[oscNumber].frequency,
-      audioCtx.currentTime
-    );
+    oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
 
     osc[oscNumber] = oscillator;
     osc[oscNumber].connect(oscMuteAmps[oscNumber]);
     ampLfoPitch.connect(osc[oscNumber].detune);
     osc[oscNumber].start();
   });
+
+  // controls frequency of all three vcos rather than looping through them.
+  const oscFreqNode = audioCtx.createConstantSource();
+  oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
+  oscFreqNode.connect(osc[1].frequency);
+  oscFreqNode.connect(osc[2].frequency);
+  oscFreqNode.connect(osc[3].frequency);
+  oscFreqNode.start();
 
   // ==========================
   //  get browser capabilities
@@ -602,6 +607,7 @@ VS.BassEmulator = function() {
   let attackEndTime;
 
   const playNewNote = function() {
+    let frequency;
     time = audioCtx.currentTime;
 
     envelope.offset.cancelScheduledValues(0);
@@ -612,17 +618,14 @@ VS.BassEmulator = function() {
 
     // VCOs 1, 2, and 3
     ampEg.gain.cancelScheduledValues(time);
+    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+
     [1, 2, 3].forEach(function(oscNumber) {
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-      patch.vco[oscNumber].frequency =
-        keyMap[notePlaying] *
-        octaveMap[patch.octave].frequencyFactor;
-
-      osc[oscNumber].frequency.setValueAtTime(
-        patch.vco[oscNumber].frequency,
-        time
-      );
+      patch.vco[oscNumber].frequency = frequency;
     });
+
+    oscFreqNode.offset.setValueAtTime(frequency, time);
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
       ampEg.gain.setValueAtTime(0, time);
@@ -644,22 +647,21 @@ VS.BassEmulator = function() {
   };
 
   const changeCurrentNote = function() {
-    [1, 2, 3].forEach(function(oscNumber) {
-      patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-      patch.vco[oscNumber].frequency =
-        keyMap[notePlaying] *
-        octaveMap[patch.octave].frequencyFactor;
+    let frequency, lastFrequency;
+    let time = audioCtx.currentTime;
+    lastFrequency = oscFreqNode.offset.value;
+    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
 
-      osc[oscNumber].frequency.setValueAtTime(
-        patch.vco[oscNumber].lastFrequency, audioCtx.currentTime
-      );
-      osc[oscNumber].frequency.linearRampToValueAtTime(
-        patch.vco[oscNumber].frequency, audioCtx.currentTime + 0.05
-      );
+    [1, 2, 3].forEach(function(oscNumber) {
+      patch.vco[oscNumber].lastFrequency = lastFrequency;
+      patch.vco[oscNumber].frequency = frequency;
     });
+
+    oscFreqNode.offset.setValueAtTime(lastFrequency, time);
+    oscFreqNode.offset.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
-  const changeOctave = function() {
+  const changeOctave = function(time = audioCtx.currentTime) {
     VS.display.update(octaveMap[patch.octave].displayNumber, 'noteString');
 
     // Turn octave knob
@@ -669,16 +671,11 @@ VS.BassEmulator = function() {
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
-    osc.forEach(function(oscillator, oscNumber) {
-      if (oscillator !== null) {
-        patch.vco[oscNumber].frequency =
-          keyMap[notePlaying] *
-          octaveMap[patch.octave].frequencyFactor;
+    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+    oscFreqNode.offset.setValueAtTime(frequency, time);
 
-        osc[oscNumber].frequency.setValueAtTime(
-          patch.vco[oscNumber].frequency, audioCtx.currentTime
-        );
-      }
+    [1, 2, 3].forEach(function(oscNumber) {
+      patch.vco[oscNumber].frequency = frequency;
     });
   }
   changeOctave();
