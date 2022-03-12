@@ -425,10 +425,10 @@ VS.BassEmulator = function() {
   filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, audioCtx.currentTime);
   filterEgAmp.connect(filter.detune);
 
-  const envelope = audioCtx.createConstantSource();
-  envelope.offset.setValueAtTime(0, audioCtx.currentTime);
-  envelope.connect(filterEgAmp);
-  envelope.start();
+  const filterEg = audioCtx.createConstantSource();
+  filterEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  filterEg.connect(filterEgAmp);
+  filterEg.start();
 
   const ampEg = audioCtx.createGain();
   ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -570,7 +570,7 @@ VS.BassEmulator = function() {
 
 
   const triggerDecay = function() {
-    envelope.offset.linearRampToValueAtTime(
+    filterEg.offset.linearRampToValueAtTime(
       0,
       attackEndTime + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
@@ -612,8 +612,8 @@ VS.BassEmulator = function() {
     let frequency;
     time = audioCtx.currentTime;
 
-    envelope.offset.cancelScheduledValues(0);
-    envelope.offset.setValueAtTime(0, time);
+    filterEg.offset.cancelScheduledValues(0);
+    filterEg.offset.setValueAtTime(0, time);
 
     lastAttackStart = time;
     attackEndTime = time + patch.envelope.attack;
@@ -640,7 +640,7 @@ VS.BassEmulator = function() {
 
     // Retrigger envelope
     // Attack
-    envelope.offset.linearRampToValueAtTime(1, attackEndTime);
+    filterEg.offset.linearRampToValueAtTime(1, attackEndTime);
 
     // Decay
     if (!patch.sustainOn) {
@@ -703,17 +703,17 @@ VS.BassEmulator = function() {
 
         // filter envelope
         try {
-          envelope.offset.cancelAndHoldAtTime(time);
-          currentValue = envelope.offset.value;
+          filterEg.offset.cancelAndHoldAtTime(time);
+          currentValue = filterEg.offset.value;
         } catch (error) {
           // Firefox doesn't support cancelAndHoldAtTime();
           // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-          currentValue = envelope.offset.value;
-          envelope.offset.cancelScheduledValues(time);
-          envelope.offset.setValueAtTime(currentValue, time);
+          currentValue = filterEg.offset.value;
+          filterEg.offset.cancelScheduledValues(time);
+          filterEg.offset.setValueAtTime(currentValue, time);
         }
         // TODO: Use custom curve for filter?
-        envelope.offset.linearRampToValueAtTime(
+        filterEg.offset.linearRampToValueAtTime(
           0,
           time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
         );
@@ -745,8 +745,8 @@ VS.BassEmulator = function() {
 
     } else {
       // Filter cutoff down immediately
-      envelope.offset.cancelScheduledValues(time);
-      envelope.offset.setValueAtTime(0, time);
+      filterEg.offset.cancelScheduledValues(time);
+      filterEg.offset.setValueAtTime(0, time);
 
       // Turn amp down immediately
       ampEg.gain.setTargetAtTime(0, time, builtInDecay / 3);
