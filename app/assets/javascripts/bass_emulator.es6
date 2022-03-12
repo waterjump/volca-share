@@ -428,38 +428,22 @@ VS.BassEmulator = function() {
   envelope.connect(filterEgAmp);
   envelope.start();
 
+  const ampEg = audioCtx.createGain();
+  ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
+  ampEg.connect(filter);
+
   // Oscillator mute button amps (will go to gain 0 on mute button click)
   let osc1MuteAmp = audioCtx.createGain()
   osc1MuteAmp.gain.value = patch.vco[1].amp;
-  osc1MuteAmp.connect(filter);
+  osc1MuteAmp.connect(ampEg);
   let osc2MuteAmp = audioCtx.createGain()
   osc2MuteAmp.gain.value = patch.vco[2].amp;
-  osc2MuteAmp.connect(filter);
+  osc2MuteAmp.connect(ampEg);
   let osc3MuteAmp = audioCtx.createGain()
   osc3MuteAmp.gain.value = patch.vco[3].amp;
-  osc3MuteAmp.connect(filter);
+  osc3MuteAmp.connect(ampEg);
 
   const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
-
-  // Oscillator note amps (will go to gain 0 on note off)
-  let osc1NoteAmp = audioCtx.createGain()
-  osc1NoteAmp.gain.value = 0;
-  osc1NoteAmp.connect(oscMuteAmps[1]);
-  let osc2NoteAmp = audioCtx.createGain()
-  osc2NoteAmp.gain.value = 0;
-  osc2NoteAmp.connect(oscMuteAmps[2]);
-  let osc3NoteAmp = audioCtx.createGain()
-  osc3NoteAmp.gain.value = 0;
-  osc3NoteAmp.connect(oscMuteAmps[3]);
-
-  const ampEg = audioCtx.createConstantSource();
-  ampEg.offset.setValueAtTime(0, audioCtx.currentTime);
-  ampEg.connect(osc1NoteAmp.gain);
-  ampEg.connect(osc2NoteAmp.gain);
-  ampEg.connect(osc3NoteAmp.gain);
-  ampEg.start();
-
-  const oscNoteAmps = [null, osc1NoteAmp, osc2NoteAmp, osc3NoteAmp];
 
   let osc = [null, null, null, null];
 
@@ -546,7 +530,7 @@ VS.BassEmulator = function() {
     );
 
     osc[oscNumber] = oscillator;
-    osc[oscNumber].connect(oscNoteAmps[oscNumber]);
+    osc[oscNumber].connect(oscMuteAmps[oscNumber]);
     ampLfoPitch.connect(osc[oscNumber].detune);
     osc[oscNumber].start();
   });
@@ -585,17 +569,17 @@ VS.BassEmulator = function() {
     );
 
     if (patch.ampEgOn) {
-      ampEg.offset.setValueAtTime(1, attackEndTime);
+      ampEg.gain.setValueAtTime(1, attackEndTime);
 
       if (browserFeatures['customCurveClearing']) {
         // use custom curve
-        ampEg.offset.setValueCurveAtTime(
+        ampEg.gain.setValueCurveAtTime(
           decayReleaseGainCurve,
           attackEndTime,
           patch.envelope.decayRelease
         )
       } else {
-        ampEg.offset.linearRampToValueAtTime(
+        ampEg.gain.linearRampToValueAtTime(
           0,
           attackEndTime + patch.envelope.decayRelease
         )
@@ -627,7 +611,7 @@ VS.BassEmulator = function() {
     attackEndTime = time + patch.envelope.attack;
 
     // VCOs 1, 2, and 3
-    ampEg.offset.cancelScheduledValues(time);
+    ampEg.gain.cancelScheduledValues(time);
     [1, 2, 3].forEach(function(oscNumber) {
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
       patch.vco[oscNumber].frequency =
@@ -641,10 +625,10 @@ VS.BassEmulator = function() {
     });
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
-      ampEg.offset.setValueAtTime(0, time);
-      ampEg.offset.linearRampToValueAtTime(1, attackEndTime);
+      ampEg.gain.setValueAtTime(0, time);
+      ampEg.gain.linearRampToValueAtTime(1, attackEndTime);
     } else {
-      ampEg.offset.setValueAtTime(1, time);
+      ampEg.gain.setValueAtTime(1, time);
     }
 
     retriggerLfo();
@@ -737,14 +721,14 @@ VS.BassEmulator = function() {
 
         // Amp eg
         try {
-          ampEg.offset.cancelAndHoldAtTime(time);
-          currentValue = ampEg.offset.value; // Always between 0 and 1
+          ampEg.gain.cancelAndHoldAtTime(time);
+          currentValue = ampEg.gain.value; // Always between 0 and 1
         } catch (error) {
           // Firefox doesn't support cancelAndHoldAtTime();
           // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-          currentValue = ampEg.offset.value; // Always between 0 and 1
-          ampEg.offset.cancelScheduledValues(time);
-          ampEg.offset.setValueAtTime(currentValue, time);
+          currentValue = ampEg.gain.value; // Always between 0 and 1
+          ampEg.gain.cancelScheduledValues(time);
+          ampEg.gain.setValueAtTime(currentValue, time);
         }
 
         duration = currentValue * patch.envelope.decayRelease;
@@ -754,9 +738,9 @@ VS.BassEmulator = function() {
           gainCurve = decayReleaseGainCurve.map(
             function(value) { return value * currentValue }
           );
-          ampEg.offset.setValueCurveAtTime(gainCurve, time, duration);
+          ampEg.gain.setValueCurveAtTime(gainCurve, time, duration);
         } else {
-          ampEg.offset.linearRampToValueAtTime(0, time + duration);
+          ampEg.gain.linearRampToValueAtTime(0, time + duration);
         }
       }
 
@@ -766,7 +750,7 @@ VS.BassEmulator = function() {
       envelope.offset.setValueAtTime(0, time);
 
       // Turn amp down immediately
-      ampEg.offset.setTargetAtTime(0, time, builtInDecay / 3);
+      ampEg.gain.setTargetAtTime(0, time, builtInDecay / 3);
     }
   };
 
