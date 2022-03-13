@@ -22,5 +22,6 @@
 //= require midi
 //= require display
 //= require knob
+//= require tone
 //= require_tree .
 //= require cookies_eu

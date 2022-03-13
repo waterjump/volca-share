@@ -409,6 +409,8 @@ VS.BassEmulator = function() {
   // =====================================
 
   const audioCtx = new AudioContext();
+  Tone.setContext(audioCtx);
+  Tone.start();
 
   let masterAmp = audioCtx.createGain();
   masterAmp.connect(audioCtx.destination);
@@ -560,12 +562,24 @@ VS.BassEmulator = function() {
     } catch (error) {
       browserFeatures['customCurveClearing'] = false;
     }
-  }
+  };
+
+  const checkCancelAndHoldAtTime = function() {
+    let dummyGain = audioCtx.createGain();
+    dummyGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    try {
+      dummyGain.gain.cancelAndHoldAtTime(audioCtx.currentTime + 0.1);
+      browserFeatures['cancelAndHoldAtTime'] = true;
+    } catch (error) {
+      browserFeatures['cancelAndHoldAtTime'] = false;
+    }
+  };
 
   const testBrowserFeatures = function() {
     checkCustomCurveClearing();
+    checkCancelAndHoldAtTime();
     console.log(browserFeatures);
-  }
+  };
 
   testBrowserFeatures();
 
@@ -716,13 +730,12 @@ VS.BassEmulator = function() {
       if (time < attackEndTime || patch.sustainOn) {
 
         // filter envelope
-        try {
+        if (browserFeatures['cancelAndHoldAtTime']) {
           filterEg.offset.cancelAndHoldAtTime(time);
           currentValue = filterEg.offset.value;
-        } catch (error) {
-          // Firefox doesn't support cancelAndHoldAtTime();
-          // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-          currentValue = filterEg.offset.value;
+        } else {
+          // currentValue = filterEg.offset.value;
+          currentValue = parseFloat((time - lastAttackStart) / patch.envelope.attack);
           filterEg.offset.cancelScheduledValues(time);
           filterEg.offset.setValueAtTime(currentValue, time);
         }
@@ -733,16 +746,16 @@ VS.BassEmulator = function() {
         );
 
         // Amp eg
-        try {
+        if (browserFeatures['cancelAndHoldAtTime']) {
           ampEg.gain.cancelAndHoldAtTime(time);
           currentValue = ampEg.gain.value; // Always between 0 and 1
-        } catch (error) {
-          // Firefox doesn't support cancelAndHoldAtTime();
-          // https://developer.mozilla.org/en-US/docs/Web/API/AudioParam/cancelAndHoldAtTime
-          currentValue = ampEg.gain.value; // Always between 0 and 1
+        } else {
+          // currentValue = ampEg.gain.value; // Always between 0 and 1
+          currentValue = parseFloat((time - lastAttackStart) / patch.envelope.attack);
           ampEg.gain.cancelScheduledValues(time);
           ampEg.gain.setValueAtTime(currentValue, time);
         }
+        console.log(currentValue);
 
         duration = currentValue * patch.envelope.decayRelease;
 
@@ -766,6 +779,39 @@ VS.BassEmulator = function() {
       ampEg.gain.setTargetAtTime(0, time, builtInDecay / 3);
     }
   };
+
+
+  // ===================================
+  //  Sequencer experiment
+  // ===================================
+
+  const runToneSequencer = function(){
+    Tone.Transport.bpm.value = 60;
+    let i = 0;
+    let notes = [65, 68, 71, 74];
+    // let textNotes = ['C3', 'E3', 'G3', 'B3'];
+    Tone.Transport.scheduleRepeat(time => {
+      // console.log(Tone.now());
+      // let textNote = textNotes[i % 4];
+      // let freq = Tone.Frequency(textNote).toFrequency();
+      notePlaying = notes[i % 4];
+
+      playNewNote(time);
+      // stopNote(time + 5);
+      i++;
+    }, '16n');
+  };
+  runToneSequencer();
+
+  $('#start').on('click', function() {
+    Tone.Transport.start();
+  });
+
+  $('#stop').on('click', function() { Tone.Transport.stop() });
+
+  // ===================================
+  //  END Sequencer experiment
+  // ===================================
 
   window.onkeydown = function(keyDown) {
     // PLAY NOTES
