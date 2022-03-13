@@ -611,9 +611,8 @@ VS.BassEmulator = function() {
   let lastAttackStart;
   let attackEndTime;
 
-  const playNewNote = function() {
+  const playNewNote = function(time = audioCtx.currentTime) {
     let frequency;
-    time = audioCtx.currentTime;
 
     filterEg.offset.cancelScheduledValues(0);
     filterEg.offset.setValueAtTime(0, time);
@@ -651,11 +650,9 @@ VS.BassEmulator = function() {
     }
   };
 
-  const changeCurrentNote = function() {
-    let frequency, lastFrequency;
-    let time = audioCtx.currentTime;
-    lastFrequency = oscFreqNode.offset.value;
-    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+  const changeCurrentNote = function(time = audioCtx.currentTime) {
+    let frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+    let lastFrequency = oscFreqNode.offset.value;
 
     [1, 2, 3].forEach(function(oscNumber) {
       patch.vco[oscNumber].lastFrequency = lastFrequency;
@@ -685,19 +682,18 @@ VS.BassEmulator = function() {
   }
   changeOctave();
 
-  const keyboardDown = function(){
+  const keyboardDown = function(time = audioCtx.currentTime){
     keysDown.push(notePlaying);
 
     if (keysDown.length === 1) {
       playNewNote();
     } else {
-      changeCurrentNote();
+      changeCurrentNote(time);
     }
   };
 
-  const keyboardUp = function() {
+  const keyboardUp = function(time = audioCtx.currentTime) {
     let currentValue;
-    let time = audioCtx.currentTime;
     let gainCurve = decayReleaseGainCurve;
     let duration = patch.envelope.decayRelease;
 
