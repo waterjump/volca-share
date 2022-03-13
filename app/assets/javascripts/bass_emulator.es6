@@ -611,7 +611,7 @@ VS.BassEmulator = function() {
   const playNewNote = function(time = audioCtx.currentTime) {
     let frequency;
 
-    filterEg.offset.cancelScheduledValues(0);
+    filterEg.offset.cancelScheduledValues(time);
     filterEg.offset.setValueAtTime(0, time);
 
     lastAttackStart = time;
@@ -683,13 +683,27 @@ VS.BassEmulator = function() {
     keysDown.push(notePlaying);
 
     if (keysDown.length === 1) {
-      playNewNote();
+      playNewNote(time);
     } else {
       changeCurrentNote(time);
     }
   };
 
-  const keyboardUp = function(time = audioCtx.currentTime) {
+  const keyboardUp = function(keyUp, time = audioCtx.currentTime) {
+    keysDown = keysDown.filter(key => key !== keyUp.keyCode);
+
+    if (keysDown.length > 0) {
+      notePlaying = keysDown[keysDown.length - 1];
+
+      changeCurrentNote(time);
+
+      return;
+    }
+
+    stopNote(time);
+  };
+
+  const stopNote = function(time = audioCtx.currentTime) {
     let currentValue;
     let gainCurve = decayReleaseGainCurve;
     let duration = patch.envelope.decayRelease;
@@ -770,17 +784,7 @@ VS.BassEmulator = function() {
   };
 
   window.onkeyup = function(keyUp) {
-    keysDown = keysDown.filter(key => key !== keyUp.keyCode);
-
-    if (keysDown.length > 0) {
-      notePlaying = keysDown[keysDown.length - 1];
-
-      changeCurrentNote();
-
-      return;
-    }
-
-    keyboardUp();
+    keyboardUp(keyUp);
   };
 
   $(document).on('mousemove touchmove', function(e) {
