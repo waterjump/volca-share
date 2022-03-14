@@ -407,6 +407,7 @@ VS.BassEmulator = function() {
 
   const audioCtx = new AudioContext();
   Tone.setContext(audioCtx);
+  Tone.context.lookAhead = 0.001;
   Tone.start();
 
   let masterAmp = audioCtx.createGain();
@@ -583,7 +584,8 @@ VS.BassEmulator = function() {
   // END get browser capabilities
 
 
-  const triggerDecay = function() {
+  const triggerDecay = function(time) {
+    let attackEndTime = time + patch.envelope.attack;
     filterEg.offset.linearRampToValueAtTime(
       0,
       attackEndTime + (patch.envelope.decayRelease * patch.filterEgCoefficient)
@@ -658,7 +660,7 @@ VS.BassEmulator = function() {
 
     // Decay
     if (!patch.sustainOn) {
-      triggerDecay();
+      triggerDecay(time);
     }
   };
 
@@ -804,7 +806,10 @@ VS.BassEmulator = function() {
     Tone.Transport.start();
   });
 
-  $('#stop').on('click', function() { Tone.Transport.stop() });
+  $('#stop').on('click', function() {
+    Tone.Transport.stop();
+    stopNote();
+  });
 
   // ===================================
   //  END Sequencer experiment
