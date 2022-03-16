@@ -612,6 +612,7 @@ VS.BassEmulator = function() {
   let attackEndTime;
 
   const playNewNote = function(time = audioCtx.currentTime) {
+    if (audioCtx.state === 'suspended') { audioCtx.resume() }
     let frequency;
 
     filterEg.offset.cancelScheduledValues(time);
