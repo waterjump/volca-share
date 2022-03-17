@@ -573,10 +573,28 @@ VS.BassEmulator = function() {
     }
   };
 
+  const showPerformanceWarning = function() {
+    if (browserFeatures['cancelAndHoldAtTime']) { return; }
+
+    $('#performance-warning').html(
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      '<strong>Just a heads up: </strong><br />' +
+      'There are known performance issues with this browser, ' +
+      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
+      'For best results, use a <a class="alert-link" target="_blank" ' +
+      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
+      'supported browser.</a>'
+    );
+    $('#performance-warning').removeClass('hidden');
+  };
+
   const testBrowserFeatures = function() {
     checkCustomCurveClearing();
     checkCancelAndHoldAtTime();
     console.log(browserFeatures);
+
+    showPerformanceWarning();
   };
 
   testBrowserFeatures();
