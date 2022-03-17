@@ -21,9 +21,3 @@ while (i < 128) {
   VS.midiNoteNumbers[i] = midiMultiples[i % 12] + (Math.floor(i / 12) - 2);
   i++;
 }
-
-$(function() {
-  $('.alert').fadeTo(2000, 500).slideUp(500, function() {
-    $('.alert').slideUp(500);
-  });
-});
