@@ -646,16 +646,24 @@ VS.BassEmulator = function() {
     if (audioCtx.state === 'suspended') { audioCtx.resume() }
     let frequency;
 
-    filterEg.offset.cancelScheduledValues(time);
+    try {
+      filterEg.offset.cancelAndHoldAtTime(time);
+    } catch (error) {
+      filterEg.offset.cancelScheduledValues(time);
+    }
     filterEg.offset.setValueAtTime(0, time);
 
     lastAttackStart = time;
     attackEndTime = time + patch.envelope.attack;
 
-    // VCOs 1, 2, and 3
-    ampEg.gain.cancelScheduledValues(time);
+    try {
+      ampEg.gain.cancelAndHoldAtTime(time);
+    } catch (error) {
+      ampEg.gain.cancelScheduledValues(time);
+    }
     frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
 
+    // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
       patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
       patch.vco[oscNumber].frequency = frequency;
@@ -803,7 +811,7 @@ VS.BassEmulator = function() {
   // ===================================
 
   const runToneSequencer = function(){
-    Tone.Transport.bpm.value = 60;
+    Tone.Transport.bpm.value = 120;
     let i = 0;
     let notes = [65, 68, 71, 74];
     // let textNotes = ['C3', 'E3', 'G3', 'B3'];
