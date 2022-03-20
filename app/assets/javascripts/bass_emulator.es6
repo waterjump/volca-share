@@ -641,6 +641,7 @@ VS.BassEmulator = function() {
 
   let lastAttackStart;
   let attackEndTime;
+  let sequencerPlaying = false;
 
   const playNewNote = function(time = audioCtx.currentTime) {
     if (audioCtx.state === 'suspended') { audioCtx.resume() }
@@ -723,6 +724,7 @@ VS.BassEmulator = function() {
   changeOctave();
 
   const keyboardDown = function(time = audioCtx.currentTime){
+    if (sequencerPlaying) { return; }
     keysDown.push(notePlaying);
 
     if (keysDown.length === 1) {
@@ -733,6 +735,7 @@ VS.BassEmulator = function() {
   };
 
   const keyboardUp = function(keyUp, time = audioCtx.currentTime) {
+    if (sequencerPlaying) { return; }
     keysDown = keysDown.filter(key => key !== keyUp.keyCode);
 
     if (keysDown.length > 0) {
@@ -816,7 +819,6 @@ VS.BassEmulator = function() {
     let notes = [65, 68, 71, 74];
     // let textNotes = ['C3', 'E3', 'G3', 'B3'];
     Tone.Transport.scheduleRepeat(time => {
-      // console.log(Tone.now());
       // let textNote = textNotes[i % 4];
       // let freq = Tone.Frequency(textNote).toFrequency();
       notePlaying = notes[i % 4];
@@ -829,10 +831,12 @@ VS.BassEmulator = function() {
   runToneSequencer();
 
   $('#start').on('click', function() {
+    sequencerPlaying = true;
     Tone.Transport.start();
   });
 
   $('#stop').on('click', function() {
+    sequencerPlaying = false;
     Tone.Transport.stop();
     stopNote();
   });
