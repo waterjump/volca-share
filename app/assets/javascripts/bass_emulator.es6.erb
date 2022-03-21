@@ -3,22 +3,22 @@ VS.BassEmulator = function() {
   // Declare map constants
   // =====================
 
-  const keyMap = {
-    65: 130.81, // C
-    87: 138.59, // C#
-    83: 146.83, // D
-    69: 155.56, // D#
-    68: 164.81, // E
-    70: 174.61, // F
-    84: 185.00, // F#
-    71: 196.00, // G
-    89: 207.65, // G#
-    72: 220.00, // A
-    85: 233.08, // A#
-    74: 246.94, // B
-    75: 261.63, // C
-    79: 277.18, // C#
-    76: 293.66  // D
+  let keyMidiMap = {
+    65: 48, // C
+    87: 49, // C#
+    83: 50, // D
+    69: 51, // D#
+    68: 52, // E
+    70: 53, // F
+    84: 54, // F#
+    71: 55, // G
+    89: 56, // G#
+    72: 57, // A
+    85: 58, // A#
+    74: 59, // B
+    75: 60, // C
+    79: 61, // C#
+    76: 62  // D
   }
 
   // Key is vco pitch MIDI value.  Value is detune value in semitones.
@@ -69,7 +69,7 @@ VS.BassEmulator = function() {
     9: 127
   };
 
-  const keyCodes = Object.keys(keyMap).map(Number);
+  const keyCodes = Object.keys(keyMidiMap).map(Number);
 
   const parameterMaps = {
     decayReleaseMap: {
@@ -665,7 +665,7 @@ VS.BassEmulator = function() {
     } catch (error) {
       ampEg.gain.cancelScheduledValues(time);
     }
-    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+    frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
 
     // VCOs 1, 2, and 3
     [1, 2, 3].forEach(function(oscNumber) {
@@ -695,7 +695,7 @@ VS.BassEmulator = function() {
   };
 
   const changeCurrentNote = function(time = audioCtx.currentTime) {
-    let frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+    let frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
     let lastFrequency = oscFreqNode.offset.value;
 
     [1, 2, 3].forEach(function(oscNumber) {
@@ -707,7 +707,7 @@ VS.BassEmulator = function() {
     oscFreqNode.offset.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
-  const changeOctave = function(time = audioCtx.currentTime) {
+  const changeOctave = function(change, time = audioCtx.currentTime) {
     VS.display.update(octaveMap[patch.octave].displayNumber, 'noteString');
 
     // Turn octave knob
@@ -717,18 +717,23 @@ VS.BassEmulator = function() {
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
-    frequency = keyMap[notePlaying] * octaveMap[patch.octave].frequencyFactor;
+    let octaveOffset = change * 12;
+    notePlaying = notePlaying + octaveOffset;
+    keysDown = keysDown.map(key => key + octaveOffset);
+    let frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
     oscFreqNode.offset.setValueAtTime(frequency, time);
 
     [1, 2, 3].forEach(function(oscNumber) {
       patch.vco[oscNumber].frequency = frequency;
     });
   }
-  changeOctave();
+  changeOctave(0);
 
   const keyboardDown = function(time = audioCtx.currentTime){
     if (sequencerPlaying) { return; }
-    keysDown.push(notePlaying);
+    if (keysDown.indexOf(notePlaying) === -1) {
+      keysDown.push(notePlaying);
+    }
 
     if (keysDown.length === 1) {
       playNewNote(time);
@@ -739,7 +744,8 @@ VS.BassEmulator = function() {
 
   const keyboardUp = function(keyUp, time = audioCtx.currentTime) {
     if (sequencerPlaying) { return; }
-    keysDown = keysDown.filter(key => key !== keyUp.keyCode);
+    let octaveOffset = (patch.octave - 3) * 12;
+    keysDown = keysDown.filter(key => key !== keyMidiMap[keyUp.keyCode] + octaveOffset);
 
     if (keysDown.length > 0) {
       notePlaying = keysDown[keysDown.length - 1];
@@ -851,25 +857,27 @@ VS.BassEmulator = function() {
   window.onkeydown = function(keyDown) {
     // PLAY NOTES
     if (keyCodes.includes(keyDown.keyCode)) {
-      notePlaying = keyDown.keyCode;
+      let octaveOffset = (patch.octave - 3) * 12;
+      notePlaying = keyMidiMap[keyDown.keyCode] + octaveOffset;
 
       keyboardDown();
     }
 
     // CHANGE OCTAVE
-    if ([zKeyCode, xKeyCode].includes(keyDown.keyCode)) {
-      if (keyDown.keyCode == zKeyCode && patch.octave > -1) {
-        patch.octave -= 1;
-      }
-      if (keyDown.keyCode == xKeyCode && patch.octave < 9) {
-        patch.octave += 1;
-      }
-      changeOctave();
+    if (keyDown.keyCode == zKeyCode && patch.octave > -1) {
+      patch.octave -= 1;
+      changeOctave(-1);
+    }
+    if (keyDown.keyCode == xKeyCode && patch.octave < 9) {
+      patch.octave += 1;
+      changeOctave(1);
     }
   };
 
   window.onkeyup = function(keyUp) {
-    keyboardUp(keyUp);
+    if (keyCodes.includes(keyUp.keyCode)) {
+      keyboardUp(keyUp);
+    }
   };
 
   $(document).on('mousemove touchmove', function(e) {
@@ -1065,7 +1073,7 @@ VS.BassEmulator = function() {
     if (patch.octave < 9) {
       patch.octave += 1;
     }
-    changeOctave();
+    changeOctave(1);
   });
 
   // MOBILE OCTAVE DOWN
@@ -1073,20 +1081,19 @@ VS.BassEmulator = function() {
     if (patch.octave > -1) {
       patch.octave -= 1;
     }
-    changeOctave();
+    changeOctave(-1);
   });
 
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
-    notePlaying = $(this).data('keycode');
+    let octaveOffset = (patch.octave - 3) * 12;
+    notePlaying = keyMidiMap[$(this).data('keycode')] + octaveOffset;
 
     keyboardDown();
   });
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
-    keysDown = keysDown.filter(key => key !== $(this).data('keycode'));
-
-    keyboardUp();
+    keyboardUp({ keyCode: $(this).data('keycode') });
   });
 
   <% end %>
