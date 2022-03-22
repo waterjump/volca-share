@@ -48,7 +48,11 @@ VS.Sequences = function() {
 
   const setSequenceCount = function() {
     const vcoGroup = $('input[name=patch\\[vco_group\\]]:checked').val();
-    scope.sequenceCount = vcoGroupCounts[vcoGroup];
+    if ($('.emulator').length > 0) {
+      scope.sequenceCount = 1;
+    } else {
+      scope.sequenceCount = vcoGroupCounts[vcoGroup];
+    }
   };
 
   $('#toggle-sequences').on('click tap', function(e) {
@@ -77,6 +81,8 @@ VS.Sequences = function() {
 
   // TODO: this method sucks lol.  Refactor.
   $('.bottom-row .multi').on('click tap', function() {
+    if ($('.emulator').length > 0) { return; }
+
     $('.light[data-radio]').each(function() {
       $(this).removeClass('lit');
     });
