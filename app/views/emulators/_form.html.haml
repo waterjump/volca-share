@@ -106,6 +106,12 @@
           %span.on-off
             .note-light.note-11.lit
             .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
+
+  .field.sequence-area
+    = link_to 'Add sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
+    .sequence-holder
+      .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
+
   #mobile-keyboard.hidden
     #octave-up.mobile-control.octave-button.top Oct. ⬆️
     #octave-down.mobile-control.octave-button.bottom Oct. ⬇️

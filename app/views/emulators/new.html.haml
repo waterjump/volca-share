@@ -3,7 +3,9 @@
     Volca Bass Emulator
     %span.alpha beta
   = render 'form'
-= render 'patches/knob_debug'
+#new_choice_form{:style => "display: none;"}
+  = render partial: "sequences/new"
 #start.btn.btn-success START
 #stop.btn.btn-danger STOP
+= render 'patches/knob_debug'
 
