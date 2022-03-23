@@ -122,6 +122,19 @@ VS.BassEmulator = function() {
     }
   };
 
+  const calculateTempo = function(superMidi) {
+    let value;
+    if (superMidi <= 160) {
+      value = 56 + (0.5 * superMidi);
+    } else if (superMidi > 160 && superMidi <= 246) {
+      value = 136 + (superMidi - 160);
+    } else if (superMidi > 246 && superMidi <= 255) {
+      value = 222 + (superMidi - 246) * 2;
+    }
+    console.log('tempo: ', superMidi, value);
+    return value;
+  }
+
 
   // ===========================================
   // Setup patch object to hold parameter values
@@ -130,6 +143,7 @@ VS.BassEmulator = function() {
   const defaultVcoAmp = 0.33;
 
   const patch = {
+    tempo: 120,
     envelope: { attack: 0, decayRelease: 0.07, cutoffEgInt: 0 },
     filterEgCoefficient: 1.35,
     octave: 3,
@@ -157,6 +171,9 @@ VS.BassEmulator = function() {
 
     getPercentage: function(midiValue) {
       return midiValue / 127.0;
+    },
+    settempo: function(midiValue) {
+      this.tempo = calculateTempo(midiValue);
     },
     setattack: function(midiValue) {
       // Based on collected data from Volca Bass
@@ -840,7 +857,7 @@ VS.BassEmulator = function() {
   // ===================================
 
   const runToneSequencer = function(){
-    Tone.Transport.bpm.value = 120;
+    Tone.Transport.bpm.value = patch.tempo;
     let i = 0;
     let notes = [65, 68, 71, 74];
     // let textNotes = ['C3', 'E3', 'G3', 'B3'];
@@ -924,7 +941,16 @@ VS.BassEmulator = function() {
 
   const doKnobStuff = function(e) {
     if (VS.activeKnob === null) { return; }
+
     let midiValue, percentage;
+
+    if (VS.activeKnob.element.id == 'tempo') {
+      midiValue = $(VS.activeKnob.element).data('superMidi');
+      if (midiValue == undefined) { return; }
+
+      patch.settempo(midiValue);
+      Tone.Transport.bpm.value = patch.tempo;
+    }
 
     // NOTE:  Could probably DRY up these if blocks for each
     //   knob into a single block.

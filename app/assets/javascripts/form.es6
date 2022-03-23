@@ -168,7 +168,14 @@ VS.Form = function() {
     midi = $(this).data('midi');
     if (VS.dragging) { return false; }
     VS.activeKnob = new VS.Knob(this);
-    display.update(midi, VS.activeKnob.displayStyle);
+    if ($(this).attr('id') === 'tempo') {
+      let superMidi = $(this).data('super-midi');
+      $('#decimal').removeClass('hidden');
+      display.update(superMidi, VS.activeKnob.displayStyle);
+    } else {
+      $('#decimal').addClass('hidden');
+      display.update(midi, VS.activeKnob.displayStyle);
+    }
   });
 
   $(document).on('mousemove touchmove', function(e) {
@@ -259,6 +266,12 @@ VS.Form = function() {
         trueMidi = ((63.5 / limit) * degree) + 63.5
       }
 
+      // NOTE: Tempo knob has 256 values (0-255)
+      if ($(VS.activeKnob.element).attr('id') === 'tempo') {
+        superMidi = Math.abs(Math.round(((127.5 / limit) * degree) + 127));
+        $(VS.activeKnob.element).data('superMidi', superMidi);
+      }
+
       if (midiOut.ready()) {
         midiOut.output.sendControlChange(
           $(VS.activeKnob.element).data('control-number'),
@@ -269,7 +282,11 @@ VS.Form = function() {
       $(VS.activeKnob.element).data('midi', midi);
       $(VS.activeKnob.element).data('trueMidi', trueMidi);
       VS.activeKnob.inputElement.val(midi);
-      display.update(midi, VS.activeKnob.displayStyle);
+      if ($(VS.activeKnob.element).attr('id') === 'tempo') {
+        display.update(superMidi, VS.activeKnob.displayStyle);
+      } else {
+        display.update(midi, VS.activeKnob.displayStyle);
+      }
     }
   };
 

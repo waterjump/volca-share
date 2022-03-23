@@ -150,6 +150,25 @@ VS.Display = function(element) {
     return [thousands, hundreds, tens, ones];
   };
 
+  this.tempoString = function(superMidi) {
+    let value;
+    if (superMidi <= 160) {
+      value = 56 + (0.5 * superMidi);
+    } else if (superMidi > 160 && superMidi <= 246) {
+      value = 136 + (superMidi - 160);
+    } else if (superMidi > 246 && superMidi <= 255) {
+      value = 222 + (superMidi - 246) * 2;
+    }
+
+    let valueArray = value.toFixed(1).replace('.', '').split('');
+
+    if (valueArray.length === 3) {
+      valueArray.unshift('blank');
+    }
+
+    return valueArray;
+  };
+
   this.update = function(value, displayStyle) {
     const displayString = this[displayStyle](value);
     const digits = [this.digit1, this.digit2, this.digit3, this.digit4];

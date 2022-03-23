@@ -79,6 +79,16 @@ $pink: #fd9994;
       background-color: #141414;
     }
 
+    #decimal {
+      background-color: #f82d62;
+      top: 72%;
+      left: 71.5%;
+      width: 3%;
+      height: 6%;
+      border-radius: 40%;
+      position: absolute;
+    }
+
     .digit {
       background-image: image_url('numbers.jpg');
       background-repeat: no-repeat;
