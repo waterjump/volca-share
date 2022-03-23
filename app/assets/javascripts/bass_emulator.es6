@@ -255,6 +255,26 @@ VS.BassEmulator = function() {
     }
   };
 
+  const sequence = [];
+
+  const populateSequenceObject = function() {
+    $('.step:visible').each(function(index, step) {
+      sequence.push(
+        {
+          index: index,
+          note: $(step).find('.note-display').data('starting-note'),
+          slide: $(step).find('.slide .light').data('active'),
+          stepMode: $(step).find('.step-mode .light').data('active'),
+          activeStep: $(step).find('.active-step .light').data('active')
+        }
+      );
+    });
+  }
+
+  $('#toggle-sequences').on('click tap', function() {
+    populateSequenceObject();
+  });
+
   const volcaInterface = {
     lightAndCheck: function(paramName) {
       let light = $(`#${paramName}_light`);
@@ -827,9 +847,13 @@ VS.BassEmulator = function() {
     Tone.Transport.scheduleRepeat(time => {
       // let textNote = textNotes[i % 4];
       // let freq = Tone.Frequency(textNote).toFrequency();
-      notePlaying = notes[i % 4];
+      notePlaying = sequence[i % 16]['note'];
 
-      playNewNote(time);
+      if ( i > 0 && sequence[(i - 1) % 16]['slide']) {
+        changeCurrentNote(time);
+      } else {
+        playNewNote(time);
+      }
       // stopNote(time + 5);
       i++;
     }, '16n');
@@ -878,8 +902,28 @@ VS.BassEmulator = function() {
   };
 
   $(document).on('mousemove touchmove', function(e) {
-    if (VS.activeKnob === null) { return; }
     if (VS.dragging === false) { return; }
+    doKnobStuff(e);
+    doSequenceStuff(e);
+  });
+
+  const doSequenceStuff = function(e) {
+    if (VS.sequences.activeNote !== null) {
+      let note = VS.sequences.activeNote.data('note');
+      let index = VS.sequences.activeNote.data('index');
+      sequence[index]['note'] = VS.sequences.activeNote.data('note');
+    }
+  };
+
+  $('.sequence-holder').on('click tap', '.sequence-box .slide label', function() {
+    let light = $($(this).find('.light'));
+    light.data('active', !light.data('active'));
+    let index = light.data('index');
+    sequence[index]['slide'] = light.data('active');
+  });
+
+  const doKnobStuff = function(e) {
+    if (VS.activeKnob === null) { return; }
     let midiValue, percentage;
 
     // NOTE:  Could probably DRY up these if blocks for each
@@ -991,7 +1035,7 @@ VS.BassEmulator = function() {
       patch.setvolume(midiValue);
       masterAmp.gain.setValueAtTime(patch.volume, audioCtx.currentTime);
     }
-  });
+  };
 
   const toggleVcoAmp = function(oscNumber) {
     if (patch.vco[oscNumber].amp == defaultVcoAmp) {
