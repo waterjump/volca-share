@@ -1,6 +1,8 @@
 #interface.col-lg-9.form
   .stretchy
     .volca.bass.emulator
+      .small.knob.eg.lit#tempo{ data: { super_midi: 128, midi: 63, control_number: 0} }
+        .notch
       .small.knob.eg.lit#attack{ data: { midi: @patch.attack || 63, control_number: 46 } }
         .notch
       .small.knob.eg.lit#decay_release{ data: { midi: @patch.decay_release || 63, control_number: 47 } }
@@ -12,6 +14,7 @@
         .digit#hundreds
         .digit#tens
         .digit#ones
+        #decimal.hidden
       .medium.knob#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
         .notch
       .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
