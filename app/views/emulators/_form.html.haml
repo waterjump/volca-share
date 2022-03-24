@@ -37,6 +37,7 @@
       .medium.knob#volume{ data: { midi: 127 } }
         .notch
       .cooltip
+      .button#play
       .bottom-row
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
         = label_tag('patch[vco_group_one]') do
@@ -111,9 +112,8 @@
             .light{ id: 'amp_eg_on_light', class: @patch.lit?(:amp_eg_on) }
 
   .field.sequence-area
-    = link_to 'Add sequences', '#', id: 'toggle-sequences', class: 'btn btn-default'
     .sequence-holder
-      .sequence-message.hidden Use the VCO Group selector to change the number of sequences.
+    = link_to 'Show sequencer', '#', id: 'toggle-sequences', class: 'btn btn-default', data: { hide_text: 'Hide sequencer' }
 
   #mobile-keyboard.hidden
     #octave-up.mobile-control.octave-button.top Oct. ⬆️
