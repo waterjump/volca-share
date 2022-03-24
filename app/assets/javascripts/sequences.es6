@@ -34,7 +34,10 @@ VS.Sequences = function() {
       $('.sequence-holder').append(content);
       i++;
     }
-    $('#toggle-sequences').text('Remove sequences');
+
+    let text = $('#toggle-sequences').data('hide-text') || 'Remove sequences';
+    $('#toggle-sequences').text(text);
+
     scope.sequencesActive = true;
   };
 
@@ -63,6 +66,12 @@ VS.Sequences = function() {
       const myInput = $(`input#${$(this).parent().attr('for')}`);
       if (myInput.prop('checked')) { $(this).find('div').addClass('lit'); }
     });
+  });
+
+  $('#play').on('click tap', function(e) {
+    e.preventDefault();
+    setSequenceCount();
+    if (!scope.sequencesActive) { showSequences(); }
   });
 
   $('.sequence-holder').on('mousedown touchstart', '.note-display', function(e) {
