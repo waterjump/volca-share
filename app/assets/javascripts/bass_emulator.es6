@@ -1,4 +1,6 @@
 VS.BassEmulator = function() {
+  const { sequences } = VS;
+
   // =====================
   // Declare map constants
   // =====================
@@ -762,6 +764,7 @@ VS.BassEmulator = function() {
     });
   }
   changeOctave(0);
+  sequences.init();
 
   const keyboardDown = function(time = audioCtx.currentTime){
     if (sequencerPlaying) { return; }
