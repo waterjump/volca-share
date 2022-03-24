@@ -133,7 +133,6 @@ VS.BassEmulator = function() {
     } else if (superMidi > 246 && superMidi <= 255) {
       value = 222 + (superMidi - 246) * 2;
     }
-    console.log('tempo: ', superMidi, value);
     return value;
   }
 
@@ -862,16 +861,31 @@ VS.BassEmulator = function() {
   const runToneSequencer = function(){
     Tone.Transport.bpm.value = patch.tempo;
     let i = 0;
+    let previousStepStepMode = false;
     Tone.Transport.scheduleRepeat(time => {
       if (!sequencerPlaying) { return; }
       currentStep = sequence[i % 16];
       notePlaying = currentStep['note'];
 
-      if (currentStep['slide']) {
-        changeCurrentNote(time);
-      } else {
-        playNewNote(time);
+      if (currentStep['stepMode']) {
+        if (currentStep['slide']) {
+          if (previousStepStepMode) {
+            changeCurrentNote(time);
+          } else {
+            // Play a new note when last step stop mode was off even if
+            //   slide is active on this step.
+            playNewNote(time);
+          }
+        } else {
+          playNewNote(time);
+        }
+        previousStepStepMode = true;
+      } else if (previousStepStepMode) {
+        // NOTE: This will act weird if EG from last note is still happening
+        stopNote(time);
+        previousStepStepMode = false;
       }
+
       i++;
     }, '16n');
   };
@@ -941,6 +955,13 @@ VS.BassEmulator = function() {
     light.data('active', !light.data('active'));
     let index = light.data('index');
     sequence[index]['slide'] = light.data('active');
+  });
+
+  $('.sequence-holder').on('click tap', '.sequence-box .step-mode label', function() {
+    let light = $($(this).find('.light'));
+    light.data('active', !light.data('active'));
+    let index = light.data('index');
+    sequence[index]['stepMode'] = light.data('active');
   });
 
   const doKnobStuff = function(e) {
