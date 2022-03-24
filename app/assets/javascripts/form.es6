@@ -184,7 +184,17 @@ VS.Form = function() {
     e.preventDefault();
     e.stopPropagation();
     $('body').css('cursor', 'ns-resize');
-    VS.currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
+
+    try {
+      VS.currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
+    } catch (error) {
+      if (error instanceof TypeError) {
+        // mouse dragged off the screen.  no big deal
+      } else {
+        throw error;
+      }
+    }
+
     turnKnob(e);
     sequences.changeSequenceNote(e);
   });
