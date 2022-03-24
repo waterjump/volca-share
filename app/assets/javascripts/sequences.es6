@@ -6,6 +6,7 @@ VS.Sequences = function() {
   this.sequencesActive = $('.remove-sequence[value=\'false\']').toArray().length > 1;
   this.sequenceCount = 0;
   this.activeNote = null;
+  this.initSequences = true;
 
   const lightSequences = function() {
     $('.bottom-row label, .sequence-box label').each(function() {
@@ -27,12 +28,18 @@ VS.Sequences = function() {
 
   const showSequences = function() {
     $('.sequence-message').removeClass('hidden');
-    let i = 0;
-    while (i < scope.sequenceCount) {
-      const totalSequenceCount = $('.sequence-area .sequence-form').toArray().length;
-      const content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount);
-      $('.sequence-holder').append(content);
-      i++;
+
+    if (scope.initSequences) {
+      let i = 0;
+      while (i < scope.sequenceCount) {
+        const totalSequenceCount = $('.sequence-area .sequence-form').toArray().length;
+        const content = $('#new_choice_form').html().replace(/QQQ/g, totalSequenceCount);
+        $('.sequence-holder').append(content);
+        i++;
+      }
+      scope.initSequences = false;
+    } else {
+      $('.sequence-area .sequence-form').removeClass('hidden');
     }
 
     let text = $('#toggle-sequences').data('hide-text') || 'Remove sequences';
@@ -45,7 +52,8 @@ VS.Sequences = function() {
     $('.sequence-area .remove-sequence').val('true');
     $('.sequence-area .sequence-form').addClass('hidden');
     $('.sequence-message').addClass('hidden');
-    $('#toggle-sequences').text('Add sequences');
+    let text = $('#toggle-sequences').data('show-text') || 'Add sequences';
+    $('#toggle-sequences').text(text);
     scope.sequencesActive = false;
   };
 
