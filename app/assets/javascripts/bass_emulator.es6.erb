@@ -200,7 +200,8 @@ VS.BassEmulator = function() {
     setcutoff: function(midiValue) {
       // Note: Curve calculated using audacity data from actual synth, and
       //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
-      this.filter.cutoff = 3.28311 * (Math.E**(0.0802801 * midiValue))
+      this.filter.cutoff =
+        Math.min(...[22050, 3.28311 * (Math.E**(0.0802801 * midiValue))]);
     },
     setlfo_rate: function(midiValue) {
       // let oldValue = (this.getPercentage(midiValue)**3 * 35) + 0.1;
