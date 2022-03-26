@@ -1188,6 +1188,17 @@ VS.BassEmulator = function() {
     patch.ampEgOn = !patch.ampEgOn;
   });
 
+  $('#clear-slide').on('click tap', function() {
+    $('.slide:visible .light').each(function() {
+      let light = $(this);
+      if (light.data('active')) {
+        light.data('active', false);
+        light.removeClass('lit');
+        sequence[light.data('index')]['slide'] = false;
+      }
+    });
+  });
+
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function(){
     if (patch.octave < 9) {
