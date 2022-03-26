@@ -861,31 +861,38 @@ VS.BassEmulator = function() {
   const runToneSequencer = function(){
     Tone.Transport.bpm.value = patch.tempo;
     let i = 0;
-    let previousStepStepMode = false;
+    let previousStep;
+
+    // This is used only for scaling gate time with tempo
+    // https://tonejs.github.io/docs/14.7.77/Loop#toSeconds
+    const gain = new Tone.Gain();
+
     Tone.Transport.scheduleRepeat(time => {
       if (!sequencerPlaying) { return; }
+      let gateEnd = time + 0.58 * gain.toSeconds('16n');
       currentStep = sequence[i % 16];
       notePlaying = currentStep['note'];
 
       if (currentStep['stepMode']) {
-        if (currentStep['slide']) {
-          if (previousStepStepMode) {
+        if (i > 0 && previousStep['slide']) {
+          if (i > 0 && previousStep['stepMode']) {
             changeCurrentNote(time);
           } else {
-            // Play a new note when last step stop mode was off even if
-            //   slide is active on this step.
+            // Play a new note when last step stop mode was off
             playNewNote(time);
+            if (!currentStep['slide']) {
+              stopNote(gateEnd);
+            }
           }
         } else {
           playNewNote(time);
+          if (!currentStep['slide']) {
+            stopNote(gateEnd);
+          }
         }
-        previousStepStepMode = true;
-      } else if (previousStepStepMode) {
-        // NOTE: This will act weird if EG from last note is still happening
-        stopNote(time);
-        previousStepStepMode = false;
       }
 
+      previousStep = currentStep;
       i++;
     }, '16n');
   };
@@ -974,7 +981,11 @@ VS.BassEmulator = function() {
       if (midiValue == undefined) { return; }
 
       patch.settempo(midiValue);
+
+      // this is needed to change loop interval
       Tone.Transport.bpm.value = patch.tempo;
+      // This is needed to change tempo relative timing of gateEnd
+      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
     }
 
     // NOTE:  Could probably DRY up these if blocks for each
