@@ -7,6 +7,7 @@ VS.Sequences = function() {
   this.sequenceCount = 0;
   this.activeNote = null;
   this.initSequences = true;
+  this.shiftKeyIsDown = false;
 
   const lightSequences = function() {
     $('.bottom-row label, .sequence-box label').each(function() {
@@ -169,12 +170,46 @@ VS.Sequences = function() {
     midiOut.stopNote();
   });
 
+  window.addEventListener('keydown', function(keyDown) {
+    if (keyDown.repeat) { return; }
+    if (keyDown.key === 'Shift') {
+      scope.shiftKeyIsDown = true;
+    }
+  });
+
+  window.addEventListener('keyup', function(keyUp) {
+    if (keyUp.key === 'Shift') {
+      scope.shiftKeyIsDown = false;
+    }
+  });
+
   this.changeSequenceNote = e => {
     if (this.activeNote === null) { return; }
-    let num = this.activeNote.data('starting-note') + Math.floor((VS.clickedPoint - VS.currentPoint) / 6);
-    if (num > 127) { num = 127; }
-    if (num < 0) { num = 0; }
+
+    let num;
+    let startingNote = this.activeNote.data('starting-note');
+    let pixelsDragged = VS.clickedPoint - VS.currentPoint;
+
+    if (this.shiftKeyIsDown) {
+      num = startingNote + (Math.floor(pixelsDragged / 6)) * 12;
+      if (num < 0) { num = startingNote % 12; }
+      if (num > 127) {
+        let overflow = (num - 127);
+        let notesOver = overflow % 12;
+        if (notesOver > 0) {
+          num = 127 - (12 - notesOver);
+        } else {
+          num = 127;
+        }
+      }
+    } else {
+      num = startingNote + Math.floor(pixelsDragged / 6);
+      if (num < 0) { num = 0; }
+      if (num > 127) { num = 127; }
+    }
+
     if (num === this.activeNote.data('note')) { return; }
+
     display.update(num, 'noteString');
     this.activeNote.data('note', num);
     this.activeNote.html(VS.midiNoteNumbers[num]);
