@@ -860,8 +860,15 @@ VS.BassEmulator = function() {
 
   const runToneSequencer = function(){
     Tone.Transport.bpm.value = patch.tempo;
+
+    try {
+      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
+    } catch (error) {
+      // idc
+    }
+
     let i = 0;
-    let previousStep;
+    let previousStep, gateEnd;
 
     // This is used only for scaling gate time with tempo
     // https://tonejs.github.io/docs/14.7.77/Loop#toSeconds
@@ -869,7 +876,13 @@ VS.BassEmulator = function() {
 
     Tone.Transport.scheduleRepeat(time => {
       if (!sequencerPlaying) { return; }
-      let gateEnd = time + 0.58 * gain.toSeconds('16n');
+
+      try {
+        gateEnd = time + 0.58 * gain.toSeconds('16n');
+      } catch (error) {
+        let gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
+      }
+
       currentStep = sequence[i % 16];
       notePlaying = currentStep['note'];
 
@@ -985,7 +998,11 @@ VS.BassEmulator = function() {
       // this is needed to change loop interval
       Tone.Transport.bpm.value = patch.tempo;
       // This is needed to change tempo relative timing of gateEnd
-      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
+      try {
+        Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
+      } catch (error) {
+        // idc
+      }
     }
 
     // NOTE:  Could probably DRY up these if blocks for each
