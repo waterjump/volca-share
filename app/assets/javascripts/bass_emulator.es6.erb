@@ -162,9 +162,9 @@ VS.BassEmulator = function() {
     vco:
       [
         null,
-        { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-        { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 },
-        { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, frequency: 440, detune: 0 }
+        { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, detune: 0 },
+        { shape: 'sawtooth', amp: defaultVcoAmp, pitchMidi: 63, detune: 0 },
+        { shape: 'square', amp: defaultVcoAmp, pitchMidi: 63, detune: 0 }
       ],
     sustainOn: false,
     ampEgOn: false,
@@ -704,13 +704,9 @@ VS.BassEmulator = function() {
     } catch (error) {
       ampEg.gain.cancelScheduledValues(time);
     }
-    frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
 
-    // VCOs 1, 2, and 3
-    [1, 2, 3].forEach(function(oscNumber) {
-      patch.vco[oscNumber].lastFrequency = patch.vco[oscNumber].frequency;
-      patch.vco[oscNumber].frequency = frequency;
-    });
+    // Set frequency
+    frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
 
     oscFreqNode.offset.setValueAtTime(frequency, time);
 
@@ -737,11 +733,6 @@ VS.BassEmulator = function() {
     let frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
     let lastFrequency = oscFreqNode.offset.value;
 
-    [1, 2, 3].forEach(function(oscNumber) {
-      patch.vco[oscNumber].lastFrequency = lastFrequency;
-      patch.vco[oscNumber].frequency = frequency;
-    });
-
     oscFreqNode.offset.setValueAtTime(lastFrequency, time);
     oscFreqNode.offset.linearRampToValueAtTime(frequency, time + 0.05);
   };
@@ -761,11 +752,8 @@ VS.BassEmulator = function() {
     keysDown = keysDown.map(key => key + octaveOffset);
     let frequency = Tone.Frequency(notePlaying, 'midi').toFrequency();
     oscFreqNode.offset.setValueAtTime(frequency, time);
-
-    [1, 2, 3].forEach(function(oscNumber) {
-      patch.vco[oscNumber].frequency = frequency;
-    });
   }
+
   changeOctave(0);
   sequences.init();
 
