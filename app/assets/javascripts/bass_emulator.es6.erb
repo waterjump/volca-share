@@ -271,125 +271,127 @@ VS.BassEmulator = function() {
   }
 
   // TODO: Put this in a class?
-  // ==============================
-  // Accept query string parameters
-  // ==============================
-  const urlParams = {
-    get: function(name) {
-      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-      var results = regex.exec(location.search);
-      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+  const processQueryString = function() {
+    let urlParams;
+    try {
+      urlParams = new URLSearchParams(window.location.search);
+    } catch (_) {
+      urlParams = {
+        get: function(name) {
+          name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+          var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+          var results = regex.exec(location.search);
+          return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+      };
     }
-  };
 
-  // TODO: Switch to URLSearchParams when I find a web driver that supports it.
-  // let urlParams = new URLSearchParams(window.location.search);
+    const qsKnobs = [
+      'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
+      'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch', 'volume'
+    ];
 
-  qsKnobs = [
-    'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
-    'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch', 'volume'
-  ];
+    qsKnobs.forEach(function(qsParam) {
+      const rawValue = urlParams.get(qsParam);
+      const parsedValue = parseInt(rawValue);
+      if ( 0 <= parsedValue && parsedValue <= 127) {
+        patch[`set${qsParam}`](parsedValue);
 
-  qsKnobs.forEach(function(qsParam) {
-    let rawValue = urlParams.get(qsParam);
-    let parsedValue = parseInt(rawValue);
-    if ( 0 <= parsedValue && parsedValue <= 127) {
-      patch[`set${qsParam}`](parsedValue);
-
-      new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
-    } else {
-      new VS.Knob($(`#${qsParam}`)).setKnob();
-    }
-  });
-
-  let qsVcoActiveParams = ['vco1_active', 'vco2_active', 'vco3_active'];
-
-  qsVcoActiveParams.forEach(function(qsParam) {
-    let rawValue = urlParams.get(qsParam);
-    if (['true', 'false'].indexOf(rawValue) !== -1) {
-      patch[`set${qsParam}`](rawValue);
-
-      // NOTE: Might be able to trigger the event in form.es6 if it differs
-      //   from default.  That way the data attributes and css classes will
-      //   be handled there and I can removed a lot of this stuff.  Maybe.
-      let button = $(`#${qsParam}_button`);
-      let vcoKnob = function() {
-        let number = qsParam.charAt(3);
-        return $(`#vco${number}_pitch`);
-      }();
-
-      button.data('active', (rawValue === 'true'));
-
-      if (rawValue === 'true') {
-        if (!(button.hasClass('lit'))) { button.toggleClass('lit') }
-        if (!(vcoKnob.hasClass('lit'))) { vcoKnob.toggleClass('lit') }
-        if (vcoKnob.hasClass('unlit')) { vcoKnob.toggleClass('unlit') }
+        new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
       } else {
-        if (button.hasClass('lit')) { button.toggleClass('lit') }
-        if (vcoKnob.hasClass('lit')) { vcoKnob.toggleClass('lit') }
-        if (!(vcoKnob.hasClass('unlit'))) { vcoKnob.toggleClass('unlit') }
+        new VS.Knob($(`#${qsParam}`)).setKnob();
       }
-    }
-  });
-
-
-  let qsBooleanParameters = [
-    'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on',
-    'amp_eg_on'
-  ];
-  qsBooleanParameters.forEach(function(qsParam) {
-    let rawValue = urlParams.get(qsParam);
-    if (['true', 'false'].indexOf(rawValue) !== -1) {
-      patch[`set${qsParam}`](rawValue);
-
-      if (rawValue === 'true') {
-        volcaInterface.lightAndCheck(qsParam);
-      } else {
-        volcaInterface.unlightAndUncheck(qsParam);
-      }
-    }
-  });
-
-  // LFO wave from query string
-  let rawValue = urlParams.get('lfo_wave');
-  if (['triangle', 'square'].indexOf(rawValue) !== -1) {
-    patch.setlfo_wave(rawValue);
-
-    if (rawValue == 'square') {
-      volcaInterface.lightAndCheck('lfo_wave');
-    } else {
-      volcaInterface.unlightAndUncheck('lfo_wave');
-    }
-  }
-
-  let vcoGroupParam = urlParams.get('vco_group');
-  if (['one', 'two', 'three'].indexOf(vcoGroupParam) !== -1) {
-    // TODO: Set vco group on patch object when it is supported
-
-    $('.light[data-radio]').each(function() {
-      $(this).removeClass('lit');
-      $(`:radio[value=${vcoGroupParam}]`).prop('checked', false);
     });
-    $(`:radio[value=${vcoGroupParam}]`).prop('checked', true);
-    $(`label[for="patch_vco_group_${vcoGroupParam}"]`).find('span .light').addClass('lit');
-  }
 
-  qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
+    const qsVcoActiveParams = ['vco1_active', 'vco2_active', 'vco3_active'];
 
-  qsVcoWaves.forEach(function(qsParam) {
-    let rawValue = urlParams.get(qsParam);
+    qsVcoActiveParams.forEach(function(qsParam) {
+      const rawValue = urlParams.get(qsParam);
+      if (['true', 'false'].indexOf(rawValue) !== -1) {
+        patch[`set${qsParam}`](rawValue);
 
-    if (['square', 'sawtooth'].indexOf(rawValue) !== -1) {
-      patch[`set${qsParam}`](rawValue);
+        // NOTE: Might be able to trigger the event in form.es6 if it differs
+        //   from default.  That way the data attributes and css classes will
+        //   be handled there and I can removed a lot of this stuff.  Maybe.
+        const button = $(`#${qsParam}_button`);
+        const vcoKnob = function() {
+          const number = qsParam.charAt(3);
+          return $(`#vco${number}_pitch`);
+        }();
+
+        button.data('active', (rawValue === 'true'));
+
+        if (rawValue === 'true') {
+          if (!(button.hasClass('lit'))) { button.toggleClass('lit') }
+          if (!(vcoKnob.hasClass('lit'))) { vcoKnob.toggleClass('lit') }
+          if (vcoKnob.hasClass('unlit')) { vcoKnob.toggleClass('unlit') }
+        } else {
+          if (button.hasClass('lit')) { button.toggleClass('lit') }
+          if (vcoKnob.hasClass('lit')) { vcoKnob.toggleClass('lit') }
+          if (!(vcoKnob.hasClass('unlit'))) { vcoKnob.toggleClass('unlit') }
+        }
+      }
+    });
+
+    const qsBooleanParameters = [
+      'lfo_target_amp', 'lfo_target_pitch', 'lfo_target_cutoff', 'sustain_on',
+      'amp_eg_on'
+    ];
+    qsBooleanParameters.forEach(function(qsParam) {
+      const qsValue = urlParams.get(qsParam);
+      if (['true', 'false'].indexOf(qsValue) !== -1) {
+        patch[`set${qsParam}`](qsValue);
+
+        if (qsValue === 'true') {
+          volcaInterface.lightAndCheck(qsParam);
+        } else {
+          volcaInterface.unlightAndUncheck(qsParam);
+        }
+      }
+    });
+
+    // LFO wave from query string
+    const rawValue = urlParams.get('lfo_wave');
+    if (['triangle', 'square'].indexOf(rawValue) !== -1) {
+      patch.setlfo_wave(rawValue);
 
       if (rawValue == 'square') {
-        volcaInterface.lightAndCheck(qsParam);
+        volcaInterface.lightAndCheck('lfo_wave');
       } else {
-        volcaInterface.unlightAndUncheck(qsParam);
+        volcaInterface.unlightAndUncheck('lfo_wave');
       }
     }
-  });
+
+    const vcoGroupParam = urlParams.get('vco_group');
+    if (['one', 'two', 'three'].indexOf(vcoGroupParam) !== -1) {
+      // TODO: Set vco group on patch object when it is supported
+
+      $('.light[data-radio]').each(function() {
+        $(this).removeClass('lit');
+        $(`:radio[value=${vcoGroupParam}]`).prop('checked', false);
+      });
+      $(`:radio[value=${vcoGroupParam}]`).prop('checked', true);
+      $(`label[for="patch_vco_group_${vcoGroupParam}"]`).find('span .light').addClass('lit');
+    }
+
+    const qsVcoWaves = ['vco1_wave', 'vco2_wave', 'vco3_wave'];
+
+    qsVcoWaves.forEach(function(qsParam) {
+      const rawValue = urlParams.get(qsParam);
+
+      if (['square', 'sawtooth'].indexOf(rawValue) !== -1) {
+        patch[`set${qsParam}`](rawValue);
+
+        if (rawValue == 'square') {
+          volcaInterface.lightAndCheck(qsParam);
+        } else {
+          volcaInterface.unlightAndUncheck(qsParam);
+        }
+      }
+    });
+  };
+
+  processQueryString();
 
   // =======================
   // END query string params
