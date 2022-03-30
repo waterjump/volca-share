@@ -44,17 +44,17 @@ VS.BassEmulator = function() {
   const xKeyCode = 88;
 
   const octaveMap = {
-    "-1": { displayNumber: 8, frequencyFactor: 0.0625 },
-    0: { displayNumber: 9, frequencyFactor: 0.125 },
-    1: { displayNumber: 21, frequencyFactor: 0.25 },
-    2: { displayNumber: 33, frequencyFactor: 0.5 },
-    3: { displayNumber: 45, frequencyFactor: 1 },
-    4: { displayNumber: 57, frequencyFactor: 2 },
-    5: { displayNumber: 69, frequencyFactor: 4 },
-    6: { displayNumber: 81, frequencyFactor: 8 },
-    7: { displayNumber: 93, frequencyFactor: 16 },
-    8: { displayNumber: 105, frequencyFactor: 32 },
-    9: { displayNumber: 118, frequencyFactor: 64 }
+    "-1": 8,
+    0: 9,
+    1: 21,
+    2: 33,
+    3: 45,
+    4: 57,
+    5: 69,
+    6: 81,
+    7: 93,
+    8: 105,
+    9: 118
   };
 
   const octaveKnobMidiMap = {
@@ -742,7 +742,7 @@ VS.BassEmulator = function() {
 
   // NOTE: This message will not be used by the sequencer.
   const changeOctave = function(change, time = audioCtx.currentTime) {
-    VS.display.update(octaveMap[patch.octave].displayNumber, 'noteString');
+    VS.display.update(octaveMap[patch.octave], 'noteString');
 
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(octaveKnobMidiMap[patch.octave]);
