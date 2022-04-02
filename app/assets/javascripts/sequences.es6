@@ -183,6 +183,12 @@ VS.Sequences = function() {
     }
   });
 
+  const changeSequenceNoteEvent = new Event('changesequencenote', {
+    bubbles: true,
+    cancelable: true,
+    composed: false
+  });
+
   this.changeSequenceNote = e => {
     if (this.activeNote === null) { return; }
 
@@ -213,6 +219,7 @@ VS.Sequences = function() {
     display.update(num, 'noteString');
     this.activeNote.data('note', num);
     this.activeNote.html(VS.midiNoteNumbers[num]);
+    document.dispatchEvent(changeSequenceNoteEvent);
     midiOut.playNote(VS.midiNoteNumbers[num]);
     $('.note-light').hide();
     $(`.note-${(num + 3) % 12}`).show();

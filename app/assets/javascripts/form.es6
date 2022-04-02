@@ -178,26 +178,30 @@ VS.Form = function() {
     }
   });
 
-  $(document).on('mousemove touchmove', function(e) {
-    if (VS.clicked) { VS.dragging = true; }
-    if (!VS.dragging) { return; }
-    e.preventDefault();
-    e.stopPropagation();
-    $('body').css('cursor', 'ns-resize');
+  const dragStuff = function(e) {
+    return function (e) {
+      if (VS.clicked) { VS.dragging = true; }
+      if (!VS.dragging) { return; }
+      e.preventDefault();
+      e.stopPropagation();
 
-    try {
-      VS.currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
-    } catch (error) {
-      if (error instanceof TypeError) {
-        // mouse dragged off the screen.  no big deal
-      } else {
-        throw error;
+      $('body').css('cursor', 'ns-resize');
+      try {
+        VS.currentPoint = e.pageY || Math.round(e.originalEvent.touches[0].pageY);
+      } catch (error) {
+        if (error instanceof TypeError) {
+          // mouse dragged off the screen.  no big deal
+        } else {
+          throw error;
+        }
       }
-    }
 
-    turnKnob(e);
-    sequences.changeSequenceNote(e);
-  });
+      turnKnob(e);
+      sequences.changeSequenceNote(e);
+    }
+  };
+
+  $(document).on('mousemove touchmove', throttle(25, dragStuff()));
 
   const calculateDegree = function() {
     if ($(VS.activeKnob.element).hasClass('dark')) {
@@ -236,7 +240,13 @@ VS.Form = function() {
     }
   };
 
-  var turnKnob = function(e) {
+  const knobTurnEvent = new Event('knobturn', {
+    bubbles: true,
+    cancelable: true,
+    composed: false
+  });
+
+  const turnKnob = function(e) {
     if (VS.activeKnob === null) { return; }
 
     let degree = calculateDegree();
@@ -291,12 +301,14 @@ VS.Form = function() {
       }
       $(VS.activeKnob.element).data('midi', midi);
       $(VS.activeKnob.element).data('trueMidi', trueMidi);
+      document.dispatchEvent(knobTurnEvent);
       VS.activeKnob.inputElement.val(midi);
       if ($(VS.activeKnob.element).attr('id') === 'tempo') {
         display.update(superMidi, VS.activeKnob.displayStyle);
       } else {
         display.update(midi, VS.activeKnob.displayStyle);
       }
+
     }
   };
 
