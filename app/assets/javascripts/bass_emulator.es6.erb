@@ -690,7 +690,9 @@ VS.BassEmulator = function() {
 
   let sequencerPlaying = false;
 
+  let debugNewNote;
   const playNewNote = function(time = audioCtx.currentTime) {
+    debugNewNote = audioCtx.currentTime;
     activateAudio();
     let frequency;
 
@@ -699,7 +701,8 @@ VS.BassEmulator = function() {
       filterEgOffsetParam.cancelAndHoldAtTime(time);
     }
 
-    attackEndTime.setValueAtTime(time + patch.envelope.attack, time);
+    const attackEndTimeValue = time + patch.envelope.attack;
+    attackEndTime.setValueAtTime(attackEndTimeValue, time);
 
     if (ampEgGainParam.getValueAtTime(time) > 0) {
       // Amp EG reset
@@ -712,7 +715,7 @@ VS.BassEmulator = function() {
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
-      ampEgGainParam.linearRampToValueAtTime(1, attackEndTime.getValueAtTime(time));
+      ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
     } else {
       ampEgGainParam.setValueAtTime(1, time);
     }
@@ -789,6 +792,7 @@ VS.BassEmulator = function() {
   };
 
   const stopNote = function(time = audioCtx.currentTime) {
+    // console.log('QDEBUG:', time - debugNewNote);
     const currentValue = ampEgGainParam.getValueAtTime(time);
 
     // If note is already off, don't bother stopping it.
@@ -841,6 +845,7 @@ VS.BassEmulator = function() {
   const runToneSequencer = function(){
     Tone.Transport.bpm.value = patch.tempo;
 
+    // This is needed for when tempo is changed before the sequencer starts.
     try {
       Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
     } catch (error) {
@@ -848,22 +853,14 @@ VS.BassEmulator = function() {
     }
 
     let i = 0;
-    let previousStep, gateEnd;
-
-    // This is used only for scaling gate time with tempo
-    // https://tonejs.github.io/docs/14.7.77/Loop#toSeconds
-    const gain = new Tone.Gain();
+    let previousStep;
 
     Tone.Transport.scheduleRepeat(time => {
       if (!sequencerPlaying) { return; }
 
-      try {
-        gateEnd = time + 0.58 * gain.toSeconds('16n');
-      } catch (error) {
-        gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
-      }
+      const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
-      currentStep = sequence[i % 16];
+      let currentStep = sequence[i % 16];
       notePlaying.setValueAtTime(currentStep['note'], time);
 
       if (currentStep['stepMode']) {
