@@ -797,22 +797,17 @@ VS.BassEmulator = function() {
   };
 
   const stopNote = function(time = audioCtx.currentTime) {
-    let currentValue;
-    let gainCurve = decayReleaseGainCurve;
-    let duration = patch.envelope.decayRelease;
+    const currentValue = ampEgGainParam.getValueAtTime(time);
+
+    // If note is already off, don't bother stopping it.
+    if (currentValue === 0) { return; }
 
     if (patch.ampEgOn) {
       if (time < attackEndTime.getValueAtTime(time) || patch.sustainOn) {
 
         // filter envelope
-        try { // (browserFeatures['cancelAndHoldAtTime']) {
-          filterEgOffsetParam.cancelAndHoldAtTime(time);
-          currentValue = filterEgOffsetParam.getValueAtTime(time);
-        } catch (error) {
-          currentValue = filterEgOffsetParam.getValueAtTime(time);
-          filterEgOffsetParam.cancelScheduledValues(time);
-          filterEgOffsetParam.setValueAtTime(currentValue, time);
-        }
+        filterEgOffsetParam.cancelAndHoldAtTime(time);
+
         // TODO: Use custom curve for filter?
         filterEgOffsetParam.linearRampToValueAtTime(
           0,
@@ -820,20 +815,13 @@ VS.BassEmulator = function() {
         );
 
         // Amp eg
-        try { // if (browserFeatures['cancelAndHoldAtTime']) {
-          ampEgGainParam.cancelAndHoldAtTime(time);
-          currentValue = ampEgGainParam.getValueAtTime(time); // Always between 0 and 1
-        } catch (error) {
-          currentValue = ampEgGainParam.getValueAtTime(time); // Always between 0 and 1
-          ampEgGainParam.cancelScheduledValues(time);
-          ampEgGainParam.setValueAtTime(currentValue, time);
-        }
+        ampEgGainParam.cancelAndHoldAtTime(time);
 
-        duration = currentValue * patch.envelope.decayRelease;
+        const duration = currentValue * patch.envelope.decayRelease;
 
         if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
-          // adjust gain curve
-          gainCurve = decayReleaseGainCurve.map(
+          // custom curve
+          const gainCurve = decayReleaseGainCurve.map(
             function(value) { return value * currentValue }
           );
           ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
