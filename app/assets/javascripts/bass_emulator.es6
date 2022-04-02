@@ -444,8 +444,8 @@ VS.BassEmulator = function() {
   // =====================================
 
   const audioCtx = new AudioContext();
-  Tone.setContext(audioCtx);
-  Tone.context.lookAhead = 0.001;
+  const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
+  Tone.setContext(myToneCtx);
   Tone.start();
   const notePlaying = new Tone.Param(audioCtx.createGain().gain);
   const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
@@ -688,7 +688,9 @@ VS.BassEmulator = function() {
   let sequencerPlaying = false;
 
   const playNewNote = function(time = audioCtx.currentTime) {
-    if (audioCtx.state === 'suspended') { audioCtx.resume(); }
+    debugNewNote = audioCtx.currentTime;
+    console.log('PLAYING NEW NOTE:', time, audioCtx.currentTime);
+    activateAudio();
     let frequency;
 
     // Filter EG reset
@@ -905,9 +907,20 @@ VS.BassEmulator = function() {
       i++;
     }, '16n');
   };
+
   runToneSequencer();
 
+  const activateAudio = function() {
+    if (audioCtx.state === 'running') { return; }
+
+    audioCtx.resume().then(() => {
+      Tone.context.resume();
+      Tone.start();
+    });
+  };
+
   $('#play').on('click tap', function() {
+    activateAudio();
     if (sequencerPlaying) {
       // STOP
       sequencerPlaying = false;
