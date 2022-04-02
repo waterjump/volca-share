@@ -965,8 +965,9 @@ VS.BassEmulator = function() {
     if (VS.activeKnob === null) { return; }
 
     let midiValue, percentage;
+    const knobId = VS.activeKnob.element.id;
 
-    if (VS.activeKnob.element.id == 'tempo') {
+    if (knobId === 'tempo') {
       midiValue = $(VS.activeKnob.element).data('superMidi');
       if (midiValue == undefined) { return; }
 
@@ -986,7 +987,7 @@ VS.BassEmulator = function() {
     //   knob into a single block.
 
     // EG ATTACK
-    if (VS.activeKnob.element.id == 'attack') {
+    if (knobId === 'attack') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -994,7 +995,7 @@ VS.BassEmulator = function() {
     }
 
     // EG DECAY/RELEASE
-    if (VS.activeKnob.element.id == 'decay_release') {
+    if (knobId === 'decay_release') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1002,7 +1003,7 @@ VS.BassEmulator = function() {
     }
 
     // CUTOFF EG INT
-    if (VS.activeKnob.element.id == 'cutoff_eg_int') {
+    if (knobId === 'cutoff_eg_int') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1017,7 +1018,7 @@ VS.BassEmulator = function() {
     // TODO: Change octave when octave knob is turn via interface
 
     // FILTER PEAK (RESONANCE)
-    if (VS.activeKnob.element.id == 'peak') {
+    if (knobId === 'peak') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1027,7 +1028,7 @@ VS.BassEmulator = function() {
     }
 
     // FILTER CUTOFF
-    if (VS.activeKnob.element.id == 'cutoff') {
+    if (knobId === 'cutoff') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1037,7 +1038,7 @@ VS.BassEmulator = function() {
     }
 
     // LFO RATE
-    if (VS.activeKnob.element.id == 'lfo_rate') {
+    if (knobId === 'lfo_rate') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1047,7 +1048,7 @@ VS.BassEmulator = function() {
     }
 
     // LFO INT
-    if (VS.activeKnob.element.id == 'lfo_int') {
+    if (knobId === 'lfo_int') {
       midiValue = $(VS.activeKnob.element).data('trueMidi');
       if (midiValue == undefined) { return; }
 
@@ -1069,7 +1070,7 @@ VS.BassEmulator = function() {
 
     // VCO PITCH KNOBS
     [1, 2, 3].forEach(function(oscNumber) {
-      if (VS.activeKnob.element.id == `vco${oscNumber}_pitch`) {
+      if (knobId === `vco${oscNumber}_pitch`) {
         midiValue = $(VS.activeKnob.element).data('midi');
         if (midiValue == undefined) { return; }
 
@@ -1084,7 +1085,7 @@ VS.BassEmulator = function() {
     });
 
     // VOLUME
-    if (VS.activeKnob.element.id == 'volume') {
+    if (knobId === 'volume') {
       midiValue = $(VS.activeKnob.element).data('midi');
       if (midiValue == undefined) { return; }
 
