@@ -937,19 +937,15 @@ VS.BassEmulator = function() {
     }
   };
 
-  $(document).on('mousemove touchmove', function(e) {
-    if (VS.dragging === false) { return; }
-    doKnobStuff(e);
-    doSequenceStuff(e);
-  });
-
   const doSequenceStuff = function(e) {
     if (VS.sequences.activeNote !== null) {
-      let note = VS.sequences.activeNote.data('note');
-      let index = VS.sequences.activeNote.data('index');
+      const note = VS.sequences.activeNote.data('note');
+      const index = VS.sequences.activeNote.data('index');
       sequence[index]['note'] = VS.sequences.activeNote.data('note');
     }
   };
+
+  document.addEventListener('changesequencenote', doSequenceStuff);
 
   $('.sequence-holder').on('click tap', '.sequence-box .slide label', function() {
     let light = $($(this).find('.light'));
@@ -1096,6 +1092,8 @@ VS.BassEmulator = function() {
       masterAmp.gain.setValueAtTime(patch.volume, audioCtx.currentTime);
     }
   };
+
+  document.addEventListener('knobturn', doKnobStuff);
 
   const toggleVcoAmp = function(oscNumber) {
     if (patch.vco[oscNumber].amp == defaultVcoAmp) {

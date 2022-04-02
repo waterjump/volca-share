@@ -1,0 +1,17 @@
+const throttle = function(delay, fn) {
+  <% if Rails.env.test? %>
+    return function (...args) {
+      return fn(...args);
+    }
+  <% else %>
+    let lastCall = 0;
+    return function (...args) {
+      const now = (new Date).getTime();
+      if (now - lastCall < delay) {
+        return;
+      }
+      lastCall = now;
+      return fn(...args);
+    }
+  <% end %>
+};
