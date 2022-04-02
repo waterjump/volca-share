@@ -693,22 +693,14 @@ VS.BassEmulator = function() {
 
     if (filterEgOffsetParam.getValueAtTime(time) > 0) {
       // Filter EG reset
-      try {
-        filterEgOffsetParam.cancelAndHoldAtTime(time);
-      } catch (error) {
-        filterEgOffsetParam.cancelScheduledValues(time);
-      }
+      filterEgOffsetParam.cancelAndHoldAtTime(time);
     }
 
     attackEndTime.setValueAtTime(time + patch.envelope.attack, time);
 
     if (ampEgGainParam.getValueAtTime(time) > 0) {
       // Amp EG reset
-      try {
-        ampEgGainParam.cancelAndHoldAtTime(time);
-      } catch (error) {
-        ampEgGainParam.cancelScheduledValues(time);
-      }
+      ampEgGainParam.cancelAndHoldAtTime(time);
     }
 
     // Set frequency
