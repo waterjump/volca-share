@@ -649,26 +649,26 @@ VS.BassEmulator = function() {
   // END get browser capabilities
 
 
-  const triggerDecay = function(time) {
+  const triggerDecay = function(attackEndTimeValue) {
     filterEgOffsetParam.linearRampToValueAtTime(
       0,
-      attackEndTime.getValueAtTime(time) + (patch.envelope.decayRelease * patch.filterEgCoefficient)
+      attackEndTimeValue + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
 
     if (patch.ampEgOn) {
-      ampEgGainParam.setValueAtTime(1, attackEndTime.getValueAtTime(time));
+      ampEgGainParam.setValueAtTime(1, attackEndTimeValue);
 
       if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
         // use custom curve
         ampEgGainParam.setValueCurveAtTime(
           decayReleaseGainCurve,
-          attackEndTime.getValueAtTime(time),
+          attackEndTimeValue,
           patch.envelope.decayRelease
         )
       } else {
         ampEgGainParam.linearRampToValueAtTime(
           0,
-          attackEndTime.getValueAtTime(time) + patch.envelope.decayRelease
+          attackEndTimeValue + patch.envelope.decayRelease
         )
       }
     }
@@ -693,18 +693,14 @@ VS.BassEmulator = function() {
     activateAudio();
     let frequency;
 
-    if (filterEgOffsetParam.getValueAtTime(time) > 0) {
-      // Filter EG reset
-      filterEgOffsetParam.cancelAndHoldAtTime(time);
-    }
+    // Filter EG reset
+    filterEgOffsetParam.cancelAndHoldAtTime(time);
 
     const attackEndTimeValue = time + patch.envelope.attack;
     attackEndTime.setValueAtTime(attackEndTimeValue, time);
 
-    if (ampEgGainParam.getValueAtTime(time) > 0) {
-      // Amp EG reset
-      ampEgGainParam.cancelAndHoldAtTime(time);
-    }
+    // Amp EG reset
+    ampEgGainParam.cancelAndHoldAtTime(time);
 
     // Set frequency
     frequency = Tone.Frequency(notePlaying.getValueAtTime(time), 'midi').toFrequency();
@@ -722,11 +718,11 @@ VS.BassEmulator = function() {
     // Retrigger envelope
     // Attack
     filterEgOffsetParam.setValueAtTime(0, time);
-    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTime.getValueAtTime(time));
+    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
 
     // Decay
     if (!patch.sustainOn) {
-      triggerDecay(time);
+      triggerDecay(attackEndTimeValue);
     }
   };
 
@@ -796,7 +792,7 @@ VS.BassEmulator = function() {
     if (currentValue === 0) { return; }
 
     if (patch.ampEgOn) {
-      if (time < attackEndTime.getValueAtTime(time) || patch.sustainOn) {
+      if (patch.sustainOn || (time < attackEndTime.getValueAtTime(time))) {
 
         // filter envelope
         filterEgOffsetParam.cancelAndHoldAtTime(time);
