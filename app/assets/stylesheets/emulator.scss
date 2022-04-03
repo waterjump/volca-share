@@ -24,6 +24,7 @@
 
   #play {
     left: 43.35%;
+    z-index: 1;
   }
 
   #experimental {
@@ -36,6 +37,15 @@
     width: 1.8%;
     top: 49%;
     transform: rotate(18deg);
+  }
+
+  #stop {
+    background-color: #333;
+    position: absolute;
+    left: 46.1%;
+    height: 2.3%;
+    width: 1.3%;
+    top: 51.2%;
   }
 
   .highlight {
