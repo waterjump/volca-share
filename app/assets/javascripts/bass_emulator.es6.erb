@@ -144,7 +144,7 @@ VS.BassEmulator = function() {
   const defaultVcoAmp = 0.33;
 
   const patch = {
-    tempo: 120,
+    tempo: 56,
     envelope: { attack: 0, decayRelease: 0.07, cutoffEgInt: 0 },
     filterEgCoefficient: 1.35,
     octave: 3,
@@ -326,8 +326,9 @@ VS.BassEmulator = function() {
     }
 
     const qsKnobs = [
-      'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
-      'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch', 'volume'
+      'tempo', 'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak',
+      'cutoff', 'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch',
+      'volume'
     ];
 
     qsKnobs.forEach(function(qsParam) {
