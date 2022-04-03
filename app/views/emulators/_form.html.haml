@@ -37,7 +37,8 @@
       .medium.knob#volume{ data: { midi: 127 } }
         .notch
       .cooltip
-      .button#play
+      .button#play.highlight
+      #experimental
 
       .bottom-row
         = radio_button_tag 'patch[vco_group]', 'one', @patch.vco_group_one, class: :control
