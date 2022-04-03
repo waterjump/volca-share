@@ -620,6 +620,10 @@ VS.BassEmulator = function() {
     }
   };
 
+  const checkChrome = function() {
+    browserFeatures['usingChrome'] = navigator.userAgent.includes('Chrome/');
+  };
+
   const showPerformanceWarning = function() {
     if (browserFeatures['cancelAndHoldAtTime']) { return; }
 
@@ -639,6 +643,7 @@ VS.BassEmulator = function() {
   const testBrowserFeatures = function() {
     checkCustomCurveClearing();
     checkCancelAndHoldAtTime();
+    checkChrome();
     console.log(browserFeatures);
 
     // showPerformanceWarning();
