@@ -641,7 +641,7 @@ VS.BassEmulator = function() {
     checkCancelAndHoldAtTime();
     console.log(browserFeatures);
 
-    showPerformanceWarning();
+    // showPerformanceWarning();
   };
 
   testBrowserFeatures();
