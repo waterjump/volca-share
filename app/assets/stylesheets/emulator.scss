@@ -54,13 +54,20 @@
     box-shadow: 0px 0px 20px lime;
   }
 
-  #clear-slide {
+  .clear-control {
     width: 5%;
     height: 87%;
     position: absolute;
     top: 1%;
-    left: 73%;
     cursor: pointer;
+  }
+
+  #clear-slide {
+    left: 73%;
+  }
+
+  #clear-active-step{
+    left: 78.6%;
   }
 }
 

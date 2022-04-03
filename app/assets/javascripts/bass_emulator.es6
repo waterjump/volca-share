@@ -1198,6 +1198,17 @@ VS.BassEmulator = function() {
     });
   });
 
+  $('#clear-active-step').on('click tap', function() {
+    $('.active-step:visible .light').each(function() {
+      const light = $(this);
+      if (!light.data('active')) {
+        light.data('active', true);
+        light.addClass('lit');
+        sequence[light.data('index')].activeStep = true;
+      }
+    });
+  });
+
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function(){
     if (patch.octave < 9) {
