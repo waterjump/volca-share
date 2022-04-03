@@ -859,6 +859,12 @@ VS.BassEmulator = function() {
     Tone.Transport.scheduleRepeat(time => {
       if (!sequencerPlaying) { return; }
 
+      while (!sequence[i % 16].activeStep) {
+        // Bail out if all steps are inactive
+        if (!sequence.some(step => { return step.activeStep })) { return; }
+        i++;
+      }
+
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
       let currentStep = sequence[i % 16];
@@ -968,6 +974,13 @@ VS.BassEmulator = function() {
     light.data('active', !light.data('active'));
     let index = light.data('index');
     sequence[index]['stepMode'] = light.data('active');
+  });
+
+  $('.sequence-holder').on('click tap', '.sequence-box .active-step label', function() {
+    const light = $($(this).find('.light'));
+    light.data('active', !light.data('active'));
+    const index = light.data('index');
+    sequence[index]['activeStep'] = light.data('active');
   });
 
   const doKnobStuff = function(e) {
