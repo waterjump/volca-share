@@ -893,6 +893,7 @@ VS.BassEmulator = function() {
 
   $('#play').on('click tap', function() {
     activateAudio();
+    $('#stop').toggleClass('hidden');
     if (sequencerPlaying) {
       // STOP
       Tone.Transport.stop();
