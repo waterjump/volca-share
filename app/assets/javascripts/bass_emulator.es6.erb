@@ -1191,7 +1191,7 @@ VS.BassEmulator = function() {
     patch.ampEgOn = !patch.ampEgOn;
   });
 
-  $('#clear-slide').on('click tap', function() {
+  const clearSlide = function () {
     $('.slide:visible .light').each(function() {
       let light = $(this);
       if (light.data('active')) {
@@ -1200,9 +1200,9 @@ VS.BassEmulator = function() {
         sequence[light.data('index')]['slide'] = false;
       }
     });
-  });
+  };
 
-  $('#clear-active-step').on('click tap', function() {
+  const clearActiveStep = function() {
     $('.active-step:visible .light').each(function() {
       const light = $(this);
       if (!light.data('active')) {
@@ -1211,6 +1211,36 @@ VS.BassEmulator = function() {
         sequence[light.data('index')].activeStep = true;
       }
     });
+  };
+
+  const clearNotes = function() {
+    $('.note:visible span').each(function() {
+      const el = $(this);
+      el.html('C3');
+      sequence[el.data('index')].note = 60;
+    });
+  };
+
+  const clearStepMode = function() {
+    $('.step-mode:visible .light').each(function() {
+      const light = $(this);
+      if (!light.data('active')) {
+        light.data('active', true);
+        light.addClass('lit');
+        sequence[light.data('index')].stepMode = true;
+      }
+    });
+  };
+
+  $('#clear-slide').on('click tap', clearSlide);
+
+  $('#clear-active-step').on('click tap', clearActiveStep);
+
+  $('#clear-part').on('click tap', function() {
+    clearNotes();
+    clearSlide();
+    clearStepMode();
+    clearActiveStep();
   });
 
   // MOBILE OCTAVE UP
