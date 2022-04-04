@@ -313,6 +313,8 @@ VS.Form = function() {
   };
 
   $(document).on('mouseup touchend', function(e) {
+    VS.sequenceDragging = false;
+    VS.sequenceDragParam = null;
     VS.clicked = false;
     if (!VS.dragging) { tapKnob(); }
     if (!VS.dragging) { return; }
