@@ -291,7 +291,9 @@ VS.BassEmulator = function() {
   }
 
   $('#toggle-sequences, #play').on('click tap', function() {
-    populateSequenceObject();
+    if (sequence.length === 0) {
+      populateSequenceObject();
+    }
   });
 
   const volcaInterface = {
@@ -963,26 +965,32 @@ VS.BassEmulator = function() {
 
   document.addEventListener('changesequencenote', doSequenceStuff);
 
-  $('.sequence-holder').on('click tap', '.sequence-box .slide label', function() {
-    let light = $($(this).find('.light'));
-    light.data('active', !light.data('active'));
-    let index = light.data('index');
-    sequence[index]['slide'] = light.data('active');
-  });
+  $('.sequence-holder').on('sequenceparamchange', '.sequence-box .slide label',
+    function() {
+      const light = $($(this).find('.light'));
+      light.data('active', !light.data('active'));
+      const index = light.data('index');
+      sequence[index]['slide'] = light.data('active');
+    }
+  );
 
-  $('.sequence-holder').on('click tap', '.sequence-box .step-mode label', function() {
-    let light = $($(this).find('.light'));
-    light.data('active', !light.data('active'));
-    let index = light.data('index');
-    sequence[index]['stepMode'] = light.data('active');
-  });
+  $('.sequence-holder').on('sequenceparamchange', '.sequence-box .step-mode label',
+    function() {
+      const light = $($(this).find('.light'));
+      light.data('active', !light.data('active'));
+      const index = light.data('index');
+      sequence[index]['stepMode'] = light.data('active');
+    }
+  );
 
-  $('.sequence-holder').on('click tap', '.sequence-box .active-step label', function() {
-    const light = $($(this).find('.light'));
-    light.data('active', !light.data('active'));
-    const index = light.data('index');
-    sequence[index]['activeStep'] = light.data('active');
-  });
+  $('.sequence-holder').on('sequenceparamchange', '.sequence-box .active-step label',
+    function() {
+      const light = $($(this).find('.light'));
+      light.data('active', !light.data('active'));
+      const index = light.data('index');
+      sequence[index]['activeStep'] = light.data('active');
+    }
+  );
 
   const doKnobStuff = function(e) {
     if (VS.activeKnob === null) { return; }

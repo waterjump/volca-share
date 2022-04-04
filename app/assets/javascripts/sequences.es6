@@ -10,9 +10,13 @@ VS.Sequences = function() {
   this.shiftKeyIsDown = false;
 
   const lightSequences = function() {
-    $('.bottom-row label, .sequence-box label').each(function() {
-      const myInput = $(`input#${$(this).attr('for')}`);
-      if (myInput.prop('checked')) { $(this).find('span').find('div').addClass('lit'); }
+    if ($('body.show').length > 0) { return; }
+
+    $('.bottom-row label, .sequence-box label span .light').each(function() {
+      const light = $(this);
+      if (light.data('active') || (light.data('active') === 'true')) {
+        light.addClass('lit');
+      }
     });
   };
 
@@ -94,6 +98,34 @@ VS.Sequences = function() {
 
   $('.sequence-holder').on('click tap', '.sequence-box label', function() {
     if ($('body.show').length > 0) { return; }
+    if ($('.volca.emulator').length > 0) { return; }
+    $(this).find('span').find('div').toggleClass('lit');
+  });
+
+  const sequenceParamChangeEvent = new Event('sequenceparamchange', {
+    bubbles: true,
+    cancelable: true,
+    composed: false
+  });
+
+  $('.sequence-holder').on('mousedown touchstart', '.sequence-box label', function(e) {
+    if ($('.volca.emulator').length === 0) { return; }
+    e.preventDefault();
+    this.dispatchEvent(sequenceParamChangeEvent);
+    $(this).find('span').find('div').toggleClass('lit');
+    const paramType = $(this).parent().data('paramType');
+    VS.sequenceDragParam = paramType;
+    VS.sequenceDragging = true;
+  });
+
+  $('.sequence-holder').on('mouseenter', '.sequence-box label', function(e) {
+    if ($('.volca.emulator').length === 0) { return; }
+    if (!VS.sequenceDragging) { return; }
+    const paramType = $(this).parent().data('paramType');
+    if (paramType !== VS.sequenceDragParam) { return; }
+    e.preventDefault();
+
+    this.dispatchEvent(sequenceParamChangeEvent);
     $(this).find('span').find('div').toggleClass('lit');
   });
 

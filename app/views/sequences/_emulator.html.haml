@@ -1,0 +1,32 @@
+- seq_num ||= 'QQQ'
+.sequence-form
+  .outer-sequence-box
+    .sequence-box
+      .param-labels.line
+        .spacer
+        .note Note
+        .slide Slide
+        .step-mode Step Mode
+        .active-step Active Step
+      .scrolly
+        .steps.clearfix
+          - 16.times do |num|
+            .step{ class: (num + 1) % 4 == 0 ? 'line' : '' }
+              .up.arrow
+              .note.param
+                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]") do
+                  %span.note-display{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_note_display", data: { 'starting-note' => 60, index: num } }
+                    C3
+              .down.arrow
+              .slide.param{ data: { param_type: 'slide' }}
+                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[slide]]]") do
+                  %span
+                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: 'false', index: num } }
+              .step-mode.param{ data: { param_type: 'step-mode' }}
+                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[step_mode]]]") do
+                  %span
+                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: 'true', index: num } }
+              .active-step.param{ data: { param_type: 'active-step' }}
+                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
+                  %span
+                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: 'true', index: num } }
