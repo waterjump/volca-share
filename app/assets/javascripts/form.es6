@@ -241,7 +241,7 @@ VS.Form = function() {
   };
 
   const knobTurnEvent = new Event('knobturn', {
-    bubbles: true,
+    bubbles: false,
     cancelable: true,
     composed: false
   });
@@ -301,7 +301,7 @@ VS.Form = function() {
       }
       $(VS.activeKnob.element).data('midi', midi);
       $(VS.activeKnob.element).data('trueMidi', trueMidi);
-      document.dispatchEvent(knobTurnEvent);
+      VS.activeKnob.element.dispatchEvent(knobTurnEvent);
       VS.activeKnob.inputElement.val(midi);
       if ($(VS.activeKnob.element).attr('id') === 'tempo') {
         display.update(superMidi, VS.activeKnob.displayStyle);
@@ -346,6 +346,6 @@ VS.Form = function() {
 
   var tapKnob = function() {
     if ((VS.activeKnob === null) || (typeof VS.activeKnob !== VS.Knob)) { return; }
-    display.update(VS.activeKnob.midi, VS.activeKnob.displayStyle);
+    display.update(VS.activeKnob.midi(), VS.activeKnob.displayStyle);
   };
 };
