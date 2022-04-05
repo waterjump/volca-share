@@ -1,7 +1,8 @@
 VS.Knob = function(element) {
   this.element = element;
   this.jElement = $(this.element);
-  this.midi = this.jElement.data('midi');
+  this.midi = () => { return this.jElement.data('midi') };
+  this.trueMidi = () => { return this.jElement.data('trueMidi') };
   this.rotation = this.jElement.data('rotation') || 0;
   this.displayStyle = 'midiString';
   this.inputElement = $(`input#patch_${this.jElement.attr('id')}`);
@@ -75,7 +76,7 @@ VS.Knob = function(element) {
     <% end %>
   };
 
-  this.setKnob = function(midiValue = this.midi) {
+  this.setKnob = function(midiValue = this.midi()) {
     this.jElement.data('midi', midiValue);
     let degree = this.degreeForMidi(midiValue, 140);
     this.jElement.data('rotation', degree);
