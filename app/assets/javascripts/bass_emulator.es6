@@ -952,11 +952,11 @@ VS.BassEmulator = function() {
     }
   };
 
-  const doSequenceStuff = function(e) {
+  const doSequenceStuff = function() {
     if (VS.sequences.activeNote !== null) {
       const note = VS.sequences.activeNote.data('note');
       const index = VS.sequences.activeNote.data('index');
-      sequence[index]['note'] = VS.sequences.activeNote.data('note');
+      sequence[index]['note'] = note;
     }
   };
 
