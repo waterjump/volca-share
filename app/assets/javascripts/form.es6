@@ -308,7 +308,6 @@ VS.Form = function() {
       } else {
         display.update(midi, VS.activeKnob.displayStyle);
       }
-
     }
   };
 
