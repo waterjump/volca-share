@@ -37,6 +37,14 @@ $(function() {
         checkbox.prop('checked') ? 'square' : 'sawtooth';
     });
 
+    sequence = VS.bassEmulator.getSequence();
+    if (sequence.length === 16) {
+      result['sequence'] = sequence.map(step => {
+        return `${step.note}${step.slide ? 't' : 'f'}` +
+          `${step.stepMode ? 't' : 'f'}${step.activeStep ? 't' : 'f'}`;
+      }).join('|');
+    }
+
     return Object.entries(result).map(param => param.join('=')).join('&');
   }
 
