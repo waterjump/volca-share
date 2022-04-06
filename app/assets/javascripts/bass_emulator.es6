@@ -276,6 +276,10 @@ VS.BassEmulator = function() {
 
   const sequence = [];
 
+  this.getSequence = function() {
+    return sequence;
+  };
+
   const populateSequenceObject = function() {
     $('.step:visible').each(function(index, step) {
       sequence.push(
@@ -290,7 +294,24 @@ VS.BassEmulator = function() {
     });
   }
 
+  const setSequenceView = function() {
+    if (sequence.length !== 16) { return }
+
+    sequence.forEach(step => {
+      jElement = $(`#step_${step.index}`)
+      jElement.find('.note-display').data('starting-note', step.note);
+      jElement.find('.note-display').html(VS.midiNoteNumbers[step.note]);
+      jElement.find('.slide .light').data('active', step.slide);
+      jElement.find('.slide .light').addClass(step.slide ? 'lit' : '');
+      jElement.find('.step-mode .light').data('active', step.stepMode);
+      jElement.find('.step-mode .light').removeClass(step.stepMode ? '' : 'lit');
+      jElement.find('.active-step .light').data('active', step.activeStep);
+      jElement.find('.active-step .light').removeClass(step.activeStep ? '' : 'lit');
+    });
+  };
+
   $('#toggle-sequences, #play').on('click tap', function() {
+    setSequenceView();
     if (sequence.length === 0) {
       populateSequenceObject();
     }
@@ -312,6 +333,36 @@ VS.BassEmulator = function() {
   }
 
   // TODO: Put this in a class?
+  const letterToBoolean = function(letter){
+    return letter.toLowerCase() === 't';
+  };
+
+  const processSequenceFromQueryString = function(urlParams) {
+    const rawValue = urlParams.get('sequence');
+    if (rawValue === null) { return; }
+    if (rawValue.match(/^(\d{1,3}[tf]{3}\|){15}(\d{1,3}[tf]{3})$/) === null) {
+      console.log('Sequence param is malformed.  Ignoring.');
+      return;
+    }
+
+    const steps = rawValue.split('|');
+    $(steps).each((index, step) => {
+      let note = parseInt(step.match(/^\d+/)[0]);
+      if (note > 127) {
+        note = 127;
+      }
+      sequence.push(
+        {
+          index: index,
+          note: note,
+          slide: letterToBoolean(step.match(/[tf]/g)[0]),
+          stepMode: letterToBoolean(step.match(/[tf]/g)[1]),
+          activeStep: letterToBoolean(step.match(/[tf]/g)[2])
+        }
+      );
+    });
+  };
+
   const processQueryString = function() {
     let urlParams;
     try {
@@ -431,6 +482,8 @@ VS.BassEmulator = function() {
         }
       }
     });
+
+    processSequenceFromQueryString(urlParams);
   };
 
   processQueryString();

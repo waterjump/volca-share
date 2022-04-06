@@ -11,7 +11,7 @@
       .scrolly
         .steps.clearfix
           - 16.times do |num|
-            .step{ class: (num + 1) % 4 == 0 ? 'line' : '' }
+            .step{ class: (num + 1) % 4 == 0 ? 'line' : '', id: "step_#{num}" }
               .up.arrow
               .note.param
                 = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]") do
