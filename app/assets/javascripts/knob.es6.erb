@@ -77,6 +77,10 @@ VS.Knob = function(element) {
   };
 
   this.setKnob = function(midiValue = this.midi()) {
+    if (this.jElement.attr('id') === 'tempo') {
+      this.jElement.data('super-midi', midiValue);
+      midiValue = midiValue / 2.0;
+    }
     this.jElement.data('midi', midiValue);
     let degree = this.degreeForMidi(midiValue, 140);
     this.jElement.data('rotation', degree);

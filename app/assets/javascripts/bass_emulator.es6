@@ -379,15 +379,14 @@ VS.BassEmulator = function() {
     }
 
     const qsKnobs = [
-      'tempo', 'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak',
-      'cutoff', 'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch',
-      'volume'
+      'attack', 'decay_release', 'cutoff_eg_int', 'octave', 'peak', 'cutoff',
+      'lfo_rate', 'lfo_int', 'vco1_pitch','vco2_pitch', 'vco3_pitch', 'volume'
     ];
 
     qsKnobs.forEach(function(qsParam) {
       const rawValue = urlParams.get(qsParam);
       const parsedValue = parseInt(rawValue);
-      if ( 0 <= parsedValue && parsedValue <= 127) {
+      if (0 <= parsedValue && parsedValue <= 127) {
         patch[`set${qsParam}`](parsedValue);
 
         new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
@@ -395,6 +394,12 @@ VS.BassEmulator = function() {
         new VS.Knob($(`#${qsParam}`)).setKnob();
       }
     });
+
+    const tempoParam = parseInt(urlParams.get('tempo'));
+    if (0 <= tempoParam && tempoParam <= 255) {
+      patch.settempo(tempoParam);
+      new VS.Knob($('#tempo')).setKnob(tempoParam);
+    }
 
     const qsVcoActiveParams = ['vco1_active', 'vco2_active', 'vco3_active'];
 

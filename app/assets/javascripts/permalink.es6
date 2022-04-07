@@ -39,6 +39,7 @@ $(function() {
 
     sequence = VS.bassEmulator.getSequence();
     if (sequence.length === 16) {
+      result['tempo'] = $('#tempo').data('super-midi');
       result['sequence'] = sequence.map(step => {
         return `${step.note}${step.slide ? 't' : 'f'}` +
           `${step.stepMode ? 't' : 'f'}${step.activeStep ? 't' : 'f'}`;
