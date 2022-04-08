@@ -41,7 +41,7 @@ def fill_out_patch_form(patch, anon = false)
   find('#amp_eg_on_light').click if patch.amp_eg_on
   fill_in 'patch[name]', with: patch.name
   fill_in 'patch[notes]', with: patch.notes
-  fill_in 'patch[tags]', with: patch.tags.join(', '), visible: false
+  find('.bootstrap-tagsinput > input').set(patch.tags.join(', '))
   return if anon
   check 'patch[secret]' if patch.secret?
   fill_in 'patch[audio_sample]', with: patch.audio_sample

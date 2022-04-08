@@ -12,9 +12,10 @@ RSpec.describe 'Deleting a keys patch', type: :feature, js: true do
       login
       visit user_keys_patch_path(user.slug, patch.slug)
       click_button('Delete')
-      user.reload
+      page.driver.browser.switch_to.alert.accept
 
-      expect(user.patches.count).to eq(0)
+      sleep(0.5)
+      expect(user.reload.patches.count).to eq(0)
       expect(Keys::Patch.where(id: patch.id).count).to eq(0)
     end
   end
