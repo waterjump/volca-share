@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.feature 'Authentication process', type: :feature do
+RSpec.feature 'Authentication process', type: :feature, js: true do
   let(:user) { FactoryBot.create(:user) }
 
   describe 'signing up' do

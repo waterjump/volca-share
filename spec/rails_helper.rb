@@ -11,12 +11,11 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'ffaker'
 require 'devise'
-require 'capybara/poltergeist'
+require 'webdrivers/chromedriver'
 require 'rubygems'
 require 'vcr'
 require 'feature_macros'
 require 'keys_feature_macros'
-require 'capybara-screenshot/rspec'
 
 VCR.configure do |config|
   config.cassette_library_dir = 'spec/fixtures/vcr_cassettes'
@@ -27,19 +26,26 @@ VCR.configure do |config|
     match_requests_on: [:method, :uri],
     allow_playback_repeats: true
   }
+  config.allow_http_connections_when_no_cassette = true
 end
 
-Capybara.register_driver :poltergeist do |app|
-  Capybara::Poltergeist::Driver.new(
-    app,
-    timeout: 60,
-    js_errors: false,
-    # NOTE: Comment this out to see javascipt console stuff during tests
-    phantomjs_logger: IO.new(IO.sysopen('/dev/null', 'w+'))
+Capybara.configure do |config|
+  config.default_normalize_ws = true
+end
+
+Capybara.register_driver :chrome do |app|
+  Capybara::Selenium::Driver.new(app, browser: :chrome)
+end
+
+Capybara.register_driver :chrome do |app|
+  options = Selenium::WebDriver::Chrome::Options.new(
+    args: %w(headless disable-gpu --window-size=1024,1024)
   )
+
+  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
 end
 
-Capybara.javascript_driver = :poltergeist
+Capybara.javascript_driver = :chrome
 
 # Add additional requires below this line. Rails is not loaded until this point!
 

@@ -46,7 +46,7 @@ RSpec.feature 'tags', type: :feature, js: true do
       create(:user_patch, user: user, tag_list: 'cool')
 
       visit tags_show_path(tag: :cool)
-      page.find('.speaker', match: :first).trigger('click')
+      page.find('.speaker', match: :first).click
 
       expect(page).to have_selector('#preview-modal-body')
     end

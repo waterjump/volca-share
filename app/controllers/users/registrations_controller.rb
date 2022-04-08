@@ -11,7 +11,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # POST /resource
   def create
-    if verify_recaptcha
+    if (!Rails.env.production? || verify_recaptcha)
       params['user'][:slug] = params['user']['username'].parameterize
 
       super

@@ -42,17 +42,16 @@ group :development, :test do
   gem 'better_errors'
   gem 'byebug'
   gem 'bullet'
-  gem 'capybara'
-  gem 'capybara-screenshot'
+  gem 'capybara', '3.18.0'
   gem 'dotenv-rails'
   gem 'factory_bot_rails', '~> 4.0'
   gem 'ffaker'
   gem 'launchy'
-  gem 'poltergeist'
   gem 'rspec-rails'
 end
 
 group :test do
+  gem 'webdrivers'
   gem 'climate_control'
   gem 'database_cleaner'
   gem 'fuubar'

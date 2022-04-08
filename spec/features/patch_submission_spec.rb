@@ -93,7 +93,8 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
         expect(page.body).to have_content('Patch saved successfully.')
       end
 
-      it 'rejects invalid URLS' do
+      # TODO: Make sure this is covered by unit tests instead
+      xit 'rejects invalid URLS' do
         fill_in 'patch[audio_sample]', with: 'https://foo.edu/69bot/shallow'
         click_button 'Save'
         expect(page).to have_content(

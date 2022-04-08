@@ -49,11 +49,11 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       expect(page).not_to have_link 'Add sequences'
       expect(page).to have_link 'Remove sequences'
       page.find('label[for=patch_sequences_attributes_0_step_1_step_mode]')
-          .trigger('click')
+        .click
       page.find('label[for=patch_sequences_attributes_1_step_2_slide]')
-          .trigger('click')
+        .click
       page.find('label[for=patch_sequences_attributes_2_step_3_active_step]')
-          .trigger('click')
+        .click
 
       click_button 'Save'
       expect(Patch.first.sequences.count).to eq(3)
@@ -117,27 +117,27 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     page.find('#patch_sequences_attributes_0_step_1_note_display')
         .drag_to(seq_form_light(0, 1, 'slide'))
-    seq_form_light(0, 1, 'slide').trigger('click')
-    seq_form_light(0, 5, 'slide').trigger('click')
-    seq_form_light(0, 6, 'slide').trigger('click')
-    seq_form_light(0, 9, 'slide').trigger('click')
-    seq_form_light(0, 10, 'slide').trigger('click')
-    seq_form_light(0, 11, 'slide').trigger('click')
-    seq_form_light(0, 13, 'slide').trigger('click')
-    seq_form_light(0, 14, 'slide').trigger('click')
-    seq_form_light(0, 15, 'slide').trigger('click')
-    seq_form_light(0, 16, 'slide').trigger('click')
+    seq_form_light(0, 1, 'slide').click
+    seq_form_light(0, 5, 'slide').click
+    seq_form_light(0, 6, 'slide').click
+    seq_form_light(0, 9, 'slide').click
+    seq_form_light(0, 10, 'slide').click
+    seq_form_light(0, 11, 'slide').click
+    seq_form_light(0, 13, 'slide').click
+    seq_form_light(0, 14, 'slide').click
+    seq_form_light(0, 15, 'slide').click
+    seq_form_light(0, 16, 'slide').click
 
-    seq_form_light(0, 3, 'step_mode').trigger('click')
-    seq_form_light(0, 7, 'step_mode').trigger('click')
-    seq_form_light(0, 11, 'step_mode').trigger('click')
-    seq_form_light(0, 15, 'step_mode').trigger('click')
+    seq_form_light(0, 3, 'step_mode').click
+    seq_form_light(0, 7, 'step_mode').click
+    seq_form_light(0, 11, 'step_mode').click
+    seq_form_light(0, 15, 'step_mode').click
 
     click_button 'Save'
     expect(page).to have_selector('.sequence-show')
     expect(
       page.find('#patch_sequences_attributes_0_step_1_note_display').text
-    ).to eq('G#2')
+    ).to eq('F2')
     expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_5_slide_light.lit')
     expect(page).to have_css('#patch_sequences_0_step_6_slide_light.lit')
@@ -189,7 +189,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
       login
       visit patch_path(patch)
-      first('#patch_sequences_0_step_1_slide_light').trigger('click')
+      first('#patch_sequences_0_step_1_slide_light').click
       expect(page).to have_css('#patch_sequences_0_step_1_slide_light.lit')
     end
   end
@@ -206,8 +206,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-form')
-    seq_form_light(0, 1, 'step_mode').trigger('click')
-    seq_form_light(1, 2, 'slide').trigger('click')
+    seq_form_light(0, 1, 'step_mode').click
+    seq_form_light(1, 2, 'slide').click
 
     click_button 'Save'
     expect(page).to have_link('Edit')
@@ -279,11 +279,11 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     # TODO: The following line is imprecise
     page.find('#patch_sequences_attributes_0_step_1_note_display')
         .drag_to(seq_form_light(0, 1, 'slide'))
-    seq_form_light(0, 1, 'slide').trigger('click')
-    seq_form_light(0, 5, 'slide').trigger('click')
-    seq_form_light(0, 13, 'slide').trigger('click')
-    seq_form_light(0, 16, 'slide').trigger('click')
-    seq_form_light(0, 7, 'step_mode').trigger('click')
+    seq_form_light(0, 1, 'slide').click
+    seq_form_light(0, 5, 'slide').click
+    seq_form_light(0, 13, 'slide').click
+    seq_form_light(0, 16, 'slide').click
+    seq_form_light(0, 7, 'step_mode').click
 
     click_button 'Save'
     find('#patch_sequences_attributes_0_step_1_note_display').hover

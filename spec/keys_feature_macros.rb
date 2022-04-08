@@ -26,7 +26,7 @@ def fill_out_keys_patch_form(patch, anon = false)
   find('#step_trigger_light').click if patch.step_trigger
   find('#tempo_delay_light').click unless patch.tempo_delay
 
-  fill_in 'patch[tags]', with: patch.tags.join(', '), visible: false
+  find('.bootstrap-tagsinput > input').set(patch.tags.join(', '))
   return if anon
   check 'patch[secret]' if patch.secret?
   fill_in 'patch[audio_sample]', with: patch.audio_sample
