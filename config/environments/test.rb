@@ -54,5 +54,5 @@ Rails.application.configure do
   config.assets.prefix = '/assets_test'
   config.assets.compile = true
   # config.serve_static_assets = true
-  # config.assets.js_compressor = Uglifier.new(harmony: true)
+  # config.assets.js_compressor = :terser
 end
