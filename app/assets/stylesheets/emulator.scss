@@ -77,8 +77,15 @@
 }
 
 #patch-metadata {
+  #emulator-keyboard {
+    width: 100%;
+    max-width: 300px;
+  }
+
   #permalink-link {
     float: left;
+    margin-top: 8px;
+    border: 1px solid #bbb;
   }
 
   #green-check-mark {

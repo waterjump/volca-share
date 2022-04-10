@@ -141,22 +141,34 @@
     #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
-  #desktop-instructions
-    Use computer keyboard to play notes
-    = image_tag('computer-midi-keyboard-small.png')
-    %br
-    %br
-    %p
-      Or try the
-      = link_to 'mobile version', '#', id: 'toggle-mobile'
-  #back-to-desktop.hidden
-    = link_to 'Back to desktop mode', '#'
-  #disclaimer
-    %h3 Disclaimer
-    %p
-      This is a <b>fan-made emulator</b>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
-  %button#permalink-link.btn 🔗 Generate permalink
-  #green-check-mark
+  .accordion
+    .accordion-item
+      %h4.accordion-header Usage
+      .accordion-body.clearfix
+        #desktop-instructions
+          Use computer keyboard to play notes
+          = image_tag('computer-midi-keyboard-small.png', id: 'emulator-keyboard')
+          %br
+          %br
+          %p
+            Or try the
+            = link_to 'mobile version', '#', id: 'toggle-mobile'
+        #back-to-desktop.hidden
+          = link_to 'Back to desktop mode', '#'
+        #saving
+          <strong>Saving / sharing a patch</strong><br />
+          To save a patch and sequence, click the "🔗&nbsp;Generate permalink" button below and then bookmark the URL.  The URL of this page will be updated to reflect the current patch and sequence settings as soon as the button is clicked.
+          %br
+          %button#permalink-link.btn 🔗 Generate permalink
+          #green-check-mark
+    .accordion-item
+      %h4.accordion-header Compatibility
+      .accordion-body
+        There are known issues with the sequencer on Chrome.  You will have a smoother experience on Firefox.
+    .accordion-item
+      %h4.accordion-header Disclaimer
+      #disclaimer.accordion-body
+        This is a <strong>fan-made emulator</strong>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
 .off-canvas
   =image_tag('numbers.jpg')
   =image_tag('symbols.jpg')
