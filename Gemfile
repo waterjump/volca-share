@@ -18,7 +18,7 @@ gem 'jbuilder', '~> 2.0'
 gem 'jquery-rails'
 gem 'kaminari-actionview'
 gem 'kaminari-mongoid'
-gem 'loofah', '~> 2.2.3'
+gem 'loofah', '~> 2.3.1'
 gem 'mongoid'
 gem 'mongoid-simple-tags',
     git: 'https://github.com/simplificator/mongoid-simple-tags.git',
