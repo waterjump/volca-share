@@ -27,6 +27,13 @@
                 %li Patches
               = link_to new_keys_patch_path, class: 'dropdown-item' do
                 %li New patch
+        - if current_page?(bass_emulator_path)
+          %li
+            = link_to 'Volca Bass Emulator', '#', class: 'link-like'
+        - else
+          %li#emulator_nav_callout
+            = link_to 'Volca Bass Emulator', bass_emulator_path
+            .speech.left Now with sequencer!
         - if ENV['FEATURE_ENABLED_PATCH_NAMER'] == 'true'
           - if current_page?(synth_patch_namer_path)
             %li

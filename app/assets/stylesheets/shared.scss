@@ -130,6 +130,27 @@ a.unstyled {
   }
 }
 
+#emulator_nav_callout {
+  a {
+    float: left;
+    color: white;
+    font-weight: 600;
+    text-shadow: #FF2929 2px 2px 0px;
+    font-style: italic;
+    font-size: 1.2em;
+  }
+
+  .speech {
+    padding: 4px;
+    margin-top: 1.8em;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+  .left.speech::after {
+    left: -4px;
+  }
+}
+
 /* SYNTH PATCH NAMER begin */
 #synth_patch_namer a {
   float: left;
