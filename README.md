@@ -1,6 +1,6 @@
 # VolcaShare
 
-VolcaShare is a tool to save and share settings (aka patches) for different sounds of the Korg Volca Bass and Korg Volca Keys synthesizers.  It’s basically a content management system, but instead of the content being blog posts or pictures of your feet or whatever, the content consists the parameters which define the synth patch, and therefore its sound.
+VolcaShare is an online patch database and content management system for the Korg Volca Bass and Korg Volca Keys synthesizers.  It also syncs patches from the browser directly to the synthesizer via WebMIDI.
 
 ## Features
 📝 **Persistence**: Create, read, update, and delete patches for the Bass and Keys.  
@@ -11,6 +11,7 @@ VolcaShare is a tool to save and share settings (aka patches) for different soun
 🎹 **Sequence support**: VolcaShare allows users to save sequences of notes to accompany their synth patch, just like the Volcas allow you do with their built in sequencer.  
 👀 **Discoverability / Ranking**: Tags can be used to categorize and navigate patches.  A sorting algorithm based on completeness and freshness places more relevant patches higher on browse pages.  
 🔀 **Patch randomization**: Change parameters randomly with the click of a button.  (Especially good mileage using the Keys with MIDI sync up.)  
+🥸 **[Volca Bass Emulator](https://www.volcashare.com/bass/emulator)**: Tweak knobs and make fun sounds and patterns directly in the browser, while bored at work, or on your phone on the toilet - wherever.
 
 ## Under the hood
 This application is built on these key frameworks/libraries:
@@ -22,10 +23,59 @@ This application is built on these key frameworks/libraries:
 * [Webmidi](https://github.com/djipco/webmidi) for sending MIDI signals via the browser.
 
 ## Installation
-Coming soon: how to install this application on your own computer.
+#### 1. Clone the repo
+`git clone git@github.com:waterjump/volca-share.git`
+
+#### 2. Ruby version
+VolcaShare currently runs on ruby 2.7.5 and uses [rbenv](https://github.com/rbenv/rbenv "rbenv") for ruby version management.
+While in the project directory, run `rbenv local` to set the ruby version configured in the repo.  If you don't have this version of ruby, you can install it with `rbenv install 2.7.5`. You will also need the `bundler` gem.
+
+#### 3. Node version
+This app requires node 17.6.0 (with npm 8.5.1) and uses [nvm](https://github.com/nvm-sh/nvm "nvm") to manage node versions.
+
+`nvm install 17.6.0`
+
+#### 4. Install MongoDB
+`brew tap mongodb/brew`
+
+`brew install mongodb-community@5.0`
+
+`brew services start mongodb/brew/mongodb-community`
+
+#### 5. Setup secrets file
+Make a copy of the secrets.yml.sample:
+
+`cp config/secrets.yml.sample config/secrets.yml`
+
+Generate values and add them to the newly generated secrets.yml file.
+
+`RAILS_ENV=development bundle exec rake secret`
+
+This will give you a long string of letters and numbers that can be used as the `secret_key_base` value.
+Repeat for test environment as well.
+
+#### 6. Remove RECAPTCHA stuff
+It's easiest just to do a project wide search for 'recaptcha' (case insensitive) and remove all matching lines.  If you want to configure your own recaptcha account for this app, you can do this on your own.
+
+#### 7. Install nodejs dependencies
+`npm install`
+
+#### 8. Install ruby dependencies
+`bundle install`
+
+
 
 ## Usage
-Coming soon: how to *run* and use this application on your own computer.
+#### Starting the server
+
+`bundle exec rails s`
+
+Then visit http://127.0.0.1:3000/ in a web browser.
+
+#### Running tests
+
+`bundle exec rspec`
+
 
 ## Reporting an issue / requesting a feature:
 Please open a [GitHub issue](https://github.com/waterjump/volca-share/issues/new).
@@ -36,7 +86,8 @@ November 2016 - [VolcaShare.com](https://www.volcashare.com) launched
 January 25 2017 - Sequence support on bass patches  
 August 8 2018 - Sort by quality  
 February 21 2020 - [Volca Keys](https://www.volcashare.com/keys/patch/new) support  
-August 15 2020 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) launched
+August 15 2020 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) launched  
+April 10 2022 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) step sequencer added  
 
 ## License
 see LICENSE.md
