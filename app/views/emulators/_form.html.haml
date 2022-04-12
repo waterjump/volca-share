@@ -143,7 +143,9 @@
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     .accordion-item
-      %h4.accordion-header Usage
+      %h4.accordion-header
+        Usage
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
       .accordion-body.clearfix
         #desktop-instructions
           Use computer keyboard to play notes
@@ -162,11 +164,15 @@
           %button#permalink-link.btn 🔗 Generate permalink
           #green-check-mark
     .accordion-item
-      %h4.accordion-header Compatibility
+      %h4.accordion-header
+        Compatibility
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
       .accordion-body
         There are known issues with the sequencer on Chrome.  You will have a smoother experience on Firefox.
     .accordion-item
-      %h4.accordion-header Disclaimer
+      %h4.accordion-header
+        Disclaimer
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
       #disclaimer.accordion-body
         This is a <strong>fan-made emulator</strong>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
 .off-canvas

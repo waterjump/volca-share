@@ -44,6 +44,22 @@ RSpec.describe 'Volca Bass Emulator', type: :feature  do
     end
   end
 
+  describe 'accordion section', :js do
+    it 'can be collapsed' do
+      visit bass_emulator_path
+
+      expect(page).to have_css('#desktop-instructions', visible: true)
+      within first('.accordion-header') do
+        find('.collapse-toggle').click
+      end
+      expect(page).not_to have_css('#desktop-instructions', visible: true)
+
+      first('.accordion-header').click
+
+      expect(page).to have_css('#desktop-instructions', visible: true)
+    end
+  end
+
   def reflects_emulator_patch(patch, options = {})
     expect(page.find('span.attack', visible: false).text).to(
       eq(rotation_from_midi(patch.attack).to_s)
@@ -195,5 +211,4 @@ RSpec.describe 'Volca Bass Emulator', type: :feature  do
       127
     end
   end
-
 end

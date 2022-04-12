@@ -102,11 +102,17 @@ body {
 
 .accordion-header {
   border: 1px solid #ccc;
-  background: #ddd;
+  background: #e4e4e4;
   padding: 5px 10px;
   width: 100%;
   border-radius: 4px 4px 0 0;
   margin-bottom: 0;
+  user-select: none;
+  -moz-user-select: none;
+
+  .collapse-toggle {
+    float: right;
+  }
 }
 
 .accordion-body {
