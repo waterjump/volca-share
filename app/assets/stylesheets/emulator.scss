@@ -20,7 +20,44 @@
 }
 
 .volca.bass.emulator {
-  background-image: image_url('VolcaBass-medium-unbranded.jpg');
+  background-image: image_url('VolcaBass-medium-unbranded-custom.jpg');
+
+  .green-check-mark {
+    position: absolute;
+    left: 23%;
+    top: 49.5%;
+    z-index: 2;
+  }
+
+  #permalink {
+    left: 25.4%;
+  }
+
+  #permalink:active {
+    background-color: #bbb;
+  }
+
+  .button:active {
+    border-color: #000;
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  #step-mode-button {
+    left: 34%;
+  }
+
+  #record-button {
+    left: 52%;
+  }
+
+  .scrim {
+    position: absolute;
+    top: 50%;
+    height: 14%;
+    width: 7%;
+    background-color: #b4b4b6;
+    opacity: 0.5;
+  }
 
   #play {
     left: 43.35%;
@@ -52,6 +89,10 @@
     background-color: rgba(0,0,0,0);
     border: 4px solid green;
     box-shadow: 0px 0px 20px lime;
+
+    &:active {
+      border: 4px solid green;
+    }
   }
 
   .clear-control {
@@ -82,14 +123,9 @@
     max-width: 300px;
   }
 
-  #permalink-link {
-    float: left;
-    margin-top: 8px;
-    border: 1px solid #bbb;
-  }
-
-  #green-check-mark {
-    float: left;
-    margin: 5px 10px 7px 10px;
+  .interface-text {
+    font-weight: 500;
+    font-stretch: condensed;
+    text-transform: uppercase;
   }
 }

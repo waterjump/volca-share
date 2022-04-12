@@ -66,7 +66,7 @@ $pink: #fd9994;
       position: absolute;
       top: 54.5%;
       background-color: #d6d7dc;
-      border: solid black;
+      border: solid #333;
       border-radius: 5px;
     }
 
@@ -238,7 +238,7 @@ $pink: #fd9994;
   #sync-button-container {
     float: right;
 
-    #green-check-mark {
+    .green-check-mark {
       float: right;
       margin: 8px 10px 7px 5px;
     }

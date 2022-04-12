@@ -49,10 +49,10 @@ $(function() {
     return Object.entries(result).map(param => param.join('=')).join('&');
   }
 
-  $('#permalink-link').on('click tap', function() {
+  $('#permalink').on('click tap', function() {
     let queryString = permalinkQueryString();
     window.history.replaceState({}, '', `${location.pathname}?${queryString}`);
-    $('#green-check-mark').show();
-    $('#green-check-mark').fadeOut(1000);
+    $('.green-check-mark').show();
+    $('.green-check-mark').fadeOut(1000);
   });
 });

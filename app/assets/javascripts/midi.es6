@@ -86,8 +86,8 @@ VS.MidiOut = function() {
 
   $('#sync').on('click tap', function() {
     scope.syncMidi();
-    $('#green-check-mark').show();
-    $('#green-check-mark').fadeOut(1000);
+    $('.green-check-mark').show();
+    $('.green-check-mark').fadeOut(1000);
 
     if (localStorageAvailable() && localStorage.DoNotShowMessageAgain != 'true') {
       localStorage.DoNotShowMessageAgain = 'true';

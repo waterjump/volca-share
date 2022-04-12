@@ -37,7 +37,11 @@
       .medium.knob#volume{ data: { midi: 127 } }
         .notch
       .cooltip
-      .button#play.highlight
+      .green-check-mark
+      .button#permalink
+      #step-mode-button.scrim
+      #play.button.highlight
+      #record-button.scrim
       #experimental
       #stop.hidden
 
@@ -159,10 +163,7 @@
           = link_to 'Back to desktop mode', '#'
         #saving
           <strong>Saving / sharing a patch</strong><br />
-          To save a patch and sequence, click the "🔗&nbsp;Generate permalink" button below and then bookmark the URL.  The URL of this page will be updated to reflect the current patch and sequence settings as soon as the button is clicked.
-          %br
-          %button#permalink-link.btn 🔗 Generate permalink
-          #green-check-mark
+          To save a patch and sequence, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface below the cutoff knob.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
     .accordion-item
       %h4.accordion-header
         Compatibility
