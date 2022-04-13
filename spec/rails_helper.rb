@@ -27,6 +27,7 @@ VCR.configure do |config|
     allow_playback_repeats: true
   }
   config.allow_http_connections_when_no_cassette = true
+  config.ignore_hosts('chromedriver.storage.googleapis.com')
 end
 
 Capybara.configure do |config|

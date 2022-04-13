@@ -1221,6 +1221,7 @@ VS.BassEmulator = function() {
     $('.note:visible span').each(function() {
       const el = $(this);
       el.html('C3');
+      el.data('starting-note', 60);
       sequence[el.data('index')].note = 60;
     });
   };
