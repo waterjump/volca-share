@@ -27,7 +27,7 @@ FactoryBot.define do
 
     audio_sample { '' }
     slug { name.parameterize }
-    tags { FFaker::Lorem.words(3) }
+    tags { FFaker::Lorem.unique.words(3).uniq }
 
     factory :user_keys_patch do
       user

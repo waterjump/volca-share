@@ -33,7 +33,7 @@ FactoryBot.define do
     amp_eg_on { FFaker::Boolean.maybe }
     secret false
     notes { FFaker::Lorem.paragraph }
-    tags { FFaker::Lorem.words(3) }
+    tags { FFaker::Lorem.unique.words(3) }
     slide_time midi_range.to_a.sample
     expression midi_range.to_a.sample
     gate_time midi_range.to_a.sample
