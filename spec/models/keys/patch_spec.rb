@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Keys::Patch do
+  let(:patch) { FactoryBot.build(:keys_patch) }
+
   describe 'fields' do
     it { is_expected.to have_field(:name).of_type(String) }
 
@@ -356,6 +358,8 @@ RSpec.describe Keys::Patch do
       end
     end
   end
+
+  it_behaves_like 'taggable'
 
   describe 'quality' do
     context 'when a legacy record has audio_sample that is no longer available' do

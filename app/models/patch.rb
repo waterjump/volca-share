@@ -8,6 +8,7 @@ class Patch
   include Mongoid::Document::Taggable
   include ActiveModel::Validations
   include AudioSample
+  include Tags
 
   field :name, type: String
   field :attack, type: Integer, default: 63

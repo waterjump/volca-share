@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Patch  do
+  let(:patch) { FactoryBot.build(:patch) }
+
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_uniqueness_of(:name) }
@@ -95,6 +97,8 @@ RSpec.describe Patch  do
           .with_default_value_of(nil)
       )
     end
+
+    it_behaves_like 'taggable'
   end
 
   describe 'quality' do

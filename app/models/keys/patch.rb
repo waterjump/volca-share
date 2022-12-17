@@ -9,6 +9,7 @@ module Keys
     include Mongoid::Document::Taggable
     include ActiveModel::Validations
     include AudioSample
+    include Tags
 
     field :name, type: String
     field :secret, type: Boolean, default: false
