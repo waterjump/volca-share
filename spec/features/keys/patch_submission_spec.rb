@@ -64,15 +64,6 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
           click_button 'Save'
           expect(page.body).to have_content('Patch saved successfully.')
         end
-
-        # TODO: Make sure this is covered by unit tests instead
-        xit 'rejects invalid URLS' do
-          fill_in 'patch[audio_sample]', with: 'https://foo.edu/69bot/shallow'
-          click_button 'Save'
-          expect(page).to have_content(
-            'Audio sample needs to be direct SoundCloud, Freesound or YouTube link.'
-          )
-        end
       end
 
       describe 'showing audio sample' do

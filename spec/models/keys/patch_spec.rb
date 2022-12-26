@@ -339,23 +339,11 @@ RSpec.describe Keys::Patch do
       end
     end
 
-    context 'when audio_sample is nil' do
-      it 'sets that audio_sample_available to nil' do
-        patch = create(:keys_patch, audio_sample: nil, audio_sample_available: true)
-        expect(patch.audio_sample_available).to be_nil
-      end
-    end
+    describe 'audio sample validations' do
+      let(:model) { build(:keys_patch, audio_sample: audio_sample) }
+      let(:user_model) { build(:user_keys_patch, audio_sample: audio_sample) }
 
-    context 'when audio_sample is not nil' do
-      it 'validates that audio_sample_available is true' do
-        patch = build(
-          :user_keys_patch,
-          audio_sample: 'https://soundcloud.com/squidbrain/fake-track'
-        )
-
-        expect(patch).not_to be_valid
-        expect(patch.errors.full_messages).to eq(['Audio sample is not available.'])
-      end
+      it_behaves_like 'models with audio_sample field'
     end
   end
 

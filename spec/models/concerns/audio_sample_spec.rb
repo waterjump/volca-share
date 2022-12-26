@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-
+#
+# TODO: Move into shared audio smaple examples
+#
 class DummyModel
   # NOTE: I tried to include the same modules used in the models but I couldn't
   #  do it without including Mongoid::Document, so I stubbed the methods.
