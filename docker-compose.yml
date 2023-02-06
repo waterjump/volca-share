@@ -1,0 +1,24 @@
+version: '3'
+services:
+  mongo:
+    image: mongo:5.0.6
+    command: --bind_ip_all
+    restart: always
+      #environment:
+      #  # mongodb client connection
+      #  MONGO_INITDB_ROOT_USERNAME: user
+      #  MONGO_INITDB_ROOT_PASSWORD: password
+      #  MONGO_INITDB_DATABASE: volca_share_development
+    ports:
+      - '27017:27017'
+  vs:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - ".:/myapp"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    links:
+      - mongo
