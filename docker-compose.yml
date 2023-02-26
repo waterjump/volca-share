@@ -11,6 +11,7 @@ services:
       #  MONGO_INITDB_DATABASE: volca_share_development
     ports:
       - '27017:27017'
+    profiles: ['dev', 'test']
   vs:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
@@ -20,5 +21,11 @@ services:
       - "3000:3000"
     depends_on:
       - mongo
+    environment:
+      - SELENIUM_HOST=chrome-server
     links:
       - mongo
+      - chrome-server
+  chrome-server:
+    image: selenium/standalone-chrome-debug
+    profiles: ['test']

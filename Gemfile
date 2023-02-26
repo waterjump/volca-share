@@ -8,7 +8,6 @@ gem 'addressable', '>= 2.8.0'
 gem 'babel-transpiler'
 gem 'bootstrap-sass', '>= 3.4.1'
 gem 'bootstrap-tagsinput-rails'
-gem 'bundler', '~> 1.15'
 gem 'coffee-rails'
 gem 'cookies_eu'
 gem 'devise', '4.7.1'
@@ -51,7 +50,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'webdrivers'
+  gem 'selenium-webdriver'
   gem 'climate_control'
   gem 'database_cleaner'
   gem 'fuubar'

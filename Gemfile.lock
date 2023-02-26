@@ -342,10 +342,6 @@ GEM
       binding_of_caller (>= 0.7.2)
       railties (>= 4.0)
       sprockets-rails (>= 2.0, < 4.0)
-    webdrivers (5.0.0)
-      nokogiri (~> 1.6)
-      rubyzip (>= 1.3.0)
-      selenium-webdriver (~> 4.0)
     webmock (3.5.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -367,7 +363,6 @@ DEPENDENCIES
   bootstrap-tagsinput-rails
   bson_ext
   bullet
-  bundler (~> 1.15)
   byebug
   capybara (= 3.18.0)
   climate_control
@@ -403,6 +398,7 @@ DEPENDENCIES
   rubocop (~> 0.66.0)
   ruby-oembed
   sass-rails
+  selenium-webdriver
   sendgrid-actionmailer
   simplecov
   sinatra (~> 2.0.2)
@@ -411,7 +407,6 @@ DEPENDENCIES
   timecop
   vcr
   web-console (~> 2.0)
-  webdrivers
   webmock (~> 3.5.0)
   websocket-extensions (>= 0.1.5)
 

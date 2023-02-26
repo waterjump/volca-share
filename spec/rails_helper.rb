@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-ENV['RAILS_ENV'] ||= 'test'
+ENV['RAILS_ENV'] = 'test'
 require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
@@ -11,7 +11,6 @@ require 'capybara/rails'
 require 'capybara/rspec'
 require 'ffaker'
 require 'devise'
-require 'webdrivers/chromedriver'
 require 'rubygems'
 require 'vcr'
 require 'feature_macros'
@@ -27,26 +26,42 @@ VCR.configure do |config|
     allow_playback_repeats: true
   }
   config.allow_http_connections_when_no_cassette = true
-  config.ignore_hosts('chromedriver.storage.googleapis.com')
+  config.ignore_hosts('chrome-server')
 end
 
 Capybara.configure do |config|
   config.default_normalize_ws = true
 end
 
-Capybara.register_driver :chrome do |app|
-  Capybara::Selenium::Driver.new(app, browser: :chrome)
-end
+Capybara.server_host = '0.0.0.0'
+Capybara.server_port = 31337
+Capybara.app_host =
+  "http://#{ENV.fetch("HOSTNAME")}:#{Capybara.server_port}"
 
 Capybara.register_driver :chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new(
     args: %w(headless disable-gpu --window-size=1024,1024)
   )
 
-  Capybara::Selenium::Driver.new(app, browser: :chrome, options: options)
+  Capybara::Selenium::Driver.new(app, browser: :chrome, capabilities: options)
 end
 
-Capybara.javascript_driver = :chrome
+Capybara.register_driver :remote_selenium_headless do |app|
+  options = Selenium::WebDriver::Chrome::Options.new
+  options.add_argument("--headless")
+  options.add_argument("--window-size=1024,1024")
+  options.add_argument("--no-sandbox")
+  options.add_argument("--disable-dev-shm-usage")
+
+  Capybara::Selenium::Driver.new(
+    app,
+    browser: :chrome,
+    url: "http://#{ENV["SELENIUM_HOST"]}:4444/wd/hub",
+    capabilities: options,
+  )
+end
+
+Capybara.javascript_driver = :remote_selenium_headless
 
 # Add additional requires below this line. Rails is not loaded until this point!
 
