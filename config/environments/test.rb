@@ -43,14 +43,6 @@ Rails.application.configure do
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
 
-  # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
-  config.after_initialize do
-    Bullet.enable = true
-    Bullet.bullet_logger = true
-    Bullet.raise = false # raise an error if n+1 query occurs
-  end
-
   config.assets.prefix = '/assets_test'
   config.assets.compile = true
   # config.serve_static_assets = true

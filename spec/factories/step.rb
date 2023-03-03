@@ -10,8 +10,8 @@ end
 
 FactoryBot.define do
   factory :step do
-    index one_to_sixteen.to_a.sample
-    note midi_range.to_a.sample
+    index { one_to_sixteen.to_a.sample }
+    note { midi_range.to_a.sample }
     step_mode { FFaker::Boolean.maybe }
     slide { FFaker::Boolean.maybe }
     active_step { FFaker::Boolean.maybe }
