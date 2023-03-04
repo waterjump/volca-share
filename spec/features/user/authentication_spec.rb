@@ -49,7 +49,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
           click_button 'Sign up'
         end
 
-        expect(page).to have_content('Email is already taken')
+        expect(page).to have_content('Email has already been taken')
       end
     end
 
@@ -67,7 +67,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
           click_button 'Sign up'
         end
 
-        expect(page).to have_content('Username is already taken')
+        expect(page).to have_content('Username has already been taken')
       end
     end
 

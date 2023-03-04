@@ -9,10 +9,11 @@ RSpec.describe PatchesController, type: :controller do
   let(:invalid_attributes) { attributes_for(:patch, attack: 'bort') }
   let(:tags_string) { 'aaa,bbb,ccc' }
   let(:valid_session) { {} }
+  let(:session_user) { User.first }
+  let!(:patch) { create(:patch) }
 
   describe 'GET #index' do
     it 'assigns all patches as @patches' do
-      patch = Patch.create! valid_attributes.merge(user_id: '123')
       get :index
       expect(assigns(:patches)).to eq([patch])
     end
@@ -20,7 +21,6 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #show' do
     it 'assigns the requested patch as @patch' do
-      patch = Patch.create!(valid_attributes)
       get :show, params: { id: patch.to_param }, session: valid_session
       expect(assigns(:patch)).to eq(patch)
     end
@@ -35,7 +35,6 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'GET #edit' do
     it 'assigns the requested patch as @patch' do
-      patch = create(:patch)
       get :edit, params: { id: patch.to_param }, session: valid_session
       expect(assigns(:patch)).to eq(patch)
     end
@@ -122,17 +121,14 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'PUT #update' do
     context 'with valid params' do
-      let!(:user) do
-        FactoryBot.create(:user, id: '123')
-      end
+      let!(:user) { create(:user, id: '123') }
+      let(:patch) { create(:user_patch, user: user) }
 
       let(:new_attributes) do
         attributes_for(:patch, name: 'New Weird Patch', user_id: user.id)
       end
 
       it 'updates the requested patch' do
-        patch = user.patches.build(valid_attributes)
-        patch.save
         put(
           :update,
           params: {
@@ -146,8 +142,6 @@ RSpec.describe PatchesController, type: :controller do
       end
 
       it 'assigns the requested patch as @patch' do
-        patch = user.patches.build(valid_attributes)
-        patch.save
         put(
           :update,
           params: {
@@ -160,13 +154,11 @@ RSpec.describe PatchesController, type: :controller do
       end
 
       it 'redirects to the patch' do
-        patch = user.patches.build(valid_attributes)
-        patch.save
         put(
           :update,
           params: {
             id: patch.id,
-            patch: valid_attributes.merge(tags: tags_string)
+            patch: patch.attributes.except('_id').merge(tags: tags_string)
           },
           session: valid_session
         )
@@ -176,7 +168,7 @@ RSpec.describe PatchesController, type: :controller do
 
     context 'with invalid params' do
       it 'assigns the patch as @patch' do
-        patch = Patch.create! valid_attributes
+        patch = create(:user_patch)
         put(
           :update,
           params: {
@@ -189,7 +181,7 @@ RSpec.describe PatchesController, type: :controller do
       end
 
       it "re-renders the 'edit' template" do
-        patch = Patch.create! valid_attributes
+        patch = create(:user_patch)
         put(
           :update,
           params: {
@@ -205,17 +197,19 @@ RSpec.describe PatchesController, type: :controller do
 
   describe 'DELETE #destroy' do
     context 'when user is author' do
+      let!(:patch) { create(:user_patch, user: session_user) }
+
       it 'destroys the requested patch' do
-        patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         expect do
           delete :destroy,
                  params: { id: patch.to_param },
                  session: valid_session
         end.to change(Patch, :count).by(-1)
+
+        expect { patch.reload }.to raise_error(Mongoid::Errors::DocumentNotFound)
       end
 
       it 'redirects to the patches index' do
-        patch = Patch.create! valid_attributes.merge(user_id: User.first.id)
         delete :destroy,
                params: { id: patch.to_param },
                session: valid_session
@@ -224,8 +218,9 @@ RSpec.describe PatchesController, type: :controller do
     end
 
     context 'when user is not author' do
+      let(:patch) { create(:user_patch) }
+
       it 'is disallowed' do
-        patch = Patch.create! valid_attributes.merge(user_id: 'abc123')
         delete :destroy,
                 params: { id: patch.to_param },
                 session: valid_session
