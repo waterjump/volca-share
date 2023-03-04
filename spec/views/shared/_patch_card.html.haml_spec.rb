@@ -9,7 +9,7 @@ RSpec.describe 'shared/_patch_card.html.haml', type: :view do
 
   let(:render_options) do
     {
-      partial: 'shared/patch_card.html.haml',
+      partial: 'shared/patch_card',
       locals: { current_user: user, patch: patch_view_model }
     }
   end

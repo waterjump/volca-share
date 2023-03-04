@@ -24,7 +24,7 @@ gem 'mongoid-simple-tags',
     git: 'https://github.com/simplificator/mongoid-simple-tags.git',
     ref: '940c575'
 gem 'nokogiri', '>= 1.12.5'
-gem 'rails', '6.0.6.1'
+gem 'rails', '6.1.7.2'
 gem 'rack', '~> 2.1'
 gem 'rack-timeout'
 gem 'rails-html-sanitizer', '~> 1.0'

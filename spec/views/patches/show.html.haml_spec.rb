@@ -53,7 +53,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
     context 'when user is author' do
       before do
         render(
-          template: 'patches/show.html.haml',
+          template: 'patches/show',
           locals: { current_user: user }
         )
       end
@@ -80,7 +80,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
     context 'when user is not author' do
       before do
         render(
-          template: 'patches/show.html.haml',
+          template: 'patches/show',
           locals: { current_user: FactoryBot.create(:user) }
         )
       end
@@ -99,7 +99,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
     before do
       @patch = user_patch
       render(
-        template: 'patches/show.html.haml',
+        template: 'patches/show',
         locals: { current_user: FactoryBot.create(:user) }
       )
     end
@@ -122,7 +122,7 @@ RSpec.describe 'patches/show.html.haml', type: :view do
       @patch = anonymous_patch
 
       render(
-        template: 'patches/show.html.haml',
+        template: 'patches/show',
         locals: { current_user: FactoryBot.create(:user) }
       )
     end

@@ -9,7 +9,7 @@ RSpec.describe 'shared/_keys_patch_card.html.haml', type: :view do
 
   let(:render_options) do
     {
-      partial: 'shared/keys_patch_card.html.haml',
+      partial: 'shared/keys_patch_card',
       locals: { current_user: nil, patch: patch_view_model }
     }
   end
@@ -19,7 +19,7 @@ RSpec.describe 'shared/_keys_patch_card.html.haml', type: :view do
   context 'when user is logged in' do
     let(:render_options) do
       {
-        partial: 'shared/keys_patch_card.html.haml',
+        partial: 'shared/keys_patch_card',
         locals: { current_user: user, patch: patch_view_model }
       }
     end

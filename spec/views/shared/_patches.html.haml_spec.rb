@@ -10,7 +10,7 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
 
   let(:render_options) do
     {
-      partial: 'shared/patches.html.haml',
+      partial: 'shared/patches',
       locals: { current_user: nil, params: params }
     }
   end

@@ -7,7 +7,7 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
 
   it 'shows tag input placeholders' do
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
-    render partial: 'patches/form.html.haml'
+    render partial: 'patches/form'
     expect(rendered).to have_selector(
       'input[placeholder="tags, separated, by, commas"]'
     )
@@ -17,7 +17,7 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
     it 'prefills patch name' do
       @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
       name = FFaker::Lorem.words(3).join(' ')
-      render partial: 'patches/form.html.haml',
+      render partial: 'patches/form',
              locals: { request: double(parameters: { name: name }) }
       expect(rendered).to have_selector("#patch_name[value='#{name}']")
     end
@@ -32,7 +32,7 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
 
     before do
       @patch = user_patch
-      render partial: 'patches/form.html.haml', locals: locals
+      render partial: 'patches/form', locals: locals
     end
 
     context 'when patch has an audio sample' do
@@ -55,7 +55,7 @@ RSpec.describe 'patches/_form.html.haml', type: :view do
     it 'shows a link to create account' do
       @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
 
-      render partial: 'patches/form.html.haml', locals: locals
+      render partial: 'patches/form', locals: locals
 
       expect(rendered).to have_link('create an account')
     end

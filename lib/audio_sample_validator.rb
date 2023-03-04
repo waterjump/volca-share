@@ -11,12 +11,14 @@ class AudioSampleValidator < ActiveModel::EachValidator
     return unless record.audio_sample.present?
 
     if record.user.blank?
-      record.errors[:audio_sample] << 'is only valid on user patches'
+      record.errors.add(:audio_sample, 'is only valid on user patches')
     end
 
     unless compare(record.audio_sample)
-      record.errors[:audio_sample] <<
+      record.errors.add(
+        :audio_sample,
         'needs to be direct SoundCloud, Freesound or YouTube link.'
+      )
     end
   end
 

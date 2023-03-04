@@ -7,7 +7,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     it 'prefills patch name' do
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
       name = FFaker::Lorem.words(3).join(' ')
-      render partial: 'keys/patches/form.html.haml',
+      render partial: 'keys/patches/form',
              locals: { request: double(parameters: { name: name }) }
       expect(rendered).to have_selector("#patch_name[value='#{name}']")
     end
@@ -22,7 +22,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
 
     before do
       @patch = user_patch
-      render partial: 'keys/patches/form.html.haml', locals: locals
+      render partial: 'keys/patches/form', locals: locals
     end
 
     context 'when patch has an audio sample' do
@@ -75,7 +75,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
     before do
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
       render(
-        partial: 'keys/patches/form.html.haml',
+        partial: 'keys/patches/form',
         locals: { current_user: create(:user) }
       )
     end
@@ -92,7 +92,7 @@ RSpec.describe 'keys/patches/_form.html.haml', type: :view do
   it 'shows tag input placeholders' do
     @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
 
-    render partial: 'keys/patches/form.html.haml'
+    render partial: 'keys/patches/form'
 
     expect(rendered).to have_selector(
       'input[placeholder="tags, separated, by, commas"]'

@@ -8,7 +8,7 @@ RSpec.describe 'shared/_keys_patches.html.haml', type: :view do
 
   let(:render_options) do
     {
-      partial: 'shared/keys_patches.html.haml',
+      partial: 'shared/keys_patches',
       locals: { current_user: nil }
     }
   end
@@ -24,7 +24,7 @@ RSpec.describe 'shared/_keys_patches.html.haml', type: :view do
   context 'when user is logged in' do
     let(:render_options) do
       {
-        partial: 'shared/keys_patches.html.haml',
+        partial: 'shared/keys_patches',
         locals: { current_user: user }
       }
     end

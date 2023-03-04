@@ -42,7 +42,7 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
     context 'when user is author' do
       before do
         render(
-          template: 'keys/patches/show.html.haml',
+          template: 'keys/patches/show',
           locals: { current_user: user }
         )
       end
@@ -59,7 +59,7 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
     context 'when user is not the author' do
       before do
         render(
-          template: 'keys/patches/show.html.haml',
+          template: 'keys/patches/show',
           locals: { current_user: create(:user) }
         )
       end
@@ -79,7 +79,7 @@ RSpec.describe 'keys/patches/show.html.haml', type: :view do
       @patch = anonymous_patch
 
       render(
-        template: 'keys/patches/show.html.haml',
+        template: 'keys/patches/show',
         locals: { current_user: nil }
       )
     end
