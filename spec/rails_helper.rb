@@ -28,6 +28,8 @@ VCR.configure do |config|
   }
   config.allow_http_connections_when_no_cassette = true
   config.ignore_hosts('chromedriver.storage.googleapis.com')
+  config.ignore_hosts('googlechromelabs.github.io')
+  config.ignore_hosts('storage.googleapis.com')
 end
 
 Capybara.configure do |config|
