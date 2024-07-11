@@ -1149,32 +1149,44 @@ VS.BassEmulator = function() {
   });
 
   // LFO TARGET AMP
-  $('label[for="patch_lfo_target_amp"]').on('click tap', function() {
-    patch.lfo.targetAmp = !patch.lfo.targetAmp;
-    setAmpLfoAmpGain();
-  });
+  document.getElementById('patch_lfo_target_amp').addEventListener(
+    'change',
+    function(event) {
+      patch.lfo.targetAmp = !patch.lfo.targetAmp;
+      setAmpLfoAmpGain();
+    }
+  );
 
   // LFO TARGET PITCH
-  $('label[for="patch_lfo_target_pitch"]').on('click tap', function() {
-    patch.lfo.targetPitch = !patch.lfo.targetPitch;
-    setAmpLfoPitchGain();
-  });
+  document.getElementById('patch_lfo_target_pitch').addEventListener(
+    'change',
+    function(event) {
+      patch.lfo.targetPitch = !patch.lfo.targetPitch;
+      setAmpLfoPitchGain();
+    }
+  );
 
   // LFO TARGET CUTOFF
-  $('label[for="patch_lfo_target_cutoff"]').on('click tap', function() {
-    patch.lfo.targetCutoff = !patch.lfo.targetCutoff;
-    setAmpLfoCutoffGain();
-  });
+  document.getElementById('patch_lfo_target_cutoff').addEventListener(
+    'change',
+    function(event) {
+      patch.lfo.targetCutoff = !patch.lfo.targetCutoff;
+      setAmpLfoCutoffGain();
+    }
+  );
 
   // LFO WAVE
-  $('label[for="patch_lfo_wave"]').on('click tap', function() {
-     if (patch.lfo.shape == 'triangle') {
-       patch.setlfo_wave('square');
-     } else {
-       patch.setlfo_wave('triangle');
+  document.getElementById('patch_lfo_wave').addEventListener(
+    'change',
+    function(event) {
+      if (patch.lfo.shape == 'triangle') {
+        patch.setlfo_wave('square');
+      } else {
+        patch.setlfo_wave('triangle');
+      }
+      oscLfo.type = patch.lfo.shape;
     }
-    oscLfo.type = patch.lfo.shape;
-  });
+  );
 
   const toggleVcoWave = function(osc, vco) {
      if (vco.shape == 'sawtooth') {
@@ -1189,18 +1201,29 @@ VS.BassEmulator = function() {
 
   // VCO WAVE
   [1, 2, 3].forEach(function(oscNumber){
-    $(`label[for="patch_vco${oscNumber}_wave"]`).on('click tap', function() {
-      toggleVcoWave(osc[oscNumber], patch.vco[oscNumber]);
-    });
+    document.getElementById(`patch_vco${oscNumber}_wave`).addEventListener(
+      'change',
+      function(event) {
+        toggleVcoWave(osc[oscNumber], patch.vco[oscNumber]);
+      }
+    );
   });
 
-  $('label[for="patch_sustain_on"]').on('click tap', function() {
-    patch.sustainOn = !patch.sustainOn;
-  });
+  // SUSTAIN ON
+  document.getElementById('patch_sustain_on').addEventListener(
+    'change',
+    function(event) {
+      patch.sustainOn = !patch.sustainOn;
+    }
+  );
 
-  $('label[for="patch_amp_eg_on"]').on('click tap', function() {
-    patch.ampEgOn = !patch.ampEgOn;
-  });
+  // AMP EG ON
+  document.getElementById('patch_amp_eg_on').addEventListener(
+    'change',
+    function(event) {
+      patch.ampEgOn = !patch.ampEgOn;
+    }
+  );
 
   const clearSlide = function () {
     $('.slide:visible .light').each(function() {
