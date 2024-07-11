@@ -1020,6 +1020,13 @@ VS.BassEmulator = function() {
 
   document.addEventListener('changesequencenote', doSequenceStuff);
 
+  // Stop audio if user switches browser tab or minimizes window
+  document.addEventListener('visibilitychange', function() {
+    if (document.hidden && !sequencerPlaying) {
+      stopNote();
+    }
+  });
+
   $('.sequence-holder').on('sequenceparamchange', '.sequence-box .slide label',
     function() {
       const light = $($(this).find('.light'));
