@@ -29,6 +29,7 @@ Rails.application.routes.draw do
   post 'patch' => 'patches#create'
   resources :patches, only: [:index]
   get 'about' => 'welcome#index'
+  resources :contacts, only: [:new, :create]
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get
 

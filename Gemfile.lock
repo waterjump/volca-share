@@ -235,6 +235,8 @@ GEM
       nio4r (~> 2.0)
     racc (1.8.0)
     rack (2.2.6.3)
+    rack-attack (6.7.0)
+      rack (>= 1.0, < 4)
     rack-protection (2.0.3)
       rack
     rack-test (2.0.2)
@@ -424,6 +426,7 @@ DEPENDENCIES
   nokogiri (>= 1.12.5)
   puma (>= 4.3.9)
   rack (~> 2.1)
+  rack-attack
   rack-timeout
   rails (= 7.0.4.2)
   rails-controller-testing

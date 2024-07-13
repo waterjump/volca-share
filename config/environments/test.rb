@@ -12,6 +12,10 @@ Rails.application.configure do
   config.perform_caching = false
   config.cache_store = :null_store
 
+  # Enable the following 2 lines to test cache-dependent features.
+  # config.perform_caching = true
+  # config.cache_store = :memory_store, { size: 64.megabytes }
+
   # Do not eager load code on boot. This avoids loading your whole application
   # just for the purpose of running a single test. If you are using a tool that
   # preloads Rails for running tests, you may have to set it to true.

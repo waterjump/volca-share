@@ -1,0 +1,29 @@
+%h1 Contact Form
+
+= form_with url: contacts_path, method: :post, local: true do |f|
+  .form-group
+    = f.label 'contact[name]', "Your name"
+    = f.text_field 'contact[name]', class: "form-control", required: true, maxlength: 50, value: params.dig(:contact, :name)
+
+  .form-group
+    = f.label 'contact[email]', "Email"
+    = f.email_field 'contact[email]', class: "form-control", required: true, value: params.dig(:contact, :email)
+
+  .form-group
+    = f.label 'contact[subject]', "Subject"
+    = f.text_field 'contact[subject]', class: "form-control", required: true, value: params.dig(:contact, :subject)
+
+  .form-group
+    = f.label 'contact[message]', "Message"
+    = f.text_area 'contact[message]', class: "form-control", rows: 5, required: true, maxlength: 1_000, value: params.dig(:contact, :message)
+
+  - if Rails.env.production?
+    = recaptcha_tags
+
+  .form-group
+    = f.submit "Submit", class: "btn btn-primary"
+
+-# Display success message if present
+- if flash[:notice]
+  .alert.alert-success= flash[:notice]
+
