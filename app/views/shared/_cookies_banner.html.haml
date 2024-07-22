@@ -1,0 +1,5 @@
+- if !cookie_consent_given?
+  #cookie-banner{ class: "alert alert-info", style: "position: fixed; bottom: 0; width: 100%; text-align: center; margin-bottom: 0;" }
+    %p
+      VolcaShare uses cookies for the "keep me logged in" feature.  There are no tracking or marketing cookies of any kind.
+      %button{ class: "btn btn-primary", onclick: "acceptCookies()" } OK
