@@ -119,8 +119,6 @@ GEM
       execjs
     coffee-script-source (1.12.2)
     concurrent-ruby (1.3.3)
-    cookies_eu (1.7.3)
-      js_cookie_rails (~> 2.2.0)
     crack (1.0.0)
       bigdecimal
       rexml
@@ -174,8 +172,6 @@ GEM
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
-    js_cookie_rails (2.2.0)
-      railties (>= 3.1)
     json (2.6.1)
     kaminari-actionview (1.2.2)
       actionview
@@ -408,7 +404,6 @@ DEPENDENCIES
   capybara (~> 3.18)
   climate_control
   coffee-rails
-  cookies_eu
   database_cleaner
   devise (~> 4.7)
   dotenv-rails
