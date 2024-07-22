@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '2.7.5'
+ruby '3.2.1'
 
 source 'https://rubygems.org'
 
@@ -40,7 +40,7 @@ gem 'websocket-extensions', '>= 0.1.5'
 group :development, :test do
   gem 'better_errors'
   gem 'byebug'
-  gem 'capybara', '3.18.0'
+  gem 'capybara', '~> 3.18'
   gem 'dotenv-rails'
   gem 'factory_bot_rails', '~> 4.0'
   gem 'ffaker'
@@ -58,7 +58,7 @@ group :test do
   gem 'simplecov', require: false
   gem 'timecop'
   gem 'vcr'
-  gem 'webmock', '~> 3.5.0'
+  gem 'webmock', '~> 3.5'
 end
 
 group :development do
@@ -66,7 +66,7 @@ group :development do
 end
 
 group :production do
-  gem 'bson_ext'
+  gem 'bson', '~> 4.0'
   gem 'puma', '>= 4.3.9'
   gem 'rails_12factor'
 end

@@ -9,9 +9,10 @@ RSpec.describe "Contact form", type: :feature do
 
       click_link 'Contact'
 
-      fill_in 'subject', with: 'Test Subject'
-      fill_in 'email', with: 'test@example.com'
-      fill_in 'message', with: 'This is a test message.'
+      fill_in 'contact[name]', with: 'Stefawn'
+      fill_in 'contact[email]', with: 'test@example.com'
+      fill_in 'contact[subject]', with: 'Test Subject'
+      fill_in 'contact[message]', with: 'This is a test message.'
 
       click_button 'Submit'
 
