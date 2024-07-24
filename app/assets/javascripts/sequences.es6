@@ -81,7 +81,7 @@ VS.Sequences = function() {
     });
   });
 
-  $('#play').on('click tap', function(e) {
+  $('#play, #record-button').on('click tap', function(e) {
     e.preventDefault();
     setSequenceCount();
     if (!scope.sequencesActive) { showSequences(); }

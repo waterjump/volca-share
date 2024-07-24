@@ -169,6 +169,8 @@ VS.BassEmulator = function() {
     sustainOn: false,
     ampEgOn: false,
     volume: 1,
+    stepRecEnabled: false,
+    stepRecIndex: 1,
 
     getPercentage: function(midiValue) {
       return midiValue / 127.0;
@@ -310,12 +312,30 @@ VS.BassEmulator = function() {
     });
   };
 
-  $('#toggle-sequences, #play').on('click tap', function() {
-    setSequenceView();
+  $('#toggle-sequences, #play, #record-button').on('click tap', function() {
     if (sequence.length === 0) {
       populateSequenceObject();
     }
+    setSequenceView();
   });
+
+  // BUTTON BLINK
+  let blinkTimeout;
+
+  const startBlink = (id) => {
+    const elToBlink = $(id);
+    elToBlink.toggleClass('lit unlit');
+    const blink = () => {
+      elToBlink.toggleClass('lit unlit');
+      blinkTimeout = setTimeout(blink, 500);
+    }
+    blink();
+  };
+
+  const stopBlink = (id) => {
+    clearTimeout(blinkTimeout);
+    if ($(id).hasClass('lit')) { $(id).toggleClass('lit unlit'); }
+  };
 
   const volcaInterface = {
     lightAndCheck: function(paramName) {
@@ -821,11 +841,32 @@ VS.BassEmulator = function() {
   changeOctave(0);
   sequences.init();
 
+  const stepRecordNote = () => {
+    if (!patch.stepRecEnabled) { return; }
+
+    // set sequence note at stepRecIndex to notePlaying
+    sequence[patch.stepRecIndex - 1]['note'] =
+      notePlaying.getValueAtTime(audioCtx.currentTime);
+
+    setSequenceView();
+    $('.step.highlighted').removeClass('highlighted');
+    $(`#step_${patch.stepRecIndex - 1}`).addClass('highlighted');
+
+    // advance stepRecIndex
+    if (patch.stepRecIndex === 16) {
+      patch.stepRecIndex = 1;
+    } else {
+      patch.stepRecIndex++;
+    }
+  }
+
   const keyboardDown = function(time = audioCtx.currentTime){
     if (sequencerPlaying) { return; }
     if (keysDown.indexOf(notePlaying.getValueAtTime(time)) === -1) {
       keysDown.push(notePlaying.getValueAtTime(time));
     }
+
+    stepRecordNote();
 
     if (keysDown.length === 1) {
       playNewNote(time);
@@ -968,13 +1009,49 @@ VS.BassEmulator = function() {
     $('#stop').toggleClass('hidden');
     if (sequencerPlaying) {
       // STOP
-      Tone.Transport.stop();
-      stopNote(Tone.now() + 0.2);
-      sequencerPlaying = false;
+      macroStopSequencer();
     } else {
       // START
       sequencerPlaying = true;
       Tone.Transport.start('+0');
+      macroStepRecOff();
+    }
+  });
+
+  const macroStepRecOn = () => {
+    if (patch.stepRecEnabled) { return; }
+    patch.stepRecEnabled = true;
+    startBlink('#record-button');
+    patch.stepRecIndex = 1;
+  };
+
+  const macroStepRecOff = () => {
+    if (!patch.stepRecEnabled) { return; }
+
+    patch.stepRecEnabled = false;
+    stopBlink('#record-button');
+    $('.step.highlighted').removeClass('highlighted');
+    let jRecButton = $('#record-button');
+    if (jRecButton.hasClass('lit')) { jRecButton.toggleClass('lit unlit'); }
+  };
+
+  const macroStopSequencer = () => {
+    if (!sequencerPlaying) { return; }
+
+    Tone.Transport.stop();
+    stopNote(Tone.now() + 0.2);
+    sequencerPlaying = false;
+    if ($('#play').hasClass('lit')) { $('#play').toggleClass('lit unlit'); }
+    if (!$('#stop').hasClass('hidden')) { $('#stop').addClass('hidden'); }
+  };
+
+  $('#record-button').on('click tap', () => {
+    macroStopSequencer();
+
+    if (!patch.stepRecEnabled) {
+      macroStepRecOn();
+    } else {
+      macroStepRecOff();
     }
   });
 
