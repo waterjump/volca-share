@@ -305,8 +305,12 @@ VS.BassEmulator = function() {
       jElement.find('.note-display').html(VS.midiNoteNumbers[step.note]);
       jElement.find('.slide .light').data('active', step.slide);
       jElement.find('.slide .light').addClass(step.slide ? 'lit' : '');
-      jElement.find('.step-mode .light').data('active', step.stepMode);
-      jElement.find('.step-mode .light').removeClass(step.stepMode ? '' : 'lit');
+
+      let jStepModeLight = jElement.find('.step-mode .light');
+      jStepModeLight.data('active', step.stepMode);
+      jStepModeLight.removeClass(step.stepMode ? '' : 'lit');
+      jStepModeLight.addClass(step.stepMode ? 'lit' : '');
+
       jElement.find('.active-step .light').data('active', step.activeStep);
       jElement.find('.active-step .light').removeClass(step.activeStep ? '' : 'lit');
     });
@@ -841,16 +845,17 @@ VS.BassEmulator = function() {
   changeOctave(0);
   sequences.init();
 
-  const stepRecordNote = () => {
+  const stepRecordNote = (skip = false) => {
     if (!patch.stepRecEnabled) { return; }
 
     // set sequence note at stepRecIndex to notePlaying
-    sequence[patch.stepRecIndex - 1]['note'] =
-      notePlaying.getValueAtTime(audioCtx.currentTime);
-
-    setSequenceView();
-    $('.step.highlighted').removeClass('highlighted');
-    $(`#step_${patch.stepRecIndex - 1}`).addClass('highlighted');
+    if (skip) {
+      sequence[patch.stepRecIndex - 1]['stepMode'] = false;
+    } else {
+      sequence[patch.stepRecIndex - 1]['note'] =
+        notePlaying.getValueAtTime(audioCtx.currentTime);
+      sequence[patch.stepRecIndex - 1]['stepMode'] = true;
+    }
 
     // advance stepRecIndex
     if (patch.stepRecIndex === 16) {
@@ -858,6 +863,11 @@ VS.BassEmulator = function() {
     } else {
       patch.stepRecIndex++;
     }
+
+    setSequenceView();
+    $('.step.highlighted').removeClass('highlighted');
+    $(`#step_${patch.stepRecIndex - 1}`).addClass('highlighted');
+
   }
 
   const keyboardDown = function(time = audioCtx.currentTime){
@@ -1023,7 +1033,13 @@ VS.BassEmulator = function() {
     patch.stepRecEnabled = true;
     startBlink('#record-button');
     patch.stepRecIndex = 1;
+    $('#skip-step').removeClass('hidden');
+    $(`#step_${patch.stepRecIndex - 1}`).addClass('highlighted');
   };
+
+  $('#skip-step').on('click tap', (e) => {
+    stepRecordNote(true);
+  });
 
   const macroStepRecOff = () => {
     if (!patch.stepRecEnabled) { return; }
@@ -1033,6 +1049,7 @@ VS.BassEmulator = function() {
     $('.step.highlighted').removeClass('highlighted');
     let jRecButton = $('#record-button');
     if (jRecButton.hasClass('lit')) { jRecButton.toggleClass('lit unlit'); }
+    $('#skip-step').addClass('hidden');
   };
 
   const macroStopSequencer = () => {

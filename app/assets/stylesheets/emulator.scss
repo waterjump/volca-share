@@ -49,9 +49,20 @@
   #record-button {
     left: 52.45%;
   }
+
   #record-scrim {
     left: 52.45%;
     height: 4%;
+    z-index:1;
+  }
+
+  #skip-step {
+    top: 49.5%;
+    left: 52.45%;
+    height: 4.5%;
+    z-index: 20;
+    border: 2px #666 solid;
+    font-size: 0.5em;
   }
 
   .scrim {
@@ -126,10 +137,34 @@
     width: 100%;
     max-width: 300px;
   }
+}
 
-  .interface-text {
-    font-weight: 500;
-    font-stretch: condensed;
-    text-transform: uppercase;
+.interface-text {
+  font-weight: 500;
+  font-stretch: condensed;
+  text-transform: uppercase;
+}
+
+@media (min-width: 440px) {
+  .volca.bass.emulator {
+    #skip-step {
+      font-size: 0.6em;
+    }
+  }
+}
+
+@media (min-width: 660px) {
+  .volca.bass.emulator {
+    #skip-step {
+      font-size: 0.7em;
+    }
+  }
+}
+
+@media (min-width: 990px) {
+  .volca.bass.emulator {
+    #skip-step {
+      font-size: 0.85em;
+    }
   }
 }
