@@ -1,95 +1,10 @@
 VS.BassEmulator = function() {
-  const { sequences } = VS;
-
-  // =====================
-  // Declare map constants
-  // =====================
-
-  let keyMidiMap = {
-    65: 48, // C
-    87: 49, // C#
-    83: 50, // D
-    69: 51, // D#
-    68: 52, // E
-    70: 53, // F
-    84: 54, // F#
-    71: 55, // G
-    89: 56, // G#
-    72: 57, // A
-    85: 58, // A#
-    74: 59, // B
-    75: 60, // C
-    79: 61, // C#
-    76: 62  // D
-  }
-
-  // Key is vco pitch MIDI value.  Value is detune value in semitones.
-  const pitchMap = {
-     0: -12,    1: -12,    2: -11,    3: -10,    4: -9,     5: -8,     6: -7,     7: -6,     8: -5,     9: -4,
-    10: -3,    11: -2,    12: -1,    13: -0.96, 14: -0.92, 15: -0.88, 16: -0.84, 17: -0.80, 18: -0.78, 19: -0.76,
-    20: -0.74, 21: -0.72, 22: -0.70, 23: -0.68, 24: -0.66, 25: -0.64, 26: -0.62, 27: -0.60, 28: -0.58, 29: -0.56,
-    30: -0.54, 31: -0.52, 32: -0.50, 33: -0.48, 34: -0.46, 35: -0.44, 36: -0.42, 37: -0.40, 38: -0.38, 39: -0.36,
-    40: -0.34, 41: -0.32, 42: -0.30, 43: -0.28, 44: -0.26, 45: -0.24, 46: -0.22, 47: -0.20, 48: -0.18, 49: -0.16,
-    50: -0.14, 51: -0.12, 52: -0.10, 53: -0.08, 54: -0.06, 55: -0.04, 56: -0.02, 57: 0,     58: 0,     59: 0,
-    60: 0,     61: 0,     62: 0,     63: 0,     64: 0,     65: 0,     66: 0,     67: 0,     68: 0,     69: 0,
-    70: 0,     71: 0.02,  72: 0.04,  73: 0.06,  74: 0.08,  75: 0.10,  76: 0.12,  77: 0.14,  78: 0.16,  79: 0.18,
-    80: 0.20,  81: 0.22,  82: 0.24,  83: 0.26,  84: 0.28,  85: 0.30,  86: 0.32,  87: 0.34,  88: 0.36,  89: 0.38,
-    90: 0.40,  91: 0.42,  92: 0.44,  93: 0.46,  94: 0.48,  95: 0.50,  96: 0.52,  97: 0.54,  98: 0.56,  99: 0.58,
-    100: 0.60, 101: 0.62, 102: 0.64, 103: 0.66, 104: 0.68, 105: 0.70, 106: 0.72, 107: 0.74, 108: 0.76, 109: 0.78,
-    110: 0.80, 111: 0.84, 112: 0.88, 113: 0.92, 114: 0.96, 115: 1,    116: 2,    117: 3,    118: 4,    119: 5,
-    120: 6,    121: 7,    122: 8,    123: 9,    124: 10,   125: 11,   126: 12,   127: 12
-  }
-
-  const zKeyCode = 90;
-  const xKeyCode = 88;
-
-  const octaveMap = {
-    "-1": 8,
-    0: 9,
-    1: 21,
-    2: 33,
-    3: 45,
-    4: 57,
-    5: 69,
-    6: 81,
-    7: 93,
-    8: 105,
-    9: 118
-  };
-
-  const octaveKnobMidiMap = {
-    '-1': 0,
-    0: 0,
-    1: 0,
-    2: 33,
-    3: 55,
-    4: 77,
-    5: 99,
-    6: 127,
-    7: 127,
-    8: 127,
-    9: 127
-  };
-
-  const keyCodes = Object.keys(keyMidiMap).map(Number);
+  const { sequences, emulatorConstants } = VS;
 
   const parameterMaps = {
-    decayReleaseMap: {
-      0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,
-      70: 0.15, 80: 0.18, 90: 0.215, 100: 0.29, 110: 0.44, 115: 0.56, 120: 0.84,
-      122: 1.04, 125: 1.65, 127: 2.64
-    },
-    lfoRateMap: {
-      0: 0.0383, 10: 0.23, 20: 0.421, 30: 0.612, 40: 0.803, 50: 1, 60: 1.186,
-      70: 1.377, 80: 1.569, 90: 1.757, 100: 6.757, 110: 20, 115: 35.71,
-      120: 60, 127: 94
-    }
+    decayReleaseMap: emulatorConstants.decayReleaseMap,
+    lfoRateMap: emulatorConstants.lfoRateMap
   };
-
-  const decayReleaseGainCurve = [
-    1, 0.89, 0.8, 0.73, 0.65, 0.58, 0.52, 0.46, 0.41, 0.36, 0.31, 0.26, 0.22,
-    0.18, 0.15, 0.12, 0.09, 0.07, 0.05, 0.03, 0.02, 0.01, 0.005, 0.0001
-  ];
 
   const calculateMappedParameter = function(paramName, midiValue) {
     let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
@@ -217,7 +132,8 @@ VS.BassEmulator = function() {
     },
     setvco_pitch: function(oscNumber, midiValue) {
       this.vco[oscNumber].pitchMidi = midiValue;
-      this.vco[oscNumber].detune = pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
+      this.vco[oscNumber].detune =
+        emulatorConstants.pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
     },
     setvco1_pitch: function(midiValue) {
       this.setvco_pitch(1, midiValue);
@@ -751,7 +667,7 @@ VS.BassEmulator = function() {
       if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
         // use custom curve
         ampEgGainParam.setValueCurveAtTime(
-          decayReleaseGainCurve,
+          emulatorConstants.decayReleaseGainCurve,
           attackEndTimeValue,
           patch.envelope.decayRelease
         )
@@ -826,10 +742,10 @@ VS.BassEmulator = function() {
 
   // NOTE: This message will not be used by the sequencer.
   const changeOctave = function(change, time = audioCtx.currentTime) {
-    VS.display.update(octaveMap[patch.octave], 'noteString');
+    VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
     // Turn octave knob
-    new VS.Knob($('#octave')).setKnob(octaveKnobMidiMap[patch.octave]);
+    new VS.Knob($('#octave')).setKnob(emulatorConstants.octaveKnobMidiMap[patch.octave]);
 
     if (notePlaying === undefined) { return; } // at init time
 
@@ -888,7 +804,7 @@ VS.BassEmulator = function() {
   const keyboardUp = function(keyUp, time = audioCtx.currentTime) {
     if (sequencerPlaying) { return; }
     let octaveOffset = (patch.octave - 3) * 12;
-    keysDown = keysDown.filter(key => key !== keyMidiMap[keyUp.keyCode] + octaveOffset);
+    keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
 
     if (keysDown.length > 0) {
       notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
@@ -927,7 +843,7 @@ VS.BassEmulator = function() {
 
         if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
           // custom curve
-          const gainCurve = decayReleaseGainCurve.map(
+          const gainCurve = emulatorConstants.decayReleaseGainCurve.map(
             function(value) { return value * currentValue }
           );
           ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
@@ -1080,31 +996,34 @@ VS.BassEmulator = function() {
     if (keyDown.repeat) { return; }
 
     // PLAY NOTES
-    if (keyCodes.includes(keyDown.keyCode)) {
+    if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
       let octaveOffset = (patch.octave - 3) * 12;
-      notePlaying.setValueAtTime(keyMidiMap[keyDown.keyCode] + octaveOffset, audioCtx.currentTime);
+      notePlaying.setValueAtTime(
+        emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset,
+        audioCtx.currentTime
+      );
 
       keyboardDown();
     }
 
     // CHANGE OCTAVE
-    if (keyDown.keyCode == zKeyCode && patch.octave > -1) {
+    if (keyDown.keyCode == emulatorConstants.zKeyCode && patch.octave > -1) {
       patch.octave -= 1;
       changeOctave(-1);
     }
-    if (keyDown.keyCode == xKeyCode && patch.octave < 9) {
+    if (keyDown.keyCode == emulatorConstants.xKeyCode && patch.octave < 9) {
       patch.octave += 1;
       changeOctave(1);
     }
   };
 
   window.onkeyup = function(keyUp) {
-    if (keyCodes.includes(keyUp.keyCode)) {
+    if (emulatorConstants.keyCodes.includes(keyUp.keyCode)) {
       keyboardUp(keyUp);
     }
   };
 
-  const doSequenceStuff = function() {
+  const setSequenceNote = function() {
     if (VS.sequences.activeNote !== null) {
       const note = VS.sequences.activeNote.data('note');
       const index = VS.sequences.activeNote.data('index');
@@ -1112,7 +1031,7 @@ VS.BassEmulator = function() {
     }
   };
 
-  document.addEventListener('changesequencenote', doSequenceStuff);
+  document.addEventListener('changesequencenote', setSequenceNote);
 
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {

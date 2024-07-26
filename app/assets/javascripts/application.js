@@ -23,4 +23,5 @@
 //= require display
 //= require knob
 //= require tone
+//= require emulator_constants
 //= require_tree .

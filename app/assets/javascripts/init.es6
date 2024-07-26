@@ -9,6 +9,7 @@ $(function() {
   VS.sequences = new VS.Sequences;
   VS.form = new VS.Form;
   if ($('.emulator').length > 0) {
+    VS.emulatorConstants = new VS.EmulatorConstants;
     VS.bassEmulator = new VS.BassEmulator;
   }
 });
