@@ -10,6 +10,7 @@ $(function() {
   VS.form = new VS.Form;
   if ($('.emulator').length > 0) {
     VS.emulatorConstants = new VS.EmulatorConstants;
+    VS.emulatorParams = new VS.EmulatorParams;
     VS.bassEmulator = new VS.BassEmulator;
   }
 });
