@@ -1,4 +1,8 @@
 VS.EmulatorEngine = function(patch) {
+  // ===================================================================
+  // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
+  // ===================================================================
+
   const audioCtx = new AudioContext();
   const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
   this.notePlaying = new Tone.Param(audioCtx.createGain().gain);
@@ -292,4 +296,55 @@ VS.EmulatorEngine = function(patch) {
     }
   };
 
+  // CHANGE OCTAVE
+  this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
+    this.notePlaying.setValueAtTime(
+      this.notePlaying.getValueAtTime(time) + octaveOffset,
+      time
+    );
+
+    const frequency =
+      Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+
+    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+  };
+
+  this.setPeak = (value) => {
+    filter.Q.value = value;
+  };
+
+  this.setCutoff = (value, time = audioCtx.currentTime) => {
+    filter.frequency.setValueAtTime(value, time);
+  };
+
+  this.setFilterEgInt = (value, time = audioCtx.currentTime) => {
+    filterEgAmp.gain.setValueAtTime(value, time);
+  };
+
+  this.setVolume = (value, time = audioCtx.currentTime) => {
+    masterAmp.gain.setValueAtTime(value, time);
+  };
+
+  this.setOscMuteAmp = (oscNumber, value) => {
+    oscMuteAmps[oscNumber].gain.setValueAtTime(value, audioCtx.currentTime);
+  };
+
+  this.setLfoRate = (value) => {
+    oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
+  };
+
+  this.setLfoInt = (value) => {
+    // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
+    if (patch.lfo.targetPitch) {
+      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+    }
+
+    if (patch.lfo.targetCutoff) {
+      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
+    }
+
+    if (patch.lfo.targetAmp) {
+      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
+    }
+  };
 };

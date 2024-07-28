@@ -47,6 +47,8 @@ VS.BassEmulator = function() {
     return sequence;
   };
 
+  // TODO: Don't base sequence object on DOM state!!
+  //   Set a default sequence object
   const populateSequenceObject = function() {
     $('.step:visible').each(function(index, step) {
       sequence.push(
@@ -290,10 +292,9 @@ VS.BassEmulator = function() {
 
   let keysDown = [];
 
-
-  const emulatorEngine = new VS.EmulatorEngine(emulatorParams);
-  emulatorEngine.init();
-  const audioCtx = emulatorEngine.getAudioCtx();
+  const audioEngine = new VS.EmulatorEngine(emulatorParams);
+  audioEngine.init();
+  const audioCtx = audioEngine.getAudioCtx();
 
   // ==========================
   //  get browser capabilities
@@ -301,7 +302,7 @@ VS.BassEmulator = function() {
   const browserFeatures = {};
 
   const checkCustomCurveClearing = function() {
-    let dummyGain = emulatorEngine.getAudioCtx().createGain();
+    let dummyGain = audioEngine.getAudioCtx().createGain();
     dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
     try {
       dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
@@ -362,22 +363,20 @@ VS.BassEmulator = function() {
   let debugNewNote;
 
   // NOTE: This message will not be used by the sequencer.
-  // TODO: Decide how to extract engine-specific stuff
-  const changeOctave = function(change, time = audioCtx.currentTime) {
+  const changeOctave = function(change) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(emulatorConstants.octaveKnobMidiMap[patch.octave]);
 
-    if (emulatorEngine.notePlaying === undefined) { return; } // at init time
+    if (audioEngine.notePlaying === undefined) { return; } // at init time
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
-    let octaveOffset = change * 12;
-    emulatorEngine.notePlaying.setValueAtTime(emulatorEngine.notePlaying.getValueAtTime(time) + octaveOffset, time);
+    const octaveOffset = change * 12;
     keysDown = keysDown.map(key => key + octaveOffset);
-    let frequency = Tone.Frequency(emulatorEngine.notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+
+    audioEngine.changeOctave(octaveOffset);
   }
 
   changeOctave(0);
@@ -386,12 +385,12 @@ VS.BassEmulator = function() {
   const stepRecordNote = (skip = false) => {
     if (!patch.stepRecEnabled) { return; }
 
-    // set sequence note at stepRecIndex to emulatorEngine.notePlaying
+    // set sequence note at stepRecIndex to audioEngine.notePlaying
     if (skip) {
       sequence[patch.stepRecIndex - 1]['stepMode'] = false;
     } else {
       sequence[patch.stepRecIndex - 1]['note'] =
-        emulatorEngine.notePlaying.getValueAtTime(audioCtx.currentTime);
+        audioEngine.notePlaying.getValueAtTime(audioCtx.currentTime);
       sequence[patch.stepRecIndex - 1]['stepMode'] = true;
     }
 
@@ -410,16 +409,16 @@ VS.BassEmulator = function() {
 
   const keyboardDown = function(time = audioCtx.currentTime){
     if (sequencerPlaying) { return; }
-    if (keysDown.indexOf(emulatorEngine.notePlaying.getValueAtTime(time)) === -1) {
-      keysDown.push(emulatorEngine.notePlaying.getValueAtTime(time));
+    if (keysDown.indexOf(audioEngine.notePlaying.getValueAtTime(time)) === -1) {
+      keysDown.push(audioEngine.notePlaying.getValueAtTime(time));
     }
 
     stepRecordNote();
 
     if (keysDown.length === 1) {
-      emulatorEngine.playNewNote(time);
+      audioEngine.playNewNote(time);
     } else {
-      emulatorEngine.changeCurrentNote(time);
+      audioEngine.changeCurrentNote(time);
     }
   };
 
@@ -429,14 +428,14 @@ VS.BassEmulator = function() {
     keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
 
     if (keysDown.length > 0) {
-      emulatorEngine.notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
+      audioEngine.notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
 
-      emulatorEngine.changeCurrentNote(time);
+      audioEngine.changeCurrentNote(time);
 
       return;
     }
 
-    emulatorEngine.stopNote(time);
+    audioEngine.stopNote(time);
   };
 
   // ===================================
@@ -468,23 +467,23 @@ VS.BassEmulator = function() {
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
       let currentStep = sequence[i % 16];
-      emulatorEngine.notePlaying.setValueAtTime(currentStep['note'], time);
+      audioEngine.notePlaying.setValueAtTime(currentStep['note'], time);
 
       if (currentStep['stepMode']) {
         if (i > 0 && previousStep['slide']) {
           if (i > 0 && previousStep['stepMode']) {
-            emulatorEngine.changeCurrentNote(time);
+            audioEngine.changeCurrentNote(time);
           } else {
             // Play a new note when last step stop mode was off
-            emulatorEngine.playNewNote(time);
+            audioEngine.playNewNote(time);
             if (!currentStep['slide']) {
-              emulatorEngine.stopNote(gateEnd);
+              audioEngine.stopNote(gateEnd);
             }
           }
         } else {
-          emulatorEngine.playNewNote(time);
+          audioEngine.playNewNote(time);
           if (!currentStep['slide']) {
-            emulatorEngine.stopNote(gateEnd);
+            audioEngine.stopNote(gateEnd);
           }
         }
       }
@@ -497,7 +496,7 @@ VS.BassEmulator = function() {
   runToneSequencer();
 
   $('#play').on('click tap', function() {
-    emulatorEngine.activateAudio();
+    audioEngine.activateAudio();
     $('#stop').toggleClass('hidden');
     if (sequencerPlaying) {
       // STOP
@@ -538,7 +537,7 @@ VS.BassEmulator = function() {
     if (!sequencerPlaying) { return; }
 
     Tone.Transport.stop();
-    emulatorEngine.stopNote(Tone.now() + 0.2);
+    audioEngine.stopNote(Tone.now() + 0.2);
     sequencerPlaying = false;
     if ($('#play').hasClass('lit')) { $('#play').toggleClass('lit unlit'); }
     if (!$('#stop').hasClass('hidden')) { $('#stop').addClass('hidden'); }
@@ -564,8 +563,7 @@ VS.BassEmulator = function() {
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
       let octaveOffset = (patch.octave - 3) * 12;
-      console.log(emulatorEngine.notePlaying);
-      emulatorEngine.notePlaying.setValueAtTime(
+      audioEngine.notePlaying.setValueAtTime(
         emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset,
         audioCtx.currentTime
       );
@@ -603,7 +601,7 @@ VS.BassEmulator = function() {
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
     if (document.hidden && !sequencerPlaying) {
-      emulatorEngine.stopNote();
+      audioEngine.stopNote();
     }
   });
 
@@ -656,43 +654,27 @@ VS.BassEmulator = function() {
 
   $('#cutoff_eg_int').on('knobturn', () => {
     patch.setcutoff_eg_int(VS.activeKnob.trueMidi());
-
-    filterEgAmp.gain.setValueAtTime(
-      patch.envelope.cutoffEgInt,
-      audioCtx.currentTime
-    );
+    audioEngine.setFilterEgInt(patch.envelope.cutoffEgInt);
   });
 
   $('#peak').on('knobturn', () => {
     patch.setpeak(VS.activeKnob.trueMidi());
-    filter.Q.value = patch.filter.peak;
+    audioEngine.setPeak(patch.filter.peak);
   });
 
   $('#cutoff').on('knobturn', () => {
     patch.setcutoff(VS.activeKnob.trueMidi());
-    filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+    audioEngine.setCutoff(patch.filter.cutoff);
   });
 
   $('#lfo_rate').on('knobturn', () => {
     patch.setlfo_rate(VS.activeKnob.trueMidi());
-    oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
+    audioEngine.setLfoRate(patch.lfo.frequency);
   });
 
   $('#lfo_int').on('knobturn', () => {
     patch.setlfo_int(VS.activeKnob.trueMidi());
-
-    // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
-    if (patch.lfo.targetPitch) {
-      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-    }
-
-    if (patch.lfo.targetCutoff) {
-      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
-    }
-
-    if (patch.lfo.targetAmp) {
-      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
-    }
+    audioEngine.setLfoInt();
   });
 
   [1, 2, 3].forEach(oscNumber => {
@@ -707,7 +689,7 @@ VS.BassEmulator = function() {
 
   $('#volume').on('knobturn', () => {
     patch.setvolume(VS.activeKnob.midi());
-    masterAmp.gain.setValueAtTime(patch.volume, audioCtx.currentTime);
+    audioEngine.setVolume(patch.volume);
   });
 
   const toggleVcoAmp = function(oscNumber) {
@@ -716,9 +698,7 @@ VS.BassEmulator = function() {
     } else {
       patch.vco[oscNumber].amp = patch.defaultVcoAmp;
     }
-    oscMuteAmps[oscNumber].gain.setValueAtTime(
-      patch.vco[oscNumber].amp, audioCtx.currentTime
-    );
+    audioEngine.setOscMuteAmp(oscNumber, patch.vco[oscNumber].amp);
   };
 
   // VCO MUTE BUTTONS
@@ -877,7 +857,7 @@ VS.BassEmulator = function() {
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
     let octaveOffset = (patch.octave - 3) * 12;
-    emulatorEngine.notePlaying.setValueAtTime(keyMidiMap[$(this).data('keycode')] + octaveOffset, audioCtx.currentTime);
+    audioEngine.notePlaying.setValueAtTime(keyMidiMap[$(this).data('keycode')] + octaveOffset, audioCtx.currentTime);
 
     keyboardDown();
   });
