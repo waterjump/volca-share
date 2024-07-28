@@ -289,163 +289,11 @@ VS.BassEmulator = function() {
   // =======================
 
   let keysDown = [];
-  const builtInDecay = 0.1;
 
 
   const emulatorEngine = new VS.EmulatorEngine(emulatorParams);
   emulatorEngine.init();
-  // =====================================
-  // Setup web audio nodes (from here down)
-  // =====================================
-
-  // const audioCtx = new AudioContext();
-  // const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  // Tone.setContext(myToneCtx);
-  // Tone.start();
-  // const notePlaying = new Tone.Param(audioCtx.createGain().gain);
-  // const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
-
-  // let masterAmp = audioCtx.createGain();
-  // masterAmp.connect(audioCtx.destination);
-
-  // // An amp used for modulating amplitude without overriding
-  // //  the master Amp level
-  // let preAmp = audioCtx.createGain();
-  // preAmp.connect(masterAmp);
-
-  // const filter = audioCtx.createBiquadFilter();
-  // filter.type = 'lowpass';
-  // filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
-  // filter.Q.value = patch.filter.peak;
-  // filter.connect(preAmp);
-
-  // const filterEgAmp = audioCtx.createGain();
-  // filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, audioCtx.currentTime);
-  // filterEgAmp.connect(filter.detune);
-
-  // const filterEg = audioCtx.createConstantSource();
-  // filterEg.offset.setValueAtTime(0, audioCtx.currentTime);
-  // filterEg.connect(filterEgAmp);
-  // filterEg.start();
-
-  // const filterEgOffsetParam = new Tone.Param(filterEg.offset);
-
-  // const ampEg = audioCtx.createGain();
-  // ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
-  // ampEg.connect(filter);
-
-  // const ampEgGainParam = new Tone.Param(ampEg.gain);
-  // ampEgGainParam.setValueAtTime(0, audioCtx.currentTime);
-
-  // // Oscillator mute button amps (will go to gain 0 on mute button click)
-  // let osc1MuteAmp = audioCtx.createGain()
-  // osc1MuteAmp.gain.value = patch.vco[1].amp;
-  // osc1MuteAmp.connect(ampEg);
-  // let osc2MuteAmp = audioCtx.createGain()
-  // osc2MuteAmp.gain.value = patch.vco[2].amp;
-  // osc2MuteAmp.connect(ampEg);
-  // let osc3MuteAmp = audioCtx.createGain()
-  // osc3MuteAmp.gain.value = patch.vco[3].amp;
-  // osc3MuteAmp.connect(ampEg);
-
-  // const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
-
-  // let osc = [null, null, null, null];
-
-  // const ampLfoPitch = audioCtx.createGain()
-  // const setAmpLfoPitchGain = function() {
-  //   if (patch.lfo.targetPitch) {
-  //     // Affect pitch
-  //     ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-  //   } else {
-  //     // Do not affect pitch
-  //     ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
-  //   }
-  // }
-  // setAmpLfoPitchGain();
-
-  // const ampLfoCutoff = audioCtx.createGain()
-  // const setAmpLfoCutoffGain = function() {
-  //   if (patch.lfo.targetCutoff) {
-  //     // Affect filter cutoff
-  //     ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
-  //   } else {
-  //     // Do not affect filter cutoff
-  //     ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
-  //   }
-  // }
-  // setAmpLfoCutoffGain();
-  // ampLfoCutoff.connect(filter.detune);
-
-  // // Creates a curve that goes from -1, -1 to 1, 0.
-  // const makeLfoAmpCurve = function() {
-  //   let n_samples = 44100;
-  //   let curve = new Float32Array(n_samples)
-  //   let i = 0;
-  //   for ( ; i < n_samples; ++i ) {
-  //     curve[i] = i / (n_samples - 1) - 1;
-  //   }
-  //   return curve;
-  // };
-
-  // const lfoAmpWaveShaper = audioCtx.createWaveShaper();
-  // lfoAmpWaveShaper.curve = makeLfoAmpCurve();
-
-  // const ampLfoAmp = audioCtx.createGain()
-  // const setAmpLfoAmpGain = function() {
-  //   if (patch.lfo.targetAmp) {
-  //     // Affect amp
-  //     ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
-  //   } else {
-  //     // Do not affect amp
-  //     ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-  //   }
-  // }
-  // setAmpLfoAmpGain();
-
-  // lfoAmpWaveShaper.connect(ampLfoAmp);
-  // ampLfoAmp.connect(preAmp.gain);
-
-  // let oscLfo;
-
-  // const setupOscLfo = function() {
-  //   oscLfo = audioCtx.createOscillator();
-  //   oscLfo.type = patch.lfo.shape;
-  //   oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
-  //   oscLfo.connect(ampLfoPitch);
-  //   oscLfo.connect(ampLfoCutoff);
-  //   oscLfo.connect(lfoAmpWaveShaper);
-  //   oscLfo.start();
-  // }
-
-  // setupOscLfo();
-
-  // // Setup oscilators
-  // [1, 2, 3].forEach(function(oscNumber) {
-  //   let oscillator = audioCtx.createOscillator();
-  //   oscillator.type = patch.vco[oscNumber].shape;
-  //   oscillator.detune.setValueAtTime(
-  //     patch.vco[oscNumber].detune,
-  //     audioCtx.currentTime
-  //   );
-
-  //   oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
-
-  //   osc[oscNumber] = oscillator;
-  //   osc[oscNumber].connect(oscMuteAmps[oscNumber]);
-  //   ampLfoPitch.connect(osc[oscNumber].detune);
-  //   osc[oscNumber].start();
-  // });
-
-  // // controls frequency of all three vcos rather than looping through them.
-  // const oscFreqNode = audioCtx.createConstantSource();
-  // oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
-  // oscFreqNode.connect(osc[1].frequency);
-  // oscFreqNode.connect(osc[2].frequency);
-  // oscFreqNode.connect(osc[3].frequency);
-  // oscFreqNode.start();
-
-  // const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
+  const audioCtx = emulatorEngine.getAudioCtx();
 
   // ==========================
   //  get browser capabilities
@@ -501,7 +349,7 @@ VS.BassEmulator = function() {
     checkChrome();
     console.log(browserFeatures);
 
-    // showPerformanceWarning();
+    showPerformanceWarning();
   };
 
   testBrowserFeatures();
@@ -509,106 +357,26 @@ VS.BassEmulator = function() {
   // END get browser capabilities
 
 
-  const triggerDecay = function(attackEndTimeValue) {
-    filterEgOffsetParam.linearRampToValueAtTime(
-      0,
-      attackEndTimeValue + (patch.envelope.decayRelease * patch.filterEgCoefficient)
-    );
-
-    if (patch.ampEgOn) {
-      ampEgGainParam.setValueAtTime(1, attackEndTimeValue);
-
-      if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
-        // use custom curve
-        ampEgGainParam.setValueCurveAtTime(
-          emulatorConstants.decayReleaseGainCurve,
-          attackEndTimeValue,
-          patch.envelope.decayRelease
-        )
-      } else {
-        ampEgGainParam.linearRampToValueAtTime(
-          0,
-          attackEndTimeValue + patch.envelope.decayRelease
-        )
-      }
-    }
-  };
-
-  const retriggerLfo = function() {
-    let lfo = patch.lfo;
-    if (lfo.shape !== 'square') { return; }
-    if (!(lfo.targetAmp) && !(lfo.targetPitch) && !(lfo.targetCutoff)) { return; }
-    if (lfo.ampValue + lfo.pitchValue + lfo.cutoffValue === 0) { return; }
-
-    oscLfo.disconnect();
-    oscLfo = null;
-    setupOscLfo();
-  };
-
   let sequencerPlaying = false;
 
   let debugNewNote;
-  const playNewNote = function(time = audioCtx.currentTime) {
-    debugNewNote = audioCtx.currentTime;
-    activateAudio();
-    let frequency;
-
-    // Filter EG reset
-    filterEgOffsetParam.cancelAndHoldAtTime(time);
-
-    const attackEndTimeValue = time + patch.envelope.attack;
-    attackEndTime.setValueAtTime(attackEndTimeValue, time);
-
-    // Amp EG reset
-    ampEgGainParam.cancelAndHoldAtTime(time);
-
-    // Set frequency
-    frequency = Tone.Frequency(notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
-
-    if (patch.ampEgOn && patch.envelope.attack > 0) {
-      ampEgGainParam.setValueAtTime(0, time);
-      ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
-    } else {
-      ampEgGainParam.setValueAtTime(1, time);
-    }
-
-    retriggerLfo();
-
-    // Retrigger envelope
-    // Attack
-    filterEgOffsetParam.setValueAtTime(0, time);
-    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
-
-    // Decay
-    if (!patch.sustainOn) {
-      triggerDecay(attackEndTimeValue);
-    }
-  };
-
-  const changeCurrentNote = function(time = audioCtx.currentTime) {
-    let frequency = Tone.Frequency(notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
-
-    oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
-  };
 
   // NOTE: This message will not be used by the sequencer.
+  // TODO: Decide how to extract engine-specific stuff
   const changeOctave = function(change, time = audioCtx.currentTime) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(emulatorConstants.octaveKnobMidiMap[patch.octave]);
 
-    if (notePlaying === undefined) { return; } // at init time
+    if (emulatorEngine.notePlaying === undefined) { return; } // at init time
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
     let octaveOffset = change * 12;
-    notePlaying.setValueAtTime(notePlaying.getValueAtTime(time) + octaveOffset, time);
+    emulatorEngine.notePlaying.setValueAtTime(emulatorEngine.notePlaying.getValueAtTime(time) + octaveOffset, time);
     keysDown = keysDown.map(key => key + octaveOffset);
-    let frequency = Tone.Frequency(notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    let frequency = Tone.Frequency(emulatorEngine.notePlaying.getValueAtTime(time), 'midi').toFrequency();
     oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
   }
 
@@ -618,12 +386,12 @@ VS.BassEmulator = function() {
   const stepRecordNote = (skip = false) => {
     if (!patch.stepRecEnabled) { return; }
 
-    // set sequence note at stepRecIndex to notePlaying
+    // set sequence note at stepRecIndex to emulatorEngine.notePlaying
     if (skip) {
       sequence[patch.stepRecIndex - 1]['stepMode'] = false;
     } else {
       sequence[patch.stepRecIndex - 1]['note'] =
-        notePlaying.getValueAtTime(audioCtx.currentTime);
+        emulatorEngine.notePlaying.getValueAtTime(audioCtx.currentTime);
       sequence[patch.stepRecIndex - 1]['stepMode'] = true;
     }
 
@@ -642,16 +410,16 @@ VS.BassEmulator = function() {
 
   const keyboardDown = function(time = audioCtx.currentTime){
     if (sequencerPlaying) { return; }
-    if (keysDown.indexOf(notePlaying.getValueAtTime(time)) === -1) {
-      keysDown.push(notePlaying.getValueAtTime(time));
+    if (keysDown.indexOf(emulatorEngine.notePlaying.getValueAtTime(time)) === -1) {
+      keysDown.push(emulatorEngine.notePlaying.getValueAtTime(time));
     }
 
     stepRecordNote();
 
     if (keysDown.length === 1) {
-      playNewNote(time);
+      emulatorEngine.playNewNote(time);
     } else {
-      changeCurrentNote(time);
+      emulatorEngine.changeCurrentNote(time);
     }
   };
 
@@ -661,62 +429,15 @@ VS.BassEmulator = function() {
     keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
 
     if (keysDown.length > 0) {
-      notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
+      emulatorEngine.notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
 
-      changeCurrentNote(time);
+      emulatorEngine.changeCurrentNote(time);
 
       return;
     }
 
-    stopNote(time);
+    emulatorEngine.stopNote(time);
   };
-
-  const stopNote = function(time = audioCtx.currentTime) {
-    // console.log('QDEBUG:', time - debugNewNote);
-    const currentValue = ampEgGainParam.getValueAtTime(time);
-
-    // If note is already off, don't bother stopping it.
-    if (currentValue === 0) { return; }
-
-    if (patch.ampEgOn) {
-      if (patch.sustainOn || (time < attackEndTime.getValueAtTime(time))) {
-
-        // filter envelope
-        filterEgOffsetParam.cancelAndHoldAtTime(time);
-
-        // TODO: Use custom curve for filter?
-        filterEgOffsetParam.linearRampToValueAtTime(
-          0,
-          time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
-        );
-
-        // Amp eg
-        ampEgGainParam.cancelAndHoldAtTime(time);
-
-        const duration = currentValue * patch.envelope.decayRelease;
-
-        if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
-          // custom curve
-          const gainCurve = emulatorConstants.decayReleaseGainCurve.map(
-            function(value) { return value * currentValue }
-          );
-          ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
-        } else {
-          ampEgGainParam.linearRampToValueAtTime(0, time + duration);
-        }
-      }
-
-    } else {
-      // Filter cutoff down immediately
-      filterEg.offset.cancelScheduledValues(time);
-      filterEg.offset.setValueAtTime(0, time);
-
-      // Turn amp down immediately
-      ampEgGainParam.setValueAtTime(1, time);
-      ampEgGainParam.linearRampToValueAtTime(0, time + builtInDecay);
-    }
-  };
-
 
   // ===================================
   //  Sequencer experiment
@@ -747,23 +468,23 @@ VS.BassEmulator = function() {
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
       let currentStep = sequence[i % 16];
-      notePlaying.setValueAtTime(currentStep['note'], time);
+      emulatorEngine.notePlaying.setValueAtTime(currentStep['note'], time);
 
       if (currentStep['stepMode']) {
         if (i > 0 && previousStep['slide']) {
           if (i > 0 && previousStep['stepMode']) {
-            changeCurrentNote(time);
+            emulatorEngine.changeCurrentNote(time);
           } else {
             // Play a new note when last step stop mode was off
-            playNewNote(time);
+            emulatorEngine.playNewNote(time);
             if (!currentStep['slide']) {
-              stopNote(gateEnd);
+              emulatorEngine.stopNote(gateEnd);
             }
           }
         } else {
-          playNewNote(time);
+          emulatorEngine.playNewNote(time);
           if (!currentStep['slide']) {
-            stopNote(gateEnd);
+            emulatorEngine.stopNote(gateEnd);
           }
         }
       }
@@ -775,17 +496,8 @@ VS.BassEmulator = function() {
 
   runToneSequencer();
 
-  const activateAudio = function() {
-    if (audioCtx.state === 'running') { return; }
-
-    audioCtx.resume().then(() => {
-      Tone.context.resume();
-      Tone.start();
-    });
-  };
-
   $('#play').on('click tap', function() {
-    activateAudio();
+    emulatorEngine.activateAudio();
     $('#stop').toggleClass('hidden');
     if (sequencerPlaying) {
       // STOP
@@ -826,7 +538,7 @@ VS.BassEmulator = function() {
     if (!sequencerPlaying) { return; }
 
     Tone.Transport.stop();
-    stopNote(Tone.now() + 0.2);
+    emulatorEngine.stopNote(Tone.now() + 0.2);
     sequencerPlaying = false;
     if ($('#play').hasClass('lit')) { $('#play').toggleClass('lit unlit'); }
     if (!$('#stop').hasClass('hidden')) { $('#stop').addClass('hidden'); }
@@ -852,7 +564,8 @@ VS.BassEmulator = function() {
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
       let octaveOffset = (patch.octave - 3) * 12;
-      notePlaying.setValueAtTime(
+      console.log(emulatorEngine.notePlaying);
+      emulatorEngine.notePlaying.setValueAtTime(
         emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset,
         audioCtx.currentTime
       );
@@ -890,7 +603,7 @@ VS.BassEmulator = function() {
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
     if (document.hidden && !sequencerPlaying) {
-      stopNote();
+      emulatorEngine.stopNote();
     }
   });
 
@@ -1164,7 +877,7 @@ VS.BassEmulator = function() {
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
     let octaveOffset = (patch.octave - 3) * 12;
-    notePlaying.setValueAtTime(keyMidiMap[$(this).data('keycode')] + octaveOffset, audioCtx.currentTime);
+    emulatorEngine.notePlaying.setValueAtTime(keyMidiMap[$(this).data('keycode')] + octaveOffset, audioCtx.currentTime);
 
     keyboardDown();
   });

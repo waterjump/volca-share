@@ -1,55 +1,58 @@
 VS.EmulatorEngine = function(patch) {
   const audioCtx = new AudioContext();
   const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  const notePlaying = new Tone.Param(audioCtx.createGain().gain);
+  this.notePlaying = new Tone.Param(audioCtx.createGain().gain);
   const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
   const masterAmp = audioCtx.createGain();
+  const preAmp = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  const filterEgAmp = audioCtx.createGain();
+  const filterEg = audioCtx.createConstantSource();
+  const filterEgOffsetParam = new Tone.Param(filterEg.offset);
+  const ampEg = audioCtx.createGain();
+  const ampEgGainParam = new Tone.Param(ampEg.gain);
+  const osc1MuteAmp = audioCtx.createGain();
+  const osc2MuteAmp = audioCtx.createGain();
+  const osc3MuteAmp = audioCtx.createGain();
+  const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
+  const ampLfoPitch = audioCtx.createGain()
+  const ampLfoCutoff = audioCtx.createGain()
+  const lfoAmpWaveShaper = audioCtx.createWaveShaper();
+  const builtInDecay = 0.1;
+  let osc = [null, null, null, null];
+
 
   // An amp used for modulating amplitude without overriding
   //  the master Amp level
-  let preAmp = audioCtx.createGain();
   preAmp.connect(masterAmp);
 
-  const filter = audioCtx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
   filter.Q.value = patch.filter.peak;
   filter.connect(preAmp);
 
-  const filterEgAmp = audioCtx.createGain();
   filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, audioCtx.currentTime);
   filterEgAmp.connect(filter.detune);
 
-  const filterEg = audioCtx.createConstantSource();
   filterEg.offset.setValueAtTime(0, audioCtx.currentTime);
   filterEg.connect(filterEgAmp);
   filterEg.start();
 
-  const filterEgOffsetParam = new Tone.Param(filterEg.offset);
 
-  const ampEg = audioCtx.createGain();
   ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
   ampEg.connect(filter);
 
-  const ampEgGainParam = new Tone.Param(ampEg.gain);
   ampEgGainParam.setValueAtTime(0, audioCtx.currentTime);
 
   // Oscillator mute button amps (will go to gain 0 on mute button click)
-  let osc1MuteAmp = audioCtx.createGain()
   osc1MuteAmp.gain.value = patch.vco[1].amp;
   osc1MuteAmp.connect(ampEg);
-  let osc2MuteAmp = audioCtx.createGain()
   osc2MuteAmp.gain.value = patch.vco[2].amp;
   osc2MuteAmp.connect(ampEg);
-  let osc3MuteAmp = audioCtx.createGain()
   osc3MuteAmp.gain.value = patch.vco[3].amp;
   osc3MuteAmp.connect(ampEg);
 
-  const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
 
-  let osc = [null, null, null, null];
-
-  const ampLfoPitch = audioCtx.createGain()
   const setAmpLfoPitchGain = function() {
     if (patch.lfo.targetPitch) {
       // Affect pitch
@@ -61,7 +64,6 @@ VS.EmulatorEngine = function(patch) {
   }
   setAmpLfoPitchGain();
 
-  const ampLfoCutoff = audioCtx.createGain()
   const setAmpLfoCutoffGain = function() {
     if (patch.lfo.targetCutoff) {
       // Affect filter cutoff
@@ -85,7 +87,6 @@ VS.EmulatorEngine = function(patch) {
     return curve;
   };
 
-  const lfoAmpWaveShaper = audioCtx.createWaveShaper();
   lfoAmpWaveShaper.curve = makeLfoAmpCurve();
 
   const ampLfoAmp = audioCtx.createGain()
@@ -145,14 +146,150 @@ VS.EmulatorEngine = function(patch) {
   const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
 
   this.init = () => {
-    console.log('Initializing emulator engine!');
     Tone.setContext(myToneCtx);
     Tone.start();
     masterAmp.connect(audioCtx.destination);
   };
 
+  this.activateAudio = function() {
+    if (audioCtx.state === 'running') { return; }
+
+    audioCtx.resume().then(() => {
+      Tone.context.resume();
+      Tone.start();
+    });
+  };
+
   this.getAudioCtx = () => {
-    console.log('fffff');
     return audioCtx;
   };
+
+  const retriggerLfo = function() {
+    let lfo = patch.lfo;
+    if (lfo.shape !== 'square') { return; }
+    if (!(lfo.targetAmp) && !(lfo.targetPitch) && !(lfo.targetCutoff)) { return; }
+    if (lfo.ampValue + lfo.pitchValue + lfo.cutoffValue === 0) { return; }
+
+    oscLfo.disconnect();
+    oscLfo = null;
+    setupOscLfo();
+  };
+
+  const triggerDecay = function(attackEndTimeValue) {
+    filterEgOffsetParam.linearRampToValueAtTime(
+      0,
+      attackEndTimeValue + (patch.envelope.decayRelease * patch.filterEgCoefficient)
+    );
+
+    if (patch.ampEgOn) {
+      ampEgGainParam.setValueAtTime(1, attackEndTimeValue);
+
+      if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
+        // use custom curve
+        ampEgGainParam.setValueCurveAtTime(
+          emulatorConstants.decayReleaseGainCurve,
+          attackEndTimeValue,
+          patch.envelope.decayRelease
+        )
+      } else {
+        ampEgGainParam.linearRampToValueAtTime(
+          0,
+          attackEndTimeValue + patch.envelope.decayRelease
+        )
+      }
+    }
+  };
+
+  this.playNewNote = function(time = audioCtx.currentTime) {
+    debugNewNote = audioCtx.currentTime;
+    this.activateAudio();
+    let frequency;
+
+    // Filter EG reset
+    filterEgOffsetParam.cancelAndHoldAtTime(time);
+
+    const attackEndTimeValue = time + patch.envelope.attack;
+    attackEndTime.setValueAtTime(attackEndTimeValue, time);
+
+    // Amp EG reset
+    ampEgGainParam.cancelAndHoldAtTime(time);
+
+    // Set frequency
+    frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+
+    if (patch.ampEgOn && patch.envelope.attack > 0) {
+      ampEgGainParam.setValueAtTime(0, time);
+      ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
+    } else {
+      ampEgGainParam.setValueAtTime(1, time);
+    }
+
+    retriggerLfo();
+
+    // Retrigger envelope
+    // Attack
+    filterEgOffsetParam.setValueAtTime(0, time);
+    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
+
+    // Decay
+    if (!patch.sustainOn) {
+      triggerDecay(attackEndTimeValue);
+    }
+  };
+
+  this.changeCurrentNote = function(time = audioCtx.currentTime) {
+    let frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
+
+    oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
+    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
+  };
+
+  this.stopNote = function(time = audioCtx.currentTime) {
+    // console.log('QDEBUG:', time - debugNewNote);
+    const currentValue = ampEgGainParam.getValueAtTime(time);
+
+    // If note is already off, don't bother stopping it.
+    if (currentValue === 0) { return; }
+
+    if (patch.ampEgOn) {
+      if (patch.sustainOn || (time < attackEndTime.getValueAtTime(time))) {
+
+        // filter envelope
+        filterEgOffsetParam.cancelAndHoldAtTime(time);
+
+        // TODO: Use custom curve for filter?
+        filterEgOffsetParam.linearRampToValueAtTime(
+          0,
+          time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
+        );
+
+        // Amp eg
+        ampEgGainParam.cancelAndHoldAtTime(time);
+
+        const duration = currentValue * patch.envelope.decayRelease;
+
+        if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
+          // custom curve
+          const gainCurve = emulatorConstants.decayReleaseGainCurve.map(
+            function(value) { return value * currentValue }
+          );
+          ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
+        } else {
+          ampEgGainParam.linearRampToValueAtTime(0, time + duration);
+        }
+      }
+
+    } else {
+      // Filter cutoff down immediately
+      filterEg.offset.cancelScheduledValues(time);
+      filterEg.offset.setValueAtTime(0, time);
+
+      // Turn amp down immediately
+      ampEgGainParam.setValueAtTime(1, time);
+      ampEgGainParam.linearRampToValueAtTime(0, time + builtInDecay);
+    }
+  };
+
 };
