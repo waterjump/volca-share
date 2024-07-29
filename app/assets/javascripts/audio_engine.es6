@@ -1,4 +1,4 @@
-VS.EmulatorEngine = function(patch) {
+VS.AudioEngine = function(patch) {
   // ===================================================================
   // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
   // ===================================================================
@@ -149,6 +149,68 @@ VS.EmulatorEngine = function(patch) {
 
   const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
 
+  // ==========================
+  //  get browser capabilities
+  // ==========================
+  const browserFeatures = {};
+
+  const checkCustomCurveClearing = function() {
+    let dummyGain = audioCtx.createGain();
+    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
+    try {
+      dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
+      dummyGain.gain.setValueAtTime(1, audioCtx.currentTime + 0.2);
+      browserFeatures['customCurveClearing'] = true;
+    } catch (error) {
+      browserFeatures['customCurveClearing'] = false;
+    }
+  };
+
+  const checkCancelAndHoldAtTime = function() {
+    let dummyGain = audioCtx.createGain();
+    dummyGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    try {
+      dummyGain.gain.cancelAndHoldAtTime(audioCtx.currentTime + 0.1);
+      browserFeatures['cancelAndHoldAtTime'] = true;
+    } catch (error) {
+      browserFeatures['cancelAndHoldAtTime'] = false;
+    }
+  };
+
+  const checkChrome = function() {
+    browserFeatures['usingChrome'] = navigator.userAgent.includes('Chrome/');
+  };
+
+  // TODO: Get all interface logic e.g. jQuery out of this file.
+  const showPerformanceWarning = function() {
+    if (browserFeatures['cancelAndHoldAtTime']) { return; }
+
+    $('#performance-warning').html(
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      '<strong>Just a heads up: </strong><br />' +
+      'There are known performance issues with this browser, ' +
+      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
+      'For best results, use a <a class="alert-link" target="_blank" ' +
+      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
+      'supported browser.</a>'
+    );
+    $('#performance-warning').removeClass('hidden');
+  };
+
+  const testBrowserFeatures = function() {
+    checkCustomCurveClearing();
+    checkCancelAndHoldAtTime();
+    checkChrome();
+    console.log(browserFeatures);
+
+    showPerformanceWarning();
+  };
+
+  testBrowserFeatures();
+
+  // END get browser capabilities
+
   this.init = () => {
     Tone.setContext(myToneCtx);
     Tone.start();
@@ -162,10 +224,6 @@ VS.EmulatorEngine = function(patch) {
       Tone.context.resume();
       Tone.start();
     });
-  };
-
-  this.getAudioCtx = () => {
-    return audioCtx;
   };
 
   const retriggerLfo = function() {
@@ -346,5 +404,13 @@ VS.EmulatorEngine = function(patch) {
     if (patch.lfo.targetAmp) {
       ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
     }
+  };
+
+  this.setNotePlaying = (value) => {
+    this.notePlaying.setValueAtTime(value, audioCtx.currentTime);
+  };
+
+  this.getNotePlaying = () => {
+    return this.notePlaying.getValueAtTime(audioCtx.currentTime);
   };
 };

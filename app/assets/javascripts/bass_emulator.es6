@@ -292,71 +292,8 @@ VS.BassEmulator = function() {
 
   let keysDown = [];
 
-  const audioEngine = new VS.EmulatorEngine(emulatorParams);
+  const audioEngine = new VS.AudioEngine(emulatorParams);
   audioEngine.init();
-  const audioCtx = audioEngine.getAudioCtx();
-
-  // ==========================
-  //  get browser capabilities
-  // ==========================
-  const browserFeatures = {};
-
-  const checkCustomCurveClearing = function() {
-    let dummyGain = audioEngine.getAudioCtx().createGain();
-    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
-    try {
-      dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
-      dummyGain.gain.setValueAtTime(1, audioCtx.currentTime + 0.2);
-      browserFeatures['customCurveClearing'] = true;
-    } catch (error) {
-      browserFeatures['customCurveClearing'] = false;
-    }
-  };
-
-  const checkCancelAndHoldAtTime = function() {
-    let dummyGain = audioCtx.createGain();
-    dummyGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
-    try {
-      dummyGain.gain.cancelAndHoldAtTime(audioCtx.currentTime + 0.1);
-      browserFeatures['cancelAndHoldAtTime'] = true;
-    } catch (error) {
-      browserFeatures['cancelAndHoldAtTime'] = false;
-    }
-  };
-
-  const checkChrome = function() {
-    browserFeatures['usingChrome'] = navigator.userAgent.includes('Chrome/');
-  };
-
-  const showPerformanceWarning = function() {
-    if (browserFeatures['cancelAndHoldAtTime']) { return; }
-
-    $('#performance-warning').html(
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      '<strong>Just a heads up: </strong><br />' +
-      'There are known performance issues with this browser, ' +
-      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
-      'For best results, use a <a class="alert-link" target="_blank" ' +
-      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
-      'supported browser.</a>'
-    );
-    $('#performance-warning').removeClass('hidden');
-  };
-
-  const testBrowserFeatures = function() {
-    checkCustomCurveClearing();
-    checkCancelAndHoldAtTime();
-    checkChrome();
-    console.log(browserFeatures);
-
-    showPerformanceWarning();
-  };
-
-  testBrowserFeatures();
-
-  // END get browser capabilities
-
 
   let sequencerPlaying = false;
 
@@ -390,7 +327,7 @@ VS.BassEmulator = function() {
       sequence[patch.stepRecIndex - 1]['stepMode'] = false;
     } else {
       sequence[patch.stepRecIndex - 1]['note'] =
-        audioEngine.notePlaying.getValueAtTime(audioCtx.currentTime);
+        audioEngine.getNotePlaying();
       sequence[patch.stepRecIndex - 1]['stepMode'] = true;
     }
 
@@ -407,35 +344,34 @@ VS.BassEmulator = function() {
 
   }
 
-  const keyboardDown = function(time = audioCtx.currentTime){
+  const keyboardDown = function(){
     if (sequencerPlaying) { return; }
-    if (keysDown.indexOf(audioEngine.notePlaying.getValueAtTime(time)) === -1) {
-      keysDown.push(audioEngine.notePlaying.getValueAtTime(time));
+    if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
+      keysDown.push(audioEngine.getNotePlaying());
     }
 
     stepRecordNote();
 
     if (keysDown.length === 1) {
-      audioEngine.playNewNote(time);
+      audioEngine.playNewNote();
     } else {
-      audioEngine.changeCurrentNote(time);
+      audioEngine.changeCurrentNote();
     }
   };
 
-  const keyboardUp = function(keyUp, time = audioCtx.currentTime) {
+  const keyboardUp = function(keyUp) {
     if (sequencerPlaying) { return; }
     let octaveOffset = (patch.octave - 3) * 12;
     keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
 
     if (keysDown.length > 0) {
-      audioEngine.notePlaying.setValueAtTime(keysDown[keysDown.length - 1], time);
-
-      audioEngine.changeCurrentNote(time);
+      audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
+      audioEngine.changeCurrentNote();
 
       return;
     }
 
-    audioEngine.stopNote(time);
+    audioEngine.stopNote();
   };
 
   // ===================================
@@ -563,10 +499,7 @@ VS.BassEmulator = function() {
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
       let octaveOffset = (patch.octave - 3) * 12;
-      audioEngine.notePlaying.setValueAtTime(
-        emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset,
-        audioCtx.currentTime
-      );
+      audioEngine.setNotePlaying(emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset);
 
       keyboardDown();
     }
@@ -680,10 +613,7 @@ VS.BassEmulator = function() {
   [1, 2, 3].forEach(oscNumber => {
     $(`#vco${oscNumber}_pitch`).on('knobturn', () => {
       patch[`setvco${oscNumber}_pitch`](VS.activeKnob.midi());
-
-      osc[oscNumber].detune.setValueAtTime(
-        patch.vco[oscNumber].detune, audioCtx.currentTime
-      );
+      audioEngine.setOscPitch(oscNumber, patch.vco[oscNumber].detune);
     });
   });
 
@@ -857,7 +787,7 @@ VS.BassEmulator = function() {
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
     let octaveOffset = (patch.octave - 3) * 12;
-    audioEngine.notePlaying.setValueAtTime(keyMidiMap[$(this).data('keycode')] + octaveOffset, audioCtx.currentTime);
+    audioEngine.setNotePlaying(keyMidiMap[$(this).data('keycode')] + octaveOffset);
 
     keyboardDown();
   });
