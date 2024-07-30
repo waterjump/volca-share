@@ -1,46 +1,6 @@
 VS.BassEmulator = function() {
   const { sequences, emulatorConstants, emulatorParams } = VS;
-
-  const parameterMaps = {
-    decayReleaseMap: emulatorConstants.decayReleaseMap,
-    lfoRateMap: emulatorConstants.lfoRateMap
-  };
-
-  const calculateMappedParameter = function(paramName, midiValue) {
-    let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
-    let midiDifference, rawValue, cleanValue;
-    let map = parameterMaps[`${paramName}Map`];
-
-    midiValue = Math.round(midiValue);
-
-    if (map[midiValue] !== undefined) {
-      return map[midiValue];
-    } else {
-      entries =
-        Object.keys(map).map((key) => [key, map[key]]);
-
-      for (let index = 0; index < entries.length; index++) {
-        midi = entries[index][0];
-        if (midiValue < midi) {
-          paramValue = entries[index][1];
-          lowerMidi = entries[index - 1][0];
-          lowerParamValue = entries[index - 1][1];
-          slope =
-            (paramValue - lowerParamValue) /
-              (parseFloat(midi) - parseFloat(lowerMidi));
-          midiDifference = midiValue - lowerMidi;
-          rawValue = (midiDifference * slope) + lowerParamValue;
-          cleanValue = Number(rawValue.toFixed(3));
-
-          map[Number(midiValue)] = cleanValue;
-          return cleanValue;
-        }
-      }
-    }
-  };
-
   const patch = emulatorParams;
-
   const sequence = [];
 
   this.getSequence = function() {
@@ -75,6 +35,7 @@ VS.BassEmulator = function() {
 
       let jStepModeLight = jElement.find('.step-mode .light');
       jStepModeLight.data('active', step.stepMode);
+
       jStepModeLight.removeClass(step.stepMode ? '' : 'lit');
       jStepModeLight.addClass(step.stepMode ? 'lit' : '');
 
@@ -292,10 +253,8 @@ VS.BassEmulator = function() {
 
   let keysDown = [];
 
-  const audioEngine = new VS.AudioEngine(emulatorParams);
+  const audioEngine = new VS.AudioEngine(emulatorParams, sequence);
   audioEngine.init();
-
-  let sequencerPlaying = false;
 
   let debugNewNote;
 
@@ -306,7 +265,7 @@ VS.BassEmulator = function() {
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(emulatorConstants.octaveKnobMidiMap[patch.octave]);
 
-    if (audioEngine.notePlaying === undefined) { return; } // at init time
+    if (audioEngine.getNotePlaying() === undefined) { return; } // at init time
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
@@ -345,7 +304,7 @@ VS.BassEmulator = function() {
   }
 
   const keyboardDown = function(){
-    if (sequencerPlaying) { return; }
+    if (audioEngine.getSequencerPlaying()) { return; }
     if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
       keysDown.push(audioEngine.getNotePlaying());
     }
@@ -360,7 +319,7 @@ VS.BassEmulator = function() {
   };
 
   const keyboardUp = function(keyUp) {
-    if (sequencerPlaying) { return; }
+    if (audioEngine.getSequencerPlaying()) { return; }
     let octaveOffset = (patch.octave - 3) * 12;
     keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
 
@@ -374,73 +333,15 @@ VS.BassEmulator = function() {
     audioEngine.stopNote();
   };
 
-  // ===================================
-  //  Sequencer experiment
-  // ===================================
-
-  const runToneSequencer = function(){
-    Tone.Transport.bpm.value = patch.tempo;
-
-    // This is needed for when tempo is changed before the sequencer starts.
-    try {
-      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
-    } catch (error) {
-      // idc
-    }
-
-    let i = 0;
-    let previousStep;
-
-    Tone.Transport.scheduleRepeat(time => {
-      if (!sequencerPlaying) { return; }
-
-      while (!sequence[i % 16].activeStep) {
-        // Bail out if all steps are inactive
-        if (!sequence.some(step => { return step.activeStep })) { return; }
-        i++;
-      }
-
-      const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
-
-      let currentStep = sequence[i % 16];
-      audioEngine.notePlaying.setValueAtTime(currentStep['note'], time);
-
-      if (currentStep['stepMode']) {
-        if (i > 0 && previousStep['slide']) {
-          if (i > 0 && previousStep['stepMode']) {
-            audioEngine.changeCurrentNote(time);
-          } else {
-            // Play a new note when last step stop mode was off
-            audioEngine.playNewNote(time);
-            if (!currentStep['slide']) {
-              audioEngine.stopNote(gateEnd);
-            }
-          }
-        } else {
-          audioEngine.playNewNote(time);
-          if (!currentStep['slide']) {
-            audioEngine.stopNote(gateEnd);
-          }
-        }
-      }
-
-      previousStep = currentStep;
-      i++;
-    }, '16n');
-  };
-
-  runToneSequencer();
-
   $('#play').on('click tap', function() {
     audioEngine.activateAudio();
     $('#stop').toggleClass('hidden');
-    if (sequencerPlaying) {
+    if (audioEngine.getSequencerPlaying()) {
       // STOP
       macroStopSequencer();
     } else {
       // START
-      sequencerPlaying = true;
-      Tone.Transport.start('+0');
+      audioEngine.startSequencer();
       macroStepRecOff();
     }
   });
@@ -470,11 +371,9 @@ VS.BassEmulator = function() {
   };
 
   const macroStopSequencer = () => {
-    if (!sequencerPlaying) { return; }
+    if (!audioEngine.getSequencerPlaying()) { return; }
 
-    Tone.Transport.stop();
-    audioEngine.stopNote(Tone.now() + 0.2);
-    sequencerPlaying = false;
+    audioEngine.stopSequencer();
     if ($('#play').hasClass('lit')) { $('#play').toggleClass('lit unlit'); }
     if (!$('#stop').hasClass('hidden')) { $('#stop').addClass('hidden'); }
   };
@@ -533,7 +432,7 @@ VS.BassEmulator = function() {
 
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
-    if (document.hidden && !sequencerPlaying) {
+    if (document.hidden && !audioEngine.getSequencerPlaying()) {
       audioEngine.stopNote();
     }
   });
@@ -568,15 +467,7 @@ VS.BassEmulator = function() {
   $('#tempo').on('knobturn', () => {
     midiValue = VS.activeKnob.jElement.data('superMidi');
     patch.settempo(midiValue);
-
-    // this is needed to change loop interval
-    Tone.Transport.bpm.value = patch.tempo;
-    // This is needed to change tempo relative timing of gateEnd
-    try {
-      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
-    } catch (error) {
-      // idc
-    }
+    audioEngine.setTempo();
   });
 
   ['attack', 'decay_release'].forEach(id => {
@@ -643,7 +534,7 @@ VS.BassEmulator = function() {
     'change',
     function(event) {
       patch.lfo.targetAmp = !patch.lfo.targetAmp;
-      setAmpLfoAmpGain();
+      audioEngine.setAmpLfoAmpGain();
     }
   );
 
@@ -652,7 +543,7 @@ VS.BassEmulator = function() {
     'change',
     function(event) {
       patch.lfo.targetPitch = !patch.lfo.targetPitch;
-      setAmpLfoPitchGain();
+      audioEngine.setAmpLfoPitchGain();
     }
   );
 
@@ -661,7 +552,7 @@ VS.BassEmulator = function() {
     'change',
     function(event) {
       patch.lfo.targetCutoff = !patch.lfo.targetCutoff;
-      setAmpLfoCutoffGain();
+      audioEngine.setAmpLfoCutoffGain();
     }
   );
 
@@ -674,19 +565,17 @@ VS.BassEmulator = function() {
       } else {
         patch.setlfo_wave('triangle');
       }
-      oscLfo.type = patch.lfo.shape;
+      audioEngine.setLfoWave(patch.lfo.shape);
     }
   );
 
-  const toggleVcoWave = function(osc, vco) {
-     if (vco.shape == 'sawtooth') {
-       vco.shape = 'square';
-     } else {
-       vco.shape = 'sawtooth';
-     }
-     if (osc !== null) {
-       osc.type = vco.shape;
-     }
+  const toggleVcoWave = (index) => {
+    const vcoShape = patch.vco[index].shape;
+    let newShape = vcoShape == 'sawtooth' ? 'square' : 'sawtooth';
+    patch.vco[index].shape = newShape;
+    if (audioEngine.getOsc[index] !== null) {
+      audioEngine.setOscShape(index, newShape);
+    }
   };
 
   // VCO WAVE
@@ -694,7 +583,7 @@ VS.BassEmulator = function() {
     document.getElementById(`patch_vco${oscNumber}_wave`).addEventListener(
       'change',
       function(event) {
-        toggleVcoWave(osc[oscNumber], patch.vco[oscNumber]);
+        toggleVcoWave(oscNumber);
       }
     );
   });

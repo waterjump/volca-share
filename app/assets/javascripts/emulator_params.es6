@@ -1,4 +1,5 @@
 VS.EmulatorParams = function() {
+  const { emulatorConstants } = VS;
   this.defaultVcoAmp = 0.33;
 
   this.tempo = 56;
@@ -75,7 +76,7 @@ VS.EmulatorParams = function() {
   this.setvco_pitch = function(oscNumber, midiValue) {
     this.vco[oscNumber].pitchMidi = midiValue;
     this.vco[oscNumber].detune =
-      emulatorConstants.pitchMap[patch.vco[oscNumber].pitchMidi] * 100;
+      emulatorConstants.pitchMap[this.vco[oscNumber].pitchMidi] * 100;
   };
   this.setvco1_pitch = function(midiValue) {
     this.setvco_pitch(1, midiValue);
@@ -145,4 +146,42 @@ VS.EmulatorParams = function() {
     }
     return value;
   }
+
+  const parameterMaps = {
+    decayReleaseMap: emulatorConstants.decayReleaseMap,
+    lfoRateMap: emulatorConstants.lfoRateMap
+  };
+
+  const calculateMappedParameter = function(paramName, midiValue) {
+    let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
+    let midiDifference, rawValue, cleanValue;
+    let map = parameterMaps[`${paramName}Map`];
+
+    midiValue = Math.round(midiValue);
+
+    if (map[midiValue] !== undefined) {
+      return map[midiValue];
+    } else {
+      entries =
+        Object.keys(map).map((key) => [key, map[key]]);
+
+      for (let index = 0; index < entries.length; index++) {
+        midi = entries[index][0];
+        if (midiValue < midi) {
+          paramValue = entries[index][1];
+          lowerMidi = entries[index - 1][0];
+          lowerParamValue = entries[index - 1][1];
+          slope =
+            (paramValue - lowerParamValue) /
+              (parseFloat(midi) - parseFloat(lowerMidi));
+          midiDifference = midiValue - lowerMidi;
+          rawValue = (midiDifference * slope) + lowerParamValue;
+          cleanValue = Number(rawValue.toFixed(3));
+
+          map[Number(midiValue)] = cleanValue;
+          return cleanValue;
+        }
+      }
+    }
+  };
 };

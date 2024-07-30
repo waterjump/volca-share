@@ -1,4 +1,4 @@
-VS.AudioEngine = function(patch) {
+VS.AudioEngine = function(patch, sequence) {
   // ===================================================================
   // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
   // ===================================================================
@@ -24,7 +24,9 @@ VS.AudioEngine = function(patch) {
   const lfoAmpWaveShaper = audioCtx.createWaveShaper();
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
+  let sequencerPlaying = false;
 
+  // TODO: Encampsulate this setup script in its own function.
 
   // An amp used for modulating amplitude without overriding
   //  the master Amp level
@@ -57,7 +59,7 @@ VS.AudioEngine = function(patch) {
   osc3MuteAmp.connect(ampEg);
 
 
-  const setAmpLfoPitchGain = function() {
+  this.setAmpLfoPitchGain = function() {
     if (patch.lfo.targetPitch) {
       // Affect pitch
       ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
@@ -66,9 +68,9 @@ VS.AudioEngine = function(patch) {
       ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
     }
   }
-  setAmpLfoPitchGain();
+  this.setAmpLfoPitchGain();
 
-  const setAmpLfoCutoffGain = function() {
+  this.setAmpLfoCutoffGain = function() {
     if (patch.lfo.targetCutoff) {
       // Affect filter cutoff
       ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
@@ -77,7 +79,7 @@ VS.AudioEngine = function(patch) {
       ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
     }
   }
-  setAmpLfoCutoffGain();
+  this.setAmpLfoCutoffGain();
   ampLfoCutoff.connect(filter.detune);
 
   // Creates a curve that goes from -1, -1 to 1, 0.
@@ -94,7 +96,7 @@ VS.AudioEngine = function(patch) {
   lfoAmpWaveShaper.curve = makeLfoAmpCurve();
 
   const ampLfoAmp = audioCtx.createGain()
-  const setAmpLfoAmpGain = function() {
+  this.setAmpLfoAmpGain = function() {
     if (patch.lfo.targetAmp) {
       // Affect amp
       ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
@@ -103,7 +105,8 @@ VS.AudioEngine = function(patch) {
       ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
     }
   }
-  setAmpLfoAmpGain();
+  this.setAmpLfoAmpGain();
+
 
   lfoAmpWaveShaper.connect(ampLfoAmp);
   ampLfoAmp.connect(preAmp.gain);
@@ -210,6 +213,65 @@ VS.AudioEngine = function(patch) {
   testBrowserFeatures();
 
   // END get browser capabilities
+
+  // ===================================
+  //  Sequencer experiment
+  // ===================================
+
+  const scope = this;
+  const runToneSequencer = function(){
+    // TODO: Replace with call to setTempo();
+    Tone.Transport.bpm.value = patch.tempo;
+
+    // This is needed for when tempo is changed before the sequencer starts.
+    try {
+      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
+    } catch (error) {
+      // idc
+    }
+
+    let i = 0;
+    let previousStep;
+
+    Tone.Transport.scheduleRepeat(time => {
+      if (!sequencerPlaying) { return; }
+
+      while (!sequence[i % 16].activeStep) {
+        // Bail out if all steps are inactive
+        if (!sequence.some(step => { return step.activeStep })) { return; }
+        i++;
+      }
+
+      const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
+
+      let currentStep = sequence[i % 16];
+      scope.setNotePlaying(currentStep['note'], time);
+
+      if (currentStep['stepMode']) {
+        if (i > 0 && previousStep['slide']) {
+          if (i > 0 && previousStep['stepMode']) {
+            scope.changeCurrentNote(time);
+          } else {
+            // Play a new note when last step stop mode was off
+            scope.playNewNote(time);
+            if (!currentStep['slide']) {
+              scope.stopNote(gateEnd);
+            }
+          }
+        } else {
+          scope.playNewNote(time);
+          if (!currentStep['slide']) {
+            scope.stopNote(gateEnd);
+          }
+        }
+      }
+
+      previousStep = currentStep;
+      i++;
+    }, '16n');
+  };
+
+  runToneSequencer();
 
   this.init = () => {
     Tone.setContext(myToneCtx);
@@ -391,6 +453,10 @@ VS.AudioEngine = function(patch) {
     oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
   };
 
+  this.setLfoWave = (value) => {
+    oscLfo.type = value;
+  }
+
   this.setLfoInt = (value) => {
     // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
     if (patch.lfo.targetPitch) {
@@ -406,11 +472,53 @@ VS.AudioEngine = function(patch) {
     }
   };
 
-  this.setNotePlaying = (value) => {
-    this.notePlaying.setValueAtTime(value, audioCtx.currentTime);
+  this.setNotePlaying = (value, time = audioCtx.currentTime) => {
+    this.notePlaying.setValueAtTime(value, time);
   };
 
   this.getNotePlaying = () => {
     return this.notePlaying.getValueAtTime(audioCtx.currentTime);
+  };
+
+  this.setOscPitch = (index, value) => {
+    osc[index].detune.setValueAtTime(value, audioCtx.currentTime);
+  };
+
+  this.setTempo = () => {
+    // this is needed to change loop interval
+    Tone.Transport.bpm.value = patch.tempo;
+    // This is needed to change tempo relative timing of gateEnd
+    try {
+      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
+    } catch (error) {
+      // idc
+    }
+  };
+
+  this.startSequencer = () => {
+    sequencerPlaying = true;
+    Tone.Transport.start('+0');
+  };
+
+  this.stopSequencer = () => {
+    sequencerPlaying = false;
+    Tone.Transport.stop();
+    this.stopNote(Tone.now() + 0.2);
+  };
+
+  this.getSequencerPlaying = () => {
+    return sequencerPlaying;
+  };
+
+  this.setSequencerPlaying = (value) => {
+    sequencerPlaying = value;
+  };
+
+  this.getOsc = (index) => {
+    return osc[index];
+  };
+
+  this.setOscShape = (index, value) => {
+    osc[index].type = value;
   };
 };
