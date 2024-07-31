@@ -256,6 +256,24 @@ VS.BassEmulator = function() {
   const audioEngine = new VS.AudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
+  const showPerformanceWarning = () => {
+    $('#performance-warning').html(
+      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
+      '<span aria-hidden="true">&times;</span></button>' +
+      '<strong>Just a heads up: </strong><br />' +
+      'There are known performance issues with this browser, ' +
+      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
+      'For best results, use a <a class="alert-link" target="_blank" ' +
+      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
+      'supported browser.</a>'
+    );
+    $('#performance-warning').removeClass('hidden');
+  };
+
+  if (audioEngine.showPerformanceWarning()) {
+    showPerformanceWarning();
+  }
+
   let debugNewNote;
 
   // NOTE: This message will not be used by the sequencer.
@@ -269,6 +287,7 @@ VS.BassEmulator = function() {
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
+    // Transpose all keys held down to new octave
     const octaveOffset = change * 12;
     keysDown = keysDown.map(key => key + octaveOffset);
 
@@ -318,10 +337,15 @@ VS.BassEmulator = function() {
     }
   };
 
+  // This transposes keycode based on octave
+  const octaveAdjustedKeyCode = (keycode) => {
+    const octaveOffset = (patch.octave - 3) * 12;
+    return emulatorConstants.keyMidiMap[keycode] + octaveOffset;
+  };
+
   const keyboardUp = function(keyUp) {
     if (audioEngine.getSequencerPlaying()) { return; }
-    let octaveOffset = (patch.octave - 3) * 12;
-    keysDown = keysDown.filter(key => key !== emulatorConstants.keyMidiMap[keyUp.keyCode] + octaveOffset);
+    keysDown = keysDown.filter(key => key !== octaveAdjustedKeyCode(keyUp.keyCode));
 
     if (keysDown.length > 0) {
       audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
@@ -392,26 +416,33 @@ VS.BassEmulator = function() {
   //  END Sequencer experiment
   // ===================================
 
+  const macroOctaveUp = () => {
+    if (patch.octave >= 9) { return }
+
+    patch.octave += 1;
+    changeOctave(1);
+  };
+
+  const macroOctaveDown = () => {
+    if (patch.octave <= -1) { return }
+
+    patch.octave -= 1;
+    changeOctave(-1);
+  };
+
   window.onkeydown = function(keyDown) {
     if (keyDown.repeat) { return; }
 
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
-      let octaveOffset = (patch.octave - 3) * 12;
-      audioEngine.setNotePlaying(emulatorConstants.keyMidiMap[keyDown.keyCode] + octaveOffset);
+      audioEngine.setNotePlaying(octaveAdjustedKeyCode(keyDown.keyCode));
 
       keyboardDown();
     }
 
     // CHANGE OCTAVE
-    if (keyDown.keyCode == emulatorConstants.zKeyCode && patch.octave > -1) {
-      patch.octave -= 1;
-      changeOctave(-1);
-    }
-    if (keyDown.keyCode == emulatorConstants.xKeyCode && patch.octave < 9) {
-      patch.octave += 1;
-      changeOctave(1);
-    }
+    if (keyDown.keyCode == emulatorConstants.zKeyCode) { macroOctaveDown() }
+    if (keyDown.keyCode == emulatorConstants.xKeyCode) { macroOctaveUp() }
   };
 
   window.onkeyup = function(keyUp) {
@@ -514,11 +545,7 @@ VS.BassEmulator = function() {
   });
 
   const toggleVcoAmp = function(oscNumber) {
-    if (patch.vco[oscNumber].amp == patch.defaultVcoAmp) {
-      patch.vco[oscNumber].amp = 0;
-    } else {
-      patch.vco[oscNumber].amp = patch.defaultVcoAmp;
-    }
+    patch.toggleVcoAmp(oscNumber);
     audioEngine.setOscMuteAmp(oscNumber, patch.vco[oscNumber].amp);
   };
 
@@ -658,25 +685,14 @@ VS.BassEmulator = function() {
   });
 
   // MOBILE OCTAVE UP
-  $('#octave-up').on('click tap', function(){
-    if (patch.octave < 9) {
-      patch.octave += 1;
-    }
-    changeOctave(1);
-  });
+  $('#octave-up').on('click tap', function() { macroOctaveUp() });
 
   // MOBILE OCTAVE DOWN
-  $('#octave-down').on('click tap', function(){
-    if (patch.octave > -1) {
-      patch.octave -= 1;
-    }
-    changeOctave(-1);
-  });
+  $('#octave-down').on('click tap', function() { macroOctaveDown() });
 
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
-    let octaveOffset = (patch.octave - 3) * 12;
-    audioEngine.setNotePlaying(keyMidiMap[$(this).data('keycode')] + octaveOffset);
+    audioEngine.setNotePlaying(octaveAdjustedKeyCode($(this).data('keycode')));
 
     keyboardDown();
   });

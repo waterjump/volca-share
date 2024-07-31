@@ -88,11 +88,7 @@ VS.EmulatorParams = function() {
     this.setvco_pitch(3, midiValue);
   };
   this.setvco_active = function(oscNumber, value) {
-    if (value === 'true') {
-      this.vco[oscNumber].amp = this.defaultVcoAmp;
-    } else {
-      this.vco[oscNumber].amp = 0;
-    }
+    this.vco[oscNumber].amp = value === 'true' ? this.defaultVcoAmp : 0;
   };
   this.setvco1_active = function(value) {
     this.setvco_active(1, value);
@@ -132,7 +128,10 @@ VS.EmulatorParams = function() {
   };
   this.setamp_eg_on = function(value) {
     this.ampEgOn = (value === 'true');
-  }
+  };
+  this.toggleVcoAmp = function(oscNumber) {
+    this.vco[oscNumber].amp = this.vco[oscNumber].amp === 0 ? this.defaultVcoAmp : 0;
+  };
 
   // UTILITY FUNCTIONS
   const calculateTempo = function(superMidi) {
@@ -152,35 +151,25 @@ VS.EmulatorParams = function() {
     lfoRateMap: emulatorConstants.lfoRateMap
   };
 
-  const calculateMappedParameter = function(paramName, midiValue) {
-    let entries, midi, paramValue, lowerMidi, lowerParamValue, slope;
-    let midiDifference, rawValue, cleanValue;
-    let map = parameterMaps[`${paramName}Map`];
-
+  const calculateMappedParameter = (paramName, midiValue) => {
+    const map = parameterMaps[`${paramName}Map`];
     midiValue = Math.round(midiValue);
 
     if (map[midiValue] !== undefined) {
       return map[midiValue];
-    } else {
-      entries =
-        Object.keys(map).map((key) => [key, map[key]]);
+    }
 
-      for (let index = 0; index < entries.length; index++) {
-        midi = entries[index][0];
-        if (midiValue < midi) {
-          paramValue = entries[index][1];
-          lowerMidi = entries[index - 1][0];
-          lowerParamValue = entries[index - 1][1];
-          slope =
-            (paramValue - lowerParamValue) /
-              (parseFloat(midi) - parseFloat(lowerMidi));
-          midiDifference = midiValue - lowerMidi;
-          rawValue = (midiDifference * slope) + lowerParamValue;
-          cleanValue = Number(rawValue.toFixed(3));
+    const entries = Object.entries(map).map(([key, value]) => [Number(key), value]);
 
-          map[Number(midiValue)] = cleanValue;
-          return cleanValue;
-        }
+    for (let i = 1; i < entries.length; i++) {
+      const [midi, paramValue] = entries[i];
+      const [lowerMidi, lowerParamValue] = entries[i - 1];
+
+      if (midiValue < midi) {
+        const slope = (paramValue - lowerParamValue) / (midi - lowerMidi);
+        const cleanValue = Number(((midiValue - lowerMidi) * slope + lowerParamValue).toFixed(3));
+
+        return map[midiValue] = cleanValue;
       }
     }
   };

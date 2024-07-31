@@ -184,56 +184,43 @@ VS.AudioEngine = function(patch, sequence) {
     browserFeatures['usingChrome'] = navigator.userAgent.includes('Chrome/');
   };
 
-  // TODO: Get all interface logic e.g. jQuery out of this file.
-  const showPerformanceWarning = function() {
-    if (browserFeatures['cancelAndHoldAtTime']) { return; }
-
-    $('#performance-warning').html(
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      '<strong>Just a heads up: </strong><br />' +
-      'There are known performance issues with this browser, ' +
-      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
-      'For best results, use a <a class="alert-link" target="_blank" ' +
-      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
-      'supported browser.</a>'
-    );
-    $('#performance-warning').removeClass('hidden');
-  };
-
   const testBrowserFeatures = function() {
     checkCustomCurveClearing();
     checkCancelAndHoldAtTime();
     checkChrome();
     console.log(browserFeatures);
-
-    showPerformanceWarning();
   };
 
   testBrowserFeatures();
 
+  this.showPerformanceWarning = () => {
+    return !browserFeatures['cancelAndHoldAtTime'];
+  };
+
   // END get browser capabilities
 
   // ===================================
-  //  Sequencer experiment
+  //  SEQUENCER
   // ===================================
 
-  const scope = this;
-  const runToneSequencer = function(){
-    // TODO: Replace with call to setTempo();
+  const setTempo = () => {
+    // this is needed to change loop interval
     Tone.Transport.bpm.value = patch.tempo;
-
-    // This is needed for when tempo is changed before the sequencer starts.
+    // This is needed to change tempo relative timing of gateEnd
     try {
       Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
     } catch (error) {
       // idc
     }
+  };
+
+  const runToneSequencer = function(){
+    setTempo();
 
     let i = 0;
     let previousStep;
 
-    Tone.Transport.scheduleRepeat(time => {
+    Tone.Transport.scheduleRepeat(function(time) {
       if (!sequencerPlaying) { return; }
 
       while (!sequence[i % 16].activeStep) {
@@ -245,31 +232,31 @@ VS.AudioEngine = function(patch, sequence) {
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
       let currentStep = sequence[i % 16];
-      scope.setNotePlaying(currentStep['note'], time);
+      this.setNotePlaying(currentStep['note'], time);
 
       if (currentStep['stepMode']) {
         if (i > 0 && previousStep['slide']) {
           if (i > 0 && previousStep['stepMode']) {
-            scope.changeCurrentNote(time);
+            this.changeCurrentNote(time);
           } else {
             // Play a new note when last step stop mode was off
-            scope.playNewNote(time);
+            this.playNewNote(time);
             if (!currentStep['slide']) {
-              scope.stopNote(gateEnd);
+              this.stopNote(gateEnd);
             }
           }
         } else {
-          scope.playNewNote(time);
+          this.playNewNote(time);
           if (!currentStep['slide']) {
-            scope.stopNote(gateEnd);
+            this.stopNote(gateEnd);
           }
         }
       }
 
       previousStep = currentStep;
       i++;
-    }, '16n');
-  };
+    }.bind(this), '16n');
+  }.bind(this);
 
   runToneSequencer();
 
@@ -311,7 +298,7 @@ VS.AudioEngine = function(patch, sequence) {
       if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
         // use custom curve
         ampEgGainParam.setValueCurveAtTime(
-          emulatorConstants.decayReleaseGainCurve,
+          VS.emulatorConstants.decayReleaseGainCurve,
           attackEndTimeValue,
           patch.envelope.decayRelease
         )
@@ -396,7 +383,7 @@ VS.AudioEngine = function(patch, sequence) {
 
         if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
           // custom curve
-          const gainCurve = emulatorConstants.decayReleaseGainCurve.map(
+          const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
             function(value) { return value * currentValue }
           );
           ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
@@ -485,14 +472,7 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.setTempo = () => {
-    // this is needed to change loop interval
-    Tone.Transport.bpm.value = patch.tempo;
-    // This is needed to change tempo relative timing of gateEnd
-    try {
-      Tone.getTransport().bpm.rampTo(patch.tempo, 0.0001);
-    } catch (error) {
-      // idc
-    }
+    setTempo();
   };
 
   this.startSequencer = () => {
