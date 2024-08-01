@@ -71,6 +71,21 @@ VS.EmulatorConstants = function() {
     9: 127
   };
 
+  // Maps musical octave to midi rotation of octave knob
+  this.darkOctaveKnobMidiMap = {
+    '-1': 10,
+    0: 10,
+    1: 10,
+    2: 30,
+    3: 50,
+    4: 70,
+    5: 100,
+    6: 120,
+    7: 120,
+    8: 120,
+    9: 120
+  };
+
   // key: midi value of parameter.  value: decay/release in seconds
   this.decayReleaseMap = {
     0: 0.07, 10: 0.075, 20: 0.085, 30: 0.091, 40: 0.1, 50: 0.11, 60: 0.13,

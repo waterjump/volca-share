@@ -43,15 +43,16 @@ VS.KeysEmulator = function() {
   let debugNewNote;
 
   // this is how to auto-rotate knobs
-  // new VS.Knob($('#attack')).setKnob();
-  new VS.Knob($('#voice')).setKnob();
+  $('.knob').each(function() {
+    new VS.Knob(this).setKnob($(this).data('midi'));
+  });
 
   // NOTE: This message will not be used by the sequencer.
   const changeOctave = function(change) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
     // Turn octave knob
-    new VS.Knob($('#octave')).setKnob(emulatorConstants.octaveKnobMidiMap[patch.octave]);
+    new VS.Knob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
 
     if (audioEngine.getNotePlaying() === undefined) { return; } // at init time
 
@@ -206,10 +207,15 @@ VS.KeysEmulator = function() {
     audioEngine.setTempo();
   });
 
-  ['attack', 'decay_release'].forEach(id => {
+  ['attack', 'decay_release', 'portamento'].forEach(id => {
     $(`#${id}`).on('knobturn', () => {
       patch[`set${id}`](VS.activeKnob.trueMidi());
     });
+  });
+
+  $('#voice').on('knobturn', () => {
+    patch.setvoice(VS.activeKnob.midi());
+    // TODO: set voice in audioEngine;
   });
 
   $('#vcf_eg_int').on('knobturn', () => {

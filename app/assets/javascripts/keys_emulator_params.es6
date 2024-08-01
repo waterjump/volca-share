@@ -24,13 +24,18 @@ VS.EmulatorParams = function() {
       null,
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 },
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 },
-      { shape: 'square', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 }
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 }
     ];
   this.ampEgOn = false;
   this.volume = 1;
 
   this.getPercentage = function(midiValue) {
     return midiValue / 127.0;
+  };
+  this.setvoice = function(midiValue) {
+    if (midiValue !== this.voice) {
+      this.voice = midiValue;
+    }
   };
   this.settempo = function(midiValue) {
     this.tempo = calculateTempo(midiValue);
@@ -49,6 +54,9 @@ VS.EmulatorParams = function() {
     // let oldValueInHz = this.getPercentage(midiValue)**2 * 10000;
     // TODO: This needs adjusting.  NOTE: It's in cents now.  Not Hz.
     this.vcf_eg_int = 1200 * (midiValue / 20.0);
+  };
+  this.setportamento = function(midiValue) {
+    this.portamento = this.getPercentage(midiValue) * 2.0;
   };
   this.setoctave = function(midiValue) {
     this.octave = parseInt(VS.display.octaveString(midiValue)[3]);

@@ -80,7 +80,7 @@ VS.KeysAudioEngine = function(patch) {
   setupOscLfo();
 
   // Setup oscilators
-  [1].forEach(function(oscNumber) {
+  [1, 2, 3].forEach(function(oscNumber) {
     let oscillator = audioCtx.createOscillator();
     oscillator.type = patch.vco[oscNumber].shape;
     oscillator.detune.setValueAtTime(
@@ -100,6 +100,8 @@ VS.KeysAudioEngine = function(patch) {
   const oscFreqNode = audioCtx.createConstantSource();
   oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
   oscFreqNode.connect(osc[1].frequency);
+  oscFreqNode.connect(osc[2].frequency);
+  oscFreqNode.connect(osc[3].frequency);
   oscFreqNode.start();
 
   const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
@@ -318,6 +320,8 @@ const runToneSequencer = function() {
     let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
 
     oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
+
+    // TODO: Use patch.portamento instead of 0.05
     oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
