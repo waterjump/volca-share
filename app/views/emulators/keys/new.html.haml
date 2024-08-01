@@ -1,0 +1,9 @@
+.clearfix
+  %h1
+    Volca keys Emulator
+    %span.alpha beta
+  = render 'emulators/keys/form'
+#new_choice_form{:style => "display: none;"}
+  = render partial: 'sequences/emulator'
+= render 'patches/knob_debug'
+

@@ -16,4 +16,14 @@ class EmulatorsController < ApplicationController
     )
     @title = 'Volca Bass Emulator'
   end
+
+  def new_keys
+    @body_class = :form
+    @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
+      attack: 0,
+      cutoff: 127
+    ))
+    @title = 'Volca Keys Emulator'
+    render 'emulators/keys/new'
+  end
 end

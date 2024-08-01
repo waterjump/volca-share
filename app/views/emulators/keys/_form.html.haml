@@ -1,0 +1,197 @@
+#interface.col-lg-9.form
+  .stretchy
+    .volca.keys.emulator
+      .small.knob.midi-enabled.first-row.vco-column.lit#detune{ data: { midi: @patch.detune, control_number: 42 } }
+        .notch
+      .small.knob.midi-enabled.second-row.vco-column.lit#portamento{ data: { midi: @patch.portamento, control_number: 5 } }
+        .notch
+      .small.knob.midi-enabled.third-row.vco-column.lit#vco_eg_int{ data: { midi: @patch.vco_eg_int, control_number: 43 } }
+        .notch
+      .small.knob.midi-enabled.first-row.vcf-column.lit#cutoff{ data: { midi: @patch.cutoff, control_number: 44 } }
+        .notch
+      .small.knob.second-row.vcf-column.lit#peak{ data: { midi: @patch.peak, control_number: 0 } }
+        .notch
+      .small.knob.midi-enabled.third-row.vcf-column.lit#vcf_eg_int{ data: { midi: @patch.vcf_eg_int, control_number: 45 } }
+        .notch
+      .small.knob.midi-enabled.first-row.lfo-column.lit#lfo_rate{ data: { midi: @patch.lfo_rate, control_number: 46 } }
+        .notch
+      .small.knob.midi-enabled.second-row.lfo-column.lit#lfo_pitch_int{ data: { midi: @patch.lfo_pitch_int, control_number: 47 } }
+        .notch
+      .small.knob.midi-enabled.third-row.lfo-column.lit#lfo_cutoff_int{ data: { midi: @patch.lfo_cutoff_int, control_number: 48 } }
+        .notch
+      .small.knob.midi-enabled.first-row.eg-column.lit#attack{ data: { midi: @patch.attack, control_number: 49 } }
+        .notch
+      .small.knob.midi-enabled.second-row.eg-column.lit#decay_release{ data: { midi: @patch.decay_release, control_number: 50 } }
+        .notch
+      .small.knob.midi-enabled.third-row.eg-column.lit#sustain{ data: { midi: @patch.sustain, control_number: 51 } }
+        .notch
+      .dark.knob.midi-enabled#voice{ data: { midi: @patch.voice, control_number: 40 } }
+        .notch
+      .dark.knob.midi-enabled#octave{ data: { midi: @patch.octave, control_number: 41 } }
+        .notch
+      .small.knob.midi-enabled.unlit#delay_time{ data: { midi: @patch.delay_time, control_number: 52 } }
+        .notch
+      .small.knob.midi-enabled.unlit#delay_feedback{ data: { midi: @patch.delay_feedback, control_number: 53 } }
+        .notch
+      #led
+        .digit#thousands
+        .digit#hundreds
+        .digit#tens
+        .digit#ones
+
+      .bottom-row
+        .placeholder
+        .placeholder
+        .placeholder
+
+        -# LFO SHAPE SAW
+        = radio_button_tag 'patch[lfo_shape]',
+                           'saw',
+                           @patch.lfo_shape_saw,
+                           class: :control
+        = label_tag('patch[lfo_shape_saw]') do
+          %span.multi
+            .light{ id: 'lfo_shape_saw_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_saw ? 'lit' : 'unlit' }
+
+
+        -# LFO SHAPE TRI
+        = radio_button_tag 'patch[lfo_shape]',
+                           'triangle',
+                           @patch.lfo_shape_triangle,
+                           class: :control
+        = label_tag('patch[lfo_shape_triangle]') do
+          %span.multi
+            .light{ id: 'lfo_shape_triangle_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_triangle ? 'lit' : 'unlit' }
+
+        -# LFO SHAPE SQUARE
+        = radio_button_tag 'patch[lfo_shape]',
+                           'square',
+                           @patch.lfo_shape_square,
+                           class: :control
+        = label_tag('patch[lfo_shape_square]') do
+          %span.multi
+            .light{ id: 'lfo_shape_square_light',
+                    data: { radio: true },
+                    class: @patch.lfo_shape_square ? 'lit' : 'unlit' }
+
+        -# LFO TRIGGER SYNC
+        = check_box :patch,
+                    :lfo_trigger_sync,
+                    @patch.checked?('lfo_trigger_sync'),
+                    'true',
+                    'false'
+        = label_tag('patch[lfo_trigger_sync]') do
+          %span.on-off
+            .light{ id: 'lfo_trigger_sync_light',
+                    class: @patch.lit?(:lfo_trigger_sync) }
+
+        -# TEMPO PLACEHOLDERS
+        .placeholder
+        .placeholder
+        .placeholder
+
+        -# METRONOME
+        .placeholder
+
+        -# STEP TRIGGER
+        = check_box :patch,
+                    :step_trigger,
+                    @patch.checked?('step_trigger'),
+                    'true',
+                    'false'
+        = label_tag('patch[step_trigger]') do
+          %span.on-off
+            .light{ id: 'step_trigger_light',
+                    class: @patch.lit?(:step_trigger) }
+
+        -# TEMPO DELAY
+        = check_box :patch,
+                    :tempo_delay,
+                    @patch.checked?('tempo_delay'),
+                    'true',
+                    'false'
+        = label_tag('patch[tempo_delay]') do
+          %span.on-off
+            .light{ id: 'tempo_delay_light',
+                    class: @patch.lit?(:tempo_delay) }
+
+  = range_field_tag 'patch[voice]', (@patch.voice || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[octave]', (@patch.octave || 57), in: 0..127, class: :hidden
+  = range_field_tag 'patch[detune]', (@patch.detune || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[portamento]', (@patch.portamento || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vco_eg_int]', (@patch.vco_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[cutoff]', (@patch.cutoff || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[peak]', (@patch.peak || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[vcf_eg_int]', (@patch.vcf_eg_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_rate]', (@patch.lfo_rate || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_pitch_int]', (@patch.lfo_pitch_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[lfo_cutoff_int]', (@patch.lfo_cutoff_int || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[attack]', (@patch.attack || 0), in: 0..127, class: :hidden
+  = range_field_tag 'patch[decay_release]', (@patch.decay_release || 63), in: 0..127, class: :hidden
+  = range_field_tag 'patch[sustain]', (@patch.sustain || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_time]', (@patch.delay_time || 127), in: 0..127, class: :hidden
+  = range_field_tag 'patch[delay_feedback]', (@patch.delay_feedback || 127), in: 0..127, class: :hidden
+
+
+  .field.sequence-area
+    .sequence-holder
+    = link_to 'Show sequencer', '#', id: 'toggle-sequences', class: 'btn btn-default', data: { hide_text: 'Hide sequencer', show_text: 'Show sequencer' }
+
+  #mobile-keyboard.hidden
+    #octave-up.mobile-control.octave-button.top Oct. ⬆️
+    #octave-down.mobile-control.octave-button.bottom Oct. ⬇️
+    #w.mobile-control.key.top{ data: { keyCode: 87 } }
+    #e.mobile-control.key.top{ data: { keyCode: 69 } }
+    #t.mobile-control.key.top{ data: { keyCode: 84 } }
+    #y.mobile-control.key.top{ data: { keyCode: 89 } }
+    #u.mobile-control.key.top{ data: { keyCode: 85 } }
+    #o.mobile-control.key.top{ data: { keyCode: 79 } }
+    #a.mobile-control.key.bottom{ data: { keyCode: 65 } }
+    #s.mobile-control.key.bottom{ data: { keyCode: 83 } }
+    #d.mobile-control.key.bottom{ data: { keyCode: 68 } }
+    #f.mobile-control.key.bottom{ data: { keyCode: 70 } }
+    #g.mobile-control.key.bottom{ data: { keyCode: 71 } }
+    #h.mobile-control.key.bottom{ data: { keyCode: 72 } }
+    #j.mobile-control.key.bottom{ data: { keyCode: 74 } }
+    #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
+    #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
+#patch-metadata.col-md-9.col-lg-3
+  #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
+  .accordion
+    .accordion-item
+      %h4.accordion-header
+        Usage
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
+      .accordion-body.clearfix
+        #desktop-instructions
+          Use computer keyboard to play notes
+          = image_tag('computer-midi-keyboard-small.png', id: 'emulator-keyboard')
+          %br
+          %br
+          %p
+            Or try the
+            = link_to 'mobile version', '#', id: 'toggle-mobile'
+        #back-to-desktop.hidden
+          = link_to 'Back to desktop mode', '#'
+        #saving
+          <strong>Saving / sharing a patch</strong><br />
+          To save a patch and sequence, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface below the cutoff knob.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
+    .accordion-item
+      %h4.accordion-header
+        Compatibility
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
+      .accordion-body
+        There are known issues with the sequencer on Chrome.  You will have a smoother experience on Firefox.
+    .accordion-item
+      %h4.accordion-header
+        Disclaimer
+        .collapse-toggle.glyphicon.glyphicon-chevron-down
+      #disclaimer.accordion-body
+        This is a <strong>fan-made emulator</strong>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
+.off-canvas
+  =image_tag('numbers.jpg')
+  =image_tag('symbols.jpg')

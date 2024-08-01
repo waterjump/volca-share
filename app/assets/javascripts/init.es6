@@ -8,9 +8,16 @@ $(function() {
   VS.display = new VS.Display($('#led'));
   VS.sequences = new VS.Sequences;
   VS.form = new VS.Form;
-  if ($('.emulator').length > 0) {
+  if ($('.bass.emulator').length > 0) {
+    console.log('bass emulator code loading!');
     VS.emulatorConstants = new VS.EmulatorConstants;
     VS.emulatorParams = new VS.EmulatorParams;
     VS.bassEmulator = new VS.BassEmulator;
+  }
+  if ($('.keys.emulator').length > 0) {
+    console.log('KEYS emulator code loading!');
+    VS.emulatorConstants = new VS.EmulatorConstants;
+    VS.emulatorParams = new VS.EmulatorParams;
+    VS.bassEmulator = new VS.KeysEmulator;
   }
 });
