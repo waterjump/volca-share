@@ -271,7 +271,7 @@ VS.BassEmulator = function() {
   };
 
   if (audioEngine.showPerformanceWarning()) {
-    showPerformanceWarning();
+    // showPerformanceWarning();
   }
 
   let debugNewNote;
