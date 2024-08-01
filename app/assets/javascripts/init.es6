@@ -17,7 +17,7 @@ $(function() {
   if ($('.keys.emulator').length > 0) {
     console.log('KEYS emulator code loading!');
     VS.emulatorConstants = new VS.EmulatorConstants;
-    VS.emulatorParams = new VS.EmulatorParams;
+    VS.emulatorParams = new VS.KeysEmulatorParams;
     VS.bassEmulator = new VS.KeysEmulator;
   }
 });

@@ -1,4 +1,4 @@
-VS.EmulatorParams = function() {
+VS.KeysEmulatorParams = function() {
   const { emulatorConstants } = VS;
 
   this.tempo = 56;
