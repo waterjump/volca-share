@@ -293,6 +293,11 @@ VS.Form = function() {
         $(VS.activeKnob.element).data('superMidi', superMidi);
       }
 
+      // ignore non-snap movements on 'dark' knobs (volca keys only)
+      if ($(VS.activeKnob.element).hasClass('dark') && $(VS.activeKnob.element).data('midi') === midi) {
+        return;
+      }
+
       if (midiOut.ready()) {
         midiOut.output.sendControlChange(
           $(VS.activeKnob.element).data('control-number'),
@@ -300,6 +305,7 @@ VS.Form = function() {
           midiOut.channel
         );
       }
+
       $(VS.activeKnob.element).data('midi', midi);
       $(VS.activeKnob.element).data('trueMidi', trueMidi);
       VS.activeKnob.element.dispatchEvent(knobTurnEvent);

@@ -96,15 +96,20 @@ VS.KeysAudioEngine = function(patch) {
     osc[oscNumber].start();
   });
 
+  // TODO: The oscillators "base frequency" are not all the same in the keys.
   // controls frequency of all three vcos rather than looping through them.
   const oscFreqNode = audioCtx.createConstantSource();
+  const oscFreqNode3 = audioCtx.createConstantSource();
   oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
+  oscFreqNode3.offset.setValueAtTime(440, audioCtx.currentTime);
   oscFreqNode.connect(osc[1].frequency);
   oscFreqNode.connect(osc[2].frequency);
-  oscFreqNode.connect(osc[3].frequency);
+  oscFreqNode3.connect(osc[3].frequency);
   oscFreqNode.start();
+  oscFreqNode3.start();
 
   const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
+  const oscFreqNode3OffsetParam = new Tone.Param(oscFreqNode3.offset);
 
   // ==========================
   //  get browser capabilities
@@ -277,6 +282,12 @@ const runToneSequencer = function() {
     }
   };
 
+  const setOscillatorFrequencies = function(time = audioCtx.currentTime) {
+    frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    oscFreqNodeOffsetParam.setValueAtTime(frequency * patch.vco[1].factor, time);
+    oscFreqNode3OffsetParam.setValueAtTime(frequency * patch.vco[3].factor, time);
+  }.bind(this);
+
   this.playNewNote = function(time = audioCtx.currentTime) {
     debugNewNote = audioCtx.currentTime;
     this.activateAudio();
@@ -291,9 +302,8 @@ const runToneSequencer = function() {
     // Amp EG reset
     ampEgGainParam.cancelAndHoldAtTime(time);
 
-    // Set frequency
-    frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    // Set frequency of all oscillators
+    setOscillatorFrequencies();
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
@@ -323,6 +333,10 @@ const runToneSequencer = function() {
 
     // TODO: Use patch.portamento instead of 0.05
     oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
+  };
+
+  this.changeVoice = function() {
+    setOscillatorFrequencies();
   };
 
   this.stopNote = function(time = audioCtx.currentTime) {

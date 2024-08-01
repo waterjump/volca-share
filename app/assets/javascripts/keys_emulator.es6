@@ -215,7 +215,7 @@ VS.KeysEmulator = function() {
 
   $('#voice').on('knobturn', () => {
     patch.setvoice(VS.activeKnob.midi());
-    // TODO: set voice in audioEngine;
+    audioEngine.changeVoice();
   });
 
   $('#vcf_eg_int').on('knobturn', () => {

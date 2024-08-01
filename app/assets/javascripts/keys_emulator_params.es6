@@ -2,7 +2,7 @@ VS.EmulatorParams = function() {
   const { emulatorConstants } = VS;
 
   this.tempo = 56;
-  this.voice = 30;
+  this.voice = 'unison';
   this.octave = 3;
   this.detune = 0;
   this.portamento = 0;
@@ -22,9 +22,9 @@ VS.EmulatorParams = function() {
   this.vco =
     [
       null,
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0 }
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 },
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 },
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 }
     ];
   this.ampEgOn = false;
   this.volume = 1;
@@ -32,9 +32,43 @@ VS.EmulatorParams = function() {
   this.getPercentage = function(midiValue) {
     return midiValue / 127.0;
   };
+
+  this.voiceChange = {
+      poly: function() {
+        // NotImplemented
+      },
+      unison: function() {
+        console.log('KAE: unison voice');
+        this.vco[3].factor = 1.0;
+      }.bind(this),
+      octave: function() {
+        console.log('KAE: octave voice');
+        this.vco[3].factor = 2.0;
+      }.bind(this),
+      fifth: function() {
+        console.log('KAE: fifth voice');
+        this.vco[3].factor = 1.4983;
+      }.bind(this),
+      'unison ring': function() {
+       // NotImplemented
+      },
+      'poly ring': function() {
+        // NotImplemented
+      }
+    };
+
   this.setvoice = function(midiValue) {
-    if (midiValue !== this.voice) {
-      this.voice = midiValue;
+    const voiceMidiMap = {
+      10: 'poly',
+      30: 'unison',
+      50: 'octave',
+      70: 'fifth',
+      100: 'unison ring',
+      120: 'poly ring'
+    };
+    if (voiceMidiMap[midiValue] !== this.voice) {
+      this.voice = voiceMidiMap[midiValue];
+      this.voiceChange[this.voice]()
     }
   };
   this.settempo = function(midiValue) {
