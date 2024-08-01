@@ -23,10 +23,28 @@ VS.KeysAudioEngine = function(patch) {
   // TODO: Encampsulate this setup script in its own function.
 
 
+  // BEGIN delay
+  const delay = audioCtx.createDelay();
+  delay.delayTime.setValueAtTime(0.2, audioCtx.currentTime);
+
+  const delayFilter = audioCtx.createBiquadFilter();
+  delayFilter.type = 'lowpass';
+  delayFilter.Q.value = 0;
+  delayFilter.frequency.setValueAtTime(2000, audioCtx.currentTime);
+
+  const delayAmp = audioCtx.createGain();
+  delayAmp.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  delay.connect(delayFilter);
+  delayFilter.connect(delayAmp);
+  delayAmp.connect(masterAmp);
+  delayAmp.connect(delay);
+  // END delay
+
   filter.type = 'lowpass';
   filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
   filter.Q.value = patch.filter.peak;
   filter.connect(masterAmp);
+  filter.connect(delay);
 
   filterEgAmp.gain.setValueAtTime(patch.vcf_eg_int, audioCtx.currentTime);
   filterEgAmp.connect(filter.detune);
@@ -480,5 +498,13 @@ const runToneSequencer = function() {
   this.setDetune = () => {
     osc[1].detune.setValueAtTime(patch.vco[1].detune, audioCtx.currentTime);
     osc[3].detune.setValueAtTime(patch.vco[3].detune, audioCtx.currentTime);
+  };
+
+  this.setDelayTime = () => {
+    delay.delayTime.setValueAtTime(patch.delay.time, audioCtx.currentTime);
+  };
+
+  this.setDelayFeedback = () => {
+    delayAmp.gain.setValueAtTime(patch.delay.feedback, audioCtx.currentTime);
   };
 };

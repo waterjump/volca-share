@@ -213,6 +213,16 @@ VS.KeysEmulator = function() {
     });
   });
 
+  $('#delay_time').on('knobturn', () => {
+    patch.setdelay_time(VS.activeKnob.trueMidi());
+    audioEngine.setDelayTime();
+  });
+
+  $('#delay_feedback').on('knobturn', () => {
+    patch.setdelay_feedback(VS.activeKnob.trueMidi());
+    audioEngine.setDelayFeedback();
+  });
+
   $('#detune').on('knobturn', () => {
     patch.setdetune(VS.activeKnob.trueMidi());
     audioEngine.setDetune();

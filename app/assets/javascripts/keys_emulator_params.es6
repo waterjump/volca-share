@@ -27,6 +27,7 @@ VS.KeysEmulatorParams = function() {
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 }
     ];
   this.ampEgOn = false;
+  this.delay = { time: 0.2, feedback: 0.5 }
   this.volume = 1;
 
   this.getPercentage = function(midiValue) {
@@ -122,20 +123,34 @@ VS.KeysEmulatorParams = function() {
     this.vco[3].detune = cents;
   };
 
+  this.setdelay_time = function(midiValue) {
+    // TODO: Implement machine specific values
+    this.delay.time = 0.01 + this.getPercentage(midiValue) * 0.79;
+  }
+
+  this.setdelay_feedback = function(midiValue) {
+    // TODO: Implement machine specific values
+    this.delay.feedback = this.getPercentage(midiValue) * 0.5;
+  }
+
   this.setvco_pitch = function(oscNumber, midiValue) {
     this.vco[oscNumber].pitchMidi = midiValue;
     this.vco[oscNumber].detune =
       emulatorConstants.pitchMap[this.vco[oscNumber].pitchMidi] * 100;
   };
+
   this.setvco1_pitch = function(midiValue) {
     this.setvco_pitch(1, midiValue);
   };
+
   this.setvco2_pitch = function(midiValue) {
     this.setvco_pitch(2, midiValue);
   };
+
   this.setvco3_pitch = function(midiValue) {
     this.setvco_pitch(3, midiValue);
   };
+
   this.setvco_active = function(oscNumber, value) {
     this.vco[oscNumber].amp = value === 'true' ? this.defaultVcoAmp : 0;
   };
