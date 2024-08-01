@@ -22,9 +22,9 @@ VS.KeysEmulatorParams = function() {
   this.vco =
     [
       null,
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0.01, factor: 1.0 }
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 },
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 },
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 }
     ];
   this.ampEgOn = false;
   this.volume = 1;
@@ -39,15 +39,15 @@ VS.KeysEmulatorParams = function() {
       },
       unison: function() {
         console.log('KAE: unison voice');
-        this.vco[3].factor = 1.0;
+        this.vco[3].voiceDetune = 0;
       }.bind(this),
       octave: function() {
         console.log('KAE: octave voice');
-        this.vco[3].factor = 2.0;
+        this.vco[3].voiceDetune = 1200;
       }.bind(this),
       fifth: function() {
         console.log('KAE: fifth voice');
-        this.vco[3].factor = 1.4983;
+        this.vco[3].voiceDetune = 700;
       }.bind(this),
       'unison ring': function() {
        // NotImplemented
@@ -114,6 +114,14 @@ VS.KeysEmulatorParams = function() {
     this.lfo.cutoffValue = percentage**2 * 4800;
     this.lfo.ampValue = percentage;
   };
+
+  this.setdetune = function(midiValue) {
+    this.detune = midiValue;
+    cents = this.getPercentage(midiValue) * 84;
+    this.vco[1].detune = cents * -1;
+    this.vco[3].detune = cents;
+  };
+
   this.setvco_pitch = function(oscNumber, midiValue) {
     this.vco[oscNumber].pitchMidi = midiValue;
     this.vco[oscNumber].detune =

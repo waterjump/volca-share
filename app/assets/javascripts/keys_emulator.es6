@@ -213,6 +213,11 @@ VS.KeysEmulator = function() {
     });
   });
 
+  $('#detune').on('knobturn', () => {
+    patch.setdetune(VS.activeKnob.trueMidi());
+    audioEngine.setDetune();
+  });
+
   $('#voice').on('knobturn', () => {
     patch.setvoice(VS.activeKnob.midi());
     audioEngine.changeVoice();

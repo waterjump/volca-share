@@ -479,4 +479,9 @@ const runToneSequencer = function() {
   this.setOscShape = (index, value) => {
     osc[index].type = value;
   };
+
+  this.setDetune = () => {
+    osc[1].detune.setValueAtTime(patch.vco[1].detune, audioCtx.currentTime);
+    osc[3].detune.setValueAtTime(patch.vco[3].detune, audioCtx.currentTime);
+  };
 };
