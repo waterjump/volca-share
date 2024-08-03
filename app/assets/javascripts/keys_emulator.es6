@@ -68,13 +68,15 @@ VS.KeysEmulator = function() {
   changeOctave(0);
 
   const keyboardDown = function(){
-    if (audioEngine.getSequencerPlaying()) { return; }
+    // if (audioEngine.getSequencerPlaying()) { return; }
     if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
       keysDown.push(audioEngine.getNotePlaying());
     }
 
     if (keysDown.length === 1) {
       audioEngine.playNewNote();
+    } else if (patch.voice.includes('poly')){
+      audioEngine.addNote(keysDown);
     } else {
       audioEngine.changeCurrentNote();
     }
@@ -87,14 +89,18 @@ VS.KeysEmulator = function() {
   };
 
   const keyboardUp = function(keyUp) {
-    if (audioEngine.getSequencerPlaying()) { return; }
+    // if (audioEngine.getSequencerPlaying()) { return; }
     keysDown = keysDown.filter(key => key !== octaveAdjustedKeyCode(keyUp.keyCode));
 
     if (keysDown.length > 0) {
-      audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
-      audioEngine.changeCurrentNote();
-
-      return;
+      if (patch.voice.includes('poly')) {
+        audioEngine.stopPolyNote(keysDown);
+        return;
+      } else {
+        audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
+        audioEngine.changeCurrentNote();
+        return;
+      }
     }
 
     audioEngine.stopNote();

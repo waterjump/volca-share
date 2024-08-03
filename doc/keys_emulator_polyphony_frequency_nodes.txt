@@ -1,0 +1,50 @@
+constantSource
+┌───────────┐
+│oscFreqNode├────┬────────────┐             freq  ┌──────┐
+└───────────┘    │            └──────────────────►│ osc1 │
+                 │                                └──────┘
+                 │       gainNode
+                 │      ┌──────────────┐
+                 ├─────►│unisonNoteAmp2├────┐
+                 │      └──────────────┘    │ freq┌──────┐
+constantSource   │       gainNode           ├────►│ osc2 │
+┌────────────┐   :      ┌──────────────┐    │     └──────┘
+│oscFreqNode2├─────────►│polyNoteAmp2  ├────┘
+└────────────┘   :      └──────────────┘
+                 │
+                 │       gainNode
+                 │      ┌──────────────┐
+                 └─────►│unisonNoteAmp3├────┐
+                        └──────────────┘    │ freq┌──────┐
+constantSouce            gainNode           ├────►│ osc3 │
+┌────────────┐          ┌──────────────┐    │     └──────┘
+│oscFreqNode3├─────────►│polyNoteAmp3  ├────┘
+└────────────┘          └──────────────┘
+
+
+UnisonNoteAmps are set to gain = 1 for unison voices, and 0
+for poly voices.  This ensures that the frequency value from
+oscFreq are not receive by the oscillator.  A constantSourceNode
+called unisonNoteSwitchController governs the gain values:
+
+                                          gainNode
+                                   gain  ┌──────────────┐
+ constantSourceNode               ┌─────►│unisonNoteAmp3│
+ ┌──────────────────────────┐     │      └──────────────┘
+ │unisonNoteSwitchController├─────┤       gainNOde
+ └──────────────────────────┘     │gain  ┌──────────────┐
+                                  └─────►│unisonNoteAmp3│
+                                         └──────────────┘
+
+polyNoteAmps are set to gain = 0 for unison voices, and are switched
+to gain = 1 for poly voices.  A constantSourceNode called
+polyNoteSwitchController governs the gain valies:
+
+                                          gainNode
+                                   gain  ┌──────────────┐
+ constantSourceNode               ┌─────►│  polyNoteAmp3│
+ ┌──────────────────────────┐     │      └──────────────┘
+ │  polyNoteSwitchController├─────┤       gainNOde
+ └──────────────────────────┘     │gain  ┌──────────────┐
+                                  └─────►│  polyNoteAmp3│
+                                         └──────────────┘

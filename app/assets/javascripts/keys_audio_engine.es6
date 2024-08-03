@@ -110,6 +110,11 @@ VS.KeysAudioEngine = function(patch) {
   modGain2.connect(modGain3);
   modGain3.connect(ampEg);
 
+  const oscPolyMonoAmp2 = audioCtx.createGain();
+  oscPolyMonoAmp2.gain.value = 1;
+  const oscPolyMonoAmp3 = audioCtx.createGain();
+  oscPolyMonoAmp3.gain.value = 1;
+
   // Setup oscilators
   [1, 2, 3].forEach(function(oscNumber) {
     let oscillator = audioCtx.createOscillator();
@@ -125,19 +130,25 @@ VS.KeysAudioEngine = function(patch) {
     const thruGain = audioCtx.createGain();
     thruGain.gain.value = 0;
     thruGainSwitchController.connect(thruGain.gain);
-    oscillator.connect(thruGain);
     thruGain.connect(ampEg);
 
     const modGainSwitch = audioCtx.createGain();
     modGainSwitch.gain.value = 0;
     modGainSwitchController.connect(modGainSwitch.gain);
-    oscillator.connect(modGainSwitch);
 
     if (oscNumber === 1) {
+      oscillator.connect(thruGain);
+      oscillator.connect(modGainSwitch);
       modGainSwitch.connect(modGain2); // carrier
     } else if ( oscNumber === 2) {
+      oscillator.connect(oscPolyMonoAmp2);
+      oscPolyMonoAmp2.connect(thruGain);
+      oscPolyMonoAmp2.connect(modGainSwitch);
       modGainSwitch.connect(modGain2.gain); // modulator
     } else {
+      oscillator.connect(oscPolyMonoAmp3);
+      oscPolyMonoAmp3.connect(thruGain);
+      oscPolyMonoAmp3.connect(modGainSwitch);
       modGainSwitch.connect(modGain3.gain); // modulator
     }
     oscillator.start();
@@ -151,16 +162,54 @@ VS.KeysAudioEngine = function(patch) {
   voiceOscDetuner3.connect(osc[3].detune);
   voiceOscDetuner3.start();
 
+
+  const unisonNoteAmp2 = audioCtx.createGain();
+  unisonNoteAmp2.gain.value = 0;
+  const unisonNoteAmp3 = audioCtx.createGain();
+  unisonNoteAmp3.gain.value = 0;
+
   // TODO: The oscillators "base frequency" are not all the same in the keys.
   // controls frequency of all three vcos rather than looping through them.
   const oscFreqNode = audioCtx.createConstantSource();
   oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
   oscFreqNode.connect(osc[1].frequency);
-  oscFreqNode.connect(osc[2].frequency);
-  oscFreqNode.connect(osc[3].frequency);
+  oscFreqNode.connect(unisonNoteAmp2);
+  oscFreqNode.connect(unisonNoteAmp3);
+  unisonNoteAmp2.connect(osc[2].frequency);
+  unisonNoteAmp3.connect(osc[3].frequency);
   oscFreqNode.start();
 
   const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
+
+  const oscFreqNode2 = audioCtx.createConstantSource();
+  oscFreqNode2.offset.setValueAtTime(440, audioCtx.currentTime);
+  const polyNoteAmp2 = audioCtx.createGain();
+  polyNoteAmp2.gain.value = 0;
+  oscFreqNode2.connect(polyNoteAmp2);
+  polyNoteAmp2.connect(osc[2].frequency);
+  oscFreqNode2.start();
+
+  const oscFreqNode3 = audioCtx.createConstantSource();
+  oscFreqNode3.offset.setValueAtTime(440, audioCtx.currentTime);
+  const polyNoteAmp3 = audioCtx.createGain();
+  polyNoteAmp3.gain.value = 0;
+  oscFreqNode3.connect(polyNoteAmp3);
+  polyNoteAmp3.connect(osc[3].frequency);
+  oscFreqNode3.start();
+
+  // Switch for unison note frequencies
+  const unisonNoteSwitchController = audioCtx.createConstantSource();
+  unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+  unisonNoteSwitchController.connect(unisonNoteAmp2.gain);
+  unisonNoteSwitchController.connect(unisonNoteAmp3.gain);
+  unisonNoteSwitchController.start();
+
+  // Switch for poly note frequencies
+  const polyNoteSwitchController = audioCtx.createConstantSource();
+  polyNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+  polyNoteSwitchController.connect(polyNoteAmp2.gain);
+  polyNoteSwitchController.connect(polyNoteAmp3.gain);
+  polyNoteSwitchController.start();
 
   // ==========================
   //  get browser capabilities
@@ -381,8 +430,52 @@ const runToneSequencer = function() {
     oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
+  // Poly voices only!
+  this.addNote = function(keysDown) {
+    if (keysDown.length === 2) {
+      const frequency2 = Tone.Frequency(keysDown[1], 'midi').toFrequency();
+      oscFreqNode2.offset.setValueAtTime(frequency2, audioCtx.currentTime);
+      oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
+    } else if (keysDown.length === 3) {
+      const frequency3 = Tone.Frequency(keysDown[2], 'midi').toFrequency();
+      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
+      oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+    } else if (keysDown.length > 3) {
+      // TODO: Behavior of actual synth is the replace the note nearest to it,
+      //       replacing the higher note if its exactly between two.
+      const frequency3 = Tone.Frequency(keysDown[keysDown.length - 1], 'midi').toFrequency();
+      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
+    }
+  };
+
+  this.stopPolyNote = function(keysDown) {
+    if (keysDown.length === 1) {
+      oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else if (keysDown.length === 2) {
+      oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else if (keysDown.length > 2) {
+      // TODO: Behavior of actual synth is the replace the note nearest to it,
+      //       replacing the higher note if its exactly between two.
+
+      // change osc3 to last note in keysDown
+      const frequency3 = Tone.Frequency(keysDown[keysDown.length - 1], 'midi').toFrequency();
+      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
+    }
+  };
+
   this.changeVoice = function() {
-    // only applies to unison, octave and fifth, unison ring
+    /*
+    Voices implemented:
+    [X] poly
+    [X] unison
+    [X] octave and
+    [X] fifth
+    [X] unison ring
+    [ ] poly ring
+
+    TODO: Try to break out the configurations of different voices
+          into an object or something.
+    */
     voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, audioCtx.currentTime);
 
     osc.forEach((oscillator, index) => {
@@ -391,7 +484,22 @@ const runToneSequencer = function() {
       }
     });
 
-    if (patch.voice === 'unison ring') {
+    if(patch.voice.includes('poly')) {
+      console.log('poly ');
+      oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
+      oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+      unisonNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+      polyNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+    } else {
+      console.log('unison');
+      oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
+      oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+      unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+      polyNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+    }
+
+    if (patch.voice.includes('ring')) {
+      console.log('...ring');
       thruGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
       modGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
     } else {

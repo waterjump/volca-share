@@ -1,0 +1,18 @@
+┌──────┐
+│ osc1 ├────────────────────────────►... (to ring mod switch)
+└──────┘
+
+
+┌──────┐     ┌─────────────────┐
+│ osc2 ├────►│ oscPolyMonoAmp2 ├────►... (to ring mod switch)
+└──────┘     └─────────────────┘
+
+
+┌──────┐     ┌─────────────────┐
+│ osc3 ├────►│ oscPolyMonoAmp3 ├────►... (to ring mod switch)
+└──────┘     └─────────────────┘
+
+Description: oscPolyMonoAmps control whether an individual
+note (oscillator) is playing depending on unison/poly, and
+number of keys currently pressed. Osc1 is always on because
+it always plays in unison/poly, and first keyPress.
