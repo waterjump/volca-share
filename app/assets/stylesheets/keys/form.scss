@@ -74,6 +74,16 @@ $aspect: 1800 / 1072 / 100;
     top: 27%;
   }
 
+  #tempo {
+    top: 27%;
+    left: 79.7%;
+  }
+
+  #volume {
+    top: 27%;
+    left: 88.7%;
+  }
+
   .bottom-row {
     padding-left: 5%;
 
@@ -130,6 +140,16 @@ $aspect: 1800 / 1072 / 100;
     #delay_feedback {
       top: 28.2%;
       left: 71.8%;
+    }
+
+    #tempo {
+      top: 28.4%;
+      left: 80.9%;
+    }
+
+    #volume {
+      top: 28.4%;
+      left: 90%;
     }
   }
 }
