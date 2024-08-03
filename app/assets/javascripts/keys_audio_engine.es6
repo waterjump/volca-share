@@ -32,7 +32,7 @@ VS.KeysAudioEngine = function(patch) {
   delayFilter.frequency.setValueAtTime(2000, audioCtx.currentTime);
 
   const delayAmp = audioCtx.createGain();
-  delayAmp.gain.setValueAtTime(0.5, audioCtx.currentTime);
+  delayAmp.gain.setValueAtTime(patch.delay.feedback, audioCtx.currentTime);
   delay.connect(delayFilter);
   delayFilter.connect(delayAmp);
   delayAmp.connect(masterAmp);

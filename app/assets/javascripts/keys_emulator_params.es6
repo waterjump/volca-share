@@ -28,7 +28,7 @@ VS.KeysEmulatorParams = function() {
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 }
     ];
   this.ampEgOn = false;
-  this.delay = { time: 0.2, feedback: 0.5 }
+  this.delay = { time: 0.2, feedback: 0 }
   this.volume = 1;
 
   this.getPercentage = function(midiValue) {
@@ -132,7 +132,10 @@ VS.KeysEmulatorParams = function() {
 
   this.setdelay_time = function(midiValue) {
     // TODO: Implement machine specific values
-    this.delay.time = 0.01 + this.getPercentage(midiValue) * 0.79;
+    //  Max: 0.5
+    //  Mid: ~ 0.2
+    //  Min: 0.129
+    this.delay.time = 0.129 + this.getPercentage(midiValue) * 0.371;
   }
 
   this.setdelay_feedback = function(midiValue) {
