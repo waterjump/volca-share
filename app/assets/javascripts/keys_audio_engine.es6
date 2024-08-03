@@ -102,11 +102,22 @@ VS.KeysAudioEngine = function(patch) {
   const modGainSwitchController = audioCtx.createConstantSource();
   modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
 
+  // Early outputs for one and two note poly ring scenarios.
+  // The modGain amps are off by default unless that note of polyphony is
+  // playing.  The amps provide a bypass for when less notes are playing.
+  const oneNotePolyRingAmp = audioCtx.createGain();
+  oneNotePolyRingAmp.gain.value = 0;
+  oneNotePolyRingAmp.connect(ampEg);
+  const twoNotePolyRingAmp = audioCtx.createGain();
+  twoNotePolyRingAmp.gain.value = 0;
+  twoNotePolyRingAmp.connect(ampEg);
+
   const modGain2 = audioCtx.createGain();
   modGain2.gain.value = 0;
 
   const modGain3 = audioCtx.createGain();
   modGain3.gain.value = 0;
+  modGain2.connect(twoNotePolyRingAmp);
   modGain2.connect(modGain3);
   modGain3.connect(ampEg);
 
@@ -139,6 +150,7 @@ VS.KeysAudioEngine = function(patch) {
     if (oscNumber === 1) {
       oscillator.connect(thruGain);
       oscillator.connect(modGainSwitch);
+      modGainSwitch.connect(oneNotePolyRingAmp);
       modGainSwitch.connect(modGain2); // carrier
     } else if ( oscNumber === 2) {
       oscillator.connect(oscPolyMonoAmp2);
@@ -387,6 +399,10 @@ const runToneSequencer = function() {
     this.activateAudio();
     let frequency;
 
+    if (patch.voice === 'poly ring') {
+      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+    }
+
     // Filter EG reset
     filterEgOffsetParam.cancelAndHoldAtTime(time);
 
@@ -436,10 +452,18 @@ const runToneSequencer = function() {
       const frequency2 = Tone.Frequency(keysDown[1], 'midi').toFrequency();
       oscFreqNode2.offset.setValueAtTime(frequency2, audioCtx.currentTime);
       oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
+      if (patch.voice === 'poly ring') {
+        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+        twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      }
     } else if (keysDown.length === 3) {
       const frequency3 = Tone.Frequency(keysDown[2], 'midi').toFrequency();
       oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
       oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+      if (patch.voice === 'poly ring') {
+        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+        twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
     } else if (keysDown.length > 3) {
       // TODO: Behavior of actual synth is the replace the note nearest to it,
       //       replacing the higher note if its exactly between two.
@@ -451,8 +475,16 @@ const runToneSequencer = function() {
   this.stopPolyNote = function(keysDown) {
     if (keysDown.length === 1) {
       oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
+      if (patch.voice === 'poly ring') {
+        oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+        twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      }
     } else if (keysDown.length === 2) {
       oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+      if (patch.voice === 'poly ring') {
+        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+        twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      }
     } else if (keysDown.length > 2) {
       // TODO: Behavior of actual synth is the replace the note nearest to it,
       //       replacing the higher note if its exactly between two.
