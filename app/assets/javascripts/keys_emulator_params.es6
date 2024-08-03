@@ -1,6 +1,7 @@
 VS.KeysEmulatorParams = function() {
   const { emulatorConstants } = VS;
 
+  this.defaultVcoAmp = 0.33;
   this.tempo = 56;
   this.voice = 'unison';
   this.octave = 3;
@@ -39,20 +40,26 @@ VS.KeysEmulatorParams = function() {
         // NotImplemented
       },
       unison: function() {
-        console.log('KAE: unison voice');
         this.vco[3].voiceDetune = 0;
       }.bind(this),
+
       octave: function() {
-        console.log('KAE: octave voice');
         this.vco[3].voiceDetune = 1200;
       }.bind(this),
+
       fifth: function() {
-        console.log('KAE: fifth voice');
         this.vco[3].voiceDetune = 700;
+        [1, 2, 3].forEach(function(i) {
+          this.vco[i].shape = 'sawtooth';
+        }.bind(this));
       }.bind(this),
+
       'unison ring': function() {
-       // NotImplemented
-      },
+        this.vco[3].voiceDetune = 0;
+        [1, 2, 3].forEach(function(i) {
+          this.vco[i].shape = 'square';
+        }.bind(this));
+      }.bind(this),
       'poly ring': function() {
         // NotImplemented
       }

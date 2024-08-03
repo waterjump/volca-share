@@ -22,7 +22,6 @@ VS.KeysAudioEngine = function(patch) {
 
   // TODO: Encampsulate this setup script in its own function.
 
-
   // BEGIN delay
   const delay = audioCtx.createDelay();
   delay.delayTime.setValueAtTime(0.2, audioCtx.currentTime);
@@ -97,6 +96,20 @@ VS.KeysAudioEngine = function(patch) {
 
   setupOscLfo();
 
+  const thruGainSwitchController = audioCtx.createConstantSource();
+  thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
+
+  const modGainSwitchController = audioCtx.createConstantSource();
+  modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+
+  const modGain2 = audioCtx.createGain();
+  modGain2.gain.value = 0;
+
+  const modGain3 = audioCtx.createGain();
+  modGain3.gain.value = 0;
+  modGain2.connect(modGain3);
+  modGain3.connect(ampEg);
+
   // Setup oscilators
   [1, 2, 3].forEach(function(oscNumber) {
     let oscillator = audioCtx.createOscillator();
@@ -105,14 +118,33 @@ VS.KeysAudioEngine = function(patch) {
       patch.vco[oscNumber].detune,
       audioCtx.currentTime
     );
-
     oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
-
     osc[oscNumber] = oscillator;
-    osc[oscNumber].connect(ampEg);
-    ampLfoPitch.connect(osc[oscNumber].detune);
-    osc[oscNumber].start();
+    ampLfoPitch.connect(oscillator.detune);
+
+    const thruGain = audioCtx.createGain();
+    thruGain.gain.value = 0;
+    thruGainSwitchController.connect(thruGain.gain);
+    oscillator.connect(thruGain);
+    thruGain.connect(ampEg);
+
+    const modGainSwitch = audioCtx.createGain();
+    modGainSwitch.gain.value = 0;
+    modGainSwitchController.connect(modGainSwitch.gain);
+    oscillator.connect(modGainSwitch);
+
+    if (oscNumber === 1) {
+      modGainSwitch.connect(modGain2); // carrier
+    } else if ( oscNumber === 2) {
+      modGainSwitch.connect(modGain2.gain); // modulator
+    } else {
+      modGainSwitch.connect(modGain3.gain); // modulator
+    }
+    oscillator.start();
   });
+
+  thruGainSwitchController.start();
+  modGainSwitchController.start();
 
   const voiceOscDetuner3 = audioCtx.createConstantSource();
   voiceOscDetuner3.offset.setValueAtTime(0, audioCtx.currentTime);
@@ -350,8 +382,22 @@ const runToneSequencer = function() {
   };
 
   this.changeVoice = function() {
-    // only applies to unison, octave and fifth for now
+    // only applies to unison, octave and fifth, unison ring
     voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, audioCtx.currentTime);
+
+    osc.forEach((oscillator, index) => {
+      if (oscillator !== null) {
+        oscillator.type = patch.vco[index].shape;
+      }
+    });
+
+    if (patch.voice === 'unison ring') {
+      thruGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+      modGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+    } else {
+      thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
+      modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+    }
   };
 
   this.stopNote = function(time = audioCtx.currentTime) {
