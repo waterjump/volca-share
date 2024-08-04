@@ -19,6 +19,7 @@ VS.KeysAudioEngine = function(patch) {
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
   let sequencerPlaying = false;
+  let oscillatorNoteMap = { 1: -1, 2: -1, 3: -1 }
 
   // TODO: Encampsulate this setup script in its own function.
 
@@ -121,6 +122,8 @@ VS.KeysAudioEngine = function(patch) {
   modGain2.connect(modGain3);
   modGain3.connect(ampEg);
 
+  const oscPolyMonoAmp1 = audioCtx.createGain();
+  oscPolyMonoAmp1.gain.value = 1;
   const oscPolyMonoAmp2 = audioCtx.createGain();
   oscPolyMonoAmp2.gain.value = 1;
   const oscPolyMonoAmp3 = audioCtx.createGain();
@@ -148,8 +151,9 @@ VS.KeysAudioEngine = function(patch) {
     modGainSwitchController.connect(modGainSwitch.gain);
 
     if (oscNumber === 1) {
-      oscillator.connect(thruGain);
-      oscillator.connect(modGainSwitch);
+      oscillator.connect(oscPolyMonoAmp1);
+      oscPolyMonoAmp1.connect(thruGain);
+      oscPolyMonoAmp1.connect(modGainSwitch);
       modGainSwitch.connect(oneNotePolyRingAmp);
       modGainSwitch.connect(modGain2); // carrier
     } else if ( oscNumber === 2) {
@@ -397,7 +401,7 @@ const runToneSequencer = function() {
   this.playNewNote = function(time = audioCtx.currentTime) {
     debugNewNote = audioCtx.currentTime;
     this.activateAudio();
-    let frequency;
+    oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
 
     if (patch.voice === 'poly ring') {
       oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -413,7 +417,10 @@ const runToneSequencer = function() {
     ampEgGainParam.cancelAndHoldAtTime(time);
 
     // Set frequency of all oscillators
-    frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    const currentNote = this.notePlaying.getValueAtTime(time);
+    oscillatorNoteMap[1] = currentNote;
+
+    const frequency = Tone.Frequency(currentNote, 'midi').toFrequency();
     oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
@@ -446,65 +453,175 @@ const runToneSequencer = function() {
     oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
-  // Poly voices only!
-  this.addNote = function(keysDown) {
-    if (keysDown.length === 2) {
-      const frequency2 = Tone.Frequency(keysDown[1], 'midi').toFrequency();
-      oscFreqNode2.offset.setValueAtTime(frequency2, audioCtx.currentTime);
-      oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
-      if (patch.voice === 'poly ring') {
-        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-        twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+  const lowestFreeOscillator = () => {
+    for (let key in oscillatorNoteMap) {
+      if (oscillatorNoteMap[key] === -1) {
+        return parseInt(key);
       }
-    } else if (keysDown.length === 3) {
-      const frequency3 = Tone.Frequency(keysDown[2], 'midi').toFrequency();
-      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
-      oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
-      if (patch.voice === 'poly ring') {
-        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-        twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+    }
+    return null;
+  };
+
+  const findOscillatorPlayingClosestNote = function(target) {
+    let closestKey = null;
+    let smallestDifference = Infinity;
+
+    for (let key in oscillatorNoteMap) {
+      let difference = Math.abs(oscillatorNoteMap[key] - target);
+
+      if (
+        difference < smallestDifference ||
+        (difference === smallestDifference && oscillatorNoteMap[key] > oscillatorNoteMap[closestKey])
+      ) {
+        closestKey = key;
+        smallestDifference = difference;
       }
-    } else if (keysDown.length > 3) {
-      // TODO: Behavior of actual synth is the replace the note nearest to it,
-      //       replacing the higher note if its exactly between two.
-      const frequency3 = Tone.Frequency(keysDown[keysDown.length - 1], 'midi').toFrequency();
-      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
+    }
+
+    return parseInt(closestKey);
+  };
+
+  // NOTE: This will need changes for when carrier (osc1) stops playing
+  const adjustPolyRingAlgo = function(numberOfKeysDown) {
+    if (numberOfKeysDown === 2) {
+      oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+    } else if (numberOfKeysDown === 3) {
+      oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
     }
   };
 
-  this.stopPolyNote = function(keysDown) {
-    if (keysDown.length === 1) {
-      oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
-      if (patch.voice === 'poly ring') {
-        oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-        twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      }
-    } else if (keysDown.length === 2) {
-      oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
-      if (patch.voice === 'poly ring') {
-        oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-        twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-      }
-    } else if (keysDown.length > 2) {
-      // TODO: Behavior of actual synth is the replace the note nearest to it,
-      //       replacing the higher note if its exactly between two.
+  // TODO: Think about making an oscillator class to get rid off all
+  //       these switch cases.
+  // Poly voices only!
+  this.addNote = function(keysDown) {
+    const lowestFreeOsc = lowestFreeOscillator();
+    const noteToAdd = keysDown[keysDown.length -1];
+    const frequency = Tone.Frequency(noteToAdd, 'midi').toFrequency();
+    if (lowestFreeOsc !== null) {
+      oscillatorNoteMap[lowestFreeOsc] = noteToAdd;
 
-      // change osc3 to last note in keysDown
-      const frequency3 = Tone.Frequency(keysDown[keysDown.length - 1], 'midi').toFrequency();
-      oscFreqNode3.offset.setValueAtTime(frequency3, audioCtx.currentTime);
+      switch (lowestFreeOsc) {
+        case 1:
+          oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
+          break;
+        case 2:
+          oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
+          break;
+        case 3:
+          oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+          break;
+      }
+
+    } else {
+      // swap closest playing note
+      const closestOscillator = findOscillatorPlayingClosestNote(noteToAdd);
+      oscillatorNoteMap[closestOscillator] = noteToAdd;
+      switch (closestOscillator) {
+        case 1:
+          oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          break;
+        case 2:
+          oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          break;
+        case 3:
+          oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          break;
+      }
     }
+
+    adjustPolyRingAlgo(keysDown.length);
+  };
+
+  const findOscByNote = (note) => {
+    for (let key in oscillatorNoteMap) {
+      if (oscillatorNoteMap[key] === note) {
+        return parseInt(key);
+      }
+    }
+    return null;
+  };
+
+  const findClosestValue = function(arr, target) {
+    return arr.reduce((closest, current) => {
+      const closestDiff = Math.abs(closest - target);
+      const currentDiff = Math.abs(current - target);
+
+      // If current is closer, or the same distance but greater, update closest
+      if (
+        currentDiff < closestDiff ||
+        (currentDiff === closestDiff && current > closest)
+      ) {
+        return current;
+      } else {
+        return closest;
+      }
+    });
+  };
+
+  const swapPolyNote = function(keysDown, noteThatStopped, oscAffected) {
+    if (oscAffected === null) { return; }
+    // find notes that aren't playing
+    const notesStillPlaying = Object.values(oscillatorNoteMap);
+    const notesNotPlaying = keysDown.filter(note => !notesStillPlaying.includes(note));
+
+    let noteToSwapIn;
+    if (notesNotPlaying.length === 1) {
+      noteToSwapIn = notesNotPlaying[0];
+    } else {
+      noteToSwapIn = findClosestValue(notesNotPlaying, noteThatStopped);
+    }
+
+    const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
+    oscillatorNoteMap[oscAffected] = noteToSwapIn;
+
+    switch(oscAffected) {
+      case 1:
+        oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        break;
+      case 2:
+        oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        break;
+      case 3:
+        oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        break;
+      default:
+        // do nothing
+    }
+  };
+
+  this.stopPolyNote = function(keysDown, noteThatStopped) {
+    const oscAffected = findOscByNote(noteThatStopped);
+    if (oscAffected === null) { return; }
+
+    if (keysDown.length > 2) {
+      swapPolyNote(keysDown, noteThatStopped, oscAffected);
+    } else {
+      oscillatorNoteMap[oscAffected] = -1;
+      switch(oscAffected) {
+        case 1:
+          oscPolyMonoAmp1.gain.setValueAtTime(0, audioCtx.currentTime);
+          break;
+        case 2:
+          oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
+          break;
+        case 3:
+          oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+          break;
+        default:
+          // do nothing
+      }
+    }
+
+    adjustPolyRingAlgo(keysDown.length);
   };
 
   this.changeVoice = function() {
     /*
-    Voices implemented:
-    [X] poly
-    [X] unison
-    [X] octave and
-    [X] fifth
-    [X] unison ring
-    [ ] poly ring
-
     TODO: Try to break out the configurations of different voices
           into an object or something.
     */

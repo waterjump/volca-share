@@ -67,11 +67,12 @@ VS.KeysEmulator = function() {
 
   changeOctave(0);
 
-  const keyboardDown = function(){
+  const keyboardDown = function(keyCode){
+    keysDown.push(keyCode);
     // if (audioEngine.getSequencerPlaying()) { return; }
-    if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
-      keysDown.push(audioEngine.getNotePlaying());
-    }
+    // if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
+    //  keysDown.push(audioEngine.getNotePlaying());
+    // }
 
     if (keysDown.length === 1) {
       audioEngine.playNewNote();
@@ -90,11 +91,12 @@ VS.KeysEmulator = function() {
 
   const keyboardUp = function(keyUp) {
     // if (audioEngine.getSequencerPlaying()) { return; }
-    keysDown = keysDown.filter(key => key !== octaveAdjustedKeyCode(keyUp.keyCode));
+    const noteThatStopped = octaveAdjustedKeyCode(keyUp.keyCode);
+    keysDown = keysDown.filter(key => key !== noteThatStopped);
 
     if (keysDown.length > 0) {
       if (patch.voice.includes('poly')) {
-        audioEngine.stopPolyNote(keysDown);
+        audioEngine.stopPolyNote(keysDown, noteThatStopped);
         return;
       } else {
         audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
@@ -103,6 +105,7 @@ VS.KeysEmulator = function() {
       }
     }
 
+    audioEngine.stopPolyNote(keysDown, noteThatStopped);
     audioEngine.stopNote();
   };
 
@@ -184,9 +187,9 @@ VS.KeysEmulator = function() {
 
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
-      audioEngine.setNotePlaying(octaveAdjustedKeyCode(keyDown.keyCode));
-
-      keyboardDown();
+      const adjustedKeyDown = octaveAdjustedKeyCode(keyDown.keyCode);
+      audioEngine.setNotePlaying(adjustedKeyDown);
+      keyboardDown(adjustedKeyDown);
     }
 
     // CHANGE OCTAVE
@@ -307,9 +310,10 @@ VS.KeysEmulator = function() {
 
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
-    audioEngine.setNotePlaying(octaveAdjustedKeyCode($(this).data('keycode')));
+    const keyCode = octaveAdjustedKeyCode($(this).data('keycode'))
+    audioEngine.setNotePlaying(keyCode);
 
-    keyboardDown();
+    keyboardDown(keyCode);
   });
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
