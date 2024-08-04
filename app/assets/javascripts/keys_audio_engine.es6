@@ -18,7 +18,6 @@ VS.KeysAudioEngine = function(patch) {
   const ampLfoCutoff = audioCtx.createGain()
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
-  let sequencerPlaying = false;
   let oscillatorNoteMap = { 1: -1, 2: -1, 3: -1 }
 
   // TODO: Encampsulate this setup script in its own function.
@@ -274,10 +273,6 @@ VS.KeysAudioEngine = function(patch) {
 
   // END get browser capabilities
 
-  // ===================================
-  //  SEQUENCER
-  // ===================================
-
   const setTempo = () => {
     // this is needed to change loop interval
     Tone.Transport.bpm.value = patch.tempo;
@@ -288,64 +283,6 @@ VS.KeysAudioEngine = function(patch) {
       // idc
     }
   };
-
-const runToneSequencer = function() {
-  setTempo();
-
-  let i = 0;
-  let previousStep;
-
-  // Calculate tempo-based gate duration only once
-
-    Tone.Transport.scheduleRepeat(function(time) {
-      if (!sequencerPlaying) return;
-
-      let activeStepFound = false;
-
-      // Find the next active step
-      for (let j = 0; j < 16; j++) {
-        i = i % 16;
-        if (sequence[i].activeStep) {
-          activeStepFound = true;
-          break;
-        }
-        i++;
-      }
-
-      // Bail out if no active steps are found
-      if (!activeStepFound) return;
-      const gateDurationFactor = 0.58 * (60 / (patch.tempo * 4));
-
-      const gateEnd = time + gateDurationFactor;
-
-      let currentStep = sequence[i];
-      this.setNotePlaying(currentStep.note, time);
-
-      // Simplified logic for handling step mode and slide
-      if (currentStep.stepMode) {
-        if (previousStep && previousStep.slide) {
-          if (previousStep.stepMode) {
-            this.changeCurrentNote(time);
-          } else {
-            this.playNewNote(time);
-            if (!currentStep.slide) {
-              this.stopNote(gateEnd);
-            }
-          }
-        } else {
-          this.playNewNote(time);
-          if (!currentStep.slide) {
-            this.stopNote(gateEnd);
-          }
-        }
-      }
-
-      previousStep = currentStep;
-      i++;
-    }.bind(this), '16n');
-  }.bind(this);
-
-  runToneSequencer();
 
   this.init = () => {
     Tone.setContext(myToneCtx);
@@ -382,7 +319,7 @@ const runToneSequencer = function() {
     if (patch.ampEgOn) {
       ampEgGainParam.setValueAtTime(1, attackEndTimeValue);
 
-      if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
+      if (browserFeatures['customCurveClearing']) {
         // use custom curve
         ampEgGainParam.setValueCurveAtTime(
           VS.emulatorConstants.decayReleaseGainCurve,
@@ -681,7 +618,7 @@ const runToneSequencer = function() {
 
         const duration = currentValue * patch.envelope.decayRelease;
 
-        if (browserFeatures['customCurveClearing'] && !sequencerPlaying) {
+        if (browserFeatures['customCurveClearing']) {
           // custom curve
           const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
             function(value) { return value * currentValue }
@@ -769,25 +706,6 @@ const runToneSequencer = function() {
 
   this.setTempo = () => {
     setTempo();
-  };
-
-  this.startSequencer = () => {
-    sequencerPlaying = true;
-    Tone.Transport.start('+0');
-  };
-
-  this.stopSequencer = () => {
-    sequencerPlaying = false;
-    Tone.Transport.stop();
-    this.stopNote(Tone.now() + 0.2);
-  };
-
-  this.getSequencerPlaying = () => {
-    return sequencerPlaying;
-  };
-
-  this.setSequencerPlaying = (value) => {
-    sequencerPlaying = value;
   };
 
   this.getOsc = (index) => {

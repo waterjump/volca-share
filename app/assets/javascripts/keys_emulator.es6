@@ -27,8 +27,7 @@ VS.KeysEmulator = function() {
       '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
       '<span aria-hidden="true">&times;</span></button>' +
       '<strong>Just a heads up: </strong><br />' +
-      'There are known performance issues with this browser, ' +
-      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
+      'There are known performance issues with this browser.' +
       'For best results, use a <a class="alert-link" target="_blank" ' +
       'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
       'supported browser.</a>'
@@ -47,7 +46,6 @@ VS.KeysEmulator = function() {
     new VS.Knob(this).setKnob($(this).data('midi'));
   });
 
-  // NOTE: This message will not be used by the sequencer.
   const changeOctave = function(change) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
@@ -69,7 +67,6 @@ VS.KeysEmulator = function() {
 
   const keyboardDown = function(keyCode){
     keysDown.push(keyCode);
-    // if (audioEngine.getSequencerPlaying()) { return; }
     // if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
     //  keysDown.push(audioEngine.getNotePlaying());
     // }
@@ -90,7 +87,6 @@ VS.KeysEmulator = function() {
   };
 
   const keyboardUp = function(keyUp) {
-    // if (audioEngine.getSequencerPlaying()) { return; }
     const noteThatStopped = octaveAdjustedKeyCode(keyUp.keyCode);
     keysDown = keysDown.filter(key => key !== noteThatStopped);
 
@@ -108,65 +104,6 @@ VS.KeysEmulator = function() {
     audioEngine.stopPolyNote(keysDown, noteThatStopped);
     audioEngine.stopNote();
   };
-
-  $('#play').on('click tap', function() {
-    audioEngine.activateAudio();
-    $('#stop').toggleClass('hidden');
-    if (audioEngine.getSequencerPlaying()) {
-      // STOP
-      macroStopSequencer();
-    } else {
-      // START
-      audioEngine.startSequencer();
-      macroStepRecOff();
-    }
-  });
-
-  const macroStepRecOn = () => {
-    if (patch.stepRecEnabled) { return; }
-    patch.stepRecEnabled = true;
-    startBlink('#record-button');
-    patch.stepRecIndex = 1;
-    $('#skip-step').removeClass('hidden');
-    $(`#step_${patch.stepRecIndex - 1}`).addClass('highlighted');
-  };
-
-  $('#skip-step').on('click tap', (e) => {
-    stepRecordNote(true);
-  });
-
-  const macroStepRecOff = () => {
-    if (!patch.stepRecEnabled) { return; }
-
-    patch.stepRecEnabled = false;
-    stopBlink('#record-button');
-    $('.step.highlighted').removeClass('highlighted');
-    let jRecButton = $('#record-button');
-    if (jRecButton.hasClass('lit')) { jRecButton.toggleClass('lit unlit'); }
-    $('#skip-step').addClass('hidden');
-  };
-
-  const macroStopSequencer = () => {
-    if (!audioEngine.getSequencerPlaying()) { return; }
-
-    audioEngine.stopSequencer();
-    if ($('#play').hasClass('lit')) { $('#play').toggleClass('lit unlit'); }
-    if (!$('#stop').hasClass('hidden')) { $('#stop').addClass('hidden'); }
-  };
-
-  $('#record-button').on('click tap', () => {
-    macroStopSequencer();
-
-    if (!patch.stepRecEnabled) {
-      macroStepRecOn();
-    } else {
-      macroStepRecOff();
-    }
-  });
-
-  // ===================================
-  //  END Sequencer experiment
-  // ===================================
 
   const macroOctaveUp = () => {
     if (patch.octave >= 9) { return }
@@ -205,7 +142,7 @@ VS.KeysEmulator = function() {
 
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
-    if (document.hidden && !audioEngine.getSequencerPlaying()) {
+    if (document.hidden) {
       audioEngine.stopNote();
     }
   });
