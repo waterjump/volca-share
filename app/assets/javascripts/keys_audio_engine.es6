@@ -5,7 +5,6 @@ VS.KeysAudioEngine = function(patch) {
 
   const audioCtx = new AudioContext();
   const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  this.notePlaying = new Tone.Param(audioCtx.createGain().gain);
   const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
   const masterAmp = audioCtx.createGain();
   const filter = audioCtx.createBiquadFilter();
@@ -204,6 +203,8 @@ VS.KeysAudioEngine = function(patch) {
   polyNoteAmp2.connect(osc[2].frequency);
   oscFreqNode2.start();
 
+  const oscFreqNodeOffsetParam2 = new Tone.Param(oscFreqNode2.offset);
+
   const oscFreqNode3 = audioCtx.createConstantSource();
   oscFreqNode3.offset.setValueAtTime(440, audioCtx.currentTime);
   const polyNoteAmp3 = audioCtx.createGain();
@@ -211,6 +212,8 @@ VS.KeysAudioEngine = function(patch) {
   oscFreqNode3.connect(polyNoteAmp3);
   polyNoteAmp3.connect(osc[3].frequency);
   oscFreqNode3.start();
+
+  const oscFreqNodeOffsetParam3 = new Tone.Param(oscFreqNode3.offset);
 
   // Switch for unison note frequencies
   const unisonNoteSwitchController = audioCtx.createConstantSource();
@@ -335,7 +338,7 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.playNewNote = function(time = audioCtx.currentTime) {
+  this.playNewNote = function(note, time = audioCtx.currentTime) {
     debugNewNote = audioCtx.currentTime;
     this.activateAudio();
     oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -354,7 +357,7 @@ VS.KeysAudioEngine = function(patch) {
     ampEgGainParam.cancelAndHoldAtTime(time);
 
     // Set frequency of all oscillators
-    const currentNote = this.notePlaying.getValueAtTime(time);
+    const currentNote = note;
     oscillatorNoteMap[1] = currentNote;
 
     const frequency = Tone.Frequency(currentNote, 'midi').toFrequency();
@@ -380,8 +383,8 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.changeCurrentNote = function(time = audioCtx.currentTime) {
-    let frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+  this.changeCurrentNote = function(note, time = audioCtx.currentTime) {
+    let frequency = Tone.Frequency(note, 'midi').toFrequency();
     let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
 
     oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
@@ -642,15 +645,33 @@ VS.KeysAudioEngine = function(patch) {
 
   // CHANGE OCTAVE
   this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
-    this.notePlaying.setValueAtTime(
-      this.notePlaying.getValueAtTime(time) + octaveOffset,
-      time
-    );
+    // TODO: This function is in need of a refactor.
 
-    const frequency =
-      Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
+    if (oscillatorNoteMap[1] !== -1) {
+      const newNote1 = oscillatorNoteMap[1] + octaveOffset;
+      oscillatorNoteMap[1] = newNote1;
+      const frequency = Tone.Frequency(newNote1, 'midi').toFrequency();
+      oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    }
 
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    if (oscillatorNoteMap[2] !== -1) {
+      const frequency2 = Tone.Frequency(
+        oscillatorNoteMap[2] + octaveOffset,
+        'midi'
+      ).toFrequency();
+      oscillatorNoteMap[2] = oscillatorNoteMap[2] + octaveOffset;
+      oscFreqNodeOffsetParam2.setValueAtTime(frequency2, time);
+    }
+
+    if (oscillatorNoteMap[3] !== -1) {
+      const frequency3 = Tone.Frequency(
+        oscillatorNoteMap[3] + octaveOffset,
+        'midi'
+      ).toFrequency();
+      oscillatorNoteMap[3] = oscillatorNoteMap[3] + octaveOffset;
+
+      oscFreqNodeOffsetParam3.setValueAtTime(frequency3, time);
+    }
   };
 
   this.setPeak = (value) => {
@@ -692,13 +713,9 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.setNotePlaying = (value, time = audioCtx.currentTime) => {
-    this.notePlaying.setValueAtTime(value, time);
-  };
-
-  this.getNotePlaying = () => {
-    return this.notePlaying.getValueAtTime(audioCtx.currentTime);
-  };
+  this.noteIsPlaying = () => {
+    return Object.values(oscillatorNoteMap).some(value => value !== -1);
+  }
 
   this.setOscPitch = (index, value) => {
     osc[index].detune.setValueAtTime(value, audioCtx.currentTime);

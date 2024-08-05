@@ -52,7 +52,7 @@ VS.KeysEmulator = function() {
     // Turn octave knob
     new VS.Knob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
 
-    if (audioEngine.getNotePlaying() === undefined) { return; } // at init time
+    if (!audioEngine.noteIsPlaying()) { return; } // at init time
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
@@ -65,18 +65,18 @@ VS.KeysEmulator = function() {
 
   changeOctave(0);
 
-  const keyboardDown = function(keyCode){
-    keysDown.push(keyCode);
+  const keyboardDown = function(note){
+    keysDown.push(note);
     // if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
     //  keysDown.push(audioEngine.getNotePlaying());
     // }
 
     if (keysDown.length === 1) {
-      audioEngine.playNewNote();
+      audioEngine.playNewNote(note);
     } else if (patch.voice.includes('poly')){
       audioEngine.addNote(keysDown);
     } else {
-      audioEngine.changeCurrentNote();
+      audioEngine.changeCurrentNote(note);
     }
   };
 
@@ -95,8 +95,7 @@ VS.KeysEmulator = function() {
         audioEngine.stopPolyNote(keysDown, noteThatStopped);
         return;
       } else {
-        audioEngine.setNotePlaying(keysDown[keysDown.length - 1]);
-        audioEngine.changeCurrentNote();
+        audioEngine.changeCurrentNote(keysDown[keysDown.length - 1]);
         return;
       }
     }
@@ -125,7 +124,6 @@ VS.KeysEmulator = function() {
     // PLAY NOTES
     if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
       const adjustedKeyDown = octaveAdjustedKeyCode(keyDown.keyCode);
-      audioEngine.setNotePlaying(adjustedKeyDown);
       keyboardDown(adjustedKeyDown);
     }
 
@@ -247,10 +245,8 @@ VS.KeysEmulator = function() {
 
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {
-    const keyCode = octaveAdjustedKeyCode($(this).data('keycode'))
-    audioEngine.setNotePlaying(keyCode);
-
-    keyboardDown(keyCode);
+    const note = octaveAdjustedKeyCode($(this).data('keycode'))
+    keyboardDown(note);
   });
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
