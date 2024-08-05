@@ -690,10 +690,6 @@ VS.KeysAudioEngine = function(patch) {
     masterAmp.gain.setValueAtTime(value, time);
   };
 
-  this.setOscMuteAmp = (oscNumber, value) => {
-    oscMuteAmps[oscNumber].gain.setValueAtTime(value, audioCtx.currentTime);
-  };
-
   this.setLfoRate = (value) => {
     oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
   };
@@ -714,20 +710,8 @@ VS.KeysAudioEngine = function(patch) {
     return Object.values(oscillatorNoteMap).some(value => value !== -1);
   }
 
-  this.setOscPitch = (index, value) => {
-    osc[index].detune.setValueAtTime(value, audioCtx.currentTime);
-  };
-
   this.setTempo = () => {
     setTempo();
-  };
-
-  this.getOsc = (index) => {
-    return osc[index];
-  };
-
-  this.setOscShape = (index, value) => {
-    osc[index].type = value;
   };
 
   this.setDetune = () => {

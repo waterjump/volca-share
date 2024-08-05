@@ -155,41 +155,12 @@ VS.KeysEmulatorParams = function() {
       emulatorConstants.pitchMap[this.vco[oscNumber].pitchMidi] * 100;
   };
 
-  this.setvco1_pitch = function(midiValue) {
-    this.setvco_pitch(1, midiValue);
-  };
-
-  this.setvco2_pitch = function(midiValue) {
-    this.setvco_pitch(2, midiValue);
-  };
-
-  this.setvco3_pitch = function(midiValue) {
-    this.setvco_pitch(3, midiValue);
-  };
-
-  this.setvco_active = function(oscNumber, value) {
-    this.vco[oscNumber].amp = value === 'true' ? this.defaultVcoAmp : 0;
-  };
-  this.setvco1_active = function(value) {
-    this.setvco_active(1, value);
-  };
-  this.setvco2_active = function(value) {
-    this.setvco_active(2, value);
-  };
-  this.setvco3_active = function(value) {
-    this.setvco_active(3, value);
-  };
   this.setvolume = function(value) {
     this.volume = this.getPercentage(value);
   };
+
   this.setlfo_wave = function(shape) {
     this.lfo.shape = shape;
-  };
-  this.setamp_eg_on = function(value) {
-    this.ampEgOn = (value === 'true');
-  };
-  this.toggleVcoAmp = function(oscNumber) {
-    this.vco[oscNumber].amp = this.vco[oscNumber].amp === 0 ? this.defaultVcoAmp : 0;
   };
 
   // UTILITY FUNCTIONS

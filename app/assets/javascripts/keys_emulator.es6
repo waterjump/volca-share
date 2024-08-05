@@ -207,40 +207,10 @@ VS.KeysEmulator = function() {
     audioEngine.setLfoCutoffInt();
   });
 
-  [1, 2, 3].forEach(oscNumber => {
-    $(`#vco${oscNumber}_pitch`).on('knobturn', () => {
-      patch[`setvco${oscNumber}_pitch`](VS.activeKnob.midi());
-      audioEngine.setOscPitch(oscNumber, patch.vco[oscNumber].detune);
-    });
-  });
-
   $('#volume').on('knobturn', () => {
     patch.setvolume(VS.activeKnob.midi());
     audioEngine.setVolume(patch.volume);
   });
-
-  const toggleVcoAmp = function(oscNumber) {
-    patch.toggleVcoAmp(oscNumber);
-    audioEngine.setOscMuteAmp(oscNumber, patch.vco[oscNumber].amp);
-  };
-
-  // LFO PITCH INT
-  document.getElementById('lfo_pitch_int').addEventListener(
-    'change',
-    function(event) {
-      patch.lfo.targetAmp = !patch.lfo.targetAmp;
-      audioEngine.setAmpLfoAmpGain();
-    }
-  );
-
-  // LFO CUTOFF INT
-  document.getElementById('lfo_cutoff_int').addEventListener(
-    'change',
-    function(event) {
-      patch.lfo.targetPitch = !patch.lfo.targetPitch;
-      audioEngine.setAmpLfoPitchGain();
-    }
-  );
 
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function() { macroOctaveUp() });
@@ -256,26 +226,6 @@ VS.KeysEmulator = function() {
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
     keyboardUp({ keyCode: $(this).data('keycode') });
-  });
-
-  // TOOLTIPS
-  const itemsComingSoon = [
-    'label[for="patch_vco_group_one"]',
-    'label[for="patch_vco_group_two"]'
-  ];
-
-  itemsComingSoon.forEach(function(selector) {
-    $(selector).mouseenter(function() {
-      if (VS.dragging) { return; }
-      $('.cooltip').text("Coming soon!");
-      $('.cooltip').show();
-    });
-  });
-
-  itemsComingSoon.forEach(function(selector) {
-    $(selector).mouseleave(function() {
-      $('.cooltip').hide();
-    });
   });
 
   $('#octave').mouseenter(function() {
