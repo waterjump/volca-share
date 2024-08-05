@@ -197,9 +197,14 @@ VS.KeysEmulator = function() {
     audioEngine.setLfoRate(patch.lfo.frequency);
   });
 
-  $('#lfo_int').on('knobturn', () => {
-    patch.setlfo_int(VS.activeKnob.trueMidi());
-    audioEngine.setLfoInt();
+  $('#lfo_pitch_int').on('knobturn', () => {
+    patch.setlfo_pitch_int(VS.activeKnob.trueMidi());
+    audioEngine.setLfoPitchInt();
+  });
+
+  $('#lfo_cutoff_int').on('knobturn', () => {
+    patch.setlfo_cutoff_int(VS.activeKnob.trueMidi());
+    audioEngine.setLfoCutoffInt();
   });
 
   [1, 2, 3].forEach(oscNumber => {

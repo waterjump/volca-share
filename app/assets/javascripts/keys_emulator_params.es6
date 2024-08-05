@@ -116,11 +116,17 @@ VS.KeysEmulatorParams = function() {
     // let oldValue = (this.getPercentage(midiValue)**3 * 35) + 0.1;
     this.lfo.frequency = calculateMappedParameter('lfoRate', midiValue);
   };
-  this.setlfo_int = function(midiValue) {
+
+  this.setlfo_pitch_int = function(midiValue) {
+    // TODO: Implement machine specific values
     percentage = this.getPercentage(midiValue);
     this.lfo.pitchValue = percentage * 900;
+  };
+
+  this.setlfo_cutoff_int = function(midiValue) {
+    // TODO: Implement machine specific values
+    percentage = this.getPercentage(midiValue);
     this.lfo.cutoffValue = percentage**2 * 4800;
-    this.lfo.ampValue = percentage;
   };
 
   this.setdetune = function(midiValue) {

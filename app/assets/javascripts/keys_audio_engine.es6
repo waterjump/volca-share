@@ -702,15 +702,12 @@ VS.KeysAudioEngine = function(patch) {
     oscLfo.type = value;
   }
 
-  this.setLfoInt = (value) => {
-    // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
-    if (patch.lfo.targetPitch) {
-      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-    }
+  this.setLfoPitchInt = () => {
+    ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+  }
 
-    if (patch.lfo.targetCutoff) {
-      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
-    }
+  this.setLfoCutoffInt = () => {
+    ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
   };
 
   this.noteIsPlaying = () => {
