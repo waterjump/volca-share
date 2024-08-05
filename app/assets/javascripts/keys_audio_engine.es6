@@ -423,7 +423,12 @@ VS.KeysAudioEngine = function(patch) {
 
   // NOTE: This will need changes for when carrier (osc1) stops playing
   const adjustPolyRingAlgo = function(numberOfKeysDown) {
-    if (numberOfKeysDown === 2) {
+    if (patch.voice !== 'poly ring') { return; }
+
+    if (numberOfKeysDown === 1) {
+      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+    } else if (numberOfKeysDown === 2) {
       oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
       twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
     } else if (numberOfKeysDown === 3) {
