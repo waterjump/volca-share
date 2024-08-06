@@ -313,33 +313,40 @@ VS.KeysAudioEngine = function(patch) {
     setupOscLfo();
   };
 
-  const triggerDecay = function(attackEndTimeValue) {
+  const triggerDecayRelease = function(time = audioCtx.currentTime) {
+    const isDecay = Object.values(oscillatorNoteMap).some(value => value !== -1);
+    const endValue = isDecay ? patch.envelope.sustain : 0;
+    let duration;
+    const currentValue = ampEgGainParam.getValueAtTime(time);
+
+    // filterEgOffsetParam.cancelAndHoldAtTime(time);
+    filterEgOffsetParam.cancelScheduledValues(time);
     filterEgOffsetParam.linearRampToValueAtTime(
-      0,
-      attackEndTimeValue + (patch.envelope.decayRelease * patch.filterEgCoefficient)
+     endValue,
+     time + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
 
-    if (patch.ampEgOn) {
-      ampEgGainParam.setValueAtTime(1, attackEndTimeValue);
+    if (isDecay) {
+      ampEgGainParam.setValueAtTime(1, time);
+      duration = patch.envelope.decayRelease;
+    } else {
+      ampEgGainParam.cancelAndHoldAtTime(time); // kill attack in progress
+      ampEgGainParam.setValueAtTime(currentValue, time);  // stop at current value
+      duration = currentValue * patch.envelope.decayRelease;
+    }
 
-      if (browserFeatures['customCurveClearing']) {
-        // use custom curve
-        ampEgGainParam.setValueCurveAtTime(
-          VS.emulatorConstants.decayReleaseGainCurve,
-          attackEndTimeValue,
-          patch.envelope.decayRelease
-        )
-      } else {
-        ampEgGainParam.linearRampToValueAtTime(
-          0,
-          attackEndTimeValue + patch.envelope.decayRelease
-        )
-      }
+    if (browserFeatures['customCurveClearing']) {
+      // use custom curve (scaled to amount between current and end values)
+      const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
+        function(value) { return value * (currentValue - endValue) + endValue }
+      );
+      ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
+    } else {
+      ampEgGainParam.linearRampToValueAtTime(endValue, time + duration)
     }
   };
 
   this.playNewNote = function(note, time = audioCtx.currentTime) {
-    debugNewNote = audioCtx.currentTime;
     this.activateAudio();
     oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
 
@@ -356,14 +363,12 @@ VS.KeysAudioEngine = function(patch) {
     // Amp EG reset
     ampEgGainParam.cancelAndHoldAtTime(time);
 
-    // Set frequency of all oscillators
-    const currentNote = note;
-    oscillatorNoteMap[1] = currentNote;
-
-    const frequency = Tone.Frequency(currentNote, 'midi').toFrequency();
+    // Set frequency of oscillators
+    oscillatorNoteMap[1] = note;
+    const frequency = Tone.Frequency(note, 'midi').toFrequency();
     oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
 
-    if (patch.ampEgOn && patch.envelope.attack > 0) {
+    if (patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
       ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
     } else {
@@ -378,9 +383,7 @@ VS.KeysAudioEngine = function(patch) {
     filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
 
     // Decay
-    if (!patch.sustainOn) {
-      triggerDecay(attackEndTimeValue);
-    }
+    triggerDecayRelease(attackEndTimeValue);
   };
 
   this.changeCurrentNote = function(note, time = audioCtx.currentTime) {
@@ -540,6 +543,12 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   this.stopPolyNote = function(keysDown, noteThatStopped) {
+    // important because EG uses oscillatorNoteMap to determine decay vs release
+    if (keysDown.length === 0) {
+      [1, 2, 3].forEach(i => oscillatorNoteMap[i] = -1);
+    }
+    if (!patch.voice.includes('poly')) { return; }
+
     const oscAffected = findOscByNote(noteThatStopped);
     if (oscAffected === null) { return; }
 
@@ -602,50 +611,8 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.stopNote = function(time = audioCtx.currentTime) {
-    // console.log('QDEBUG:', time - debugNewNote);
-    const currentValue = ampEgGainParam.getValueAtTime(time);
-
-    // If note is already off, don't bother stopping it.
-    if (currentValue === 0) { return; }
-
-    if (patch.ampEgOn) {
-      if (patch.sustainOn || (time < attackEndTime.getValueAtTime(time))) {
-
-        // filter envelope
-        filterEgOffsetParam.cancelAndHoldAtTime(time);
-
-        // TODO: Use custom curve for filter?
-        filterEgOffsetParam.linearRampToValueAtTime(
-          0,
-          time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
-        );
-
-        // Amp eg
-        ampEgGainParam.cancelAndHoldAtTime(time);
-
-        const duration = currentValue * patch.envelope.decayRelease;
-
-        if (browserFeatures['customCurveClearing']) {
-          // custom curve
-          const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
-            function(value) { return value * currentValue }
-          );
-          ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
-        } else {
-          ampEgGainParam.linearRampToValueAtTime(0, time + duration);
-        }
-      }
-
-    } else {
-      // Filter cutoff down immediately
-      filterEg.offset.cancelScheduledValues(time);
-      filterEg.offset.setValueAtTime(0, time);
-
-      // Turn amp down immediately
-      ampEgGainParam.setValueAtTime(1, time);
-      ampEgGainParam.linearRampToValueAtTime(0, time + builtInDecay);
-    }
+  this.stopNote = function() {
+    triggerDecayRelease();
   };
 
   // CHANGE OCTAVE

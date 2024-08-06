@@ -151,7 +151,7 @@ VS.KeysEmulator = function() {
     audioEngine.setTempo();
   });
 
-  ['attack', 'decay_release', 'portamento'].forEach(id => {
+  ['attack', 'decay_release', 'portamento', 'sustain'].forEach(id => {
     $(`#${id}`).on('knobturn', () => {
       patch[`set${id}`](VS.activeKnob.trueMidi());
     });

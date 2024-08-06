@@ -27,7 +27,6 @@ VS.KeysEmulatorParams = function() {
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 },
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 }
     ];
-  this.ampEgOn = false;
   this.delay = { time: 0.2, feedback: 0 }
   this.volume = 1;
 
@@ -86,12 +85,18 @@ VS.KeysEmulatorParams = function() {
     // Based on collected data from Volca Bass
     this.envelope.attack = this.getPercentage(midiValue) * 0.86;
   };
+
   this.setdecay_release = function(midiValue) {
     // Keeping these old formulas bc I might do a before and after.
     // let oldValue = 5 * this.getPercentage(midiValue)**3 + 0.05;
     this.envelope.decayRelease =
       calculateMappedParameter('decayRelease', midiValue);
   };
+
+  this.setsustain = function(midiValue) {
+    this.envelope.sustain = this.getPercentage(midiValue);
+  };
+
   this.setcutoff_eg_int = function(midiValue) {
     // let oldValueInHz = this.getPercentage(midiValue)**2 * 10000;
     // TODO: This needs adjusting.  NOTE: It's in cents now.  Not Hz.
