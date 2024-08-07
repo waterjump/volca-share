@@ -78,9 +78,11 @@ VS.KeysEmulatorParams = function() {
       this.voiceChange[this.voice]()
     }
   };
+
   this.settempo = function(midiValue) {
     this.tempo = calculateTempo(midiValue);
   };
+
   this.setattack = function(midiValue) {
     // Based on collected data from Volca Bass
     this.envelope.attack = this.getPercentage(midiValue) * 0.86;

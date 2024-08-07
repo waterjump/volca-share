@@ -222,6 +222,21 @@ VS.KeysEmulator = function() {
     audioEngine.setVolume(patch.volume);
   });
 
+  // LFO WAVE
+  $('#patch_lfo_shape_saw').on('change', function(event) {
+    audioEngine.setLfoWave($(this).val());
+  });
+
+  // LFO WAVE
+  $('#patch_lfo_shape_triangle').on('change', function(event) {
+    audioEngine.setLfoWave($(this).val());
+  });
+
+  // LFO WAVE
+  $('#patch_lfo_shape_square').on('change', function(event) {
+    audioEngine.setLfoWave($(this).val());
+  });
+
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function() { macroOctaveUp() });
 
@@ -260,4 +275,11 @@ VS.KeysEmulator = function() {
     $('#back-to-desktop').addClass('hidden');
     $('#desktop-instructions').show();
   })
+
+  $('.bottom-row .multi').on('click tap', function() {
+    $('.light[data-radio]').each(function() {
+      $(this).removeClass('lit');
+    });
+    $(this).find('.light').addClass('lit');
+  });
 };
