@@ -13,11 +13,33 @@ VS.KeysAudioEngine = function(patch) {
   const filterEgOffsetParam = new Tone.Param(filterEg.offset);
   const ampEg = audioCtx.createGain();
   const ampEgGainParam = new Tone.Param(ampEg.gain);
-  const ampLfoPitch = audioCtx.createGain()
-  const ampLfoCutoff = audioCtx.createGain()
+  const universalEg = audioCtx.createConstantSource();
+  const universalEgOffsetParam = new Tone.Param(universalEg.offset);
+  const vcoEgShaper = audioCtx.createWaveShaper();
+  const vcoEgIntAmp = audioCtx.createGain();
+  const ampLfoPitch = audioCtx.createGain();
+  const ampLfoCutoff = audioCtx.createGain();
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
   let oscillatorNoteMap = { 1: -1, 2: -1, 3: -1 }
+
+  const makeVcoEgShaperCurve = function() {
+    const curve = new Float32Array(256);
+    const sustain = patch.envelope.sustain;
+
+    for (let i = 0; i < 256; i++) {
+      // Counterintuitively, the shaper is excepting -1 to 1 range even
+      // though it appears that the universalEgOffsetParam outputs values
+      // in range 0 to 1.  Not sure why, but this works.
+      const x = (i - 128) / 128; // Normalize input range (-1 to 1)
+
+      curve[i] = x - sustain;
+    }
+    return curve;
+  }
+
+  vcoEgShaper.curve = makeVcoEgShaperCurve();
+  vcoEgShaper.oversample = 'none';
 
   // TODO: Encampsulate this setup script in its own function.
 
@@ -127,6 +149,8 @@ VS.KeysAudioEngine = function(patch) {
   const oscPolyMonoAmp3 = audioCtx.createGain();
   oscPolyMonoAmp3.gain.value = 1;
 
+  vcoEgIntAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+
   // Setup oscilators
   [1, 2, 3].forEach(function(oscNumber) {
     let oscillator = audioCtx.createOscillator();
@@ -138,6 +162,7 @@ VS.KeysAudioEngine = function(patch) {
     oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
     osc[oscNumber] = oscillator;
     ampLfoPitch.connect(oscillator.detune);
+    vcoEgIntAmp.connect(oscillator.detune);
 
     const thruGain = audioCtx.createGain();
     thruGain.gain.value = 0;
@@ -167,6 +192,11 @@ VS.KeysAudioEngine = function(patch) {
     }
     oscillator.start();
   });
+
+  universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  universalEg.connect(vcoEgShaper);
+  vcoEgShaper.connect(vcoEgIntAmp);
+  universalEg.start();
 
   thruGainSwitchController.start();
   modGainSwitchController.start();
@@ -328,10 +358,13 @@ VS.KeysAudioEngine = function(patch) {
 
     if (isDecay) {
       ampEgGainParam.setValueAtTime(1, time);
+      universalEgOffsetParam.setValueAtTime(1, time);
       duration = patch.envelope.decayRelease;
     } else {
       ampEgGainParam.cancelAndHoldAtTime(time); // kill attack in progress
       ampEgGainParam.setValueAtTime(currentValue, time);  // stop at current value
+      universalEgOffsetParam.cancelAndHoldAtTime(time); // kill attack in progress
+      universalEgOffsetParam.setValueAtTime(currentValue, time);  // stop at current value
       duration = currentValue * patch.envelope.decayRelease;
     }
 
@@ -341,8 +374,10 @@ VS.KeysAudioEngine = function(patch) {
         function(value) { return value * (currentValue - endValue) + endValue }
       );
       ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
+      universalEgOffsetParam.setValueCurveAtTime(gainCurve, time, duration);
     } else {
       ampEgGainParam.linearRampToValueAtTime(endValue, time + duration)
+      universalEgOffsetParam.linearRampToValueAtTime(endValue, time + duration)
     }
   };
 
@@ -362,6 +397,7 @@ VS.KeysAudioEngine = function(patch) {
 
     // Amp EG reset
     ampEgGainParam.cancelAndHoldAtTime(time);
+    universalEgOffsetParam.cancelAndHoldAtTime(time);
 
     // Set frequency of oscillators
     oscillatorNoteMap[1] = note;
@@ -371,8 +407,11 @@ VS.KeysAudioEngine = function(patch) {
     if (patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
       ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
+      universalEgOffsetParam.setValueAtTime(0, time);
+      universalEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
     } else {
       ampEgGainParam.setValueAtTime(1, time);
+      universalEgOffsetParam.setValueAtTime(1, time);
     }
 
     retriggerLfo();
@@ -668,11 +707,16 @@ VS.KeysAudioEngine = function(patch) {
 
   this.setLfoWave = (value) => {
     oscLfo.type = value;
-  }
+  };
+
+  this.setSustain = (value) => {
+    // recalculate vcoEg envelope so that sustain always equals 0 (aka not detuned).
+    vcoEgShaper.curve = makeVcoEgShaperCurve();
+  };
 
   this.setLfoPitchInt = () => {
     ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-  }
+  };
 
   this.setLfoCutoffInt = () => {
     ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
@@ -680,7 +724,7 @@ VS.KeysAudioEngine = function(patch) {
 
   this.noteIsPlaying = () => {
     return Object.values(oscillatorNoteMap).some(value => value !== -1);
-  }
+  };
 
   this.setTempo = () => {
     setTempo();
@@ -689,6 +733,10 @@ VS.KeysAudioEngine = function(patch) {
   this.setDetune = () => {
     osc[1].detune.setValueAtTime(patch.vco[1].detune, audioCtx.currentTime);
     osc[3].detune.setValueAtTime(patch.vco[3].detune, audioCtx.currentTime);
+  };
+
+  this.setVcoEgInt = () => {
+    vcoEgIntAmp.gain.setValueAtTime(patch.vco_eg_int, audioCtx.currentTime);
   };
 
   this.setDelayTime = () => {

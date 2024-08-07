@@ -160,6 +160,10 @@ VS.KeysEmulatorParams = function() {
       emulatorConstants.pitchMap[this.vco[oscNumber].pitchMidi] * 100;
   };
 
+  this.setvco_eg_int = function(midiValue) {
+    this.vco_eg_int = this.getPercentage(midiValue) * 1200;
+  };
+
   this.setvolume = function(value) {
     this.volume = this.getPercentage(value);
   };

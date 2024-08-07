@@ -151,10 +151,20 @@ VS.KeysEmulator = function() {
     audioEngine.setTempo();
   });
 
-  ['attack', 'decay_release', 'portamento', 'sustain'].forEach(id => {
+  ['attack', 'decay_release', 'portamento'].forEach(id => {
     $(`#${id}`).on('knobturn', () => {
       patch[`set${id}`](VS.activeKnob.trueMidi());
     });
+  });
+
+  $('#sustain').on('knobturn', () => {
+    patch.setsustain(VS.activeKnob.trueMidi());
+    audioEngine.setSustain();
+  });
+
+  $('#vco_eg_int').on('knobturn', () => {
+    patch.setvco_eg_int(VS.activeKnob.trueMidi());
+    audioEngine.setVcoEgInt();
   });
 
   $('#delay_time').on('knobturn', () => {
