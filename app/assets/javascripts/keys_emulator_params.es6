@@ -152,8 +152,7 @@ VS.KeysEmulatorParams = function() {
   }
 
   this.setdelay_feedback = function(midiValue) {
-    // TODO: Implement machine specific values
-    this.delay.feedback = this.getPercentage(midiValue) * 0.5;
+    this.delay.feedback = this.getPercentage(midiValue) * 0.6;
   }
 
   this.setvco_pitch = function(oscNumber, midiValue) {

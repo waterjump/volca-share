@@ -50,7 +50,7 @@ VS.KeysAudioEngine = function(patch) {
   const delayFilter = audioCtx.createBiquadFilter();
   delayFilter.type = 'lowpass';
   delayFilter.Q.value = 0;
-  delayFilter.frequency.setValueAtTime(2000, audioCtx.currentTime);
+  delayFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
 
   const delayAmp = audioCtx.createGain();
   delayAmp.gain.setValueAtTime(patch.delay.feedback, audioCtx.currentTime);
