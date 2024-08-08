@@ -79,30 +79,7 @@ VS.KeysAudioEngine = function(patch) {
 
   ampEgGainParam.setValueAtTime(0, audioCtx.currentTime);
 
-  this.setAmpLfoPitchGain = function() {
-    if (patch.lfo.targetPitch) {
-      // Affect pitch
-      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
-    } else {
-      // Do not affect pitch
-      ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
-    }
-  }
-  this.setAmpLfoPitchGain();
-
-  this.setAmpLfoCutoffGain = function() {
-    if (patch.lfo.targetCutoff) {
-      // Affect filter cutoff
-      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
-    } else {
-      // Do not affect filter cutoff
-      ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
-    }
-  }
-  this.setAmpLfoCutoffGain();
   ampLfoCutoff.connect(filter.detune);
-
-
 
   let oscLfo;
 
