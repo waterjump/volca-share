@@ -105,7 +105,7 @@ VS.KeysEmulatorParams = function() {
     this.vcf_eg_int = 1200 * (midiValue / 20.0);
   };
   this.setportamento = function(midiValue) {
-    this.portamento = this.getPercentage(midiValue) * 2.0;
+    this.portamento = this.getPercentage(midiValue) * 0.258 + 0.008;
   };
   this.setoctave = function(midiValue) {
     this.octave = parseInt(VS.display.octaveString(midiValue)[3]);

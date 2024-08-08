@@ -5,7 +5,6 @@ VS.KeysAudioEngine = function(patch) {
 
   const audioCtx = new AudioContext();
   const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
   const masterAmp = audioCtx.createGain();
   const filter = audioCtx.createBiquadFilter();
   const filterEgAmp = audioCtx.createGain();
@@ -198,7 +197,8 @@ VS.KeysAudioEngine = function(patch) {
   // TODO: The oscillators "base frequency" are not all the same in the keys.
   // controls frequency of all three vcos rather than looping through them.
   const oscFreqNode = audioCtx.createConstantSource();
-  oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
+  const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
+  oscFreqNodeOffsetParam.setValueAtTime(440, audioCtx.currentTime);
   oscFreqNode.connect(osc[1].frequency);
   oscFreqNode.connect(unisonNoteAmp2);
   oscFreqNode.connect(unisonNoteAmp3);
@@ -206,27 +206,26 @@ VS.KeysAudioEngine = function(patch) {
   unisonNoteAmp3.connect(osc[3].frequency);
   oscFreqNode.start();
 
-  const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
 
   const oscFreqNode2 = audioCtx.createConstantSource();
-  oscFreqNode2.offset.setValueAtTime(440, audioCtx.currentTime);
+  const oscFreqNodeOffsetParam2 = new Tone.Param(oscFreqNode2.offset);
+  oscFreqNodeOffsetParam2.setValueAtTime(440, audioCtx.currentTime);
   const polyNoteAmp2 = audioCtx.createGain();
   polyNoteAmp2.gain.value = 0;
   oscFreqNode2.connect(polyNoteAmp2);
   polyNoteAmp2.connect(osc[2].frequency);
   oscFreqNode2.start();
 
-  const oscFreqNodeOffsetParam2 = new Tone.Param(oscFreqNode2.offset);
 
   const oscFreqNode3 = audioCtx.createConstantSource();
-  oscFreqNode3.offset.setValueAtTime(440, audioCtx.currentTime);
+  const oscFreqNodeOffsetParam3 = new Tone.Param(oscFreqNode3.offset);
+  oscFreqNodeOffsetParam3.setValueAtTime(440, audioCtx.currentTime);
   const polyNoteAmp3 = audioCtx.createGain();
   polyNoteAmp3.gain.value = 0;
   oscFreqNode3.connect(polyNoteAmp3);
   polyNoteAmp3.connect(osc[3].frequency);
   oscFreqNode3.start();
 
-  const oscFreqNodeOffsetParam3 = new Tone.Param(oscFreqNode3.offset);
 
   // Switch for unison note frequencies
   const unisonNoteSwitchController = audioCtx.createConstantSource();
@@ -364,28 +363,15 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.playNewNote = function(note, time = audioCtx.currentTime) {
-    this.activateAudio();
-    oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
-
-    if (patch.voice === 'poly ring') {
-      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-    }
-
+  const triggerEg = function(time = audioCtx.currentTime) {
     // Filter EG reset
     filterEgOffsetParam.cancelAndHoldAtTime(time);
 
     const attackEndTimeValue = time + patch.envelope.attack;
-    attackEndTime.setValueAtTime(attackEndTimeValue, time);
 
     // Amp EG reset
     ampEgGainParam.cancelAndHoldAtTime(time);
     universalEgOffsetParam.cancelAndHoldAtTime(time);
-
-    // Set frequency of oscillators
-    oscillatorNoteMap[1] = note;
-    const frequency = Tone.Frequency(note, 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
 
     if (patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
@@ -399,8 +385,6 @@ VS.KeysAudioEngine = function(patch) {
 
     retriggerLfo();
 
-    // Retrigger envelope
-    // Attack
     filterEgOffsetParam.setValueAtTime(0, time);
     filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
 
@@ -408,14 +392,28 @@ VS.KeysAudioEngine = function(patch) {
     triggerDecayRelease(attackEndTimeValue);
   };
 
+  this.playNewNote = function(note, time = audioCtx.currentTime) {
+    this.activateAudio();
+    oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
+
+    if (patch.voice === 'poly ring') {
+      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+    }
+
+    // Set frequency of oscillators
+    oscillatorNoteMap[1] = note;
+    const frequency = Tone.Frequency(note, 'midi').toFrequency();
+    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+
+    triggerEg(time);
+  };
+
   this.changeCurrentNote = function(note, time = audioCtx.currentTime) {
     let frequency = Tone.Frequency(note, 'midi').toFrequency();
     let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
 
     oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-
-    // TODO: Use patch.portamento instead of 0.05
-    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
+    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
   };
 
   const lowestFreeOscillator = () => {
@@ -466,40 +464,56 @@ VS.KeysAudioEngine = function(patch) {
   //       these switch cases.
   // Poly voices only!
   this.addNote = function(keysDown) {
+    const time = audioCtx.currentTime;
     const lowestFreeOsc = lowestFreeOscillator();
     const noteToAdd = keysDown[keysDown.length -1];
     const frequency = Tone.Frequency(noteToAdd, 'midi').toFrequency();
+    const closestOscillator = findOscillatorPlayingClosestNote(noteToAdd);
+    const closestNote = oscillatorNoteMap[closestOscillator];
+    const closestNoteFrequency = Tone.Frequency(closestNote, 'midi').toFrequency();
+
+    if (patch.portamento > 0.008) {
+      triggerEg(time);
+    }
+
+    // if there's an unused oscillator
     if (lowestFreeOsc !== null) {
       oscillatorNoteMap[lowestFreeOsc] = noteToAdd;
 
       switch (lowestFreeOsc) {
         case 1:
-          oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
-          oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
+          oscFreqNodeOffsetParam.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
+          oscPolyMonoAmp1.gain.setValueAtTime(1, time);
           break;
         case 2:
-          oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
-          oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
+          oscFreqNodeOffsetParam2.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
+          oscPolyMonoAmp2.gain.setValueAtTime(1, time);
           break;
         case 3:
-          oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
-          oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+          oscFreqNodeOffsetParam3.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
+          oscPolyMonoAmp3.gain.setValueAtTime(1, time);
           break;
       }
 
     } else {
       // swap closest playing note
-      const closestOscillator = findOscillatorPlayingClosestNote(noteToAdd);
       oscillatorNoteMap[closestOscillator] = noteToAdd;
+      // NOTE: Sometimes note coming in does not do portamento.  Reason unknown.
       switch (closestOscillator) {
         case 1:
-          oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscFreqNodeOffsetParam.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
           break;
         case 2:
-          oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscFreqNodeOffsetParam2.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
           break;
         case 3:
-          oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
+          oscFreqNodeOffsetParam3.setValueAtTime(closestNoteFrequency, time);
+          oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
           break;
       }
     }
@@ -536,6 +550,7 @@ VS.KeysAudioEngine = function(patch) {
   const swapPolyNote = function(keysDown, noteThatStopped, oscAffected) {
     if (oscAffected === null) { return; }
     // find notes that aren't playing
+    const time = audioCtx.currentTime;
     const notesStillPlaying = Object.values(oscillatorNoteMap);
     const notesNotPlaying = keysDown.filter(note => !notesStillPlaying.includes(note));
 
@@ -546,28 +561,41 @@ VS.KeysAudioEngine = function(patch) {
       noteToSwapIn = findClosestValue(notesNotPlaying, noteThatStopped);
     }
 
+    const lastFrequency = Tone.Frequency(oscillatorNoteMap[oscAffected], 'midi').toFrequency();
     const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
     oscillatorNoteMap[oscAffected] = noteToSwapIn;
 
     switch(oscAffected) {
       case 1:
-        oscFreqNode.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
+        oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
         break;
       case 2:
-        oscFreqNode2.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        oscFreqNodeOffsetParam2.setValueAtTime(lastFrequency, time);
+        oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
         break;
       case 3:
-        oscFreqNode3.offset.setValueAtTime(frequency, audioCtx.currentTime);
+        oscFreqNodeOffsetParam3.setValueAtTime(lastFrequency, time);
+        oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
         break;
       default:
         // do nothing
     }
   };
 
+  // TODO: Will probably need to account for EG release at some point.
+  //       (Same needs to happen in stopPolyNote function)
+  const turnOffAllOscAmps = function() {
+    oscPolyMonoAmp1.gain.setValueAtTime(0, audioCtx.currentTime);
+    oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
+    oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+  };
+
   this.stopPolyNote = function(keysDown, noteThatStopped) {
     // important because EG uses oscillatorNoteMap to determine decay vs release
     if (keysDown.length === 0) {
       [1, 2, 3].forEach(i => oscillatorNoteMap[i] = -1);
+      turnOffAllOscAmps();
     }
     if (!patch.voice.includes('poly')) { return; }
 
@@ -578,6 +606,7 @@ VS.KeysAudioEngine = function(patch) {
       swapPolyNote(keysDown, noteThatStopped, oscAffected);
     } else {
       oscillatorNoteMap[oscAffected] = -1;
+      // TODO: Will probably need to account for EG release at some point.
       switch(oscAffected) {
         case 1:
           oscPolyMonoAmp1.gain.setValueAtTime(0, audioCtx.currentTime);
@@ -610,13 +639,11 @@ VS.KeysAudioEngine = function(patch) {
     });
 
     if(patch.voice.includes('poly')) {
-      console.log('poly ');
       oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
       oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
       unisonNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
       polyNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
     } else {
-      console.log('unison');
       oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
       oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
       unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
@@ -624,7 +651,6 @@ VS.KeysAudioEngine = function(patch) {
     }
 
     if (patch.voice.includes('ring')) {
-      console.log('...ring');
       thruGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
       modGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
     } else {
