@@ -84,8 +84,7 @@ VS.KeysEmulatorParams = function() {
   };
 
   this.setattack = function(midiValue) {
-    // Based on collected data from Volca Bass
-    this.envelope.attack = this.getPercentage(midiValue) * 0.86;
+    this.envelope.attack = this.getPercentage(midiValue) * 0.89;
   };
 
   this.setdecay_release = function(midiValue) {
