@@ -392,7 +392,13 @@ VS.KeysAudioEngine = function(patch) {
 
   this.playNewNote = function(note, time = audioCtx.currentTime) {
     this.activateAudio();
-    turnOnAllOscPolyMonoAmps();
+
+    if (!patch.voice.includes('poly')) {
+      turnOnAllOscPolyMonoAmps();
+    } else {
+      oscPolyMonoAmp1.gain.cancelScheduledValues(time);
+      oscPolyMonoAmp1.gain.setValueAtTime(1, time);
+    }
 
     if (patch.voice === 'poly ring') {
       oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
