@@ -464,6 +464,24 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
+  const swapOscillorFrequency = function(oscNumber, oldFreq, newFreq, time = audioCtx.currentTime) {
+    const rampEndTime = time + patch.portamento;
+    switch (oscNumber) {
+      case 1:
+        oscFreqNodeOffsetParam.setValueAtTime(oldFreq, time);
+        oscFreqNodeOffsetParam.linearRampToValueAtTime(newFreq, rampEndTime);
+        break;
+      case 2:
+        oscFreqNodeOffsetParam2.setValueAtTime(oldFreq, time);
+        oscFreqNodeOffsetParam2.linearRampToValueAtTime(newFreq, rampEndTime);
+        break;
+      case 3:
+        oscFreqNodeOffsetParam3.setValueAtTime(oldFreq, time);
+        oscFreqNodeOffsetParam3.linearRampToValueAtTime(newFreq, rampEndTime);
+        break;
+    }
+  }
+
   // TODO: Think about making an oscillator class to get rid off all
   //       these switch cases.
   // Poly voices only!
@@ -484,20 +502,16 @@ VS.KeysAudioEngine = function(patch) {
     if (lowestFreeOsc !== null) {
       oscillatorNoteMap[lowestFreeOsc] = noteToAdd;
 
+      swapOscillorFrequency(lowestFreeOsc, closestNoteFrequency, frequency, time);
+
       switch (lowestFreeOsc) {
         case 1:
-          oscFreqNodeOffsetParam.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
           oscPolyMonoAmp1.gain.setValueAtTime(1, time);
           break;
         case 2:
-          oscFreqNodeOffsetParam2.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
           oscPolyMonoAmp2.gain.setValueAtTime(1, time);
           break;
         case 3:
-          oscFreqNodeOffsetParam3.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
           oscPolyMonoAmp3.gain.setValueAtTime(1, time);
           break;
       }
@@ -505,20 +519,7 @@ VS.KeysAudioEngine = function(patch) {
     } else {
       // swap closest playing note
       oscillatorNoteMap[closestOscillator] = noteToAdd;
-      switch (closestOscillator) {
-        case 1:
-          oscFreqNodeOffsetParam.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
-          break;
-        case 2:
-          oscFreqNodeOffsetParam2.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
-          break;
-        case 3:
-          oscFreqNodeOffsetParam3.setValueAtTime(closestNoteFrequency, time);
-          oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
-          break;
-      }
+      swapOscillorFrequency(closestOscillator, closestNoteFrequency, frequency, time);
     }
 
     adjustPolyRingAlgo(keysDown.length);
@@ -568,22 +569,7 @@ VS.KeysAudioEngine = function(patch) {
     const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
     oscillatorNoteMap[oscAffected] = noteToSwapIn;
 
-    switch(oscAffected) {
-      case 1:
-        oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-        oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
-        break;
-      case 2:
-        oscFreqNodeOffsetParam2.setValueAtTime(lastFrequency, time);
-        oscFreqNodeOffsetParam2.linearRampToValueAtTime(frequency, time + patch.portamento);
-        break;
-      case 3:
-        oscFreqNodeOffsetParam3.setValueAtTime(lastFrequency, time);
-        oscFreqNodeOffsetParam3.linearRampToValueAtTime(frequency, time + patch.portamento);
-        break;
-      default:
-        // do nothing
-    }
+    swapOscillorFrequency(oscAffected, lastFrequency, frequency, time);
   };
 
   const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
@@ -640,7 +626,7 @@ VS.KeysAudioEngine = function(patch) {
       }
     });
 
-    if(patch.voice.includes('poly')) {
+    if (patch.voice.includes('poly')) {
       oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
       oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
       unisonNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
