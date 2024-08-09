@@ -381,9 +381,18 @@ VS.KeysAudioEngine = function(patch) {
     triggerDecayRelease(attackEndTimeValue);
   };
 
+  const turnOnAllOscPolyMonoAmps = function(time = audioCtx.currentTime) {
+    oscPolyMonoAmp1.gain.cancelScheduledValues(time);
+    oscPolyMonoAmp1.gain.setValueAtTime(1, time);
+    oscPolyMonoAmp2.gain.cancelScheduledValues(time);
+    oscPolyMonoAmp2.gain.setValueAtTime(1, time);
+    oscPolyMonoAmp3.gain.cancelScheduledValues(time);
+    oscPolyMonoAmp3.gain.setValueAtTime(1, time);
+  };
+
   this.playNewNote = function(note, time = audioCtx.currentTime) {
     this.activateAudio();
-    oscPolyMonoAmp1.gain.setValueAtTime(1, audioCtx.currentTime);
+    turnOnAllOscPolyMonoAmps();
 
     if (patch.voice === 'poly ring') {
       oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
@@ -490,7 +499,6 @@ VS.KeysAudioEngine = function(patch) {
     } else {
       // swap closest playing note
       oscillatorNoteMap[closestOscillator] = noteToAdd;
-      // NOTE: Sometimes note coming in does not do portamento.  Reason unknown.
       switch (closestOscillator) {
         case 1:
           oscFreqNodeOffsetParam.setValueAtTime(closestNoteFrequency, time);
@@ -572,12 +580,11 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  // TODO: Will probably need to account for EG release at some point.
-  //       (Same needs to happen in stopPolyNote function)
-  const turnOffAllOscAmps = function() {
-    oscPolyMonoAmp1.gain.setValueAtTime(0, audioCtx.currentTime);
-    oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
-    oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+  const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
+    const turnOffTime = time + patch.envelope.decayRelease;
+    oscPolyMonoAmp1.gain.setValueAtTime(0, turnOffTime);
+    oscPolyMonoAmp2.gain.setValueAtTime(0, turnOffTime);
+    oscPolyMonoAmp3.gain.setValueAtTime(0, turnOffTime);
   };
 
   this.stopPolyNote = function(keysDown, noteThatStopped) {
