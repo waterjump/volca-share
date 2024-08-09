@@ -11,7 +11,6 @@ VS.KeysAudioEngine = function(patch) {
   const filterEg = audioCtx.createConstantSource();
   const filterEgOffsetParam = new Tone.Param(filterEg.offset);
   const ampEg = audioCtx.createGain();
-  const ampEgGainParam = new Tone.Param(ampEg.gain);
   const universalEg = audioCtx.createConstantSource();
   const universalEgOffsetParam = new Tone.Param(universalEg.offset);
   const vcoEgShaper = audioCtx.createWaveShaper();
@@ -75,8 +74,6 @@ VS.KeysAudioEngine = function(patch) {
 
   ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
   ampEg.connect(filter);
-
-  ampEgGainParam.setValueAtTime(0, audioCtx.currentTime);
 
   ampLfoCutoff.connect(filter.detune);
 
@@ -176,6 +173,7 @@ VS.KeysAudioEngine = function(patch) {
   });
 
   universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  universalEg.connect(ampEg.gain);
   universalEg.connect(vcoEgShaper);
   vcoEgShaper.connect(vcoEgIntAmp);
   universalEg.start();
@@ -329,7 +327,7 @@ VS.KeysAudioEngine = function(patch) {
     const isDecay = Object.values(oscillatorNoteMap).some(value => value !== -1);
     const endValue = isDecay ? patch.envelope.sustain : 0;
     let duration;
-    const currentValue = ampEgGainParam.getValueAtTime(time);
+    const currentValue = universalEgOffsetParam.getValueAtTime(time);
 
     // filterEgOffsetParam.cancelAndHoldAtTime(time);
     filterEgOffsetParam.cancelScheduledValues(time);
@@ -339,12 +337,9 @@ VS.KeysAudioEngine = function(patch) {
     );
 
     if (isDecay) {
-      ampEgGainParam.setValueAtTime(1, time);
       universalEgOffsetParam.setValueAtTime(1, time);
       duration = patch.envelope.decayRelease;
     } else {
-      ampEgGainParam.cancelAndHoldAtTime(time); // kill attack in progress
-      ampEgGainParam.setValueAtTime(currentValue, time);  // stop at current value
       universalEgOffsetParam.cancelAndHoldAtTime(time); // kill attack in progress
       universalEgOffsetParam.setValueAtTime(currentValue, time);  // stop at current value
       duration = currentValue * patch.envelope.decayRelease;
@@ -355,10 +350,8 @@ VS.KeysAudioEngine = function(patch) {
       const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
         function(value) { return value * (currentValue - endValue) + endValue }
       );
-      ampEgGainParam.setValueCurveAtTime(gainCurve, time, duration);
       universalEgOffsetParam.setValueCurveAtTime(gainCurve, time, duration);
     } else {
-      ampEgGainParam.linearRampToValueAtTime(endValue, time + duration)
       universalEgOffsetParam.linearRampToValueAtTime(endValue, time + duration)
     }
   };
@@ -370,16 +363,12 @@ VS.KeysAudioEngine = function(patch) {
     const attackEndTimeValue = time + patch.envelope.attack;
 
     // Amp EG reset
-    ampEgGainParam.cancelAndHoldAtTime(time);
     universalEgOffsetParam.cancelAndHoldAtTime(time);
 
     if (patch.envelope.attack > 0) {
-      ampEgGainParam.setValueAtTime(0, time);
-      ampEgGainParam.linearRampToValueAtTime(1, attackEndTimeValue);
       universalEgOffsetParam.setValueAtTime(0, time);
       universalEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
     } else {
-      ampEgGainParam.setValueAtTime(1, time);
       universalEgOffsetParam.setValueAtTime(1, time);
     }
 
