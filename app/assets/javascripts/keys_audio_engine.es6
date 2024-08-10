@@ -17,8 +17,6 @@ VS.KeysAudioEngine = function(patch) {
   const vcoEgIntAmp = audioCtx.createGain();
   const ampLfoPitch = audioCtx.createGain();
   const ampLfoCutoff = audioCtx.createGain();
-  const builtInDecay = 0.1;
-  let osc = [null, null, null, null];
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -120,13 +118,6 @@ VS.KeysAudioEngine = function(patch) {
   modGain2.connect(modGain3);
   modGain3.connect(ampEg);
 
-  const oscPolyMonoAmp1 = audioCtx.createGain();
-  oscPolyMonoAmp1.gain.value = 1;
-  const oscPolyMonoAmp2 = audioCtx.createGain();
-  oscPolyMonoAmp2.gain.value = 1;
-  const oscPolyMonoAmp3 = audioCtx.createGain();
-  oscPolyMonoAmp3.gain.value = 1;
-
   vcoEgIntAmp.gain.setValueAtTime(0, audioCtx.currentTime);
 
   const oscillatorObj = function(oscNumber) {
@@ -199,6 +190,14 @@ VS.KeysAudioEngine = function(patch) {
     2: new oscillatorObj(2),
     3: new oscillatorObj(3)
   };
+
+
+  // TODO: Manage this in adjustPolyRingAlgo
+  // Temporary: Connect ring mod nodes manually
+  oscillators[1].modGainSwitch.connect(modGain2);
+  oscillators[2].modGainSwitch.connect(modGain2.gain);
+  oscillators[3].modGainSwitch.connect(modGain3.gain);
+
 
   universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
   universalEg.connect(ampEg.gain);
@@ -609,13 +608,13 @@ VS.KeysAudioEngine = function(patch) {
     Object.values(oscillators).forEach(obj => obj.oscillator.type = patch.vco[obj.oscNumber].shape);
 
     if (patch.voice.includes('poly')) {
-      oscPolyMonoAmp2.gain.setValueAtTime(0, audioCtx.currentTime);
-      oscPolyMonoAmp3.gain.setValueAtTime(0, audioCtx.currentTime);
+      oscillators[2].oscAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      oscillators[3].oscAmp.gain.setValueAtTime(0, audioCtx.currentTime);
       unisonNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
       polyNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
     } else {
-      oscPolyMonoAmp2.gain.setValueAtTime(1, audioCtx.currentTime);
-      oscPolyMonoAmp3.gain.setValueAtTime(1, audioCtx.currentTime);
+      oscillators[2].oscAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      oscillators[3].oscAmp.gain.setValueAtTime(1, audioCtx.currentTime);
       unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
       polyNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
     }
