@@ -444,13 +444,7 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   const lowestFreeOscillator = () => {
-    const oscillatorValues = Object.values(oscillators);
-    for (const oscillator of oscillatorValues) {
-      if (oscillator.note === -1) {
-        return oscillator.oscNumber;
-      }
-    }
-    return null;
+    return Object.values(oscillators).find(osc => osc.note === -1) || null;
   };
 
   const findOscillatorPlayingClosestNote = function(target) {
@@ -523,10 +517,10 @@ VS.KeysAudioEngine = function(patch) {
 
     // if there's an unused oscillator
     if (lowestFreeOsc !== null) {
-      oscillators[lowestFreeOsc].note = noteToAdd;
+      lowestFreeOsc.note = noteToAdd;
 
-      swapOscillatorFrequency(lowestFreeOsc, closestNoteFrequency, frequency, time);
-      oscillators[lowestFreeOsc].turnOnOscAmp();
+      swapOscillatorFrequency(lowestFreeOsc.oscNumber, closestNoteFrequency, frequency, time);
+      lowestFreeOsc.turnOnOscAmp();
     } else {
       // swap closest playing note
       closestOscillator.note = noteToAdd;
@@ -536,15 +530,8 @@ VS.KeysAudioEngine = function(patch) {
     adjustPolyRingAlgo(keysDown.length);
   };
 
-  // TODO: Return osc object instead of index
   const findOscByNote = (note) => {
-    const oscillatorValues = Object.values(oscillators);
-    for (const oscillator of oscillatorValues) {
-      if (oscillator.note === note) {
-        return oscillator.oscNumber;
-      }
-    }
-    return null;
+    return Object.values(oscillators).find(osc => osc.note === note) || null;
   };
 
   const findClosestValue = function(arr, target) {
@@ -578,11 +565,11 @@ VS.KeysAudioEngine = function(patch) {
       noteToSwapIn = findClosestValue(notesNotPlaying, noteThatStopped);
     }
 
-    const lastFrequency = Tone.Frequency(oscillators[oscAffected].note, 'midi').toFrequency();
+    const lastFrequency = Tone.Frequency(oscAffected.note, 'midi').toFrequency();
     const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
-    oscillators[oscAffected].note = noteToSwapIn;
+    oscAffected.note = noteToSwapIn;
 
-    swapOscillatorFrequency(oscAffected, lastFrequency, frequency, time);
+    swapOscillatorFrequency(oscAffected.oscNumber, lastFrequency, frequency, time);
   };
 
   const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
@@ -604,9 +591,9 @@ VS.KeysAudioEngine = function(patch) {
     if (keysDown.length > 2) {
       swapPolyNote(keysDown, noteThatStopped, oscAffected);
     } else {
-      oscillators[oscAffected].note = -1;
+      oscAffected.note = -1;
       // TODO: Will probably need to account for EG release at some point.
-      oscillators[oscAffected].turnOffOscAmp();
+      oscAffected.turnOffOscAmp();
     }
 
     adjustPolyRingAlgo(keysDown.length);
