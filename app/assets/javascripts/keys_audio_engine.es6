@@ -19,7 +19,6 @@ VS.KeysAudioEngine = function(patch) {
   const ampLfoCutoff = audioCtx.createGain();
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
-  let oscillatorNoteMap = { 1: -1, 2: -1, 3: -1 }
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -353,7 +352,8 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   const triggerDecayRelease = function(time = audioCtx.currentTime) {
-    const isDecay = Object.values(oscillatorNoteMap).some(value => value !== -1);
+    const isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
+
     const endValue = isDecay ? patch.envelope.sustain : 0;
     let duration;
     const currentValue = universalEgOffsetParam.getValueAtTime(time);
@@ -428,7 +428,6 @@ VS.KeysAudioEngine = function(patch) {
     }
 
     // Set frequency of oscillators
-    oscillatorNoteMap[1] = note;
     oscillators[1].note = note;
     const frequency = Tone.Frequency(note, 'midi').toFrequency();
     oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
@@ -445,31 +444,33 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   const lowestFreeOscillator = () => {
-    for (let key in oscillatorNoteMap) {
-      if (oscillatorNoteMap[key] === -1) {
-        return parseInt(key);
+    const oscillatorValues = Object.values(oscillators);
+    for (const oscillator of oscillatorValues) {
+      if (oscillator.note === -1) {
+        return oscillator.oscNumber;
       }
     }
     return null;
   };
 
   const findOscillatorPlayingClosestNote = function(target) {
-    let closestKey = null;
+    let closestOsc = null;
     let smallestDifference = Infinity;
 
-    for (let key in oscillatorNoteMap) {
-      let difference = Math.abs(oscillatorNoteMap[key] - target);
+    for (let key in oscillators) {
+      const currentOsc = oscillators[key];
+      const difference = Math.abs(currentOsc.note - target);
 
       if (
         difference < smallestDifference ||
-        (difference === smallestDifference && oscillatorNoteMap[key] > oscillatorNoteMap[closestKey])
+        (difference === smallestDifference && currentOsc.note > closestOsc.note)
       ) {
-        closestKey = key;
+        closestOsc = currentOsc;
         smallestDifference = difference;
       }
     }
 
-    return parseInt(closestKey);
+    return closestOsc;
   };
 
   // NOTE: This will need changes for when carrier (osc1) stops playing
@@ -488,7 +489,7 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  const swapOscillorFrequency = function(oscNumber, oldFreq, newFreq, time = audioCtx.currentTime) {
+  const swapOscillatorFrequency = function(oscNumber, oldFreq, newFreq, time = audioCtx.currentTime) {
     const rampEndTime = time + patch.portamento;
     switch (oscNumber) {
       case 1:
@@ -513,7 +514,7 @@ VS.KeysAudioEngine = function(patch) {
     const noteToAdd = keysDown[keysDown.length -1];
     const frequency = Tone.Frequency(noteToAdd, 'midi').toFrequency();
     const closestOscillator = findOscillatorPlayingClosestNote(noteToAdd);
-    const closestNote = oscillatorNoteMap[closestOscillator];
+    const closestNote = closestOscillator.note;
     const closestNoteFrequency = Tone.Frequency(closestNote, 'midi').toFrequency();
 
     if (patch.portamento > 0.008) {
@@ -522,25 +523,25 @@ VS.KeysAudioEngine = function(patch) {
 
     // if there's an unused oscillator
     if (lowestFreeOsc !== null) {
-      oscillatorNoteMap[lowestFreeOsc] = noteToAdd;
       oscillators[lowestFreeOsc].note = noteToAdd;
 
-      swapOscillorFrequency(lowestFreeOsc, closestNoteFrequency, frequency, time);
+      swapOscillatorFrequency(lowestFreeOsc, closestNoteFrequency, frequency, time);
       oscillators[lowestFreeOsc].turnOnOscAmp();
     } else {
       // swap closest playing note
-      oscillatorNoteMap[closestOscillator] = noteToAdd;
-      oscillators[closestOscillator].note = noteToAdd;
-      swapOscillorFrequency(closestOscillator, closestNoteFrequency, frequency, time);
+      closestOscillator.note = noteToAdd;
+      swapOscillatorFrequency(closestOscillator.oscNumber, closestNoteFrequency, frequency, time);
     }
 
     adjustPolyRingAlgo(keysDown.length);
   };
 
+  // TODO: Return osc object instead of index
   const findOscByNote = (note) => {
-    for (let key in oscillatorNoteMap) {
-      if (oscillatorNoteMap[key] === note) {
-        return parseInt(key);
+    const oscillatorValues = Object.values(oscillators);
+    for (const oscillator of oscillatorValues) {
+      if (oscillator.note === note) {
+        return oscillator.oscNumber;
       }
     }
     return null;
@@ -567,7 +568,7 @@ VS.KeysAudioEngine = function(patch) {
     if (oscAffected === null) { return; }
     // find notes that aren't playing
     const time = audioCtx.currentTime;
-    const notesStillPlaying = Object.values(oscillatorNoteMap);
+    const notesStillPlaying = Object.values(oscillators).map(osc => osc.note);
     const notesNotPlaying = keysDown.filter(note => !notesStillPlaying.includes(note));
 
     let noteToSwapIn;
@@ -577,12 +578,11 @@ VS.KeysAudioEngine = function(patch) {
       noteToSwapIn = findClosestValue(notesNotPlaying, noteThatStopped);
     }
 
-    const lastFrequency = Tone.Frequency(oscillatorNoteMap[oscAffected], 'midi').toFrequency();
+    const lastFrequency = Tone.Frequency(oscillators[oscAffected].note, 'midi').toFrequency();
     const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
-    oscillatorNoteMap[oscAffected] = noteToSwapIn;
     oscillators[oscAffected].note = noteToSwapIn;
 
-    swapOscillorFrequency(oscAffected, lastFrequency, frequency, time);
+    swapOscillatorFrequency(oscAffected, lastFrequency, frequency, time);
   };
 
   const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
@@ -591,9 +591,8 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   this.stopPolyNote = function(keysDown, noteThatStopped) {
-    // important because EG uses oscillatorNoteMap to determine decay vs release
+    // important because EG uses oscillator note values to determine decay vs release
     if (keysDown.length === 0) {
-      [1, 2, 3].forEach(i => oscillatorNoteMap[i] = -1);
       [1, 2, 3].forEach(i => oscillators[i].note = -1);
       turnOffAllOscAmps();
     }
@@ -605,7 +604,6 @@ VS.KeysAudioEngine = function(patch) {
     if (keysDown.length > 2) {
       swapPolyNote(keysDown, noteThatStopped, oscAffected);
     } else {
-      oscillatorNoteMap[oscAffected] = -1;
       oscillators[oscAffected].note = -1;
       // TODO: Will probably need to account for EG release at some point.
       oscillators[oscAffected].turnOffOscAmp();
@@ -652,30 +650,27 @@ VS.KeysAudioEngine = function(patch) {
   this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
     // TODO: This function is in need of a refactor.
 
-    if (oscillatorNoteMap[1] !== -1) {
-      const newNote1 = oscillatorNoteMap[1] + octaveOffset;
-      oscillatorNoteMap[1] = newNote1;
+    if (oscillators[1].note !== -1) {
+      const newNote1 = oscillators[1].note + octaveOffset;
       oscillators[1].note = newNote1;
       const frequency = Tone.Frequency(newNote1, 'midi').toFrequency();
       oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
     }
 
-    if (oscillatorNoteMap[2] !== -1) {
+    if (oscillators[2].note !== -1) {
       const frequency2 = Tone.Frequency(
-        oscillatorNoteMap[2] + octaveOffset,
+        oscillators[2].note + octaveOffset,
         'midi'
       ).toFrequency();
-      oscillatorNoteMap[2] = oscillatorNoteMap[2] + octaveOffset;
       oscillators[2].note += octaveOffset;
       oscFreqNodeOffsetParam2.setValueAtTime(frequency2, time);
     }
 
-    if (oscillatorNoteMap[3] !== -1) {
+    if (oscillators[3].note !== -1) {
       const frequency3 = Tone.Frequency(
-        oscillatorNoteMap[3] + octaveOffset,
+        oscillators[3].note + octaveOffset,
         'midi'
       ).toFrequency();
-      oscillatorNoteMap[3] = oscillatorNoteMap[3] + octaveOffset;
       oscillators[3].note += octaveOffset;
 
       oscFreqNodeOffsetParam3.setValueAtTime(frequency3, time);
@@ -723,7 +718,7 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   this.noteIsPlaying = () => {
-    return Object.values(oscillatorNoteMap).some(value => value !== -1);
+    return Object.values(oscillators).some(osc => osc.note !== -1);
   };
 
   this.setTempo = () => {
