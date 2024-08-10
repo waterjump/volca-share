@@ -144,6 +144,26 @@ VS.KeysAudioEngine = function(patch) {
       this.oscAmp.gain.setValueAtTime(0, time);
     };
 
+    this.setRingModPath = function(time = audioCtx.currentTime) {
+      const ringModPaths = [
+        this.modGain2CarrierAmp,
+        this.modGain2ModAmp,
+        this.modGain3ModAmp
+      ];
+
+      const currentNotesSorted = Object.values(oscillators)
+        .map(osc => osc.note)
+        .filter(note => note !== -1)
+        .sort((a, b) => a - b);
+
+      const indexOfAmpToTurnOn = currentNotesSorted.indexOf(this.note);
+
+      ringModPaths.forEach((amp, index) => {
+        const gainValue = index === indexOfAmpToTurnOn ? 1 : 0;
+        ringModPaths[index].gain.setValueAtTime(gainValue, time);
+      });
+    };
+
     this.initialize = function() {
       this.oscFreqNodeOffsetParam.setValueAtTime(440, audioCtx.currentTime);
       // Set up osc
@@ -172,14 +192,12 @@ VS.KeysAudioEngine = function(patch) {
       this.modGain2ModAmp.gain.value = 0;
       this.modGain3ModAmp.gain.value = 0;
 
-      /*  TBD
-      modGainSwitch.connect(osc1ModGain2CarrierAmp);
-      osc1ModGain2CarrierAmp.connect(modGain2);
-      modGainSwitch.connect(osc1ModGain2ModAmp);
-      osc1ModGain2ModAmp.connect(modGain2.gain);
-      modGainSwitch.connect(osc1ModGain3ModAmp);
-      osc1ModGain3ModAmp.connect(modGain3.gain);
-      */
+      this.modGainSwitch.connect(this.modGain2CarrierAmp);
+      this.modGain2CarrierAmp.connect(modGain2);
+      this.modGainSwitch.connect(this.modGain2ModAmp);
+      this.modGain2ModAmp.connect(modGain2.gain);
+      this.modGainSwitch.connect(this.modGain3ModAmp);
+      this.modGain3ModAmp.connect(modGain3.gain);
 
       this.oscFreqNode.start();
       this.oscillator.start();
@@ -193,14 +211,6 @@ VS.KeysAudioEngine = function(patch) {
     2: new oscillatorObj(2),
     3: new oscillatorObj(3)
   };
-
-
-  // TODO: Manage this in adjustPolyRingAlgo
-  // Temporary: Connect ring mod nodes manually
-  oscillators[1].modGainSwitch.connect(modGain2);
-  oscillators[2].modGainSwitch.connect(modGain2.gain);
-  oscillators[3].modGainSwitch.connect(modGain3.gain);
-
 
   universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
   universalEg.connect(ampEg.gain);
@@ -457,7 +467,6 @@ VS.KeysAudioEngine = function(patch) {
     return closestOsc;
   };
 
-  // NOTE: This will need changes for when carrier (osc1) stops playing
   const adjustPolyRingAlgo = function(numberOfKeysDown) {
     if (patch.voice !== 'poly ring') { return; }
 
@@ -505,6 +514,7 @@ VS.KeysAudioEngine = function(patch) {
       swapOscillatorFrequency(closestOscillator, closestNoteFrequency, frequency, time);
     }
 
+    Object.values(oscillators).forEach(osc => osc.setRingModPath());
     adjustPolyRingAlgo(keysDown.length);
   };
 
@@ -574,6 +584,7 @@ VS.KeysAudioEngine = function(patch) {
       oscAffected.turnOffOscAmp();
     }
 
+    Object.values(oscillators).forEach(osc => osc.setRingModPath());
     adjustPolyRingAlgo(keysDown.length);
   };
 
