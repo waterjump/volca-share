@@ -122,6 +122,8 @@ VS.KeysAudioEngine = function(patch) {
 
   const oscillatorObj = function(oscNumber) {
     this.oscNumber = oscNumber;
+    this.oscFreqNode = audioCtx.createConstantSource();
+    this.oscFreqNodeOffsetParam = new Tone.Param(this.oscFreqNode.offset);
     this.oscillator = audioCtx.createOscillator();
     this.oscAmp = audioCtx.createGain();
     this.thruGain = audioCtx.createGain();
@@ -143,6 +145,7 @@ VS.KeysAudioEngine = function(patch) {
     };
 
     this.initialize = function() {
+      this.oscFreqNodeOffsetParam.setValueAtTime(440, audioCtx.currentTime);
       // Set up osc
       this.oscillator.type = patch.vco[this.oscNumber].shape;
       this.oscillator.detune.setValueAtTime(
@@ -157,7 +160,6 @@ VS.KeysAudioEngine = function(patch) {
       this.oscAmp.connect(this.thruGain);
       this.oscAmp.connect(this.modGainSwitch);
 
-      //
       this.thruGain.gain.value = 0;
       thruGainSwitchController.connect(this.thruGain.gain);
       this.thruGain.connect(ampEg);
@@ -179,6 +181,7 @@ VS.KeysAudioEngine = function(patch) {
       osc1ModGain3ModAmp.connect(modGain3.gain);
       */
 
+      this.oscFreqNode.start();
       this.oscillator.start();
     }
 
@@ -219,37 +222,24 @@ VS.KeysAudioEngine = function(patch) {
   const unisonNoteAmp3 = audioCtx.createGain();
   unisonNoteAmp3.gain.value = 0;
 
-  // TODO: The oscillators "base frequency" are not all the same in the keys.
-  // controls frequency of all three vcos rather than looping through them.
-  const oscFreqNode = audioCtx.createConstantSource();
-  const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
-  oscFreqNodeOffsetParam.setValueAtTime(440, audioCtx.currentTime);
-  oscFreqNode.connect(oscillators[1].oscillator.frequency);
-  oscFreqNode.connect(unisonNoteAmp2);
-  oscFreqNode.connect(unisonNoteAmp3);
+
+  // Setup oscillator specific note frequency control
+  oscillators[1].oscFreqNode.connect(oscillators[1].oscillator.frequency);
+  oscillators[1].oscFreqNode.connect(unisonNoteAmp2);
+  oscillators[1].oscFreqNode.connect(unisonNoteAmp3);
   unisonNoteAmp2.connect(oscillators[2].oscillator.frequency);
   unisonNoteAmp3.connect(oscillators[3].oscillator.frequency);
-  oscFreqNode.start();
 
-
-  const oscFreqNode2 = audioCtx.createConstantSource();
-  const oscFreqNodeOffsetParam2 = new Tone.Param(oscFreqNode2.offset);
-  oscFreqNodeOffsetParam2.setValueAtTime(440, audioCtx.currentTime);
   const polyNoteAmp2 = audioCtx.createGain();
   polyNoteAmp2.gain.value = 0;
-  oscFreqNode2.connect(polyNoteAmp2);
+  oscillators[2].oscFreqNode.connect(polyNoteAmp2);
   polyNoteAmp2.connect(oscillators[2].oscillator.frequency);
-  oscFreqNode2.start();
 
-
-  const oscFreqNode3 = audioCtx.createConstantSource();
-  const oscFreqNodeOffsetParam3 = new Tone.Param(oscFreqNode3.offset);
-  oscFreqNodeOffsetParam3.setValueAtTime(440, audioCtx.currentTime);
   const polyNoteAmp3 = audioCtx.createGain();
   polyNoteAmp3.gain.value = 0;
-  oscFreqNode3.connect(polyNoteAmp3);
+  oscillators[3].oscFreqNode.connect(polyNoteAmp3);
   polyNoteAmp3.connect(oscillators[3].oscillator.frequency);
-  oscFreqNode3.start();
+
 
 
   // Switch for unison note frequencies
@@ -429,17 +419,18 @@ VS.KeysAudioEngine = function(patch) {
     // Set frequency of oscillators
     oscillators[1].note = note;
     const frequency = Tone.Frequency(note, 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    oscillators[1].oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
 
     triggerEg(time);
   };
 
+  // Only used for unison voices
   this.changeCurrentNote = function(note, time = audioCtx.currentTime) {
     let frequency = Tone.Frequency(note, 'midi').toFrequency();
-    let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
+    let lastFrequency = oscillators[1].oscFreqNodeOffsetParam.getValueAtTime(time);
 
-    oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
+    oscillators[1].oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
+    oscillators[1].oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
   };
 
   const lowestFreeOscillator = () => {
@@ -482,22 +473,10 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  const swapOscillatorFrequency = function(oscNumber, oldFreq, newFreq, time = audioCtx.currentTime) {
+  const swapOscillatorFrequency = function(oscillator, oldFreq, newFreq, time = audioCtx.currentTime) {
     const rampEndTime = time + patch.portamento;
-    switch (oscNumber) {
-      case 1:
-        oscFreqNodeOffsetParam.setValueAtTime(oldFreq, time);
-        oscFreqNodeOffsetParam.linearRampToValueAtTime(newFreq, rampEndTime);
-        break;
-      case 2:
-        oscFreqNodeOffsetParam2.setValueAtTime(oldFreq, time);
-        oscFreqNodeOffsetParam2.linearRampToValueAtTime(newFreq, rampEndTime);
-        break;
-      case 3:
-        oscFreqNodeOffsetParam3.setValueAtTime(oldFreq, time);
-        oscFreqNodeOffsetParam3.linearRampToValueAtTime(newFreq, rampEndTime);
-        break;
-    }
+    oscillator.oscFreqNodeOffsetParam.setValueAtTime(oldFreq, time);
+    oscillator.oscFreqNodeOffsetParam.linearRampToValueAtTime(newFreq, rampEndTime);
   }
 
   // Poly voices only!
@@ -518,12 +497,12 @@ VS.KeysAudioEngine = function(patch) {
     if (lowestFreeOsc !== null) {
       lowestFreeOsc.note = noteToAdd;
 
-      swapOscillatorFrequency(lowestFreeOsc.oscNumber, closestNoteFrequency, frequency, time);
+      swapOscillatorFrequency(lowestFreeOsc, closestNoteFrequency, frequency, time);
       lowestFreeOsc.turnOnOscAmp();
     } else {
       // swap closest playing note
       closestOscillator.note = noteToAdd;
-      swapOscillatorFrequency(closestOscillator.oscNumber, closestNoteFrequency, frequency, time);
+      swapOscillatorFrequency(closestOscillator, closestNoteFrequency, frequency, time);
     }
 
     adjustPolyRingAlgo(keysDown.length);
@@ -568,7 +547,7 @@ VS.KeysAudioEngine = function(patch) {
     const frequency = Tone.Frequency(noteToSwapIn, 'midi').toFrequency();
     oscAffected.note = noteToSwapIn;
 
-    swapOscillatorFrequency(oscAffected.oscNumber, lastFrequency, frequency, time);
+    swapOscillatorFrequency(oscAffected, lastFrequency, frequency, time);
   };
 
   const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
@@ -634,33 +613,14 @@ VS.KeysAudioEngine = function(patch) {
 
   // CHANGE OCTAVE
   this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
-    // TODO: This function is in need of a refactor.
-
-    if (oscillators[1].note !== -1) {
-      const newNote1 = oscillators[1].note + octaveOffset;
-      oscillators[1].note = newNote1;
-      const frequency = Tone.Frequency(newNote1, 'midi').toFrequency();
-      oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
-    }
-
-    if (oscillators[2].note !== -1) {
-      const frequency2 = Tone.Frequency(
-        oscillators[2].note + octaveOffset,
-        'midi'
-      ).toFrequency();
-      oscillators[2].note += octaveOffset;
-      oscFreqNodeOffsetParam2.setValueAtTime(frequency2, time);
-    }
-
-    if (oscillators[3].note !== -1) {
-      const frequency3 = Tone.Frequency(
-        oscillators[3].note + octaveOffset,
-        'midi'
-      ).toFrequency();
-      oscillators[3].note += octaveOffset;
-
-      oscFreqNodeOffsetParam3.setValueAtTime(frequency3, time);
-    }
+    Object.values(oscillators).forEach(osc => {
+      if (osc.note !== -1) {
+        const newNote = osc.note + octaveOffset;
+        osc.note = newNote;
+        const frequency = Tone.Frequency(newNote, 'midi').toFrequency();
+        osc.oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+      }
+    });
   };
 
   this.setPeak = (value) => {
