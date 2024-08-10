@@ -731,7 +731,7 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   this.setDetune = () => {
-    osc[1].detune.setValueAtTime(patch.vco[1].detune, audioCtx.currentTime);
+    osc[2].detune.setValueAtTime(patch.vco[2].detune, audioCtx.currentTime);
     osc[3].detune.setValueAtTime(patch.vco[3].detune, audioCtx.currentTime);
   };
 

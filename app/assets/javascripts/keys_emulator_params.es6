@@ -138,7 +138,7 @@ VS.KeysEmulatorParams = function() {
   this.setdetune = function(midiValue) {
     this.detune = midiValue;
     cents = this.getPercentage(midiValue) * 84;
-    this.vco[1].detune = cents * -1;
+    this.vco[2].detune = cents * -1;
     this.vco[3].detune = cents;
   };
 
