@@ -146,6 +146,7 @@ VS.KeysAudioEngine = function(patch) {
     };
 
     this.setRingModPath = function(time = audioCtx.currentTime, isRingOut = false) {
+      if (patch.voice !== 'poly ring') { return; }
       const actionTime = isRingOut ? time + patch.envelope.decayRelease : time;
       const ringModPaths = [
         this.modGain2CarrierAmp,
@@ -611,28 +612,39 @@ VS.KeysAudioEngine = function(patch) {
     TODO: Try to break out the configurations of different voices
           into an object or something.
     */
-    voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, audioCtx.currentTime);
+    const time = audioCtx.currentTime;
+    voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, time);
 
     Object.values(oscillators).forEach(obj => obj.oscillator.type = patch.vco[obj.oscNumber].shape);
 
     if (patch.voice.includes('poly')) {
-      oscillators[2].oscAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      oscillators[3].oscAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      unisonNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
-      polyNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+      oscillators[2].oscAmp.gain.setValueAtTime(0, time);
+      oscillators[3].oscAmp.gain.setValueAtTime(0, time);
+      unisonNoteSwitchController.offset.setValueAtTime(0, time);
+      polyNoteSwitchController.offset.setValueAtTime(1, time);
     } else {
-      oscillators[2].oscAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-      oscillators[3].oscAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-      unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
-      polyNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+      oscillators[2].oscAmp.gain.setValueAtTime(1, time);
+      oscillators[3].oscAmp.gain.setValueAtTime(1, time);
+      unisonNoteSwitchController.offset.setValueAtTime(1, time);
+      polyNoteSwitchController.offset.setValueAtTime(0, time);
+    }
+
+    if (patch.voice === 'unison ring') {
+      // set mod ring amps
+      oscillators[1].modGain2CarrierAmp.gain.cancelScheduledValues(time);
+      oscillators[1].modGain2CarrierAmp.gain.setValueAtTime(1, time);
+      oscillators[2].modGain2ModAmp.gain.cancelScheduledValues(time);
+      oscillators[2].modGain2ModAmp.gain.setValueAtTime(1, time);
+      oscillators[3].modGain3ModAmp.gain.cancelScheduledValues(time);
+      oscillators[3].modGain3ModAmp.gain.setValueAtTime(1, time);
     }
 
     if (patch.voice.includes('ring')) {
-      thruGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
-      modGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+      thruGainSwitchController.offset.setValueAtTime(0, time);
+      modGainSwitchController.offset.setValueAtTime(1, time);
     } else {
-      thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
-      modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+      thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, time);
+      modGainSwitchController.offset.setValueAtTime(0, time);
     }
   };
 
