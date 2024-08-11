@@ -17,6 +17,7 @@ VS.KeysAudioEngine = function(patch) {
   const vcoEgIntAmp = audioCtx.createGain();
   const ampLfoPitch = audioCtx.createGain();
   const ampLfoCutoff = audioCtx.createGain();
+  const gracePeriod = 0.05; // 50ms
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -144,7 +145,8 @@ VS.KeysAudioEngine = function(patch) {
       this.oscAmp.gain.setValueAtTime(0, time);
     };
 
-    this.setRingModPath = function(time = audioCtx.currentTime) {
+    this.setRingModPath = function(time = audioCtx.currentTime, isRingOut = false) {
+      const actionTime = isRingOut ? time + patch.envelope.decayRelease : time;
       const ringModPaths = [
         this.modGain2CarrierAmp,
         this.modGain2ModAmp,
@@ -160,7 +162,8 @@ VS.KeysAudioEngine = function(patch) {
 
       ringModPaths.forEach((amp, index) => {
         const gainValue = index === indexOfAmpToTurnOn ? 1 : 0;
-        ringModPaths[index].gain.setValueAtTime(gainValue, time);
+        amp.gain.cancelScheduledValues(time);
+        amp.gain.setValueAtTime(gainValue, actionTime);
       });
     };
 
@@ -409,7 +412,7 @@ VS.KeysAudioEngine = function(patch) {
     triggerDecayRelease(attackEndTimeValue);
   };
 
-  const turnOnAllOscPolyMonoAmps = function(time = audioCtx.currentTime) {
+  const turnOnAllOscAmps = function(time = audioCtx.currentTime) {
     Object.values(oscillators).forEach(obj => obj.turnOnOscAmp());
   };
 
@@ -417,13 +420,17 @@ VS.KeysAudioEngine = function(patch) {
     this.activateAudio();
 
     if (!patch.voice.includes('poly')) {
-      turnOnAllOscPolyMonoAmps();
+      turnOnAllOscAmps();
     } else {
       oscillators[1].turnOnOscAmp();
+      oscillators[2].turnOffOscAmp();
+      oscillators[3].turnOffOscAmp();
     }
 
     if (patch.voice === 'poly ring') {
-      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      oneNotePolyRingAmp.gain.cancelScheduledValues(time);
+      twoNotePolyRingAmp.gain.cancelScheduledValues(time);
+      oneNotePolyRingAmp.gain.setValueAtTime(1, time);
     }
 
     // Set frequency of oscillators
@@ -467,18 +474,23 @@ VS.KeysAudioEngine = function(patch) {
     return closestOsc;
   };
 
-  const adjustPolyRingAlgo = function(numberOfKeysDown) {
+  const adjustPolyRingAlgo = function(numberOfKeysDown, time = audioCtx.currentTime, isRingOut = false) {
     if (patch.voice !== 'poly ring') { return; }
 
+    const actionTime = isRingOut ? time + patch.envelope.decayRelease : time;
+
+    oneNotePolyRingAmp.gain.cancelScheduledValues(time);
+    twoNotePolyRingAmp.gain.cancelScheduledValues(time);
+
     if (numberOfKeysDown === 1) {
-      oneNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
-      twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      oneNotePolyRingAmp.gain.setValueAtTime(1, actionTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(0, actionTime);
     } else if (numberOfKeysDown === 2) {
-      oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      twoNotePolyRingAmp.gain.setValueAtTime(1, audioCtx.currentTime);
+      oneNotePolyRingAmp.gain.setValueAtTime(0, actionTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(1, actionTime);
     } else if (numberOfKeysDown === 3) {
-      oneNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
-      twoNotePolyRingAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      oneNotePolyRingAmp.gain.setValueAtTime(0, actionTime);
+      twoNotePolyRingAmp.gain.setValueAtTime(0, actionTime);
     }
   };
 
@@ -562,14 +574,20 @@ VS.KeysAudioEngine = function(patch) {
 
   const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
     const turnOffTime = time + patch.envelope.decayRelease;
-    Object.values(oscillators).forEach(obj => obj.turnOffOscAmp(turnOffTime));
+    Object.values(oscillators).forEach(obj => {
+      obj.oscAmp.gain.cancelScheduledValues(time);
+      obj.turnOffOscAmp(turnOffTime);
+    });
   };
 
   this.stopPolyNote = function(keysDown, noteThatStopped) {
-    // important because EG uses oscillator note values to determine decay vs release
     if (keysDown.length === 0) {
-      [1, 2, 3].forEach(i => oscillators[i].note = -1);
+      // Ring out
+      Object.values(oscillators).forEach(osc => osc.setRingModPath(audioCtx.currentTime, true));
+      adjustPolyRingAlgo(keysDown.length, audioCtx.currentTime, true);
       turnOffAllOscAmps();
+      [1, 2, 3].forEach(i => oscillators[i].note = -1);
+      return;
     }
     if (!patch.voice.includes('poly')) { return; }
 
@@ -580,12 +598,12 @@ VS.KeysAudioEngine = function(patch) {
       swapPolyNote(keysDown, noteThatStopped, oscAffected);
     } else {
       oscAffected.note = -1;
-      // TODO: Will probably need to account for EG release at some point.
-      oscAffected.turnOffOscAmp();
+      // Schedule note removal after 50ms grace period
+      const actionTime = audioCtx.currentTime + gracePeriod;
+      Object.values(oscillators).forEach(osc => osc.setRingModPath(actionTime));
+      adjustPolyRingAlgo(keysDown.length, actionTime);
+      oscAffected.turnOffOscAmp(actionTime);
     }
-
-    Object.values(oscillators).forEach(osc => osc.setRingModPath());
-    adjustPolyRingAlgo(keysDown.length);
   };
 
   this.changeVoice = function() {

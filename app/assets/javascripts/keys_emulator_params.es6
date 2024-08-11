@@ -59,9 +59,13 @@ VS.KeysEmulatorParams = function() {
           this.vco[i].shape = 'square';
         }.bind(this));
       }.bind(this),
+
       'poly ring': function() {
-        // NotImplemented
-      }
+        this.vco[3].voiceDetune = 0;
+        [1, 2, 3].forEach(function(i) {
+          this.vco[i].shape = 'square';
+        }.bind(this));
+      }.bind(this),
     };
 
   this.setvoice = function(midiValue) {
