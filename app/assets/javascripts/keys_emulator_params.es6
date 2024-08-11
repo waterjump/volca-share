@@ -10,8 +10,6 @@ VS.KeysEmulatorParams = function() {
   this.vco_eg_int = 0;
   this.filter = { cutoff: 20000, peak: 0 };
   this.vcf_eg_int = 0;
-
-  this.filterEgCoefficient = 1.35;
   this.lfo = {
     shape: 'triangle',
     pitchValue: 0,

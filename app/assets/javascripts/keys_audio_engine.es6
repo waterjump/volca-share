@@ -8,8 +8,6 @@ VS.KeysAudioEngine = function(patch) {
   const masterAmp = audioCtx.createGain();
   const filter = audioCtx.createBiquadFilter();
   const filterEgAmp = audioCtx.createGain();
-  const filterEg = audioCtx.createConstantSource();
-  const filterEgOffsetParam = new Tone.Param(filterEg.offset);
   const ampEg = audioCtx.createGain();
   const universalEg = audioCtx.createConstantSource();
   const universalEgOffsetParam = new Tone.Param(universalEg.offset);
@@ -64,11 +62,6 @@ VS.KeysAudioEngine = function(patch) {
 
   filterEgAmp.gain.setValueAtTime(patch.vcf_eg_int, audioCtx.currentTime);
   filterEgAmp.connect(filter.detune);
-
-  filterEg.offset.setValueAtTime(0, audioCtx.currentTime);
-  filterEg.connect(filterEgAmp);
-  filterEg.start();
-
 
   ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
   ampEg.connect(filter);
@@ -217,6 +210,7 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  universalEg.connect(filterEgAmp);
   universalEg.connect(ampEg.gain);
   universalEg.connect(vcoEgShaper);
   vcoEgShaper.connect(vcoEgIntAmp);
@@ -361,13 +355,6 @@ VS.KeysAudioEngine = function(patch) {
     let duration;
     const currentValue = universalEgOffsetParam.getValueAtTime(time);
 
-    // filterEgOffsetParam.cancelAndHoldAtTime(time);
-    filterEgOffsetParam.cancelScheduledValues(time);
-    filterEgOffsetParam.linearRampToValueAtTime(
-     endValue,
-     time + (patch.envelope.decayRelease * patch.filterEgCoefficient)
-    );
-
     if (isDecay) {
       universalEgOffsetParam.setValueAtTime(1, time);
       duration = patch.envelope.decayRelease;
@@ -389,9 +376,6 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   const triggerEg = function(time = audioCtx.currentTime) {
-    // Filter EG reset
-    filterEgOffsetParam.cancelAndHoldAtTime(time);
-
     const attackEndTimeValue = time + patch.envelope.attack;
 
     // Amp EG reset
@@ -405,9 +389,6 @@ VS.KeysAudioEngine = function(patch) {
     }
 
     retriggerLfo();
-
-    filterEgOffsetParam.setValueAtTime(0, time);
-    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
 
     // Decay
     triggerDecayRelease(attackEndTimeValue);
