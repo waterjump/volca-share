@@ -80,10 +80,11 @@ VS.KeysAudioEngine = function(patch) {
     oscLfo.type = patch.lfo.shape;
     oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
     oscLfo.connect(lfoWaveShaper);
-    lfoWaveShaper.connect(ampLfoPitch);
-    lfoWaveShaper.connect(ampLfoCutoff);
     oscLfo.start();
   }
+
+  lfoWaveShaper.connect(ampLfoPitch);
+  lfoWaveShaper.connect(ampLfoCutoff);
 
   setupOscLfo();
 
@@ -338,10 +339,9 @@ VS.KeysAudioEngine = function(patch) {
   };
 
   const retriggerLfo = function() {
-    let lfo = patch.lfo;
-    if (lfo.shape !== 'square') { return; }
-    if (!(lfo.targetAmp) && !(lfo.targetPitch) && !(lfo.targetCutoff)) { return; }
-    if (lfo.ampValue + lfo.pitchValue + lfo.cutoffValue === 0) { return; }
+    const lfo = patch.lfo;
+    if (!lfo.triggerSync) { return; }
+    if (lfo.pitchValue + lfo.cutoffValue === 0) { return; }
 
     oscLfo.disconnect();
     oscLfo = null;
@@ -665,11 +665,8 @@ VS.KeysAudioEngine = function(patch) {
     oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
   };
 
-  this.setLfoWave = (value) => {
-    if (value === 'saw') {
-      value = 'sawtooth';
-    }
-    oscLfo.type = value;
+  this.setLfoWave = () => {
+    oscLfo.type = patch.lfo.shape;
   };
 
   this.setSustain = (value) => {

@@ -14,7 +14,8 @@ VS.KeysEmulatorParams = function() {
     shape: 'triangle',
     pitchValue: 0,
     cutoffValue: 0,
-    frequency: 0.1
+    frequency: 0.1,
+    triggerSync: false
   };
   this.envelope = { attack: 0, decayRelease: 0.07, sustain: 0 };
 

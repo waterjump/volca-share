@@ -222,20 +222,30 @@ VS.KeysEmulator = function() {
     audioEngine.setVolume(patch.volume);
   });
 
-  // LFO WAVE
-  $('#patch_lfo_shape_saw').on('change', function(event) {
-    audioEngine.setLfoWave($(this).val());
+  const getShapeFromLfoLightClick = function(el) {
+    return $('#' + $(el).closest('label').attr('for')).val();
+  };
+
+  lfoControlSelectors = [
+    'label[for="patch_lfo_shape_saw"] span.multi',
+    'label[for="patch_lfo_shape_triangle"] span.multi',
+    'label[for="patch_lfo_shape_square"] span.multi'
+  ];
+
+  lfoControlSelectors.forEach(function(selector) {
+    $(selector).on('click tap', function(event) {
+      const shape = getShapeFromLfoLightClick(this);
+      patch.lfo.shape = shape === 'saw' ? 'sawtooth' : shape;
+      audioEngine.setLfoWave();
+    });
   });
 
-  // LFO WAVE
-  $('#patch_lfo_shape_triangle').on('change', function(event) {
-    audioEngine.setLfoWave($(this).val());
-  });
-
-  // LFO WAVE
-  $('#patch_lfo_shape_square').on('change', function(event) {
-    audioEngine.setLfoWave($(this).val());
-  });
+  $('label[for="patch_lfo_trigger_sync"] span.on-off').on(
+    'click tap',
+    function(event) {
+      patch.lfo.triggerSync = !patch.lfo.triggerSync;
+    }
+  );
 
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function() { macroOctaveUp() });

@@ -22,7 +22,8 @@ class EmulatorsController < ApplicationController
     @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
       voice: 30,
       attack: 0,
-      cutoff: 127
+      cutoff: 127,
+      lfo_trigger_sync: false
     ))
     @title = 'Volca Keys Emulator'
     render 'emulators/keys/new'
