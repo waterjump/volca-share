@@ -253,6 +253,25 @@ VS.KeysEmulator = function() {
     keyboardUp({ keyCode: $(this).data('keycode') });
   });
 
+  // TOOLTIPS
+  const itemsComingSoon = [
+    '.scrim',
+  ];
+
+  itemsComingSoon.forEach(function(selector) {
+    $(selector).mouseenter(function() {
+      if (VS.dragging) { return; }
+      $('.cooltip').text("Coming soon!");
+      $('.cooltip').show();
+    });
+  });
+
+  itemsComingSoon.forEach(function(selector) {
+    $(selector).mouseleave(function() {
+      $('.cooltip').hide();
+    });
+  });
+
   $('#octave').mouseenter(function() {
     $('.cooltip').text("Press 'Z' or 'X' to change octaves");
     $('.cooltip').show();

@@ -168,3 +168,20 @@
     }
   }
 }
+
+.volca.keys.emulator {
+  .scrim {
+    position: absolute;
+    top: 39%;
+    height: 16%;
+    width: 35%;
+    background-color: #bda694b2;
+    left: 60%;
+  }
+
+  .cooltip {
+    top: 14%;
+    left: 75.2%;
+    z-index:100
+  }
+}
