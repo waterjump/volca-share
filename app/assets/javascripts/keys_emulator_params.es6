@@ -37,7 +37,7 @@ VS.KeysEmulatorParams = function() {
       poly: function() {
         this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 0;
-      },
+      }.bind(this),
       unison: function() {
         this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 0;
@@ -126,14 +126,12 @@ VS.KeysEmulatorParams = function() {
       Math.min(...[22050, 3.28311 * (Math.E**(0.0802801 * midiValue))]);
   };
   this.setlfo_rate = function(midiValue) {
-    // let oldValue = (this.getPercentage(midiValue)**3 * 35) + 0.1;
-    this.lfo.frequency = calculateMappedParameter('lfoRate', midiValue);
+    this.lfo.frequency = calculateMappedParameter('keysLfoRate', midiValue);
   };
 
   this.setlfo_pitch_int = function(midiValue) {
-    // TODO: Implement machine specific values
     percentage = this.getPercentage(midiValue);
-    this.lfo.pitchValue = percentage * 900;
+    this.lfo.pitchValue = percentage * 440;
   };
 
   this.setlfo_cutoff_int = function(midiValue) {
@@ -193,9 +191,8 @@ VS.KeysEmulatorParams = function() {
   }
 
   const parameterMaps = {
-    decayReleaseMap: emulatorConstants.decayReleaseMap,
     keysDecayReleaseTapMap: emulatorConstants.keysDecayReleaseTapMap,
-    lfoRateMap: emulatorConstants.lfoRateMap
+    keysLfoRateMap: emulatorConstants.keysLfoRateMap
   };
 
   const calculateMappedParameter = (paramName, midiValue) => {

@@ -101,6 +101,12 @@ VS.EmulatorConstants = function() {
   };
 
   // key: midi value of parameter.  value: LFO rate in Hz
+  this.keysLfoRateMap = {
+    0: 0.292, 10: 0.475, 20: 0.657, 30: 0.841, 40: 1.022, 50: 1.205, 60: 1.389,
+    70: 1.572, 80: 1.754, 90: 1.934, 100: 6.757, 110: 18.518, 120: 58.823, 127: 90.91
+  }
+
+  // key: midi value of parameter.  value: LFO rate in Hz
   this.lfoRateMap = {
     0: 0.0383, 10: 0.23, 20: 0.421, 30: 0.612, 40: 0.803, 50: 1, 60: 1.186,
     70: 1.377, 80: 1.569, 90: 1.757, 100: 6.757, 110: 20, 115: 35.71,
