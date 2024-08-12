@@ -106,13 +106,13 @@ VS.KeysEmulatorParams = function() {
   };
 
   this.setcutoff_eg_int = function(midiValue) {
-    // let oldValueInHz = this.getPercentage(midiValue)**2 * 10000;
-    // TODO: This needs adjusting.  NOTE: It's in cents now.  Not Hz.
-    this.vcf_eg_int = 1200 * (midiValue / 20.0);
+    this.vcf_eg_int = this.getPercentage(midiValue) * 6000;
   };
+
   this.setportamento = function(midiValue) {
     this.portamento = this.getPercentage(midiValue) * 0.258 + 0.008;
   };
+
   this.setoctave = function(midiValue) {
     this.octave = parseInt(VS.display.octaveString(midiValue)[3]);
   };
