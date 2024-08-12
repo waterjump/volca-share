@@ -119,12 +119,11 @@ VS.KeysEmulatorParams = function() {
   this.setpeak = function(midiValue) {
     this.filter.peak = (this.getPercentage(midiValue)**2.5 * 30.0);
   };
+
   this.setcutoff = function(midiValue) {
-    // Note: Curve calculated using audacity data from actual synth, and
-    //   plugged into WolframAlpha: https://tinyurl.com/y2qp9ebp
-    this.filter.cutoff =
-      Math.min(...[22050, 3.28311 * (Math.E**(0.0802801 * midiValue))]);
+    this.filter.cutoff = calculateMappedParameter('keysCutoff', midiValue);
   };
+
   this.setlfo_rate = function(midiValue) {
     this.lfo.frequency = calculateMappedParameter('keysLfoRate', midiValue);
   };
@@ -191,6 +190,7 @@ VS.KeysEmulatorParams = function() {
   }
 
   const parameterMaps = {
+    keysCutoffMap: emulatorConstants.keysCutoffMap,
     keysDecayReleaseTapMap: emulatorConstants.keysDecayReleaseTapMap,
     keysLfoRateMap: emulatorConstants.keysLfoRateMap
   };
