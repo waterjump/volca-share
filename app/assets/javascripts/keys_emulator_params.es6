@@ -134,9 +134,7 @@ VS.KeysEmulatorParams = function() {
   };
 
   this.setlfo_cutoff_int = function(midiValue) {
-    // TODO: Implement machine specific values
-    percentage = this.getPercentage(midiValue);
-    this.lfo.cutoffValue = percentage**2 * 4800;
+    this.lfo.cutoffValue = this.getPercentage(midiValue) * 6000;
   };
 
   this.setdetune = function(midiValue) {
