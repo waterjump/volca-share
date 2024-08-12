@@ -220,6 +220,11 @@ VS.KeysAudioEngine = function(patch) {
   thruGainSwitchController.start();
   modGainSwitchController.start();
 
+  const voiceOscDetuner1 = audioCtx.createConstantSource();
+  voiceOscDetuner1.offset.setValueAtTime(0, audioCtx.currentTime);
+  voiceOscDetuner1.connect(oscillators[1].oscillator.detune);
+  voiceOscDetuner1.start();
+
   const voiceOscDetuner3 = audioCtx.createConstantSource();
   voiceOscDetuner3.offset.setValueAtTime(0, audioCtx.currentTime);
   voiceOscDetuner3.connect(oscillators[3].oscillator.detune);
@@ -594,6 +599,7 @@ VS.KeysAudioEngine = function(patch) {
           into an object or something.
     */
     const time = audioCtx.currentTime;
+    voiceOscDetuner1.offset.setValueAtTime(patch.vco[1].voiceDetune, time);
     voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, time);
 
     Object.values(oscillators).forEach(obj => obj.oscillator.type = patch.vco[obj.oscNumber].shape);

@@ -35,17 +35,21 @@ VS.KeysEmulatorParams = function() {
 
   this.voiceChange = {
       poly: function() {
-        // NotImplemented
+        this.vco[1].voiceDetune = 0;
+        this.vco[3].voiceDetune = 0;
       },
       unison: function() {
+        this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 0;
       }.bind(this),
 
       octave: function() {
+        this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 1200;
       }.bind(this),
 
       fifth: function() {
+        this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 700;
         [1, 2, 3].forEach(function(i) {
           this.vco[i].shape = 'sawtooth';
@@ -53,13 +57,15 @@ VS.KeysEmulatorParams = function() {
       }.bind(this),
 
       'unison ring': function() {
-        this.vco[3].voiceDetune = 0;
+        this.vco[1].voiceDetune = -1200;
+        this.vco[3].voiceDetune = 1;
         [1, 2, 3].forEach(function(i) {
           this.vco[i].shape = 'square';
         }.bind(this));
       }.bind(this),
 
       'poly ring': function() {
+        this.vco[1].voiceDetune = 0;
         this.vco[3].voiceDetune = 0;
         [1, 2, 3].forEach(function(i) {
           this.vco[i].shape = 'square';
