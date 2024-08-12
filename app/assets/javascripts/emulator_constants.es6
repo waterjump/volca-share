@@ -93,6 +93,13 @@ VS.EmulatorConstants = function() {
     122: 1.04, 125: 1.65, 127: 2.64
   };
 
+  // Finger tap (not held down)
+  this.keysDecayReleaseTapMap = {
+    0: 0.073, 10: 0.077, 20: 0.084, 30: 0.09, 40: 0.103, 50: 0.112, 60: 0.13,
+    70: 0.149, 80: 0.18, 90: 0.212, 100: 0.28, 110: 0.388, 115: 0.488, 120: 0.663,
+    122: 0.774, 125: 1.013, 127: 1.31
+  };
+
   // key: midi value of parameter.  value: LFO rate in Hz
   this.lfoRateMap = {
     0: 0.0383, 10: 0.23, 20: 0.421, 30: 0.612, 40: 0.803, 50: 1, 60: 1.186,

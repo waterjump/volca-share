@@ -91,10 +91,8 @@ VS.KeysEmulatorParams = function() {
   };
 
   this.setdecay_release = function(midiValue) {
-    // Keeping these old formulas bc I might do a before and after.
-    // let oldValue = 5 * this.getPercentage(midiValue)**3 + 0.05;
     this.envelope.decayRelease =
-      calculateMappedParameter('decayRelease', midiValue);
+      calculateMappedParameter('keysDecayReleaseTap', midiValue);
   };
 
   this.setsustain = function(midiValue) {
@@ -190,6 +188,7 @@ VS.KeysEmulatorParams = function() {
 
   const parameterMaps = {
     decayReleaseMap: emulatorConstants.decayReleaseMap,
+    keysDecayReleaseTapMap: emulatorConstants.keysDecayReleaseTapMap,
     lfoRateMap: emulatorConstants.lfoRateMap
   };
 
