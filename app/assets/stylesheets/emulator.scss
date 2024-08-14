@@ -170,13 +170,25 @@
 }
 
 .volca.keys.emulator {
+  background-image: image_url('VolcaKeys-medium-unbranded-shopped.jpg');
   .scrim {
     position: absolute;
+    background-color: #bda694b2;
+  }
+
+  #blackbuttons-scrim {
     top: 39%;
     height: 16%;
     width: 35%;
-    background-color: #bda694b2;
     left: 60%;
+  }
+
+  #tempo-scrim {
+    top: 27%;
+    height: 13%;
+    left: 80%;
+    width: 6%;
+    background-color: #bba397b2;
   }
 
   .cooltip {
