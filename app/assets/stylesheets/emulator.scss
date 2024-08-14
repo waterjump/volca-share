@@ -170,17 +170,44 @@
 }
 
 .volca.keys.emulator {
-  background-image: image_url('VolcaKeys-medium-unbranded-shopped.jpg');
+  background-image: image_url('VolcaKeys-medium-unbranded-shopped-permalink.jpg');
   .scrim {
     position: absolute;
     background-color: #bda694b2;
   }
 
+  #permalink {
+    left: 79.5%;
+    top: 44%;
+    background: #161113;
+    border: solid #b1b5c4;
+    box-shadow: 0 0 0 2px #161113;
+  }
+
+  #permalink:active {
+    background-color: #666;
+    border: solid #fd9994;
+  }
+
+  .green-check-mark {
+    position: absolute;
+    left: 86.5%;
+    top: 39%;
+    z-index: 2;
+  }
+
   #blackbuttons-scrim {
     top: 39%;
     height: 16%;
-    width: 35%;
+    width: 18%;
     left: 60%;
+  }
+
+  #func-scrim {
+    top: 39%;
+    height: 16%;
+    width: 7%;
+    left: 88%;
   }
 
   #tempo-scrim {

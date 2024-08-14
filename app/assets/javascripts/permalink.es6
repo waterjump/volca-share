@@ -1,5 +1,5 @@
 $(function() {
-  if ($('.emulator').length === 0) { return; }
+  if ($('.bass.emulator').length === 0) { return; }
 
   let permalinkQueryString = function() {
     let result = {};

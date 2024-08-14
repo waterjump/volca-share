@@ -338,9 +338,25 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
+  const setInitialEngineValues = function() {
+    this.changeVoice();
+    this.setDetune();
+    this.setVcoEgInt();
+    this.setCutoff(patch.filter.cutoff);
+    this.setPeak(patch.filter.peak);
+    this.setFilterEgInt(patch.vcf_eg_int);
+    this.setLfoRate(patch.lfo.frequency);
+    this.setLfoPitchInt();
+    this.setLfoCutoffInt();
+    this.setLfoWave();
+    this.setDelayTime();
+    this.setDelayFeedback();
+  }.bind(this);
+
   this.init = () => {
     Tone.setContext(myToneCtx);
     Tone.start();
+    setInitialEngineValues();
     masterAmp.connect(audioCtx.destination);
   };
 

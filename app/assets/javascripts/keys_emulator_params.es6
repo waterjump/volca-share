@@ -105,7 +105,7 @@ VS.KeysEmulatorParams = function() {
     this.envelope.sustain = this.getPercentage(midiValue);
   };
 
-  this.setcutoff_eg_int = function(midiValue) {
+  this.setvcf_eg_int = function(midiValue) {
     this.vcf_eg_int = this.getPercentage(midiValue) * 6000;
   };
 
@@ -116,6 +116,7 @@ VS.KeysEmulatorParams = function() {
   this.setoctave = function(midiValue) {
     this.octave = parseInt(VS.display.octaveString(midiValue)[3]);
   };
+
   this.setpeak = function(midiValue) {
     this.filter.peak = (this.getPercentage(midiValue)**2.5 * 30.0);
   };
@@ -172,6 +173,10 @@ VS.KeysEmulatorParams = function() {
 
   this.setlfo_wave = function(shape) {
     this.lfo.shape = shape;
+  };
+
+  this.setlfo_trigger_sync = function() {
+    this.lfo.triggerSync = !this.lfo.triggerSync;
   };
 
   // UTILITY FUNCTIONS

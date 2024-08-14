@@ -17,6 +17,87 @@ VS.KeysEmulator = function() {
     }
   }
 
+  // ==================================
+  // START QUERY STRING
+  // ==================================
+  const processQueryString = function() {
+    let urlParams;
+    try {
+      urlParams = new URLSearchParams(window.location.search);
+    } catch (_) {
+      urlParams = {
+        get: function(name) {
+          name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+          var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+          var results = regex.exec(location.search);
+          return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+      };
+    }
+
+    const qsKnobs = [
+      'voice', 'detune', 'portamento', 'vco_eg_int', 'attack', 'decay_release',
+      'vcf_eg_int', 'octave', 'peak', 'cutoff', 'sustain', 'lfo_rate',
+      'lfo_pitch_int', 'lfo_cutoff_int', 'delay_time', 'delay_feedback'
+    ];
+
+    qsKnobs.forEach(function(qsParam) {
+      const rawValue = urlParams.get(qsParam);
+      const parsedValue = parseInt(rawValue);
+      if (0 <= parsedValue && parsedValue <= 127) {
+        patch[`set${qsParam}`](parsedValue);
+
+        new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
+      } else {
+        new VS.Knob($(`#${qsParam}`)).setKnob();
+      }
+    });
+
+    const qsBooleanParameters = ['lfo_trigger_sync'];
+
+    qsBooleanParameters.forEach(function(qsParam) {
+      const qsValue = urlParams.get(qsParam);
+      if (['true', 'false'].indexOf(qsValue) !== -1) {
+        patch[`set${qsParam}`](qsValue);
+
+        if (qsValue === 'true') {
+          volcaInterface.lightAndCheck(qsParam);
+        } else {
+          volcaInterface.unlightAndUncheck(qsParam);
+        }
+      }
+    });
+
+    // LFO wave from query string
+    const rawValue = urlParams.get('lfo_shape');
+    if (['triangle', 'square', 'saw'].indexOf(rawValue) !== -1) {
+      const adjustedValue = rawValue === 'saw' ? 'sawtooth' : rawValue;
+      patch.setlfo_wave(adjustedValue);
+
+      volcaInterface.unlightAndUncheck('lfo_shape_square');
+      volcaInterface.unlightAndUncheck('lfo_shape_triangle');
+      volcaInterface.unlightAndUncheck('lfo_shape_saw');
+
+      switch (rawValue) {
+        case 'square':
+          volcaInterface.lightAndCheck('lfo_shape_square');
+          break;
+        case 'triangle':
+          volcaInterface.lightAndCheck('lfo_shape_triangle');
+          break;
+        case 'saw':
+          volcaInterface.lightAndCheck('lfo_shape_saw');
+          break;
+      }
+    }
+  };
+
+  processQueryString();
+
+  // =======================
+  // END query string params
+  // =======================
+
   let keysDown = [];
 
   const audioEngine = new VS.KeysAudioEngine(emulatorParams);
@@ -186,7 +267,7 @@ VS.KeysEmulator = function() {
   });
 
   $('#vcf_eg_int').on('knobturn', () => {
-    patch.setcutoff_eg_int(VS.activeKnob.trueMidi());
+    patch.setvcf_eg_int(VS.activeKnob.trueMidi());
     audioEngine.setFilterEgInt(patch.vcf_eg_int);
   });
 
@@ -238,12 +319,9 @@ VS.KeysEmulator = function() {
     });
   });
 
-  $('label[for="patch_lfo_trigger_sync"] span.on-off').on(
-    'click tap',
-    function(event) {
-      patch.lfo.triggerSync = !patch.lfo.triggerSync;
-    }
-  );
+  $('label[for="patch_lfo_trigger_sync"] span.on-off').on( 'click tap', () => {
+    patch.setlfo_trigger_sync();
+  });
 
   // MOBILE OCTAVE UP
   $('#octave-up').on('click tap', function() { macroOctaveUp() });
