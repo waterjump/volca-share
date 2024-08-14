@@ -16,6 +16,7 @@ VS.KeysAudioEngine = function(patch) {
   const ampLfoPitch = audioCtx.createGain();
   const ampLfoCutoff = audioCtx.createGain();
   const gracePeriod = 0.05; // 50ms
+  const carrierGain = 0.5; // so ring mod voices aren't super loud
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -79,6 +80,7 @@ VS.KeysAudioEngine = function(patch) {
     oscLfo = audioCtx.createOscillator();
     oscLfo.type = patch.lfo.shape;
     oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
+    // TODO: Skip waveshaper unless sawtooth
     oscLfo.connect(lfoWaveShaper);
     oscLfo.start();
   }
@@ -89,7 +91,7 @@ VS.KeysAudioEngine = function(patch) {
   setupOscLfo();
 
   const thruGainSwitchController = audioCtx.createConstantSource();
-  thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
+  thruGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
 
   const modGainSwitchController = audioCtx.createConstantSource();
   modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
@@ -120,6 +122,7 @@ VS.KeysAudioEngine = function(patch) {
     this.oscFreqNode = audioCtx.createConstantSource();
     this.oscFreqNodeOffsetParam = new Tone.Param(this.oscFreqNode.offset);
     this.oscillator = audioCtx.createOscillator();
+    this.volumeAmp = audioCtx.createGain();
     this.oscAmp = audioCtx.createGain();
     this.thruGain = audioCtx.createGain();
     this.modGainSwitch = audioCtx.createGain();
@@ -154,6 +157,11 @@ VS.KeysAudioEngine = function(patch) {
         .sort((a, b) => a - b);
 
       const indexOfAmpToTurnOn = currentNotesSorted.indexOf(this.note);
+      if (indexOfAmpToTurnOn === 0) {
+        this.volumeAmp.gain.setValueAtTime(carrierGain, time);
+      } else {
+        this.volumeAmp.gain.setValueAtTime(1, time);
+      }
 
       ringModPaths.forEach((amp, index) => {
         const gainValue = index === indexOfAmpToTurnOn ? 1 : 0;
@@ -174,7 +182,9 @@ VS.KeysAudioEngine = function(patch) {
       ampLfoPitch.connect(this.oscillator.detune);
       vcoEgIntAmp.connect(this.oscillator.detune);
 
-      this.oscillator.connect(this.oscAmp);
+      this.oscillator.connect(this.volumeAmp);
+      this.volumeAmp.gain.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
+      this.volumeAmp.connect(this.oscAmp);
       this.oscAmp.connect(this.thruGain);
       this.oscAmp.connect(this.modGainSwitch);
 
@@ -424,6 +434,7 @@ VS.KeysAudioEngine = function(patch) {
     oscillators[1].note = note;
     const frequency = Tone.Frequency(note, 'midi').toFrequency();
     oscillators[1].oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    oscillators[1].setRingModPath();
 
     triggerEg(time);
   };
@@ -618,6 +629,7 @@ VS.KeysAudioEngine = function(patch) {
 
     if (patch.voice === 'unison ring') {
       // set mod ring amps
+      oscillators[1].volumeAmp.gain.setValueAtTime(carrierGain, time);
       oscillators[1].modGain2CarrierAmp.gain.cancelScheduledValues(time);
       oscillators[1].modGain2CarrierAmp.gain.setValueAtTime(1, time);
       oscillators[1].modGain2ModAmp.gain.cancelScheduledValues(time);
@@ -625,6 +637,7 @@ VS.KeysAudioEngine = function(patch) {
       oscillators[1].modGain3ModAmp.gain.cancelScheduledValues(time);
       oscillators[1].modGain3ModAmp.gain.setValueAtTime(0, time);
 
+      oscillators[2].volumeAmp.gain.setValueAtTime(1, time);
       oscillators[2].modGain2CarrierAmp.gain.cancelScheduledValues(time);
       oscillators[2].modGain2CarrierAmp.gain.setValueAtTime(0, time);
       oscillators[2].modGain2ModAmp.gain.cancelScheduledValues(time);
@@ -632,6 +645,7 @@ VS.KeysAudioEngine = function(patch) {
       oscillators[2].modGain3ModAmp.gain.cancelScheduledValues(time);
       oscillators[2].modGain3ModAmp.gain.setValueAtTime(0, time);
 
+      oscillators[3].volumeAmp.gain.setValueAtTime(1, time);
       oscillators[3].modGain2CarrierAmp.gain.cancelScheduledValues(time);
       oscillators[3].modGain2CarrierAmp.gain.setValueAtTime(0, time);
       oscillators[3].modGain2ModAmp.gain.cancelScheduledValues(time);
@@ -654,8 +668,12 @@ VS.KeysAudioEngine = function(patch) {
       thruGainSwitchController.offset.setValueAtTime(0, time);
       modGainSwitchController.offset.setValueAtTime(1, time);
     } else {
-      thruGainSwitchController.offset.setValueAtTime(patch.defaultVcoAmp, time);
+      thruGainSwitchController.offset.setValueAtTime(1, time);
       modGainSwitchController.offset.setValueAtTime(0, time);
+      Object.values(oscillators).forEach(osc => {
+        osc.volumeAmp.gain.cancelScheduledValues(time);
+        osc.volumeAmp.gain.setValueAtTime(patch.defaultVcoAmp, time);
+      });
     }
   };
 
