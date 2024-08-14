@@ -17,14 +17,14 @@ VS.KeysEmulatorParams = function() {
     frequency: 0.1,
     triggerSync: false
   };
-  this.envelope = { attack: 0, decayRelease: 0.07, sustain: 0 };
+  this.envelope = { attack: 0, decayRelease: 0.07, sustain: 1 };
 
   this.vco =
     [
       null,
       { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 },
-      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 0, voiceDetune: 0 }
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: -0.5, voiceDetune: 0 },
+      { shape: 'sawtooth', amp: this.defaultVcoAmp, pitchMidi: 63, detune: 1, voiceDetune: 0 }
     ];
   this.delay = { time: 0.2, feedback: 0 }
   this.volume = 1;
@@ -140,8 +140,8 @@ VS.KeysEmulatorParams = function() {
   this.setdetune = function(midiValue) {
     this.detune = midiValue;
     cents = this.getPercentage(midiValue) * 84;
-    this.vco[2].detune = cents * -1;
-    this.vco[3].detune = cents;
+    this.vco[2].detune = (cents * -1) - 0.5;
+    this.vco[3].detune = cents + 1;
   };
 
   this.setdelay_time = function(midiValue) {
