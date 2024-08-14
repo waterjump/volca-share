@@ -58,7 +58,7 @@ VS.KeysEmulatorParams = function() {
 
       'unison ring': function() {
         this.vco[1].voiceDetune = -1200;
-        this.vco[3].voiceDetune = 1;
+        this.vco[3].voiceDetune = 0;
         [1, 2, 3].forEach(function(i) {
           this.vco[i].shape = 'square';
         }.bind(this));

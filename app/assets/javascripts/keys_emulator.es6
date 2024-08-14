@@ -39,8 +39,6 @@ VS.KeysEmulator = function() {
     // showPerformanceWarning();
   }
 
-  let debugNewNote;
-
   // this is how to auto-rotate knobs
   $('.knob').each(function() {
     new VS.Knob(this).setKnob($(this).data('midi'));

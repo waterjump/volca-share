@@ -620,10 +620,34 @@ VS.KeysAudioEngine = function(patch) {
       // set mod ring amps
       oscillators[1].modGain2CarrierAmp.gain.cancelScheduledValues(time);
       oscillators[1].modGain2CarrierAmp.gain.setValueAtTime(1, time);
+      oscillators[1].modGain2ModAmp.gain.cancelScheduledValues(time);
+      oscillators[1].modGain2ModAmp.gain.setValueAtTime(0, time);
+      oscillators[1].modGain3ModAmp.gain.cancelScheduledValues(time);
+      oscillators[1].modGain3ModAmp.gain.setValueAtTime(0, time);
+
+      oscillators[2].modGain2CarrierAmp.gain.cancelScheduledValues(time);
+      oscillators[2].modGain2CarrierAmp.gain.setValueAtTime(0, time);
       oscillators[2].modGain2ModAmp.gain.cancelScheduledValues(time);
       oscillators[2].modGain2ModAmp.gain.setValueAtTime(1, time);
+      oscillators[2].modGain3ModAmp.gain.cancelScheduledValues(time);
+      oscillators[2].modGain3ModAmp.gain.setValueAtTime(0, time);
+
+      oscillators[3].modGain2CarrierAmp.gain.cancelScheduledValues(time);
+      oscillators[3].modGain2CarrierAmp.gain.setValueAtTime(0, time);
+      oscillators[3].modGain2ModAmp.gain.cancelScheduledValues(time);
+      oscillators[3].modGain2ModAmp.gain.setValueAtTime(0, time);
       oscillators[3].modGain3ModAmp.gain.cancelScheduledValues(time);
       oscillators[3].modGain3ModAmp.gain.setValueAtTime(1, time);
+
+      oneNotePolyRingAmp.gain.setValueAtTime(0, time);
+      twoNotePolyRingAmp.gain.setValueAtTime(0, time);
+    } else {
+      oscillators[1].modGain2CarrierAmp.gain.cancelScheduledValues(time);
+      oscillators[1].modGain2CarrierAmp.gain.setValueAtTime(0, time);
+      oscillators[2].modGain2ModAmp.gain.cancelScheduledValues(time);
+      oscillators[2].modGain2ModAmp.gain.setValueAtTime(0, time);
+      oscillators[3].modGain3ModAmp.gain.cancelScheduledValues(time);
+      oscillators[3].modGain3ModAmp.gain.setValueAtTime(0, time);
     }
 
     if (patch.voice.includes('ring')) {
