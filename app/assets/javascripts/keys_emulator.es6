@@ -357,7 +357,7 @@ VS.KeysEmulator = function() {
   });
 
   $('.keyboard-notice').on('mouseup touchend', () => {
-    $('#keyboard-tip').fadeOut(1000);
+    $('#keyboard-tip').fadeOut(3000);
   });
 
   $('#toggle-mobile').on('click tap', function(e) {
