@@ -71,7 +71,7 @@ VS.KeysAudioEngine = function(patch) {
 
   let oscLfo;
 
-  // NOTE: This is needed to flip the LFO wave upside down so the sawtooth wave
+  //  This is needed to flip the LFO wave upside down so the sawtooth wave
   //  slopes top to bottom and not bottom to top.
   const lfoWaveShaper = audioCtx.createWaveShaper();
   lfoWaveShaper.curve = new Float32Array([1, 0, -1]);
@@ -80,13 +80,20 @@ VS.KeysAudioEngine = function(patch) {
     oscLfo = audioCtx.createOscillator();
     oscLfo.type = patch.lfo.shape;
     oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
-    // TODO: Skip waveshaper unless sawtooth
-    oscLfo.connect(lfoWaveShaper);
+
+    if (patch.lfo.shape === 'square') {
+      // Don't invert the square LFO
+      lfoWaveShaper.disconnect();
+      oscLfo.connect(ampLfoPitch);
+      oscLfo.connect(ampLfoCutoff);
+    } else {
+      oscLfo.connect(lfoWaveShaper);
+      lfoWaveShaper.connect(ampLfoPitch);
+      lfoWaveShaper.connect(ampLfoCutoff);
+    }
+
     oscLfo.start();
   }
-
-  lfoWaveShaper.connect(ampLfoPitch);
-  lfoWaveShaper.connect(ampLfoCutoff);
 
   setupOscLfo();
 
@@ -731,6 +738,7 @@ VS.KeysAudioEngine = function(patch) {
 
   this.setLfoWave = () => {
     oscLfo.type = patch.lfo.shape;
+    retriggerLfo();
   };
 
   this.setSustain = (value) => {

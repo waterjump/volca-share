@@ -313,8 +313,11 @@ VS.KeysEmulator = function() {
 
   lfoControlSelectors.forEach(function(selector) {
     $(selector).on('click tap', function(event) {
-      const shape = getShapeFromLfoLightClick(this);
-      patch.lfo.shape = shape === 'saw' ? 'sawtooth' : shape;
+      let shape = getShapeFromLfoLightClick(this);
+      shape = shape === 'saw' ? 'sawtooth' : shape;
+      if (shape === patch.lfo.shape) { return; }
+
+      patch.lfo.shape = shape;
       audioEngine.setLfoWave();
     });
   });
