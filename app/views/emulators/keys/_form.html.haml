@@ -132,7 +132,8 @@
       %h4.accordion-header
         Usage
         .collapse-toggle.glyphicon.glyphicon-chevron-down
-      .accordion-body.clearfix
+      - usageBodyStyle = cookies[:accordionUsage] == 'closed' ? 'display:none;' : ''
+      .accordion-body.clearfix{ style: usageBodyStyle }
         #desktop-instructions
           Use computer keyboard to play notes
           = image_tag('computer-midi-keyboard-small.png', id: 'emulator-keyboard')
@@ -150,7 +151,8 @@
       %h4.accordion-header
         Disclaimer
         .collapse-toggle.glyphicon.glyphicon-chevron-down
-      #disclaimer.accordion-body
+      - disclaimerBodyStyle = cookies[:accordionDisclaimer] == 'closed' ? 'display:none;' : ''
+      #disclaimer.accordion-body{ style: disclaimerBodyStyle }
         This is a <strong>fan-made emulator</strong>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
 .off-canvas
   =image_tag('numbers.jpg')

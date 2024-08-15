@@ -14,6 +14,17 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
     expect(page).to have_css('.volca.keys.emulator')
   end
 
+  context 'when closing accordion display' do
+    it 'remains closed on next page load' do
+      expect(page).to have_css('#desktop-instructions', visible: true)
+      find('.accordion-header', text: 'Usage').click
+      expect(page).not_to have_css('#desktop-instructions', visible: true)
+
+      visit keys_emulator_path
+      expect(page).not_to have_css('#desktop-instructions', visible: true)
+    end
+  end
+
   context 'when query string parameters are passed' do
     let(:patch) { VolcaShare::Keys::PatchViewModel.wrap(create(:keys_patch)) }
     let(:query_string) { patch.emulator_query_string }
