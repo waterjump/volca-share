@@ -10,6 +10,9 @@ $(function() {
     const accordionHeader = $(e.currentTarget);
     const toggleControl = accordionHeader.find('.glyphicon');
     const sectionName = accordionHeader.text().trim();
+    if (sectionName === 'Support') {
+      return;
+    }
     if (accordionSectionVisibility[sectionName] === undefined) {
       accordionSectionVisibility[sectionName] = true;
     }

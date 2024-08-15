@@ -42,3 +42,5 @@ bower.json
 .env
 .byebug_history
 .nerdtreeignore
+
+/config/master.key

@@ -130,6 +130,22 @@
   .accordion
     .accordion-item
       %h4.accordion-header
+        Feedback
+      .accordion-body.clearfix
+        If you enjoy this emulator, consider buying me a coffee.
+        <br /><br />
+        %form{ action: "https://www.paypal.com/donate", method: "post", target: "_blank" }
+          %input{ type: "hidden", name: "hosted_button_id", value: Rails.application.credentials.paypal_button_id }
+          %input{ type: "image", src: "https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif", border: "0", name: "submit", title: "PayPal - The safer, easier way to pay online!", alt: "Donate with PayPal button" }
+          %img{ alt: "", border: "0", src: "https://www.paypal.com/en_DE/i/scr/pixel.gif", width: "1", height: "1" }
+        <br />
+        You can also reach out via the
+        = link_to 'contact form', new_contact_path
+        or open a
+        = link_to 'GitHub issue.', 'https://github.com/waterjump/volca-share/issues/new'
+
+    .accordion-item
+      %h4.accordion-header
         Usage
         .collapse-toggle.glyphicon.glyphicon-chevron-down
       - usageBodyStyle = cookies[:accordionUsage] == 'closed' ? 'display:none;' : ''
