@@ -349,6 +349,14 @@ VS.KeysEmulator = function() {
     $('.cooltip').hide();
   });
 
+  $('.keyboard-notice').on('mousedown touchstart', () => {
+    $('#keyboard-tip').show();
+  });
+
+  $('.keyboard-notice').on('mouseup touchend', () => {
+    $('#keyboard-tip').fadeOut(1000);
+  });
+
   $('#toggle-mobile').on('click tap', function(e) {
     e.preventDefault();
     $('#mobile-keyboard').removeClass('hidden');

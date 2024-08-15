@@ -218,6 +218,46 @@
     background-color: #bba397b2;
   }
 
+  .keyboard-notice {
+    position: absolute;
+    z-index: 50;
+  }
+
+  #keyboard-tip {
+    display: none;
+    position: absolute;
+    top: 63%;
+    left: 13%;
+    height: 9%;
+    width: 75%;
+    font-size: 2em;
+    line-height: 0.8em;
+    color: #ffffff;
+    letter-spacing: 0.08em;
+  }
+
+  #black-keys, {
+    top: 59%;
+    height: 13%;
+    width: 84%;
+    left: 8%;
+  }
+
+  #white-keys-left, #white-keys-right {
+    top: 72%;
+    height: 15%;
+  }
+
+  #white-keys-left {
+    left: 5%;
+    width: 17%;
+  }
+
+  #white-keys-right {
+    left: 45%;
+    width: 50%;
+  }
+
   .cooltip {
     top: 14%;
     left: 75.2%;
