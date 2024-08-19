@@ -1,0 +1,35 @@
+window.getCookieValue = function(name) {
+  let nameEQ = name + "=";
+  let cookies = document.cookie.split(';');
+
+  for(let i = 0; i < cookies.length; i++) {
+    let cookie = cookies[i].trim();
+    if (cookie.indexOf(nameEQ) === 0) {
+      return cookie.substring(nameEQ.length, cookie.length);
+    }
+  }
+  return null;
+};
+
+$(document).ready(function(){
+  if (getCookieValue('keysEmulatorCalloutSeen') !== 'true') {
+    $('#keys-callout-button').click();
+    document.cookie =
+      `keysEmulatorCalloutSeen=true; max-age=${(24 * 60 * 60 * 365 * 2)}; path=/;`;
+  }
+
+  <% if Rails.env.production? %>
+    $('#keys-emulator-callout-modal').on('click.dismiss.bs.modal', function () {
+      ga('send', 'event', 'modal', 'decline', `click_kem_outside_of_modal`);
+    });
+
+    $('#kem-x-out, #kem-close').on('click tap', function() {
+      ga('send', 'event', 'modal', 'decline', `click_${$(this).attr('id')}`);
+    });
+
+    $('#kem-try-it-now, #kem-image').on('click tap', function() {
+      ga('send', 'event', 'modal', 'accept', `click_${$(this).attr('id')}`);
+    });
+  <% end %>
+});
+

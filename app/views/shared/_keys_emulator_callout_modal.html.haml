@@ -1,0 +1,26 @@
+- keys_callout_feature_on = ENV['FEATURE_ENABLED_KEYS_EMULATOR_CALLOUT'] == 'true'
+- cookie_not_set = cookies[:keysEmulatorCalloutSeen] != 'true'
+- on_keys_emulator_page = current_page?(keys_emulator_path)
+- if keys_callout_feature_on && cookie_not_set && !on_keys_emulator_page
+  - if Rails.env.production?
+    :javascript
+      ga('send', 'event', 'modal', 'view', 'keys_emulator_callout_modal', 1);
+  %button#keys-callout-button.hidden{ type: "button", class: "btn btn-primary btn-lg", data: { toggle: "modal", target: "#keys-emulator-callout-modal" } }
+    Launch demo modal
+
+  #keys-emulator-callout-modal.modal.fade{"aria-labelledby" => "keysEmulatorCalloutModaLabel", :role => "dialog", :tabindex => "-1", :data => { show: 'true' }}
+    .modal-dialog{:role => "document"}
+      .modal-content
+        .modal-header
+          %button#kem-x-out.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+            %span{"aria-hidden" => "true"} ×
+          %h2#keysEmulatorCalloutModaLabel.modal-title
+            🎉 Introducing the Volca&nbsp;Keys&nbsp;Emulator!
+        #keys-emulator-callout-modal-body.modal-body
+          =link_to keys_emulator_path, id: 'kem-image' do
+            #banner
+          %p
+            Play notes, tweak parameters, and explore the sound design features of the Volca Keys directly in your web browser.  No hardware necessary.
+        .modal-footer
+          %button#kem-close.btn.btn-default{"data-dismiss" => "modal", type: 'button'} Close
+          =link_to 'Try it now', keys_emulator_path, class: 'btn btn-primary', id: 'kem-try-it-now'

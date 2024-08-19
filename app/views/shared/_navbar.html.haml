@@ -33,8 +33,9 @@
         - else
           %li
             = link_to 'Volca Bass Emulator', bass_emulator_path
-        %li
+        %li#emulator_nav_callout
           = link_to 'Volca Keys Emulator', keys_emulator_path
+          .speech.left Brand new
 
         - if ENV['FEATURE_ENABLED_PATCH_NAMER'] == 'true'
           - if current_page?(synth_patch_namer_path)

@@ -205,3 +205,38 @@ a.unstyled {
   background-image: image_url('green-check-mark.png');
   background-size: contain;
 }
+
+#keys-emulator-callout-modal {
+  @keyframes borderColorChange {
+    0% { border-color: #00ffcb; }
+    25% { border-color: white; }
+    50% { border-color: #00ffcb; }
+    75% { border-color: black; }
+    100% { border-color: #00ffcb; }
+  }
+
+  .modal-body {
+    padding: 0;
+
+    #banner {
+      background-image: image-url('keys-emulator-callout.png');
+      background-size: cover;
+      min-height: 181px;
+      width: 100%;
+      border: 5px solid #00ffcb;
+      animation: borderColorChange 1s infinite;
+      animation-timing-function: linear;
+      background-color: black;
+
+    }
+
+    p {
+      padding: 15px;
+      font-size: 1.5em
+    }
+  }
+
+  .btn-primary {
+    font-size: 18px;
+  }
+}
