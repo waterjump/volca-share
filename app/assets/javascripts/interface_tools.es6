@@ -36,4 +36,6 @@ $(function() {
     accordionSectionVisibility[sectionName] = false;
     toggleControl.css({ transform: 'rotate(90deg)'});
   });
+
+  $('[data-toggle="tooltip"]').tooltip();
 });

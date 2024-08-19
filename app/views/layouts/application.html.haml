@@ -7,6 +7,7 @@
     %meta{ content: 'Browse, create, and share patches for the Korg Volca Bass and Volca Keys synthesizers.  Sync and control parameters from the browser in real-time via Web MIDI', name: 'Description'}/
     %title= [@title, 'VolcaShare'].compact.join(' | ')
     %link{ href: asset_path('favicon2.png'), rel: 'shortcut icon'}/
+    %script{src: "https://code.jquery.com/jquery-3.6.0.min.js", integrity: 'sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=', crossorigin: 'anonymous'}
     = stylesheet_link_tag    'application', media: 'all', async: Rails.env.production?
     = javascript_include_tag 'application', async: Rails.env.production?
     = csrf_meta_tags
@@ -37,6 +38,5 @@
     = render 'shared/footer'
     = render 'shared/cookies_banner' unless Rails.env.test?
 
-    %script{src: "https://code.jquery.com/jquery-3.6.0.min.js", integrity: 'sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=', crossorigin: 'anonymous'}
     :javascript
       window.jQuery || document.write('<\/script>')

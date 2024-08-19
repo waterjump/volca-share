@@ -113,6 +113,12 @@
 
 .col-lg-3.col-md-9#patch-metadata
   .mb-3
+    = link_to keys_emulator_path(@patch.emulator_query_string), id: 'emulate-patch', class: 'btn btn-lg h4' do
+      %p.rainbow-text
+        Emulate this patch
+    %i.glyphicon.glyphicon-info-sign{data: {toggle: 'tooltip', placement: 'top', title: 'Use VolcaShare\'s in-browser Volca Keys emulator to appoximate what this patch sounds like.'}}
+    %br
+    %br
     = render 'shared/midi_button', button_text: 'Send this patch to your Volca', new_form: false
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'

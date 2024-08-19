@@ -30,7 +30,7 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
     let(:query_string) { patch.emulator_query_string }
 
     it 'reflects the query string parameters' do
-      reflects_emulator_patch(patch)
+      reflects_keys_emulator_patch(patch)
     end
 
     it 'shows volume knob all the way up' do
@@ -49,7 +49,7 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
           )
         )
 
-        reflects_emulator_patch(patch)
+        reflects_keys_emulator_patch(patch)
         expect(page).to have_link('Back to desktop mode')
       end
     end
@@ -66,91 +66,6 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
       first('.collapse-toggle').click
 
       expect(page).to have_css('#desktop-instructions', visible: true)
-    end
-  end
-
-  # ========= helper methods ==========
-
-  def reflects_emulator_patch(patch, options = {})
-    expect(page.find('span.voice', visible: false).text).to(
-      eq(snap_knob_rotation_from_midi(patch.voice).to_s)
-    )
-    expect(page.find('span.octave', visible: false).text).to(
-      eq(snap_knob_rotation_from_midi(patch.octave).to_s)
-    )
-    expect(page.find('span.detune', visible: false).text).to(
-      eq(rotation_from_midi(patch.detune).to_s)
-    )
-    expect(page.find('span.portamento', visible: false).text).to(
-      eq(rotation_from_midi(patch.portamento).to_s)
-    )
-    expect(page.find('span.vco_eg_int', visible: false).text).to(
-      eq(rotation_from_midi(patch.vco_eg_int).to_s)
-    )
-    expect(page.find('span.cutoff', visible: false).text).to(
-      eq(rotation_from_midi(patch.cutoff).to_s)
-    )
-    expect(page.find('span.peak', visible: false).text).to(
-      eq(rotation_from_midi(patch.peak).to_s)
-    )
-    expect(page.find('span.vcf_eg_int', visible: false).text).to(
-      eq(rotation_from_midi(patch.vcf_eg_int).to_s)
-    )
-    expect(page.find('span.lfo_rate', visible: false).text).to(
-      eq(rotation_from_midi(patch.lfo_rate).to_s)
-    )
-    expect(page.find('span.lfo_pitch_int', visible: false).text).to(
-      eq(rotation_from_midi(patch.lfo_pitch_int).to_s)
-    )
-    expect(page.find('span.lfo_cutoff_int', visible: false).text).to(
-      eq(rotation_from_midi(patch.lfo_cutoff_int).to_s)
-    )
-    expect(page.find('span.attack', visible: false).text).to(
-      eq(rotation_from_midi(patch.attack).to_s)
-    )
-    expect(page.find('span.decay_release', visible: false).text).to(
-      eq(rotation_from_midi(patch.decay_release).to_s)
-    )
-    expect(page.find('span.sustain', visible: false).text).to(
-      eq(rotation_from_midi(patch.sustain).to_s)
-    )
-    expect(page.find('span.delay_time', visible: false).text).to(
-      eq(rotation_from_midi(patch.delay_time).to_s)
-    )
-    expect(page.find('span.delay_feedback', visible: false).text).to(
-      eq(rotation_from_midi(patch.delay_feedback).to_s)
-    )
-
-    case patch.lfo_shape
-    when 'sawtooth'
-      expect(page).to have_css('#lfo_shape_saw_light.lit')
-    when 'square'
-      expect(page).to have_css('#lfo_shape_square_light.lit')
-    when 'triangle'
-      expect(page).to have_css('#lfo_shape_triangle_light.lit')
-    end
-
-    if (patch.lfo_trigger_sync)
-      expect(page).to have_css('#lfo_trigger_sync_light.lit')
-    else
-      expect(page).not_to have_css('#lfo_trigger_sync_light.lit')
-    end
-  end
-
-  def closest_octave_value(midi_value)
-    case midi_value
-    when 0..21
-      0
-    when 22..43
-      33
-    when 44..65
-      55
-    when 66..87
-      77
-    when 88..109
-      110
-    when 110..127
-      127
     end
   end
 end

@@ -171,3 +171,69 @@ def reflects_keys_patch(patch, options = {})
   expect(interface).to have_content(patch.name)
   expect(interface).to have_content(patch.notes)
 end
+
+def reflects_keys_emulator_patch(patch, options = {})
+  expect(page.find('span.voice', visible: false).text).to(
+    eq(snap_knob_rotation_from_midi(patch.voice).to_s)
+  )
+  expect(page.find('span.octave', visible: false).text).to(
+    eq(snap_knob_rotation_from_midi(patch.octave).to_s)
+  )
+  expect(page.find('span.detune', visible: false).text).to(
+    eq(rotation_from_midi(patch.detune).to_s)
+  )
+  expect(page.find('span.portamento', visible: false).text).to(
+    eq(rotation_from_midi(patch.portamento).to_s)
+  )
+  expect(page.find('span.vco_eg_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.vco_eg_int).to_s)
+  )
+  expect(page.find('span.cutoff', visible: false).text).to(
+    eq(rotation_from_midi(patch.cutoff).to_s)
+  )
+  expect(page.find('span.peak', visible: false).text).to(
+    eq(rotation_from_midi(patch.peak).to_s)
+  )
+  expect(page.find('span.vcf_eg_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.vcf_eg_int).to_s)
+  )
+  expect(page.find('span.lfo_rate', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_rate).to_s)
+  )
+  expect(page.find('span.lfo_pitch_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_pitch_int).to_s)
+  )
+  expect(page.find('span.lfo_cutoff_int', visible: false).text).to(
+    eq(rotation_from_midi(patch.lfo_cutoff_int).to_s)
+  )
+  expect(page.find('span.attack', visible: false).text).to(
+    eq(rotation_from_midi(patch.attack).to_s)
+  )
+  expect(page.find('span.decay_release', visible: false).text).to(
+    eq(rotation_from_midi(patch.decay_release).to_s)
+  )
+  expect(page.find('span.sustain', visible: false).text).to(
+    eq(rotation_from_midi(patch.sustain).to_s)
+  )
+  expect(page.find('span.delay_time', visible: false).text).to(
+    eq(rotation_from_midi(patch.delay_time).to_s)
+  )
+  expect(page.find('span.delay_feedback', visible: false).text).to(
+    eq(rotation_from_midi(patch.delay_feedback).to_s)
+  )
+
+  case patch.lfo_shape
+  when 'sawtooth'
+    expect(page).to have_css('#lfo_shape_saw_light.lit')
+  when 'square'
+    expect(page).to have_css('#lfo_shape_square_light.lit')
+  when 'triangle'
+    expect(page).to have_css('#lfo_shape_triangle_light.lit')
+  end
+
+  if (patch.lfo_trigger_sync)
+    expect(page).to have_css('#lfo_trigger_sync_light.lit')
+  else
+    expect(page).not_to have_css('#lfo_trigger_sync_light.lit')
+  end
+end

@@ -255,6 +255,21 @@ $pink: #fd9994;
 
 #patch-metadata {
   padding: 0;
+
+  #emulate-patch.btn {
+    display: inline-block;
+    margin-right: 10px;
+    border: 1px solid #999999;
+    border-radius: 3px;
+    background-image: linear-gradient(#606060, #00ffcb);
+
+    &:hover {
+      background-image: linear-gradient(#888, #00ffcb);
+    }
+    &:active {
+      background-image: linear-gradient(#333, #00ffcb);
+    }
+  }
 }
 
 #randomize {

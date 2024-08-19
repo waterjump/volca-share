@@ -1,0 +1,63 @@
+@keyframes rainbow {
+  0% {
+    background-position: 100% 50%;
+  }
+  40% {
+    background-position: 95% 50%;
+  }
+  60% {
+    background-position: 10% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.rainbow-text {
+  margin: 0;
+  font-weight: 400;
+  height: 100%;
+  background: linear-gradient(
+    -60deg,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #00ffcb,  /* Green */
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+    #ffffff,
+  );
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 6s ease infinite;
+
+  &:hover {
+    text-decoration: none;
+  }
+}
