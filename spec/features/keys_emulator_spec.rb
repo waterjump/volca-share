@@ -59,13 +59,11 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
     it 'can be collapsed' do
       expect(page).to have_css('#desktop-instructions', visible: true)
 
-      within first('.accordion-header') do
-        find('.collapse-toggle').click
-      end
+      first('.collapse-toggle').click
 
       expect(page).not_to have_css('#desktop-instructions', visible: true)
 
-      first('.accordion-header').click
+      first('.collapse-toggle').click
 
       expect(page).to have_css('#desktop-instructions', visible: true)
     end
