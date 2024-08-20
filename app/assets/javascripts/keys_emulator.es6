@@ -125,13 +125,15 @@ VS.KeysEmulator = function() {
     new VS.Knob(this).setKnob($(this).data('midi'));
   });
 
-  const changeOctave = function(change) {
+  const changeOctave = function(change, keyStroke = true) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
-    // Turn octave knob
-    new VS.Knob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
+    if (keyStroke) {
+      // Turn octave knob
+      new VS.Knob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
 
-    if (!audioEngine.noteIsPlaying()) { return; } // at init time
+      if (!audioEngine.noteIsPlaying()) { return; } // at init time
+    }
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
@@ -266,6 +268,14 @@ VS.KeysEmulator = function() {
     audioEngine.changeVoice();
   });
 
+ $('#octave').on('knobturn', () => {
+   const startingOctave = patch.octave;
+   patch.setoctave(VS.activeKnob.midi());
+
+   const octaveDifference = patch.octave - startingOctave;
+   changeOctave(octaveDifference, false);
+ });
+
   $('#vcf_eg_int').on('knobturn', () => {
     patch.setvcf_eg_int(VS.activeKnob.trueMidi());
     audioEngine.setFilterEgInt(patch.vcf_eg_int);
@@ -340,16 +350,6 @@ VS.KeysEmulator = function() {
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
     keyboardUp({ keyCode: $(this).data('keycode') });
-  });
-
-  // TOOLTIPS
-  $('#octave').mouseenter(function() {
-    $('.cooltip').text("Press 'Z' or 'X' to change octaves");
-    $('.cooltip').show();
-  });
-
-  $('#octave').mouseleave(function() {
-    $('.cooltip').hide();
   });
 
   $('.keyboard-notice').on('mousedown touchstart', () => {

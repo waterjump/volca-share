@@ -14,6 +14,14 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
     expect(page).to have_css('.volca.keys.emulator')
   end
 
+  describe 'octave parameter' do
+    it 'can be set using click and drag' do
+      page.find('#octave').drag_to(find('#voice'))
+      find('#permalink').click
+      expect(page.current_url).to include('octave=120')
+    end
+  end
+
   context 'when closing accordion display' do
     it 'remains closed on next page load' do
       expect(page).to have_css('#desktop-instructions', visible: true)
