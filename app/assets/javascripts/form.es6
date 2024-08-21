@@ -60,7 +60,7 @@ VS.Form = function() {
         assignKnobValue($(this));
       });
 
-      if (!midiOut.ready()) { return; }
+      if (($('body').data('midi-out') !== undefined) && !midiOut.ready()) { return; }
 
       $('#midi-only-controls .knob').each(function() {
         if ($(this).attr('id') == 'expression') {
@@ -133,7 +133,7 @@ VS.Form = function() {
       randomizeKeysLfoShape();
     }
 
-    midiOut.syncMidi();
+    document.dispatchEvent(new Event('midisync'));
   });
 
   $('.bottom-row .on-off').on('click tap', function() {
@@ -247,6 +247,15 @@ VS.Form = function() {
     composed: false
   });
 
+  const createMidiControlChangeEvent = (controlNumber, midiValue) => {
+    return new CustomEvent('midicontrolchange', {
+      detail: {
+        controlNumber: controlNumber,
+        midiValue: midiValue
+      }
+    });
+  };
+
   const turnKnob = function(e) {
     if (VS.activeKnob === null) { return; }
 
@@ -298,13 +307,10 @@ VS.Form = function() {
         return;
       }
 
-      if (midiOut.ready()) {
-        midiOut.output.sendControlChange(
-          $(VS.activeKnob.element).data('control-number'),
-          midi,
-          midiOut.channel
-        );
-      }
+      document.dispatchEvent(createMidiControlChangeEvent(
+        $(VS.activeKnob.element).data('control-number'),
+        midi
+      ));
 
       $(VS.activeKnob.element).data('midi', midi);
       $(VS.activeKnob.element).data('trueMidi', trueMidi);

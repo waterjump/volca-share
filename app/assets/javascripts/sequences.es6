@@ -1,6 +1,5 @@
 VS.Sequences = function() {
   const { display } = VS;
-  const { midiOut } = VS;
   const scope = this;
   const vcoGroupCounts = {one: 3, two: 2, three: 1};
   this.sequencesActive = $('.remove-sequence[value=\'false\']').toArray().length > 1;
@@ -24,6 +23,16 @@ VS.Sequences = function() {
     $('.note-display').each(function() {
       $(this).html(VS.midiNoteNumbers[$(this).data('starting-note')]);
     });
+  };
+
+  const dispatchMidiOutPlayNoteEvent = function(note) {
+    document.dispatchEvent(
+      new CustomEvent('midioutplaynote', { detail: { note: note } })
+    );
+  };
+
+  const dispatchMidiOutStopNoteEvent = function() {
+    document.dispatchEvent(new CustomEvent('midioutstopnote'));
   };
 
   this.init = function() {
@@ -191,7 +200,7 @@ VS.Sequences = function() {
     if (VS.dragging) { return false; }
     const value = $(this).data('starting-note');
     display.update(value, 'noteString');
-    midiOut.playNote($(this).html());
+    dispatchMidiOutPlayNoteEvent($(this).html());
     $('.note-light').hide();
     $(`.note-${(value + 3) % 12}`).show();
   });
@@ -199,7 +208,7 @@ VS.Sequences = function() {
   $('.sequence-holder').on('mouseleave', '.note-display', function() {
     if (VS.dragging) { return false; }
     $('.note-light').hide();
-    midiOut.stopNote();
+    dispatchMidiOutStopNoteEvent();
   });
 
   window.addEventListener('keydown', function(keyDown) {
@@ -252,7 +261,7 @@ VS.Sequences = function() {
     this.activeNote.data('note', num);
     this.activeNote.html(VS.midiNoteNumbers[num]);
     document.dispatchEvent(changeSequenceNoteEvent);
-    midiOut.playNote(VS.midiNoteNumbers[num]);
+    dispatchMidiOutPlayNoteEvent(VS.midiNoteNumbers[num]);
     $('.note-light').hide();
     $(`.note-${(num + 3) % 12}`).show();
   };
@@ -260,7 +269,7 @@ VS.Sequences = function() {
   this.endNoteChange = function() {
     if (this.activeNote === null) { return; }
     this.activeNote.data('starting-note', this.activeNote.data('note'));
-    midiOut.stopNote();
+    dispatchMidiOutStopNoteEvent();
     $('.note-light').hide();
     const inputId = this.activeNote['0'].parentNode.attributes['0'].value;
     $(`input#${inputId}`).val(this.activeNote.data('note'));

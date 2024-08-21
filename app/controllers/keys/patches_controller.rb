@@ -20,6 +20,7 @@ module Keys
 
     def new
       @body_class = :form
+      @body_data_attributes = { :'midi-out' => true }
       @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new)
       @title = 'New Keys Patch'
     end
@@ -55,6 +56,7 @@ module Keys
 
     def show
       @body_class = 'show'
+      @body_data_attributes = { :'midi-out' => true }
       if params[:user_slug].blank? && params[:slug].blank? && @patch.user.present?
         redirect_to(
           user_keys_patch_path(@patch.user.slug, @patch.slug), status: 301
@@ -64,6 +66,7 @@ module Keys
 
     def edit
       @body_class = :form
+      @body_data_attributes = { :'midi-out' => true }
       if @patch.user_id != current_user.id
         flash[:notice] = 'You may not edit that patch.'
         redirect_to user_keys_patch_path(@patch.user.slug, @patch.slug)

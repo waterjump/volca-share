@@ -1,4 +1,8 @@
 VS.MidiOut = function() {
+  if ($('body').data('midi-out') === undefined) {
+    return;
+  }
+
   const scope = this;
   this.supported;
   this.output;
@@ -73,6 +77,26 @@ VS.MidiOut = function() {
     this.output.stopNote(this.playingNote);
     this.playingNote = undefined;
   };
+
+  $(document).on('midioutplaynote', function(event) {
+    this.playNote(event.detail.note);
+  }.bind(this));
+
+  $(document).on('midioutstopnote', function() {
+    this.stopNote();
+  }.bind(this));
+
+  $(document).on('midicontrolchange', function(event) {
+    this.output.sendControlChange(
+      event.detail.controlNumber,
+      event.detail.midiValue,
+      this.channel
+    );
+  }.bind(this));
+
+  $(document).on('midisync', function() {
+    this.syncMidi();
+  }.bind(this));
 
   $('#midi-device').change(function() {
     scope.changeOutput(this);

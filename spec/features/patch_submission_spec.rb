@@ -144,7 +144,7 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
   end
 
   context 'when MIDI is not available' do
-    it 'does not randomize midi-only controls if midi not available' do
+    it 'does not randomize midi-only controls' do
       default_patch = {
         attack: '63',
         cutoff: '63',

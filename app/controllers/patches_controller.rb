@@ -38,6 +38,7 @@ class PatchesController < ApplicationController
 
   def show
     @body_class = :show
+    @body_data_attributes = { :'midi-out' => true }
     if params[:user_slug].blank? && params[:slug].blank? && @patch.user.present?
       redirect_to user_patch_path(@patch.user.slug, @patch.slug), status: 301
     end
@@ -46,6 +47,7 @@ class PatchesController < ApplicationController
   # GET /patches/new
   def new
     @body_class = :form
+    @body_data_attributes = { :'midi-out' => true }
     @patch = VolcaShare::PatchViewModel.wrap(Patch.new)
     @title = 'New Bass Patch'
   end
@@ -53,6 +55,7 @@ class PatchesController < ApplicationController
   # GET /patches/1/edit
   def edit
     @body_class = :form
+    @body_data_attributes = { :'midi-out' => true }
     if @patch.user_id != current_user.id
       flash[:notice] = 'You may not edit that patch.'
       render :show

@@ -3,7 +3,6 @@ $(function() {
 
   let activeKnob = undefined;
   const { display } = VS;
-  new VS.MidiOut;
   const { sequences } = VS;
 
   sequences.init();
