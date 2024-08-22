@@ -160,11 +160,14 @@ VS.MidiIn = function() {
   this.channel;
 
   this.changeChannel = function(newChannel) {
+    if (newChannel === 'Select MIDI Channel') { return; }
+
     this.channel = parseInt(newChannel);
-    console.log('channel changed to', this.channel);
   };
 
   this.changeInput = function(element) {
+    if ($(element).val() === 'Midi Device') { return; }
+
     this.lastInput = this.input;
     this.input = WebMidi.getInputByName($(element).val());
     setNewInput();
