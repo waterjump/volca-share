@@ -148,3 +148,96 @@ VS.MidiOut = function() {
     $('#sync').removeAttr('data-toggle data-target');
   }
 };
+
+VS.MidiIn = function() {
+  if ($('body').data('midi-in') === undefined) {
+    return;
+  }
+
+  this.supported;
+  this.lastInput = null;
+  this.input = null;
+  this.channel;
+
+  this.changeChannel = function(newChannel) {
+    this.channel = parseInt(newChannel);
+    console.log('channel changed to', this.channel);
+  };
+
+  this.changeInput = function(element) {
+    this.lastInput = this.input;
+    this.input = WebMidi.getInputByName($(element).val());
+    setNewInput();
+  };
+
+  $('#midi-device').change(function() {
+    this.changeInput($('#midi-device :selected'));
+  }.bind(this));
+
+  $('#midi-channel').change(function() {
+    const newChannel = $('#midi-channel :selected').val();
+    this.changeChannel(newChannel);
+  }.bind(this));
+
+  this.updateForm = function() {
+    if (!this.supported || !(WebMidi.inputs.length > 0)) { return; }
+    let items = '<option>Midi Device</option>';
+    $(WebMidi.inputs).each(function() {
+      items += `<option value="${this.name}">${this.name}</option>`;
+    });
+    $('#midi-device').html(items);
+    $('#midi-device option:eq(1)').attr('selected', 'selected');
+    this.changeInput($('#midi-device option:eq(1)'));
+    $('#midi-channel option:eq(1)').attr('selected', 'selected');
+    this.changeChannel($('#midi-channel option:eq(1)').val());
+    $('#midi-input').removeClass('hidden');
+    $('#enable-web-midi').hide();
+  };
+
+  const createMidiNoteOnEvent = function(note) {
+    return new CustomEvent('midinoteon', { detail: note });
+  };
+
+  const createMidiNoteOffEvent = function(note) {
+    return new CustomEvent('midinoteoff', { detail: note });
+  };
+
+  const noteOnListenerCallback = function(e) {
+    if ((this.channel === e.channel) || (this.channel === -1)) {
+      document.dispatchEvent(createMidiNoteOnEvent(e.note));
+    }
+  }.bind(this);
+
+  const noteOffListenerCallback = function(e) {
+    if ((this.channel === e.channel) || (this.channel === -1)) {
+      document.dispatchEvent(createMidiNoteOffEvent(e.note));
+    }
+  }.bind(this);
+
+  const unsetLastInput = function() {
+    if (this.lastInput !== null) {
+      this.lastInput.removeListener('noteon');
+      this.lastInput.removeListener('noteoff');
+    }
+  }.bind(this);
+
+  const setNewInput = function() {
+    if (this.input !== null) {
+      unsetLastInput();
+      this.input.addListener("noteon", "all", noteOnListenerCallback);
+      this.input.addListener("noteoff", "all", noteOffListenerCallback);
+    }
+  }.bind(this);
+
+  this.init = function() {
+    WebMidi.enable(function(err) {
+      if (err) { return; }
+      this.supported = true;
+      this.updateForm();
+
+      setNewInput();
+    }.bind(this));
+  };
+
+  this.init();
+};

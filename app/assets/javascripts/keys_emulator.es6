@@ -167,8 +167,7 @@ VS.KeysEmulator = function() {
     return emulatorConstants.keyMidiMap[keycode] + octaveOffset;
   };
 
-  const keyboardUp = function(keyUp) {
-    const noteThatStopped = octaveAdjustedKeyCode(keyUp.keyCode);
+  const keyboardUp = function(noteThatStopped) {
     keysDown = keysDown.filter(key => key !== noteThatStopped);
 
     if (keysDown.length > 0) {
@@ -215,7 +214,8 @@ VS.KeysEmulator = function() {
 
   window.onkeyup = function(keyUp) {
     if (emulatorConstants.keyCodes.includes(keyUp.keyCode)) {
-      keyboardUp(keyUp);
+      const adjustedKeyUp = octaveAdjustedKeyCode(keyUp.keyCode);
+      keyboardUp(adjustedKeyUp);
     }
   };
 
@@ -311,6 +311,14 @@ VS.KeysEmulator = function() {
     audioEngine.setVolume(patch.volume);
   });
 
+  $(document).on('midinoteon', function(event) {
+    keyboardDown(event.detail.number);
+  });
+
+  $(document).on('midinoteoff', function(event) {
+    keyboardUp(event.detail.number);
+  });
+
   const getShapeFromLfoLightClick = function(el) {
     return $('#' + $(el).closest('label').attr('for')).val();
   };
@@ -349,7 +357,8 @@ VS.KeysEmulator = function() {
   });
 
   $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
-    keyboardUp({ keyCode: $(this).data('keycode') });
+    const adjustedKeyUp = octaveAdjustedKeyCode($(this).data('keycode'));
+    keyboardUp(adjustedKeyUp);
   });
 
   $('.keyboard-notice').on('mousedown touchstart', () => {

@@ -76,4 +76,35 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
       expect(page).to have_css('#desktop-instructions', visible: true)
     end
   end
+
+  describe 'MIDI input' do
+    context 'when midi input is supported' do
+      before do
+        page.execute_script(File.read(Rails.root.join(mock_file)))
+        page.execute_script('VS.midiIn.init();')
+      end
+
+      context 'when a midi device is available' do
+        let(:mock_file) { 'spec/support/web_midi_mock.js' }
+
+        it 'shows the midi input accordion section' do
+          expect(page).to have_css('#midi-input', visible: true)
+        end
+      end
+
+      context 'when no midi device is available' do
+        let(:mock_file) { 'spec/support/web_midi_mock_no_device.js' }
+
+        it 'does not show the midi input accordion section' do
+          expect(page).not_to have_css('#midi-input', visible: true)
+        end
+      end
+    end
+
+    context 'when midi input is not supported' do
+      it 'does not show the midi input accordion section' do
+        expect(page).not_to have_css('#midi-input', visible: true)
+      end
+    end
+  end
 end

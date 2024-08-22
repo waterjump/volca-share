@@ -19,6 +19,7 @@ class EmulatorsController < ApplicationController
 
   def new_keys
     @body_class = :form
+    @body_data_attributes = { :'midi-in' => true }
     @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
       voice: 30,
       attack: 0,

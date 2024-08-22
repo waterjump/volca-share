@@ -4,6 +4,7 @@ $(function() {
   VS.activeKnob = null;
   VS.clickedPoint = null;
   VS.currentPoint = null;
+  VS.midiIn = new VS.MidiIn;
   VS.midiOut = new VS.MidiOut;
   VS.display = new VS.Display($('#led'));
   VS.sequences = new VS.Sequences;

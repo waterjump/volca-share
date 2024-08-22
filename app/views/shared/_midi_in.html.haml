@@ -1,0 +1,10 @@
+.accordion-item#midi-input.hidden
+  %h4.accordion-header Midi input
+  .accordion-body.clearfix
+    %select.form-control#midi-device
+    %select.form-control#midi-channel
+      %option Select MIDI Channel
+      %option{value: -1} Any
+
+      - (1..16).each do |number|
+        %option{value: number}= "Channel #{number}"
