@@ -237,8 +237,6 @@ VS.MidiIn = function() {
       if (err) { return; }
       this.supported = true;
       this.updateForm();
-
-      setNewInput();
     }.bind(this));
   };
 
