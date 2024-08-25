@@ -1,4 +1,12 @@
 VS.KeysEmulator = function() {
+
+  // ===========================================================================
+  // PURPOSE:
+  // This file keeps track of user input (keystrokes, knob turns) and DOM state,
+  // and delegates this information to the audio engine and patch param
+  // components accordingly.
+  // ===========================================================================
+
   const { emulatorConstants, emulatorParams } = VS;
   const patch = emulatorParams;
 

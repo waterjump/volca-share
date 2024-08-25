@@ -1,4 +1,13 @@
 VS.KeysEmulatorParams = function() {
+
+  // ===========================================================================
+  // PURPOSE:
+  // This file acts as the canonical source of the state of the synth patch.
+  // This makes it easier than querying DOM elements or the Web Audio API for
+  // the current state of the synths parameters.  It should NOT directly
+  // interact with the DOM or the audio engine.
+  // ===========================================================================
+
   const { emulatorConstants } = VS;
 
   this.defaultVcoAmp = 0.33;

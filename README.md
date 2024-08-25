@@ -11,7 +11,9 @@ VolcaShare is an online patch database and content management system for the Kor
 🎹 **Sequence support**: VolcaShare allows users to save sequences of notes to accompany their synth patch, just like the Volcas allow you do with their built in sequencer.  
 👀 **Discoverability / Ranking**: Tags can be used to categorize and navigate patches.  A sorting algorithm based on completeness and freshness places more relevant patches higher on browse pages.  
 🔀 **Patch randomization**: Change parameters randomly with the click of a button.  (Especially good mileage using the Keys with MIDI sync up.)  
-🥸 **[Volca Bass Emulator](https://www.volcashare.com/bass/emulator)**: Tweak knobs and make fun sounds and patterns directly in the browser, while bored at work, or on your phone on the toilet - wherever.
+🥸 **Emulators**: Tweak knobs and make fun sounds and patterns directly in the browser, while bored at work, or on your phone on the toilet - wherever.  
+&nbsp; &nbsp; &nbsp; &nbsp; **[Volca Bass Emulator](https://www.volcashare.com/bass/emulator)**:   A JavaScript implementation of a three-oscillator monosynth with a 16-step sequencer.  
+&nbsp; &nbsp; &nbsp; &nbsp; **[Volca Keys Emulator](https://www.volcashare.com/keys/emulator)**:   A JavaScript implementation of a three-oscillator polysynth with a single EG and lots of ways to mess with VCO pitch.
 
 ## Under the hood
 This application is built on these key frameworks/libraries:
