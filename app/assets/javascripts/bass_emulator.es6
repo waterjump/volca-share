@@ -256,26 +256,6 @@ VS.BassEmulator = function() {
   const audioEngine = new VS.AudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
-  const showPerformanceWarning = () => {
-    $('#performance-warning').html(
-      '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
-      '<span aria-hidden="true">&times;</span></button>' +
-      '<strong>Just a heads up: </strong><br />' +
-      'There are known performance issues with this browser, ' +
-      'specifically while using the envelope and sequencer at the same time.<br /><br />' +
-      'For best results, use a <a class="alert-link" target="_blank" ' +
-      'href="https://caniuse.com/mdn-api_audioparam_cancelandholdattime">' +
-      'supported browser.</a>'
-    );
-    $('#performance-warning').removeClass('hidden');
-  };
-
-  if (audioEngine.showPerformanceWarning()) {
-    // showPerformanceWarning();
-  }
-
-  let debugNewNote;
-
   // NOTE: This message will not be used by the sequencer.
   const changeOctave = function(change) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');

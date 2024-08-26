@@ -1,27 +1,24 @@
 VS.AudioEngine = function(patch, sequence) {
   // ===================================================================
-  // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
+  // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH TONE.JS
   // ===================================================================
 
-  const audioCtx = new AudioContext();
-  const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  this.notePlaying = new Tone.Param(audioCtx.createGain().gain);
-  const attackEndTime = new Tone.Param(audioCtx.createGain().gain);
-  const masterAmp = audioCtx.createGain();
-  const preAmp = audioCtx.createGain();
-  const filter = audioCtx.createBiquadFilter();
-  const filterEgAmp = audioCtx.createGain();
-  const filterEg = audioCtx.createConstantSource();
-  const filterEgOffsetParam = new Tone.Param(filterEg.offset);
-  const ampEg = audioCtx.createGain();
+  this.notePlaying = new Tone.Param(new Tone.Gain().gain);
+  const attackEndTime = new Tone.Param(new Tone.Gain().gain);
+  const masterAmp = new Tone.Gain();
+  const preAmp = new Tone.Gain();
+  const filter = new Tone.BiquadFilter();
+  const filterEgAmp = new Tone.Gain();
+  const filterEg = new Tone.Signal();
+  const ampEg = new Tone.Gain();
   const ampEgGainParam = new Tone.Param(ampEg.gain);
-  const osc1MuteAmp = audioCtx.createGain();
-  const osc2MuteAmp = audioCtx.createGain();
-  const osc3MuteAmp = audioCtx.createGain();
+  const osc1MuteAmp = new Tone.Gain();
+  const osc2MuteAmp = new Tone.Gain();
+  const osc3MuteAmp = new Tone.Gain();
   const oscMuteAmps = [null, osc1MuteAmp, osc2MuteAmp, osc3MuteAmp];
-  const ampLfoPitch = audioCtx.createGain()
-  const ampLfoCutoff = audioCtx.createGain()
-  const lfoAmpWaveShaper = audioCtx.createWaveShaper();
+  const ampLfoPitch = new Tone.Gain()
+  const ampLfoCutoff = new Tone.Gain()
+  const lfoAmpWaveShaper = new Tone.WaveShaper();
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
   let sequencerPlaying = false;
@@ -33,22 +30,21 @@ VS.AudioEngine = function(patch, sequence) {
   preAmp.connect(masterAmp);
 
   filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+  filter.frequency.setValueAtTime(patch.filter.cutoff, Tone.now());
   filter.Q.value = patch.filter.peak;
   filter.connect(preAmp);
 
-  filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, audioCtx.currentTime);
+  filterEgAmp.gain.setValueAtTime(patch.envelope.cutoffEgInt, Tone.now());
   filterEgAmp.connect(filter.detune);
 
-  filterEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  filterEg.setValueAtTime(0, Tone.now());
   filterEg.connect(filterEgAmp);
-  filterEg.start();
 
 
-  ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
+  ampEg.gain.setValueAtTime(0, Tone.now());
   ampEg.connect(filter);
 
-  ampEgGainParam.setValueAtTime(0, audioCtx.currentTime);
+  ampEgGainParam.setValueAtTime(0, Tone.now());
 
   // Oscillator mute button amps (will go to gain 0 on mute button click)
   osc1MuteAmp.gain.value = patch.vco[1].amp;
@@ -62,10 +58,10 @@ VS.AudioEngine = function(patch, sequence) {
   this.setAmpLfoPitchGain = function() {
     if (patch.lfo.targetPitch) {
       // Affect pitch
-      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, Tone.now());
     } else {
       // Do not affect pitch
-      ampLfoPitch.gain.setValueAtTime(0, audioCtx.currentTime);
+      ampLfoPitch.gain.setValueAtTime(0, Tone.now());
     }
   }
   this.setAmpLfoPitchGain();
@@ -73,10 +69,10 @@ VS.AudioEngine = function(patch, sequence) {
   this.setAmpLfoCutoffGain = function() {
     if (patch.lfo.targetCutoff) {
       // Affect filter cutoff
-      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
+      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, Tone.now());
     } else {
       // Do not affect filter cutoff
-      ampLfoCutoff.gain.setValueAtTime(0, audioCtx.currentTime);
+      ampLfoCutoff.gain.setValueAtTime(0, Tone.now());
     }
   }
   this.setAmpLfoCutoffGain();
@@ -95,14 +91,14 @@ VS.AudioEngine = function(patch, sequence) {
 
   lfoAmpWaveShaper.curve = makeLfoAmpCurve();
 
-  const ampLfoAmp = audioCtx.createGain()
+  const ampLfoAmp = new Tone.Gain()
   this.setAmpLfoAmpGain = function() {
     if (patch.lfo.targetAmp) {
       // Affect amp
-      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
+      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, Tone.now());
     } else {
       // Do not affect amp
-      ampLfoAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+      ampLfoAmp.gain.setValueAtTime(0, Tone.now());
     }
   }
   this.setAmpLfoAmpGain();
@@ -114,9 +110,9 @@ VS.AudioEngine = function(patch, sequence) {
   let oscLfo;
 
   const setupOscLfo = function() {
-    oscLfo = audioCtx.createOscillator();
+    oscLfo = new Tone.Oscillator();
     oscLfo.type = patch.lfo.shape;
-    oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
+    oscLfo.frequency.setValueAtTime(patch.lfo.frequency, Tone.now());
     oscLfo.connect(ampLfoPitch);
     oscLfo.connect(ampLfoCutoff);
     oscLfo.connect(lfoAmpWaveShaper);
@@ -127,14 +123,14 @@ VS.AudioEngine = function(patch, sequence) {
 
   // Setup oscilators
   [1, 2, 3].forEach(function(oscNumber) {
-    let oscillator = audioCtx.createOscillator();
+    let oscillator = new Tone.Oscillator();
     oscillator.type = patch.vco[oscNumber].shape;
     oscillator.detune.setValueAtTime(
       patch.vco[oscNumber].detune,
-      audioCtx.currentTime
+      Tone.now()
     );
 
-    oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
+    oscillator.frequency.setValueAtTime(0, Tone.now());
 
     osc[oscNumber] = oscillator;
     osc[oscNumber].connect(oscMuteAmps[oscNumber]);
@@ -143,14 +139,11 @@ VS.AudioEngine = function(patch, sequence) {
   });
 
   // controls frequency of all three vcos rather than looping through them.
-  const oscFreqNode = audioCtx.createConstantSource();
-  oscFreqNode.offset.setValueAtTime(440, audioCtx.currentTime);
+  const oscFreqNode = new Tone.Signal();
+  oscFreqNode.setValueAtTime(440, Tone.now());
   oscFreqNode.connect(osc[1].frequency);
   oscFreqNode.connect(osc[2].frequency);
   oscFreqNode.connect(osc[3].frequency);
-  oscFreqNode.start();
-
-  const oscFreqNodeOffsetParam = new Tone.Param(oscFreqNode.offset);
 
   // ==========================
   //  get browser capabilities
@@ -158,11 +151,11 @@ VS.AudioEngine = function(patch, sequence) {
   const browserFeatures = {};
 
   const checkCustomCurveClearing = function() {
-    let dummyGain = audioCtx.createGain();
-    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
+    let dummyGain = new Tone.Gain();
+    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], Tone.now(), 2.6);
     try {
-      dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
-      dummyGain.gain.setValueAtTime(1, audioCtx.currentTime + 0.2);
+      dummyGain.gain.cancelScheduledValues(Tone.now() + 0.1);
+      dummyGain.gain.setValueAtTime(1, Tone.now() + 0.2);
       browserFeatures['customCurveClearing'] = true;
     } catch (error) {
       browserFeatures['customCurveClearing'] = false;
@@ -170,10 +163,10 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   const checkCancelAndHoldAtTime = function() {
-    let dummyGain = audioCtx.createGain();
-    dummyGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    let dummyGain = new Tone.Gain();
+    dummyGain.gain.setValueAtTime(0.5, Tone.now());
     try {
-      dummyGain.gain.cancelAndHoldAtTime(audioCtx.currentTime + 0.1);
+      dummyGain.gain.cancelAndHoldAtTime(Tone.now() + 0.1);
       browserFeatures['cancelAndHoldAtTime'] = true;
     } catch (error) {
       browserFeatures['cancelAndHoldAtTime'] = false;
@@ -192,10 +185,6 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   testBrowserFeatures();
-
-  this.showPerformanceWarning = () => {
-    return !browserFeatures['cancelAndHoldAtTime'];
-  };
 
   // END get browser capabilities
 
@@ -261,16 +250,14 @@ VS.AudioEngine = function(patch, sequence) {
   runToneSequencer();
 
   this.init = () => {
-    Tone.setContext(myToneCtx);
     Tone.start();
-    masterAmp.connect(audioCtx.destination);
+    masterAmp.toDestination();
   };
 
   this.activateAudio = function() {
-    if (audioCtx.state === 'running') { return; }
+    if (Tone.state === 'running') { return; }
 
-    audioCtx.resume().then(() => {
-      Tone.context.resume();
+    Tone.context.resume().then(() => {
       Tone.start();
     });
   };
@@ -287,7 +274,7 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   const triggerDecay = function(attackEndTimeValue) {
-    filterEgOffsetParam.linearRampToValueAtTime(
+    filterEg.linearRampToValueAtTime(
       0,
       attackEndTimeValue + (patch.envelope.decayRelease * patch.filterEgCoefficient)
     );
@@ -311,13 +298,12 @@ VS.AudioEngine = function(patch, sequence) {
     }
   };
 
-  this.playNewNote = function(time = audioCtx.currentTime) {
-    debugNewNote = audioCtx.currentTime;
+  this.playNewNote = function(time = Tone.now()) {
     this.activateAudio();
     let frequency;
 
     // Filter EG reset
-    filterEgOffsetParam.cancelAndHoldAtTime(time);
+    filterEg.cancelAndHoldAtTime(time);
 
     const attackEndTimeValue = time + patch.envelope.attack;
     attackEndTime.setValueAtTime(attackEndTimeValue, time);
@@ -327,7 +313,7 @@ VS.AudioEngine = function(patch, sequence) {
 
     // Set frequency
     frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    oscFreqNode.setValueAtTime(frequency, time);
 
     if (patch.ampEgOn && patch.envelope.attack > 0) {
       ampEgGainParam.setValueAtTime(0, time);
@@ -340,8 +326,8 @@ VS.AudioEngine = function(patch, sequence) {
 
     // Retrigger envelope
     // Attack
-    filterEgOffsetParam.setValueAtTime(0, time);
-    filterEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
+    filterEg.setValueAtTime(0, time);
+    filterEg.linearRampToValueAtTime(1, attackEndTimeValue);
 
     // Decay
     if (!patch.sustainOn) {
@@ -349,16 +335,15 @@ VS.AudioEngine = function(patch, sequence) {
     }
   };
 
-  this.changeCurrentNote = function(time = audioCtx.currentTime) {
+  this.changeCurrentNote = function(time = Tone.now()) {
     let frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
-    let lastFrequency = oscFreqNodeOffsetParam.getValueAtTime(time);
+    let lastFrequency = oscFreqNode.getValueAtTime(time);
 
-    oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-    oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + 0.05);
+    oscFreqNode.setValueAtTime(lastFrequency, time);
+    oscFreqNode.linearRampToValueAtTime(frequency, time + 0.05);
   };
 
-  this.stopNote = function(time = audioCtx.currentTime) {
-    // console.log('QDEBUG:', time - debugNewNote);
+  this.stopNote = function(time = Tone.now()) {
     const currentValue = ampEgGainParam.getValueAtTime(time);
 
     // If note is already off, don't bother stopping it.
@@ -368,10 +353,10 @@ VS.AudioEngine = function(patch, sequence) {
       if (patch.sustainOn || (time < attackEndTime.getValueAtTime(time))) {
 
         // filter envelope
-        filterEgOffsetParam.cancelAndHoldAtTime(time);
+        filterEg.cancelAndHoldAtTime(time);
 
         // TODO: Use custom curve for filter?
-        filterEgOffsetParam.linearRampToValueAtTime(
+        filterEg.linearRampToValueAtTime(
           0,
           time + (patch.envelope.decayRelease * patch.filterEgCoefficient * currentValue)
         );
@@ -394,8 +379,8 @@ VS.AudioEngine = function(patch, sequence) {
 
     } else {
       // Filter cutoff down immediately
-      filterEg.offset.cancelScheduledValues(time);
-      filterEg.offset.setValueAtTime(0, time);
+      filterEg.cancelScheduledValues(time);
+      filterEg.setValueAtTime(0, time);
 
       // Turn amp down immediately
       ampEgGainParam.setValueAtTime(1, time);
@@ -404,7 +389,7 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   // CHANGE OCTAVE
-  this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
+  this.changeOctave = (octaveOffset, time = Tone.now()) => {
     this.notePlaying.setValueAtTime(
       this.notePlaying.getValueAtTime(time) + octaveOffset,
       time
@@ -413,31 +398,31 @@ VS.AudioEngine = function(patch, sequence) {
     const frequency =
       Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
 
-    oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    oscFreqNode.setValueAtTime(frequency, time);
   };
 
   this.setPeak = (value) => {
     filter.Q.value = value;
   };
 
-  this.setCutoff = (value, time = audioCtx.currentTime) => {
+  this.setCutoff = (value, time = Tone.now()) => {
     filter.frequency.setValueAtTime(value, time);
   };
 
-  this.setFilterEgInt = (value, time = audioCtx.currentTime) => {
+  this.setFilterEgInt = (value, time = Tone.now()) => {
     filterEgAmp.gain.setValueAtTime(value, time);
   };
 
-  this.setVolume = (value, time = audioCtx.currentTime) => {
+  this.setVolume = (value, time = Tone.now()) => {
     masterAmp.gain.setValueAtTime(value, time);
   };
 
   this.setOscMuteAmp = (oscNumber, value) => {
-    oscMuteAmps[oscNumber].gain.setValueAtTime(value, audioCtx.currentTime);
+    oscMuteAmps[oscNumber].gain.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoRate = (value) => {
-    oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
+    oscLfo.frequency.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoWave = (value) => {
@@ -447,28 +432,28 @@ VS.AudioEngine = function(patch, sequence) {
   this.setLfoInt = (value) => {
     // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
     if (patch.lfo.targetPitch) {
-      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+      ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, Tone.now());
     }
 
     if (patch.lfo.targetCutoff) {
-      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
+      ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, Tone.now());
     }
 
     if (patch.lfo.targetAmp) {
-      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, audioCtx.currentTime);
+      ampLfoAmp.gain.setValueAtTime(patch.lfo.ampValue, Tone.now());
     }
   };
 
-  this.setNotePlaying = (value, time = audioCtx.currentTime) => {
+  this.setNotePlaying = (value, time = Tone.now()) => {
     this.notePlaying.setValueAtTime(value, time);
   };
 
   this.getNotePlaying = () => {
-    return this.notePlaying.getValueAtTime(audioCtx.currentTime);
+    return this.notePlaying.getValueAtTime(Tone.now());
   };
 
   this.setOscPitch = (index, value) => {
-    osc[index].detune.setValueAtTime(value, audioCtx.currentTime);
+    osc[index].detune.setValueAtTime(value, Tone.now());
   };
 
   this.setTempo = () => {

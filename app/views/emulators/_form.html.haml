@@ -40,11 +40,10 @@
       .green-check-mark
       #permalink.button.nolight
       #step-mode-button.scrim
-      #play.button.highlight
+      #play.button
       #skip-step.button.interface-text.hidden.nolight Skip&nbsp;Step
       #record-scrim.scrim
       #record-button.button
-      #experimental
       #stop.hidden
 
       .bottom-row
@@ -146,7 +145,6 @@
     #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
     #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
-  #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     .accordion-item
       %h4.accordion-header
@@ -169,11 +167,12 @@
           To save a patch and sequence, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface below the cutoff knob.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
     .accordion-item
       %h4.accordion-header
-        Compatibility
+        Changelog
         .collapse-toggle.glyphicon.glyphicon-chevron-down
       - compatibilityBodyStyle = cookies[:accordionCompatibility] == 'closed' ? 'display:none;' : ''
       .accordion-body{ style: compatibilityBodyStyle }
-        There are known issues with the sequencer on Chrome.  You will have a smoother experience on Firefox.
+        %b August 2024:
+        The sequencer issue on Chrome has been resolved.  Playback should be consistent and should not stutter or fizzle out.
     .accordion-item
       %h4.accordion-header
         Disclaimer
