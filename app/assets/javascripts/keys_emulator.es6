@@ -52,12 +52,20 @@ VS.KeysEmulator = function() {
     qsKnobs.forEach(function(qsParam) {
       const rawValue = urlParams.get(qsParam);
       const parsedValue = parseInt(rawValue);
+
+      let knobInstance;
+      if (['voice', 'octave'].includes(qsParam)) {
+        knobInstance = new VS.SnapKnob($(`#${qsParam}`));
+      } else {
+        knobInstance = new VS.Knob($(`#${qsParam}`));
+      }
+
       if (0 <= parsedValue && parsedValue <= 127) {
         patch[`set${qsParam}`](parsedValue);
 
-        new VS.Knob($(`#${qsParam}`)).setKnob(parsedValue);
+        knobInstance.setKnob(parsedValue);
       } else {
-        new VS.Knob($(`#${qsParam}`)).setKnob();
+        knobInstance.setKnob();
       }
     });
 
@@ -129,16 +137,14 @@ VS.KeysEmulator = function() {
   }
 
   // this is how to auto-rotate knobs
-  $('.knob').each(function() {
-    new VS.Knob(this).setKnob($(this).data('midi'));
-  });
+  VS.autoRotateAllKnobs();
 
   const changeOctave = function(change, keyStroke = true) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
     if (keyStroke) {
       // Turn octave knob
-      new VS.Knob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
+      new VS.SnapKnob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
 
       if (!audioEngine.noteIsPlaying()) { return; } // at init time
     }

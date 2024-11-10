@@ -17,7 +17,15 @@ VS.Form = function() {
 
   const rotateKnobs = function() {
     $('.knob').each(function() {
-      new VS.Knob(this).setKnob($(this).data('midi'));
+      let knobInstance;
+
+      if ($(this).hasClass('dark')) {
+        knobInstance = new VS.SnapKnob(this);
+      } else {
+        knobInstance = new VS.Knob(this);
+      }
+
+      knobInstance.setKnob($(this).data('midi'));
     });
   };
 
@@ -41,6 +49,7 @@ VS.Form = function() {
       let randomValue;
       const snapKnobMidiValues = [10, 30, 50, 70, 100, 120];
 
+      // TODO: call SnapKnob
       if ($(knob).hasClass('dark')) {
         randomValue =
           snapKnobMidiValues[
@@ -159,7 +168,7 @@ VS.Form = function() {
     e.stopPropagation();
     VS.clicked = true;
     VS.dragging = true;
-    VS.activeKnob = new VS.Knob(this);
+    VS.setActiveKnob(this);
     sequences.activeNote = null;
     const knob = $(VS.activeKnob.element);
     if (!knob.data('origin')) { knob.data('origin', {top: knob.offset().top}); }
@@ -168,7 +177,7 @@ VS.Form = function() {
   $('.knob').mouseenter(function() {
     midi = $(this).data('midi');
     if (VS.dragging) { return false; }
-    VS.activeKnob = new VS.Knob(this);
+    VS.setActiveKnob(this);
     if ($(this).attr('id') === 'tempo') {
       let superMidi = $(this).data('super-midi');
       $('#decimal').removeClass('hidden');
@@ -278,23 +287,8 @@ VS.Form = function() {
     if ((VS.currentPoint !== VS.clickedPoint) || (degree === leftLimit) || (degree === rightLimit)) {
       VS.activeKnob.rotate(degree);
 
-      // TODO: Refactor! This is ugly.  The way the Knob class is defined
-      //   isn't polymorphism friendly.
-      if ($(VS.activeKnob.element).hasClass('dark')) {
-        midi_map = {
-          '-90': 10,
-          '-60': 30,
-          '-30': 50,
-          '0': 70,
-          '30': 100,
-          '60': 120
-        };
-        midi = midi_map[degree];
-        trueMidi = ((63.5 / limit) * degree) + 63.5
-      } else {
-        midi = Math.round(((63.5 / limit) * degree) + 63.5);
-        trueMidi = ((63.5 / limit) * degree) + 63.5
-      }
+      midi = VS.activeKnob.midiByDegree(degree);
+      trueMidi = VS.activeKnob.trueMidiByDegree(degree);
 
       // NOTE: Tempo knob has 256 values (0-255)
       if ($(VS.activeKnob.element).attr('id') === 'tempo') {

@@ -39,3 +39,25 @@ $(function() {
 
   $('[data-toggle="tooltip"]').tooltip();
 });
+
+VS.autoRotateAllKnobs = function() {
+  $('.knob').each(function() {
+    let knobInstance;
+
+    if ($(this).hasClass('dark')) {
+      knobInstance = new VS.SnapKnob(this);
+    } else {
+      knobInstance = new VS.Knob(this);
+    }
+
+    knobInstance.setKnob($(this).data('midi'));
+  });
+};
+
+VS.setActiveKnob = function(element) {
+  if ($(element).hasClass('dark')) {
+    VS.activeKnob = new VS.SnapKnob(element);
+  } else {
+    VS.activeKnob = new VS.Knob(element);
+  }
+};

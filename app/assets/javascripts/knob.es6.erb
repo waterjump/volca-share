@@ -7,16 +7,6 @@ VS.Knob = function(element) {
   this.displayStyle = 'midiString';
   this.inputElement = $(`input#patch_${this.jElement.attr('id')}`);
 
-  this.setLimits = function() {
-    if (this.jElement.hasClass('dark')) {
-      this.leftLimit = -90;
-      this.rightLimit = 60;
-    } else {
-      this.leftLimit = -140;
-      this.rightLimit = 140;
-    }
-  };
-
   this.setLimits();
 
   this.setDisplayStyle = function() {
@@ -45,23 +35,6 @@ VS.Knob = function(element) {
     knob.css('-ms-transform-origin', '50% 50%');
   };
 
-  this.degreeForMidi = function(midi, limit) {
-    if (this.jElement.hasClass('dark')) {
-      midiToAngleMap = {
-        '10': -90,
-        '30': -60,
-        '50': -30,
-        '70': 0,
-        '100': 30,
-        '120': 60
-      };
-
-      return midiToAngleMap[midi];
-    } else {
-      return Math.round((midi - 63.5) / (63.5 / limit));
-    }
-  };
-
   this.autoRotate = function(d) {
     const scope = this;
     <% if Rails.env.test? %>
@@ -86,4 +59,21 @@ VS.Knob = function(element) {
     this.jElement.data('rotation', degree);
     this.autoRotate(degree)
   };
+};
+
+VS.Knob.prototype.setLimits = function() {
+  this.leftLimit = -140;
+  this.rightLimit = 140;
+};
+
+VS.Knob.prototype.degreeForMidi = function(midi, limit) {
+  return Math.round((midi - 63.5) / (63.5 / limit));
+};
+
+VS.Knob.prototype.midiByDegree = function(degree) {
+  return Math.round(((63.5 / 140) * degree) + 63.5);
+};
+
+VS.Knob.prototype.trueMidiByDegree = function(degree) {
+  return ((63.5 / 140) * degree) + 63.5;
 };
