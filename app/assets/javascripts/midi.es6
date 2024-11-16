@@ -205,6 +205,20 @@ VS.MidiIn = function() {
     return new CustomEvent('midinoteoff', { detail: note });
   };
 
+  const createMidiCcChangeEvent = function(ccNumber, value) {
+    result = new CustomEvent(
+      'midiccchange',
+      {
+        detail: {
+          ccNumber: ccNumber,
+          value: value
+        }
+      }
+    );
+
+    return result;
+  };
+
   const noteOnListenerCallback = function(e) {
     if ((this.channel === e.channel) || (this.channel === -1)) {
       document.dispatchEvent(createMidiNoteOnEvent(e.note));
@@ -214,6 +228,12 @@ VS.MidiIn = function() {
   const noteOffListenerCallback = function(e) {
     if ((this.channel === e.channel) || (this.channel === -1)) {
       document.dispatchEvent(createMidiNoteOffEvent(e.note));
+    }
+  }.bind(this);
+
+  const ccChangeListenerCallback = function(e) {
+    if ((this.channel === e.channel) || (this.channel === -1)) {
+      document.dispatchEvent(createMidiCcChangeEvent(e.controller.number, e.value));
     }
   }.bind(this);
 
@@ -229,6 +249,7 @@ VS.MidiIn = function() {
       unsetLastInput();
       this.input.addListener("noteon", "all", noteOnListenerCallback);
       this.input.addListener("noteoff", "all", noteOffListenerCallback);
+      this.input.addListener("controlchange", "all", ccChangeListenerCallback);
     }
   }.bind(this);
 

@@ -28,7 +28,22 @@ VS.SnapKnob.prototype.midiByDegree = function(degree) {
   return angleToMidiMap[degree];
 };
 
-VS.SnapKnob.prototype.degreeForMidi = function(midi, limit) {
+VS.SnapKnob.prototype.closestSnapMidiValue = function(num) {
+  const options = [10, 30, 50, 70, 100, 120];
+
+  return options.reduce((closest, current) => {
+    const closestDiff = Math.abs(num - closest);
+    const currentDiff = Math.abs(num - current);
+
+    if (currentDiff < closestDiff || (currentDiff === closestDiff && current > closest)) {
+      return current;
+    } else {
+      return closest;
+    }
+  });
+};
+
+VS.SnapKnob.prototype.degreeForMidi = function(midi, limit = 140) {
   midiToAngleMap = {
     '10': -90,
     '30': -60,

@@ -22,6 +22,22 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
     end
   end
 
+  describe 'dragging knob twice' do
+    it 'is cumulative' do
+      page.find('#peak').drag_to(find('#cutoff'))
+      peak_knob_midi_value = evaluate_script(
+        "$('#peak').data('midi')"
+      )
+      expect(peak_knob_midi_value).to eq(26)
+
+      page.find('#peak').drag_to(find('#cutoff'))
+      peak_knob_midi_value = evaluate_script(
+        "$('#peak').data('midi')"
+      )
+      expect(peak_knob_midi_value).to eq(53)
+    end
+  end
+
   context 'when closing accordion display' do
     it 'remains closed on next page load' do
       expect(page).to have_css('#desktop-instructions', visible: true)

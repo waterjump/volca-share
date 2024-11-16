@@ -136,7 +136,6 @@ VS.KeysEmulator = function() {
     // showPerformanceWarning();
   }
 
-  // this is how to auto-rotate knobs
   VS.autoRotateAllKnobs();
 
   const changeOctave = function(change, keyStroke = true) {
@@ -331,6 +330,41 @@ VS.KeysEmulator = function() {
 
   $(document).on('midinoteoff', function(event) {
     keyboardUp(event.detail.number);
+  });
+
+  // handle midi in CC event
+  $(document).on('midiccchange', function(event) {
+    let knobElement;
+    if ([40, 41].includes(event.detail.ccNumber)) {
+      knobElement = $(`.knob[data-control-number='${event.detail.ccNumber}']`)[0];
+      // Snap knob
+
+      VS.activeKnob = new VS.SnapKnob(knobElement);
+      let midi = VS.activeKnob.closestSnapMidiValue(event.detail.value);
+
+      if (VS.activeKnob.jElement.data('midi') === midi) {
+        return;
+      }
+
+      VS.activeKnob.jElement.data('midi', midi);
+      VS.activeKnob.jElement.data('trueMidi', parseFloat(midi));
+
+      let degree = VS.activeKnob.degreeForMidi(midi);
+      VS.activeKnob.rotate(degree);
+      VS.activeKnob.element.dispatchEvent(new Event('knobturn'));
+    } else {
+      knobElement = $(`.knob[data-control-number='${event.detail.ccNumber}']`);
+      if (knobElement.length > 0) {
+        $(knobElement[0]).data('trueMidi', event.detail.value);
+        // Glide knob
+
+        VS.activeKnob = new VS.Knob(knobElement[0]);
+        VS.activeKnob.setKnob(event.detail.value);
+        VS.activeKnob.element.dispatchEvent(new Event('knobturn'));
+      } else {
+        console.log(`No CC control for ${event.detail.ccNumber}`);
+      }
+    }
   });
 
   const getShapeFromLfoLightClick = function(el) {

@@ -206,18 +206,23 @@ VS.Form = function() {
         }
       }
 
-      turnKnob(e);
+      mouseKnobChange(e);
       sequences.changeSequenceNote(e);
     }
   };
 
   $(document).on('mousemove touchmove', throttle(25, dragStuff()));
 
-  const calculateDegree = function() {
+  const calculateDegree = function(midiInValue = null) {
     if ($(VS.activeKnob.element).hasClass('dark')) {
       // SNAP KNOBS
       // I suspect this is slow.
-      difference = VS.clickedPoint - VS.currentPoint;
+      let difference;
+      if (VS.dragging) {
+        difference = VS.clickedPoint - VS.currentPoint;
+      } else {
+        difference = VS.activeKnob.jElement.data('trueMidi') - midiInValue;
+      };
 
       if (difference > -15 && difference <= 15) {
         return VS.activeKnob.rotation;
@@ -265,7 +270,7 @@ VS.Form = function() {
     });
   };
 
-  const turnKnob = function(e) {
+  const mouseKnobChange = function(e) {
     if (VS.activeKnob === null) { return; }
 
     let degree = calculateDegree();
