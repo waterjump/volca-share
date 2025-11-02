@@ -1,4 +1,4 @@
-VS.KeysAudioEngine = function(patch) {
+VS.KeysAudioEngine = function(patch, sequence) {
   // ===================================================================
   // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
   // ===================================================================
@@ -17,6 +17,7 @@ VS.KeysAudioEngine = function(patch) {
   const ampLfoCutoff = audioCtx.createGain();
   const gracePeriod = 0.05; // 50ms
   const carrierGain = 0.5; // so ring mod voices aren't super loud
+  let sequencerPlaying = false;
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -334,6 +335,10 @@ VS.KeysAudioEngine = function(patch) {
 
   // END get browser capabilities
 
+  // ===================================
+  //  SEQUENCER
+  // ===================================
+
   const setTempo = () => {
     // this is needed to change loop interval
     Tone.Transport.bpm.value = patch.tempo;
@@ -344,6 +349,35 @@ VS.KeysAudioEngine = function(patch) {
       // idc
     }
   };
+
+  const runToneSequencer = function(){
+    setTempo();
+
+    let i = 0;
+    let previousStep;
+
+    Tone.Transport.scheduleRepeat(function(time) {
+      if (!sequencerPlaying) { return; }
+
+      while (!sequence[i % 16].activeStep) {
+        // Bail out if all steps are inactive
+        if (!sequence.some(step => { return step.activeStep })) { return; }
+        i++;
+      }
+
+      const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
+
+      let currentStep = sequence[i % 16];
+
+      this.playNewNote(currentStep['note'], time);
+      this.stopNote(gateEnd);
+
+      previousStep = currentStep;
+      i++;
+    }.bind(this), '16n');
+  }.bind(this);
+
+  runToneSequencer();
 
   const setInitialEngineValues = function() {
     this.changeVoice();
@@ -389,9 +423,11 @@ VS.KeysAudioEngine = function(patch) {
   const triggerDecayRelease = function(time = audioCtx.currentTime) {
     const isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
 
-    const endValue = isDecay ? patch.envelope.sustain : 0;
+    const endValue = isDecay && !sequencerPlaying ? patch.envelope.sustain : 0;
     let duration;
     const currentValue = universalEgOffsetParam.getValueAtTime(time);
+
+    if (currentValue === 0) { return; }
 
     if (isDecay) {
       universalEgOffsetParam.setValueAtTime(1, time);
@@ -700,8 +736,8 @@ VS.KeysAudioEngine = function(patch) {
     }
   };
 
-  this.stopNote = function() {
-    triggerDecayRelease();
+  this.stopNote = function(time = Tone.now()) {
+    triggerDecayRelease(time);
   };
 
   // CHANGE OCTAVE
@@ -760,6 +796,21 @@ VS.KeysAudioEngine = function(patch) {
 
   this.setTempo = () => {
     setTempo();
+  };
+
+  this.startSequencer = () => {
+    sequencerPlaying = true;
+    Tone.Transport.start('+0');
+  };
+
+  this.stopSequencer = () => {
+    sequencerPlaying = false;
+    Tone.Transport.stop();
+    this.stopNote(Tone.now() + 0.2);
+  };
+
+  this.getSequencerPlaying = () => {
+    return sequencerPlaying;
   };
 
   this.setDetune = () => {

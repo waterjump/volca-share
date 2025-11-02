@@ -33,10 +33,13 @@
         .notch
       .small.knob.midi-enabled.unlit#delay_feedback{ data: { midi: @patch.delay_feedback, control_number: 53 } }
         .notch
+      .small.knob.unlit#tempo{ data: { midi: 0, control_number: 0 } }
+        .notch
       .small.knob.unlit#volume{ data: { midi: 127 } }
         .notch
 
-      #tempo-scrim.scrim
+      #play.button.nolight
+      #stop.hidden
       #blackbuttons-scrim.scrim
       #permalink.button.nolight
       .green-check-mark
@@ -110,6 +113,9 @@
 
         -# METRONOME
         .placeholder
+  .field.sequence-area
+    .sequence-holder
+    = link_to 'Show sequencer', '#', id: 'toggle-sequences', class: 'btn btn-default', data: { hide_text: 'Hide sequencer', show_text: 'Show sequencer' }
 
   #mobile-keyboard.hidden
     #octave-up.mobile-control.octave-button.top Oct. ⬆️

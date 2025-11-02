@@ -7,8 +7,33 @@ VS.KeysEmulator = function() {
   // components accordingly.
   // ===========================================================================
 
-  const { emulatorConstants, emulatorParams } = VS;
+  const { sequences, emulatorConstants, emulatorParams } = VS;
   const patch = emulatorParams;
+
+  // initialize sequence object
+  const sequence = [];
+  for (let index = 0; index < 16; index++) {
+    sequence.push({ index: index, note: 60, activeStep: true } );
+  }
+
+  const setSequenceView = function() {
+    if (sequence.length !== 16) { return }
+
+    sequence.forEach(step => {
+      jElement = $(`#step_${step.index}`)
+      jElement.find('.note-display').data('starting-note', step.note);
+      jElement.find('.note-display').html(VS.midiNoteNumbers[step.note]);
+      jElement.find('.active-step .light').data('active', step.activeStep);
+      jElement.find('.active-step .light').removeClass(step.activeStep ? '' : 'lit');
+    });
+  };
+
+  $('#toggle-sequences, #play, #record-button').on('click tap', function() {
+    if (sequence.length === 0) {
+      populateSequenceObject();
+    }
+    setSequenceView();
+  });
 
   const volcaInterface = {
     lightAndCheck: function(paramName) {
@@ -116,7 +141,7 @@ VS.KeysEmulator = function() {
 
   let keysDown = [];
 
-  const audioEngine = new VS.KeysAudioEngine(emulatorParams);
+  const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
   const showPerformanceWarning = () => {
@@ -158,12 +183,10 @@ VS.KeysEmulator = function() {
   }
 
   changeOctave(0);
+  sequences.init();
 
   const keyboardDown = function(note){
     keysDown.push(note);
-    // if (keysDown.indexOf(audioEngine.getNotePlaying()) === -1) {
-    //  keysDown.push(audioEngine.getNotePlaying());
-    // }
 
     if (keysDown.length === 1) {
       audioEngine.playNewNote(note);
@@ -195,6 +218,34 @@ VS.KeysEmulator = function() {
 
     audioEngine.stopPolyNote(keysDown, noteThatStopped);
     audioEngine.stopNote();
+  };
+
+  $('#play').on('click tap', function() {
+    audioEngine.activateAudio();
+    if (audioEngine.getSequencerPlaying()) {
+      // STOP
+      macroStopSequencer();
+    } else {
+      // START
+      macroStartSequencer();
+    }
+  });
+
+  const macroStartSequencer = () => {
+    if (audioEngine.getSequencerPlaying()) { return; }
+    if (patch.voice.includes('poly')) { return; }
+
+    audioEngine.startSequencer();
+    $('#stop').toggleClass('hidden');
+    $('#play').toggleClass('playing');
+  };
+
+  const macroStopSequencer = () => {
+    if (!audioEngine.getSequencerPlaying()) { return; }
+
+    audioEngine.stopSequencer();
+    $('#play').toggleClass('playing');
+    $('#stop').toggleClass('hidden');
   };
 
   const macroOctaveUp = () => {
@@ -232,12 +283,31 @@ VS.KeysEmulator = function() {
     }
   };
 
+  const setSequenceNote = function() {
+    if (VS.sequences.activeNote !== null) {
+      const note = VS.sequences.activeNote.data('note');
+      const index = VS.sequences.activeNote.data('index');
+      sequence[index]['note'] = note;
+    }
+  };
+
+  document.addEventListener('changesequencenote', setSequenceNote);
+
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
     if (document.hidden) {
       audioEngine.stopNote();
     }
   });
+
+  $('.sequence-holder').on('sequenceparamchange', '.sequence-box .active-step label',
+    function() {
+      const light = $($(this).find('.light'));
+      light.data('active', !light.data('active'));
+      const index = light.data('index');
+      sequence[index]['activeStep'] = light.data('active');
+    }
+  );
 
   $('#tempo').on('knobturn', () => {
     midiValue = VS.activeKnob.jElement.data('superMidi');
@@ -279,6 +349,16 @@ VS.KeysEmulator = function() {
   $('#voice').on('knobturn', () => {
     patch.setvoice(VS.activeKnob.midi());
     audioEngine.changeVoice();
+
+    // Stop sequencer because it doesn't support polyphony
+    if (patch.voice.includes('poly')) {
+      $('#play').addClass('disabled');
+      if (audioEngine.getSequencerPlaying()) {
+        macroStopSequencer();
+      }
+    } else {
+      $('#play').removeClass('disabled');
+    }
   });
 
  $('#octave').on('knobturn', () => {

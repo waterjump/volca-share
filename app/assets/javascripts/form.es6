@@ -151,6 +151,7 @@ VS.Form = function() {
 
   $('.button').on('click tap', function() {
     if ($(this).hasClass('nolight')) { return; }
+
     const vco = $(this).attr('id').split('_')[0];
     const value = $(this).data('active');
     const vcoKnob = $(`.knob#${vco}_pitch`);
