@@ -1,27 +1,26 @@
-
-.form {
+.form.keys {
   .note {
     span {
       cursor: ns-resize;
     }
   }
-  .step-mode, .slide, .active-step {
+  .active-step {
     span {
        cursor: pointer;
     }
   }
 }
 
-.highlighted {
+.highlighted.keys {
   background-color: pink;
 }
 
-.sequence-form.bass, .sequence-show.bass {
-  padding-bottom: 18.5%;
+.sequence-form.keys {
+  padding-bottom: 9.25%;
   padding-left: 2.1%;
   padding-right: 3.2%;
   position: relative;
-  min-height: 128px;
+  min-height: 64px;
   left: -1.7%;
   max-width: 913px;
   width: 100%;
@@ -51,14 +50,14 @@
     font-weight: 800;
     font-size: x-small;
     div {
-      height: 25%
+      height: 40%
     }
     .spacer {
-      height: 10%;
+      height: 20%;
     }
   }
   .param {
-    height: 25%;
+    height: 40%;
   }
   .line {
     border-right: 1px solid black;
@@ -97,7 +96,7 @@
           text-align: center;
           font-size: 22px;
           position: relative;
-          top: -3px;
+          top: -5px;
           .grayed-out {
             color: lightgray;
           }
@@ -116,7 +115,7 @@
           display: inline-block;
 
           .light {
-            height: 72%;
+            height: 79.8%;
             width: 50%;
             border-radius: 50%;
             background-color: #DDDDDD;
@@ -134,7 +133,7 @@
 }
 
 @media (min-width: 768px) {
-  .sequence-form.bass, .sequence-show.bass {
+  .sequence-form.keys {
     .param-labels {
       font-size: smaller;
     }
@@ -143,7 +142,7 @@
         .step {
           span {
             .light {
-              height: 62%;
+              height: 79.8%;
               width: 51%
             }
           }
@@ -154,12 +153,12 @@
 }
 
 @media (min-width: 990px) {
-  .sequence-form.bass, .sequence-show.bass {
-    padding-bottom: 14%;
+  .sequence-form.keys {
+    padding-bottom: 7%;
     padding-left: 2.1%;
     padding-right: 3.2%;
     max-width: 913px;
-    min-height: 128px;
+    min-height: 64px;
     width: 110%;
     left: -1.7%;
     margin: 3% 0;
@@ -169,7 +168,7 @@
           width: 5.7%;
           span {
             .light {
-              height: 62%;
+              height: 79.8%;
               width: 44%;
             }
           }
@@ -180,11 +179,11 @@
 }
 
 @media (min-width: 1200px) {
-  .sequence-form.bass, .sequence-show.bass {
+  .sequence-form.keys {
     left: -66px;
     .step {
       .light {
-        height: 57.6%;
+        height: 79.8%;
       }
     }
   }

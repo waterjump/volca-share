@@ -123,4 +123,31 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
       end
     end
   end
+
+  describe 'sequencer' do
+    context 'when enabled' do
+      it 'shows sequencer form' do
+        expect(page).not_to have_css('.sequence-form', visible: true)
+
+        find('#toggle-sequences').click
+
+        expect(page).to have_css('.sequence-form', visible: true)
+        expect(page).not_to have_css('#step_0 .slide', visible: true)
+        expect(page).not_to have_css('#step_0 .step-mode', visible: true)
+      end
+    end
+
+    describe 'notes' do
+      it 'can be changed' do
+        find('#toggle-sequences').click
+
+        find('#patch_sequences_attributes_0_step_1_note_display')
+         .drag_to(seq_form_light(0, 1, 'active_step'))
+
+        expect(find('#patch_sequences_attributes_0_step_1_note_display')).to(
+          have_text('F2')
+        )
+      end
+    end
+  end
 end
