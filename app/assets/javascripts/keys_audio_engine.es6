@@ -798,6 +798,8 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   this.stopSequencer = () => {
     sequencerPlaying = false;
+    // set all oscillator notes to -1
+    [1, 2, 3].forEach(i => oscillators[i].note = -1);
     Tone.Transport.stop();
   };
 

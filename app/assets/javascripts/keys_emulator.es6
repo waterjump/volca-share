@@ -295,7 +295,7 @@ VS.KeysEmulator = function() {
 
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
+    if (document.hidden && !audioEngine.getSequencerPlaying()) {
       audioEngine.stopNote();
     }
   });
