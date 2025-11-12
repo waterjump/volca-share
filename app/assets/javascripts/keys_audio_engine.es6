@@ -790,8 +790,6 @@ VS.KeysAudioEngine = function(patch, sequence) {
   this.stopSequencer = () => {
     sequencerPlaying = false;
     Tone.Transport.stop();
-    // TODO stopping sequencer doesn't stop note
-    this.stopNote(Tone.now() + 0.2);
   };
 
   this.getSequencerPlaying = () => {
