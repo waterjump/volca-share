@@ -1,20 +1,17 @@
 VS.KeysAudioEngine = function(patch, sequence) {
   // ===================================================================
-  // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH AUDIO CONTEXT
+  // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH TONE.JS
   // ===================================================================
 
-  const audioCtx = new AudioContext();
-  const myToneCtx = new Tone.Context({context: audioCtx, lookAhead: 0.1})
-  const masterAmp = audioCtx.createGain();
-  const filter = audioCtx.createBiquadFilter();
-  const filterEgAmp = audioCtx.createGain();
-  const ampEg = audioCtx.createGain();
-  const universalEg = audioCtx.createConstantSource();
-  const universalEgOffsetParam = new Tone.Param(universalEg.offset);
-  const vcoEgShaper = audioCtx.createWaveShaper();
-  const vcoEgIntAmp = audioCtx.createGain();
-  const ampLfoPitch = audioCtx.createGain();
-  const ampLfoCutoff = audioCtx.createGain();
+  const masterAmp = new Tone.Gain();
+  const filter = new Tone.BiquadFilter();
+  const filterEgAmp = new Tone.Gain();
+  const ampEg = new Tone.Gain();
+  const universalEg = new Tone.Signal();
+  const vcoEgShaper = new Tone.WaveShaper();
+  const vcoEgIntAmp = new Tone.Gain();
+  const ampLfoPitch = new Tone.Gain();
+  const ampLfoCutoff = new Tone.Gain();
   const gracePeriod = 0.05; // 50ms
   const carrierGain = 0.5; // so ring mod voices aren't super loud
   let sequencerPlaying = false;
@@ -25,7 +22,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
     for (let i = 0; i < 256; i++) {
       // Counterintuitively, the shaper is excepting -1 to 1 range even
-      // though it appears that the universalEgOffsetParam outputs values
+      // though it appears that the universalEg outputs values
       // in range 0 to 1.  Not sure why, but this works.
       const x = (i - 128) / 128; // Normalize input range (-1 to 1)
 
@@ -40,16 +37,16 @@ VS.KeysAudioEngine = function(patch, sequence) {
   // TODO: Encampsulate this setup script in its own function.
 
   // BEGIN delay
-  const delay = audioCtx.createDelay();
-  delay.delayTime.setValueAtTime(0.2, audioCtx.currentTime);
+  const delay = new Tone.Delay();
+  delay.delayTime.setValueAtTime(0.2, Tone.now());
 
-  const delayFilter = audioCtx.createBiquadFilter();
+  const delayFilter = new Tone.BiquadFilter();
   delayFilter.type = 'lowpass';
   delayFilter.Q.value = 0;
-  delayFilter.frequency.setValueAtTime(1000, audioCtx.currentTime);
+  delayFilter.frequency.setValueAtTime(1000, Tone.now());
 
-  const delayAmp = audioCtx.createGain();
-  delayAmp.gain.setValueAtTime(patch.delay.feedback, audioCtx.currentTime);
+  const delayAmp = new Tone.Gain();
+  delayAmp.gain.setValueAtTime(patch.delay.feedback, Tone.now());
   delay.connect(delayFilter);
   delayFilter.connect(delayAmp);
   delayAmp.connect(masterAmp);
@@ -57,15 +54,15 @@ VS.KeysAudioEngine = function(patch, sequence) {
   // END delay
 
   filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(patch.filter.cutoff, audioCtx.currentTime);
+  filter.frequency.setValueAtTime(patch.filter.cutoff, Tone.now());
   filter.Q.value = patch.filter.peak;
   filter.connect(masterAmp);
   filter.connect(delay);
 
-  filterEgAmp.gain.setValueAtTime(patch.vcf_eg_int, audioCtx.currentTime);
+  filterEgAmp.gain.setValueAtTime(patch.vcf_eg_int, Tone.now());
   filterEgAmp.connect(filter.detune);
 
-  ampEg.gain.setValueAtTime(0, audioCtx.currentTime);
+  ampEg.gain.setValueAtTime(0, Tone.now());
   ampEg.connect(filter);
 
   ampLfoCutoff.connect(filter.detune);
@@ -74,13 +71,13 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   //  This is needed to flip the LFO wave upside down so the sawtooth wave
   //  slopes top to bottom and not bottom to top.
-  const lfoWaveShaper = audioCtx.createWaveShaper();
+  const lfoWaveShaper = new Tone.WaveShaper();
   lfoWaveShaper.curve = new Float32Array([1, 0, -1]);
 
   const setupOscLfo = function() {
-    oscLfo = audioCtx.createOscillator();
+    oscLfo = new Tone.Oscillator();
     oscLfo.type = patch.lfo.shape;
-    oscLfo.frequency.setValueAtTime(patch.lfo.frequency, audioCtx.currentTime);
+    oscLfo.frequency.setValueAtTime(patch.lfo.frequency, Tone.now());
 
     if (patch.lfo.shape === 'square') {
       // Don't invert the square LFO
@@ -98,59 +95,58 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   setupOscLfo();
 
-  const thruGainSwitchController = audioCtx.createConstantSource();
-  thruGainSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+  const thruGainSwitchController = new Tone.Signal();
+  thruGainSwitchController.setValueAtTime(1, Tone.now());
 
-  const modGainSwitchController = audioCtx.createConstantSource();
-  modGainSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+  const modGainSwitchController = new Tone.Signal();
+  modGainSwitchController.setValueAtTime(0, Tone.now());
 
   // Early outputs for one and two note poly ring scenarios.
   // The modGain amps are off by default unless that note of polyphony is
   // playing.  The amps provide a bypass for when less notes are playing.
-  const oneNotePolyRingAmp = audioCtx.createGain();
+  const oneNotePolyRingAmp = new Tone.Gain();
   oneNotePolyRingAmp.gain.value = 0;
   oneNotePolyRingAmp.connect(ampEg);
-  const twoNotePolyRingAmp = audioCtx.createGain();
+  const twoNotePolyRingAmp = new Tone.Gain();
   twoNotePolyRingAmp.gain.value = 0;
   twoNotePolyRingAmp.connect(ampEg);
 
-  const modGain2 = audioCtx.createGain();
+  const modGain2 = new Tone.Gain();
   modGain2.gain.value = 0;
 
-  const modGain3 = audioCtx.createGain();
+  const modGain3 = new Tone.Gain();
   modGain3.gain.value = 0;
   modGain2.connect(twoNotePolyRingAmp);
   modGain2.connect(modGain3);
   modGain3.connect(ampEg);
 
-  vcoEgIntAmp.gain.setValueAtTime(0, audioCtx.currentTime);
+  vcoEgIntAmp.gain.setValueAtTime(0, Tone.now());
 
   const oscillatorObj = function(oscNumber) {
     this.oscNumber = oscNumber;
-    this.oscFreqNode = audioCtx.createConstantSource();
-    this.oscFreqNodeOffsetParam = new Tone.Param(this.oscFreqNode.offset);
-    this.oscillator = audioCtx.createOscillator();
-    this.volumeAmp = audioCtx.createGain();
-    this.oscAmp = audioCtx.createGain();
-    this.thruGain = audioCtx.createGain();
-    this.modGainSwitch = audioCtx.createGain();
-    this.modGain2CarrierAmp = audioCtx.createGain();
-    this.modGain2ModAmp = audioCtx.createGain();
-    this.modGain3ModAmp = audioCtx.createGain();
+    this.oscFreqNode = new Tone.Signal();
+    this.oscillator = new Tone.Oscillator();
+    this.volumeAmp = new Tone.Gain();
+    this.oscAmp = new Tone.Gain();
+    this.thruGain = new Tone.Gain();
+    this.modGainSwitch = new Tone.Gain();
+    this.modGain2CarrierAmp = new Tone.Gain();
+    this.modGain2ModAmp = new Tone.Gain();
+    this.modGain3ModAmp = new Tone.Gain();
     this.note = -1;
     this.setFrequency = function(value) {};
 
-    this.turnOnOscAmp = function(time = audioCtx.currentTime) {
+    this.turnOnOscAmp = function(time = Tone.now()) {
       this.oscAmp.gain.cancelScheduledValues(time);
       this.oscAmp.gain.setValueAtTime(1, time);
     };
 
-    this.turnOffOscAmp = function(time = audioCtx.currentTime) {
+    this.turnOffOscAmp = function(time = Tone.now()) {
       this.oscAmp.gain.cancelScheduledValues(time);
       this.oscAmp.gain.setValueAtTime(0, time);
     };
 
-    this.setRingModPath = function(time = audioCtx.currentTime, isRingOut = false) {
+    this.setRingModPath = function(time = Tone.now(), isRingOut = false) {
       if (patch.voice !== 'poly ring') { return; }
       const actionTime = isRingOut ? time + patch.envelope.decayRelease : time;
       const ringModPaths = [
@@ -179,19 +175,19 @@ VS.KeysAudioEngine = function(patch, sequence) {
     };
 
     this.initialize = function() {
-      this.oscFreqNodeOffsetParam.setValueAtTime(440, audioCtx.currentTime);
+      this.oscFreqNode.setValueAtTime(440, Tone.now());
       // Set up osc
       this.oscillator.type = patch.vco[this.oscNumber].shape;
       this.oscillator.detune.setValueAtTime(
         patch.vco[this.oscNumber].detune,
-        audioCtx.currentTime
+        Tone.now()
       );
-      this.oscillator.frequency.setValueAtTime(0, audioCtx.currentTime);
+      this.oscillator.frequency.setValueAtTime(0, Tone.now());
       ampLfoPitch.connect(this.oscillator.detune);
       vcoEgIntAmp.connect(this.oscillator.detune);
 
       this.oscillator.connect(this.volumeAmp);
-      this.volumeAmp.gain.setValueAtTime(patch.defaultVcoAmp, audioCtx.currentTime);
+      this.volumeAmp.gain.setValueAtTime(patch.defaultVcoAmp, Tone.now());
       this.volumeAmp.connect(this.oscAmp);
       this.oscAmp.connect(this.thruGain);
       this.oscAmp.connect(this.modGainSwitch);
@@ -215,7 +211,6 @@ VS.KeysAudioEngine = function(patch, sequence) {
       this.modGainSwitch.connect(this.modGain3ModAmp);
       this.modGain3ModAmp.connect(modGain3.gain);
 
-      this.oscFreqNode.start();
       this.oscillator.start();
     }
 
@@ -228,30 +223,23 @@ VS.KeysAudioEngine = function(patch, sequence) {
     3: new oscillatorObj(3)
   };
 
-  universalEg.offset.setValueAtTime(0, audioCtx.currentTime);
+  universalEg.setValueAtTime(0, Tone.now());
   universalEg.connect(filterEgAmp);
   universalEg.connect(ampEg.gain);
   universalEg.connect(vcoEgShaper);
   vcoEgShaper.connect(vcoEgIntAmp);
-  universalEg.start();
 
-  thruGainSwitchController.start();
-  modGainSwitchController.start();
-
-  const voiceOscDetuner1 = audioCtx.createConstantSource();
-  voiceOscDetuner1.offset.setValueAtTime(0, audioCtx.currentTime);
+  const voiceOscDetuner1 = new Tone.Signal();
+  voiceOscDetuner1.setValueAtTime(0, Tone.now());
   voiceOscDetuner1.connect(oscillators[1].oscillator.detune);
-  voiceOscDetuner1.start();
 
-  const voiceOscDetuner3 = audioCtx.createConstantSource();
-  voiceOscDetuner3.offset.setValueAtTime(0, audioCtx.currentTime);
+  const voiceOscDetuner3 = new Tone.Signal();
+  voiceOscDetuner3.setValueAtTime(0, Tone.now());
   voiceOscDetuner3.connect(oscillators[3].oscillator.detune);
-  voiceOscDetuner3.start();
 
-
-  const unisonNoteAmp2 = audioCtx.createGain();
+  const unisonNoteAmp2 = new Tone.Gain();
   unisonNoteAmp2.gain.value = 0;
-  const unisonNoteAmp3 = audioCtx.createGain();
+  const unisonNoteAmp3 = new Tone.Gain();
   unisonNoteAmp3.gain.value = 0;
 
 
@@ -262,12 +250,12 @@ VS.KeysAudioEngine = function(patch, sequence) {
   unisonNoteAmp2.connect(oscillators[2].oscillator.frequency);
   unisonNoteAmp3.connect(oscillators[3].oscillator.frequency);
 
-  const polyNoteAmp2 = audioCtx.createGain();
+  const polyNoteAmp2 = new Tone.Gain();
   polyNoteAmp2.gain.value = 0;
   oscillators[2].oscFreqNode.connect(polyNoteAmp2);
   polyNoteAmp2.connect(oscillators[2].oscillator.frequency);
 
-  const polyNoteAmp3 = audioCtx.createGain();
+  const polyNoteAmp3 = new Tone.Gain();
   polyNoteAmp3.gain.value = 0;
   oscillators[3].oscFreqNode.connect(polyNoteAmp3);
   polyNoteAmp3.connect(oscillators[3].oscillator.frequency);
@@ -275,18 +263,16 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
 
   // Switch for unison note frequencies
-  const unisonNoteSwitchController = audioCtx.createConstantSource();
-  unisonNoteSwitchController.offset.setValueAtTime(1, audioCtx.currentTime);
+  const unisonNoteSwitchController = new Tone.Signal();
+  unisonNoteSwitchController.setValueAtTime(1, Tone.now());
   unisonNoteSwitchController.connect(unisonNoteAmp2.gain);
   unisonNoteSwitchController.connect(unisonNoteAmp3.gain);
-  unisonNoteSwitchController.start();
 
   // Switch for poly note frequencies
-  const polyNoteSwitchController = audioCtx.createConstantSource();
-  polyNoteSwitchController.offset.setValueAtTime(0, audioCtx.currentTime);
+  const polyNoteSwitchController = new Tone.Signal();
+  polyNoteSwitchController.setValueAtTime(0, Tone.now());
   polyNoteSwitchController.connect(polyNoteAmp2.gain);
   polyNoteSwitchController.connect(polyNoteAmp3.gain);
-  polyNoteSwitchController.start();
 
   // ==========================
   //  get browser capabilities
@@ -294,11 +280,11 @@ VS.KeysAudioEngine = function(patch, sequence) {
   const browserFeatures = {};
 
   const checkCustomCurveClearing = function() {
-    let dummyGain = audioCtx.createGain();
-    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], audioCtx.currentTime, 2.6);
+    let dummyGain = new Tone.Gain();
+    dummyGain.gain.setValueCurveAtTime([0, 0.5, 0], Tone.now(), 2.6);
     try {
-      dummyGain.gain.cancelScheduledValues(audioCtx.currentTime + 0.1);
-      dummyGain.gain.setValueAtTime(1, audioCtx.currentTime + 0.2);
+      dummyGain.gain.cancelScheduledValues(Tone.now() + 0.1);
+      dummyGain.gain.setValueAtTime(1, Tone.now() + 0.2);
       browserFeatures['customCurveClearing'] = true;
     } catch (error) {
       browserFeatures['customCurveClearing'] = false;
@@ -306,10 +292,10 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   const checkCancelAndHoldAtTime = function() {
-    let dummyGain = audioCtx.createGain();
-    dummyGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+    let dummyGain = new Tone.Gain();
+    dummyGain.gain.setValueAtTime(0.5, Tone.now());
     try {
-      dummyGain.gain.cancelAndHoldAtTime(audioCtx.currentTime + 0.1);
+      dummyGain.gain.cancelAndHoldAtTime(Tone.now() + 0.1);
       browserFeatures['cancelAndHoldAtTime'] = true;
     } catch (error) {
       browserFeatures['cancelAndHoldAtTime'] = false;
@@ -395,17 +381,15 @@ VS.KeysAudioEngine = function(patch, sequence) {
   }.bind(this);
 
   this.init = () => {
-    Tone.setContext(myToneCtx);
     Tone.start();
     setInitialEngineValues();
-    masterAmp.connect(audioCtx.destination);
+    masterAmp.toDestination();
   };
 
   this.activateAudio = function() {
-    if (audioCtx.state === 'running') { return; }
+    if (Tone.state === 'running') { return; }
 
-    audioCtx.resume().then(() => {
-      Tone.context.resume();
+    Tone.context.resume().then(() => {
       Tone.start();
     });
   };
@@ -420,21 +404,21 @@ VS.KeysAudioEngine = function(patch, sequence) {
     setupOscLfo();
   };
 
-  const triggerDecayRelease = function(time = audioCtx.currentTime) {
+  const triggerDecayRelease = function(time = Tone.now()) {
     const isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
 
     const endValue = isDecay && !sequencerPlaying ? patch.envelope.sustain : 0;
     let duration;
-    const currentValue = universalEgOffsetParam.getValueAtTime(time);
+    const currentValue = universalEg.getValueAtTime(time);
 
     if (currentValue === 0) { return; }
 
     if (isDecay) {
-      universalEgOffsetParam.setValueAtTime(1, time);
+      universalEg.setValueAtTime(1, time);
       duration = patch.envelope.decayRelease;
     } else {
-      universalEgOffsetParam.cancelAndHoldAtTime(time); // kill attack in progress
-      universalEgOffsetParam.setValueAtTime(currentValue, time);  // stop at current value
+      universalEg.cancelAndHoldAtTime(time); // kill attack in progress
+      universalEg.setValueAtTime(currentValue, time);  // stop at current value
       duration = currentValue * patch.envelope.decayRelease;
     }
 
@@ -443,23 +427,23 @@ VS.KeysAudioEngine = function(patch, sequence) {
       const gainCurve = VS.emulatorConstants.decayReleaseGainCurve.map(
         function(value) { return value * (currentValue - endValue) + endValue }
       );
-      universalEgOffsetParam.setValueCurveAtTime(gainCurve, time, duration);
+      universalEg.setValueCurveAtTime(gainCurve, time, duration);
     } else {
-      universalEgOffsetParam.linearRampToValueAtTime(endValue, time + duration)
+      universalEg.linearRampToValueAtTime(endValue, time + duration)
     }
   };
 
-  const triggerEg = function(time = audioCtx.currentTime) {
+  const triggerEg = function(time = Tone.now()) {
     const attackEndTimeValue = time + patch.envelope.attack;
 
     // Amp EG reset
-    universalEgOffsetParam.cancelAndHoldAtTime(time);
+    universalEg.cancelAndHoldAtTime(time);
 
     if (patch.envelope.attack > 0) {
-      universalEgOffsetParam.setValueAtTime(0, time);
-      universalEgOffsetParam.linearRampToValueAtTime(1, attackEndTimeValue);
+      universalEg.setValueAtTime(0, time);
+      universalEg.linearRampToValueAtTime(1, attackEndTimeValue);
     } else {
-      universalEgOffsetParam.setValueAtTime(1, time);
+      universalEg.setValueAtTime(1, time);
     }
 
     retriggerLfo();
@@ -468,11 +452,11 @@ VS.KeysAudioEngine = function(patch, sequence) {
     triggerDecayRelease(attackEndTimeValue);
   };
 
-  const turnOnAllOscAmps = function(time = audioCtx.currentTime) {
+  const turnOnAllOscAmps = function(time = Tone.now()) {
     Object.values(oscillators).forEach(obj => obj.turnOnOscAmp());
   };
 
-  this.playNewNote = function(note, time = audioCtx.currentTime) {
+  this.playNewNote = function(note, time = Tone.now()) {
     this.activateAudio();
 
     if (!patch.voice.includes('poly')) {
@@ -492,19 +476,19 @@ VS.KeysAudioEngine = function(patch, sequence) {
     // Set frequency of oscillators
     oscillators[1].note = note;
     const frequency = Tone.Frequency(note, 'midi').toFrequency();
-    oscillators[1].oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+    oscillators[1].oscFreqNode.setValueAtTime(frequency, time);
     oscillators[1].setRingModPath();
 
     triggerEg(time);
   };
 
   // Only used for unison voices
-  this.changeCurrentNote = function(note, time = audioCtx.currentTime) {
+  this.changeCurrentNote = function(note, time = Tone.now()) {
     let frequency = Tone.Frequency(note, 'midi').toFrequency();
-    let lastFrequency = oscillators[1].oscFreqNodeOffsetParam.getValueAtTime(time);
+    let lastFrequency = oscillators[1].oscFreqNode.getValueAtTime(time);
 
-    oscillators[1].oscFreqNodeOffsetParam.setValueAtTime(lastFrequency, time);
-    oscillators[1].oscFreqNodeOffsetParam.linearRampToValueAtTime(frequency, time + patch.portamento);
+    oscillators[1].oscFreqNode.setValueAtTime(lastFrequency, time);
+    oscillators[1].oscFreqNode.linearRampToValueAtTime(frequency, time + patch.portamento);
   };
 
   const lowestFreeOscillator = () => {
@@ -531,7 +515,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
     return closestOsc;
   };
 
-  const adjustPolyRingAlgo = function(numberOfKeysDown, time = audioCtx.currentTime, isRingOut = false) {
+  const adjustPolyRingAlgo = function(numberOfKeysDown, time = Tone.now(), isRingOut = false) {
     if (patch.voice !== 'poly ring') { return; }
 
     const actionTime = isRingOut ? time + patch.envelope.decayRelease : time;
@@ -551,15 +535,15 @@ VS.KeysAudioEngine = function(patch, sequence) {
     }
   };
 
-  const swapOscillatorFrequency = function(oscillator, oldFreq, newFreq, time = audioCtx.currentTime) {
+  const swapOscillatorFrequency = function(oscillator, oldFreq, newFreq, time = Tone.now()) {
     const rampEndTime = time + patch.portamento;
-    oscillator.oscFreqNodeOffsetParam.setValueAtTime(oldFreq, time);
-    oscillator.oscFreqNodeOffsetParam.linearRampToValueAtTime(newFreq, rampEndTime);
+    oscillator.oscFreqNode.setValueAtTime(oldFreq, time);
+    oscillator.oscFreqNode.linearRampToValueAtTime(newFreq, rampEndTime);
   }
 
   // Poly voices only!
   this.addNote = function(keysDown) {
-    const time = audioCtx.currentTime;
+    const time = Tone.now();
     const lowestFreeOsc = lowestFreeOscillator();
     const noteToAdd = keysDown[keysDown.length -1];
     const frequency = Tone.Frequency(noteToAdd, 'midi').toFrequency();
@@ -611,7 +595,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
   const swapPolyNote = function(keysDown, noteThatStopped, oscAffected) {
     if (oscAffected === null) { return; }
     // find notes that aren't playing
-    const time = audioCtx.currentTime;
+    const time = Tone.now();
     const notesStillPlaying = Object.values(oscillators).map(osc => osc.note);
     const notesNotPlaying = keysDown.filter(note => !notesStillPlaying.includes(note));
 
@@ -629,7 +613,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
     swapOscillatorFrequency(oscAffected, lastFrequency, frequency, time);
   };
 
-  const turnOffAllOscAmps = function(time = audioCtx.currentTime) {
+  const turnOffAllOscAmps = function(time = Tone.now()) {
     const turnOffTime = time + patch.envelope.decayRelease;
     Object.values(oscillators).forEach(obj => {
       obj.oscAmp.gain.cancelScheduledValues(time);
@@ -640,8 +624,8 @@ VS.KeysAudioEngine = function(patch, sequence) {
   this.stopPolyNote = function(keysDown, noteThatStopped) {
     if (keysDown.length === 0) {
       // Ring out
-      Object.values(oscillators).forEach(osc => osc.setRingModPath(audioCtx.currentTime, true));
-      adjustPolyRingAlgo(keysDown.length, audioCtx.currentTime, true);
+      Object.values(oscillators).forEach(osc => osc.setRingModPath(Tone.now(), true));
+      adjustPolyRingAlgo(keysDown.length, Tone.now(), true);
       turnOffAllOscAmps();
       [1, 2, 3].forEach(i => oscillators[i].note = -1);
       return;
@@ -656,7 +640,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
     } else {
       oscAffected.note = -1;
       // Schedule note removal after 50ms grace period
-      const actionTime = audioCtx.currentTime + gracePeriod;
+      const actionTime = Tone.now() + gracePeriod;
       Object.values(oscillators).forEach(osc => osc.setRingModPath(actionTime));
       adjustPolyRingAlgo(keysDown.length, actionTime);
       oscAffected.turnOffOscAmp(actionTime);
@@ -668,22 +652,22 @@ VS.KeysAudioEngine = function(patch, sequence) {
     TODO: Try to break out the configurations of different voices
           into an object or something.
     */
-    const time = audioCtx.currentTime;
-    voiceOscDetuner1.offset.setValueAtTime(patch.vco[1].voiceDetune, time);
-    voiceOscDetuner3.offset.setValueAtTime(patch.vco[3].voiceDetune, time);
+    const time = Tone.now();
+    voiceOscDetuner1.setValueAtTime(patch.vco[1].voiceDetune, time);
+    voiceOscDetuner3.setValueAtTime(patch.vco[3].voiceDetune, time);
 
     Object.values(oscillators).forEach(obj => obj.oscillator.type = patch.vco[obj.oscNumber].shape);
 
     if (patch.voice.includes('poly')) {
       oscillators[2].oscAmp.gain.setValueAtTime(0, time);
       oscillators[3].oscAmp.gain.setValueAtTime(0, time);
-      unisonNoteSwitchController.offset.setValueAtTime(0, time);
-      polyNoteSwitchController.offset.setValueAtTime(1, time);
+      unisonNoteSwitchController.setValueAtTime(0, time);
+      polyNoteSwitchController.setValueAtTime(1, time);
     } else {
       oscillators[2].oscAmp.gain.setValueAtTime(1, time);
       oscillators[3].oscAmp.gain.setValueAtTime(1, time);
-      unisonNoteSwitchController.offset.setValueAtTime(1, time);
-      polyNoteSwitchController.offset.setValueAtTime(0, time);
+      unisonNoteSwitchController.setValueAtTime(1, time);
+      polyNoteSwitchController.setValueAtTime(0, time);
     }
 
     if (patch.voice === 'unison ring') {
@@ -724,11 +708,11 @@ VS.KeysAudioEngine = function(patch, sequence) {
     }
 
     if (patch.voice.includes('ring')) {
-      thruGainSwitchController.offset.setValueAtTime(0, time);
-      modGainSwitchController.offset.setValueAtTime(1, time);
+      thruGainSwitchController.setValueAtTime(0, time);
+      modGainSwitchController.setValueAtTime(1, time);
     } else {
-      thruGainSwitchController.offset.setValueAtTime(1, time);
-      modGainSwitchController.offset.setValueAtTime(0, time);
+      thruGainSwitchController.setValueAtTime(1, time);
+      modGainSwitchController.setValueAtTime(0, time);
       Object.values(oscillators).forEach(osc => {
         osc.volumeAmp.gain.cancelScheduledValues(time);
         osc.volumeAmp.gain.setValueAtTime(patch.defaultVcoAmp, time);
@@ -741,13 +725,13 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   // CHANGE OCTAVE
-  this.changeOctave = (octaveOffset, time = audioCtx.currentTime) => {
+  this.changeOctave = (octaveOffset, time = Tone.now()) => {
     Object.values(oscillators).forEach(osc => {
       if (osc.note !== -1) {
         const newNote = osc.note + octaveOffset;
         osc.note = newNote;
         const frequency = Tone.Frequency(newNote, 'midi').toFrequency();
-        osc.oscFreqNodeOffsetParam.setValueAtTime(frequency, time);
+        osc.oscFreqNode.setValueAtTime(frequency, time);
       }
     });
   };
@@ -756,20 +740,20 @@ VS.KeysAudioEngine = function(patch, sequence) {
     filter.Q.value = value;
   };
 
-  this.setCutoff = (value, time = audioCtx.currentTime) => {
+  this.setCutoff = (value, time = Tone.now()) => {
     filter.frequency.setValueAtTime(value, time);
   };
 
-  this.setFilterEgInt = (value, time = audioCtx.currentTime) => {
+  this.setFilterEgInt = (value, time = Tone.now()) => {
     filterEgAmp.gain.setValueAtTime(value, time);
   };
 
-  this.setVolume = (value, time = audioCtx.currentTime) => {
+  this.setVolume = (value, time = Tone.now()) => {
     masterAmp.gain.setValueAtTime(value, time);
   };
 
   this.setLfoRate = (value) => {
-    oscLfo.frequency.setValueAtTime(value, audioCtx.currentTime);
+    oscLfo.frequency.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoWave = () => {
@@ -783,11 +767,11 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.setLfoPitchInt = () => {
-    ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, audioCtx.currentTime);
+    ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, Tone.now());
   };
 
   this.setLfoCutoffInt = () => {
-    ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, audioCtx.currentTime);
+    ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, Tone.now());
   };
 
   this.noteIsPlaying = () => {
@@ -806,6 +790,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
   this.stopSequencer = () => {
     sequencerPlaying = false;
     Tone.Transport.stop();
+    // TODO stopping sequencer doesn't stop note
     this.stopNote(Tone.now() + 0.2);
   };
 
@@ -814,19 +799,19 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.setDetune = () => {
-    oscillators[2].oscillator.detune.setValueAtTime(patch.vco[2].detune, audioCtx.currentTime);
-    oscillators[3].oscillator.detune.setValueAtTime(patch.vco[3].detune, audioCtx.currentTime);
+    oscillators[2].oscillator.detune.setValueAtTime(patch.vco[2].detune, Tone.now());
+    oscillators[3].oscillator.detune.setValueAtTime(patch.vco[3].detune, Tone.now());
   };
 
   this.setVcoEgInt = () => {
-    vcoEgIntAmp.gain.setValueAtTime(patch.vco_eg_int, audioCtx.currentTime);
+    vcoEgIntAmp.gain.setValueAtTime(patch.vco_eg_int, Tone.now());
   };
 
   this.setDelayTime = () => {
-    delay.delayTime.setValueAtTime(patch.delay.time, audioCtx.currentTime);
+    delay.delayTime.setValueAtTime(patch.delay.time, Tone.now());
   };
 
   this.setDelayFeedback = () => {
-    delayAmp.gain.setValueAtTime(patch.delay.feedback, audioCtx.currentTime);
+    delayAmp.gain.setValueAtTime(patch.delay.feedback, Tone.now());
   };
 };
