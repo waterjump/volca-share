@@ -356,7 +356,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
       let currentStep = sequence[i % 16];
 
       this.playNewNote(currentStep['note'], time);
-      this.stopNote(gateEnd);
+      this.triggerSequencerRelease(gateEnd);
 
       previousStep = currentStep;
       i++;
@@ -404,11 +404,16 @@ VS.KeysAudioEngine = function(patch, sequence) {
     setupOscLfo();
   };
 
-  const triggerDecayRelease = function(time = Tone.now()) {
-    const isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
+  const triggerDecayRelease = function(time = Tone.now(), forceRelease = false) {
+    let isDecay, duration;
+
+    if (forceRelease) {
+      isDecay = false;
+    } else {
+      isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
+    }
 
     const endValue = isDecay && !sequencerPlaying ? patch.envelope.sustain : 0;
-    let duration;
     const currentValue = universalEg.getValueAtTime(time);
 
     if (currentValue === 0) { return; }
@@ -722,6 +727,10 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   this.stopNote = function(time = Tone.now()) {
     triggerDecayRelease(time);
+  };
+
+  this.triggerSequencerRelease = function(time = Tone.now()) {
+    triggerDecayRelease(time, true);
   };
 
   // CHANGE OCTAVE
