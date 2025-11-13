@@ -219,7 +219,7 @@ VS.Form = function() {
       // SNAP KNOBS
       // I suspect this is slow.
       let difference;
-      if (VS.dragging) {
+      if (VS.dragging || midiInValue === null) {
         difference = VS.clickedPoint - VS.currentPoint;
       } else {
         difference = VS.activeKnob.jElement.data('trueMidi') - midiInValue;
