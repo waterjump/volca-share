@@ -16,11 +16,11 @@
 }
 
 .sequence-form.keys {
-  padding-bottom: 9.25%;
+  padding-bottom: 13.375%;
   padding-left: 2.1%;
   padding-right: 3.2%;
   position: relative;
-  min-height: 64px;
+  min-height: 96px;
   left: -1.7%;
   max-width: 913px;
   width: 100%;
@@ -50,14 +50,14 @@
     font-weight: 800;
     font-size: x-small;
     div {
-      height: 40%
+      height: 30%
     }
     .spacer {
       height: 20%;
     }
   }
   .param {
-    height: 40%;
+    height: 33.3%;
   }
   .line {
     border-right: 1px solid black;
@@ -90,7 +90,7 @@
         .down {
           border-top: 5px solid black;
           position: relative;
-          top: -7%;
+          top: -10%;
         }
         .note{
           text-align: center;
@@ -115,7 +115,7 @@
           display: inline-block;
 
           .light {
-            height: 79.8%;
+            height: 65%;
             width: 50%;
             border-radius: 50%;
             background-color: #DDDDDD;
@@ -142,7 +142,7 @@
         .step {
           span {
             .light {
-              height: 79.8%;
+              height: 65%;
               width: 51%
             }
           }
@@ -154,11 +154,11 @@
 
 @media (min-width: 990px) {
   .sequence-form.keys {
-    padding-bottom: 7%;
+    padding-bottom: 10.5%;
     padding-left: 2.1%;
     padding-right: 3.2%;
     max-width: 913px;
-    min-height: 64px;
+    min-height: 96px;
     width: 110%;
     left: -1.7%;
     margin: 3% 0;
@@ -168,7 +168,7 @@
           width: 5.7%;
           span {
             .light {
-              height: 79.8%;
+              height: 65%;
               width: 44%;
             }
           }
@@ -183,7 +183,7 @@
     left: -66px;
     .step {
       .light {
-        height: 79.8%;
+        height: 65%;
       }
     }
   }

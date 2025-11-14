@@ -355,8 +355,20 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
       let currentStep = sequence[i % 16];
 
-      this.playNewNote(currentStep['note'], time);
-      this.triggerSequencerRelease(gateEnd);
+      previousSlide = i > 0 && previousStep.slide && !patch.step_trigger
+      currentSlide = currentStep.slide && !patch.step_trigger
+
+      if (previousSlide) {
+        this.changeCurrentNote(currentStep.note, time);
+        if (!currentSlide) {
+          this.triggerSequencerRelease(gateEnd);
+        }
+      } else {
+        this.playNewNote(currentStep.note, time);
+        if (!currentSlide) {
+          this.triggerSequencerRelease(gateEnd);
+        }
+      }
 
       previousStep = currentStep;
       i++;
@@ -413,7 +425,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
       isDecay = Object.values(oscillators).some(osc => osc.note !== -1);
     }
 
-    const endValue = isDecay && !sequencerPlaying ? patch.envelope.sustain : 0;
+    const endValue = isDecay ? patch.envelope.sustain : 0;
     const currentValue = universalEg.getValueAtTime(time);
 
     if (currentValue === 0) { return; }
@@ -800,6 +812,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
     sequencerPlaying = false;
     // set all oscillator notes to -1
     [1, 2, 3].forEach(i => oscillators[i].note = -1);
+    this.triggerSequencerRelease();
     Tone.Transport.stop();
   };
 

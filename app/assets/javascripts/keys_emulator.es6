@@ -13,7 +13,14 @@ VS.KeysEmulator = function() {
   // initialize sequence object
   const sequence = [];
   for (let index = 0; index < 16; index++) {
-    sequence.push({ index: index, note: 60, activeStep: true } );
+    sequence.push(
+      {
+        index: index,
+        note: 60,
+        slide: false,
+        activeStep: true
+      }
+    );
   }
 
   const setSequenceView = function() {
@@ -23,6 +30,8 @@ VS.KeysEmulator = function() {
       jElement = $(`#step_${step.index}`)
       jElement.find('.note-display').data('starting-note', step.note);
       jElement.find('.note-display').html(VS.midiNoteNumbers[step.note]);
+      jElement.find('.slide .light').data('active', step.slide);
+      jElement.find('.slide .light').addClass(step.slide ? 'lit' : '');
       jElement.find('.active-step .light').data('active', step.activeStep);
       jElement.find('.active-step .light').removeClass(step.activeStep ? '' : 'lit');
     });
@@ -300,6 +309,15 @@ VS.KeysEmulator = function() {
     }
   });
 
+  $('.sequence-holder').on('sequenceparamchange', '.sequence-box .slide label',
+    function() {
+      const light = $($(this).find('.light'));
+      light.data('active', !light.data('active'));
+      const index = light.data('index');
+      sequence[index]['slide'] = light.data('active');
+    }
+  );
+
   $('.sequence-holder').on('sequenceparamchange', '.sequence-box .active-step label',
     function() {
       const light = $($(this).find('.light'));
@@ -470,6 +488,10 @@ VS.KeysEmulator = function() {
 
   $('label[for="patch_lfo_trigger_sync"] span.on-off').on( 'click tap', () => {
     patch.setlfo_trigger_sync();
+  });
+
+  $('label[for="patch_step_trigger"]').on( 'click tap', () => {
+    patch.setstep_trigger();
   });
 
   // MOBILE OCTAVE UP

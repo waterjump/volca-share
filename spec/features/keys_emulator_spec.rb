@@ -132,7 +132,7 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
         find('#toggle-sequences').click
 
         expect(page).to have_css('.sequence-form', visible: true)
-        expect(page).not_to have_css('#step_0 .slide', visible: true)
+        expect(page).to have_css('#step_0 .slide', visible: true)
         expect(page).not_to have_css('#step_0 .step-mode', visible: true)
       end
     end

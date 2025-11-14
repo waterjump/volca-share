@@ -5,6 +5,7 @@
       .param-labels.line
         .spacer
         .note Note
+        .slide Slide
         .active-step Active Step
       .scrolly
         .steps.clearfix
@@ -16,6 +17,10 @@
                   %span.note-display{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_note_display", data: { 'starting-note' => 60, index: num } }
                     C3
               .down.arrow
+              .slide.param{ data: { param_type: 'slide' }}
+                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[slide]]]") do
+                  %span
+                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: 'false', index: num } }
               .active-step.param{ data: { param_type: 'active-step' }}
                 = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
                   %span

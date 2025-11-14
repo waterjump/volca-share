@@ -27,6 +27,7 @@ VS.KeysEmulatorParams = function() {
     triggerSync: false
   };
   this.envelope = { attack: 0, decayRelease: 0.07, sustain: 1 };
+  this.step_trigger = false;
 
   this.vco =
     [
@@ -186,6 +187,10 @@ VS.KeysEmulatorParams = function() {
 
   this.setlfo_trigger_sync = function() {
     this.lfo.triggerSync = !this.lfo.triggerSync;
+  };
+
+  this.setstep_trigger = function() {
+    this.step_trigger = !this.step_trigger;
   };
 
   // UTILITY FUNCTIONS
