@@ -336,19 +336,22 @@ VS.KeysAudioEngine = function(patch, sequence) {
     }
   };
 
+  this.currentStepIndex = 0;
+
   const runToneSequencer = function(){
     setTempo();
 
-    let i = 0;
+    // let i = 0;
     let previousStep;
 
     Tone.Transport.scheduleRepeat(function(time) {
+      let i = this.currentStepIndex;
       if (!sequencerPlaying) { return; }
 
       while (!sequence[i % 16].activeStep) {
         // Bail out if all steps are inactive
         if (!sequence.some(step => { return step.activeStep })) { return; }
-        i++;
+        this.currentStepIndex++;
       }
 
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
@@ -371,7 +374,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
       }
 
       previousStep = currentStep;
-      i++;
+      this.currentStepIndex++;
     }.bind(this), '16n');
   }.bind(this);
 
@@ -393,6 +396,8 @@ VS.KeysAudioEngine = function(patch, sequence) {
   }.bind(this);
 
   this.init = () => {
+    Tone.Transport.loop = true;
+    Tone.Transport.loopEnd = 60 / patch.tempo * 4 + 's';
     Tone.start();
     setInitialEngineValues();
     masterAmp.toDestination();
@@ -805,7 +810,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   this.startSequencer = () => {
     sequencerPlaying = true;
-    Tone.Transport.start('+0');
+    Tone.Transport.start();
   };
 
   this.stopSequencer = () => {
@@ -814,6 +819,8 @@ VS.KeysAudioEngine = function(patch, sequence) {
     [1, 2, 3].forEach(i => oscillators[i].note = -1);
     this.triggerSequencerRelease();
     Tone.Transport.stop();
+    Tone.Transport.position = '0:0:0';
+    this.currentStepIndex = 0;
   };
 
   this.getSequencerPlaying = () => {
