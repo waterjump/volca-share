@@ -4,4 +4,8 @@ module ApplicationHelper
   def cookie_consent_given?
     cookies[:cookie_consent] == 'accepted'
   end
+
+  def format_date(date)
+    date&.strftime('%B %-d, %Y')
+  end
 end

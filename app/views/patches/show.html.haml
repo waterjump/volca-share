@@ -130,6 +130,9 @@
                   bass_emulator_path(@patch.emulator_query_string)
     = render 'shared/midi_button', button_text: 'Send this patch to your Volca', new_form: false
 
+  = label_tag 'patch[created_at]', 'Created'
+  %p
+    = format_date(@patch.created_at)
   - if @patch.tags.any?
     = label_tag 'patch[tags]', 'Tags'
     %p

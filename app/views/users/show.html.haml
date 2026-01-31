@@ -1,6 +1,6 @@
 .container
   %h1= "Patches by #{@user.username}"
-  %p= "Member since #{@user.created_at.strftime("%B %-d, %Y" )}"
+  %p= "Member since #{format_date(@user.created_at)}"
   .patches
     = render 'shared/audio_preview'
     - if @patches.empty? && @keys_patches.empty?

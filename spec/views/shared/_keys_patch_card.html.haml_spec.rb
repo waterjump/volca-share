@@ -67,22 +67,16 @@ RSpec.describe 'shared/_keys_patch_card.html.haml', type: :view do
     expect(rendered).to(
       have_link(
         patch.name,
-        href: user_keys_patch_path(patch.user.slug,patch.slug)
+        href: user_keys_patch_path(patch.user.slug, patch.slug)
       )
     )
   end
 
   it 'shows the patch notes' do
-    expect(rendered).to(
-      have_content(
-        VolcaShare::Keys::PatchViewModel.wrap(patch).notes
-      )
-    )
+    expect(rendered).to have_content(patch_view_model.notes)
   end
 
   it 'shows date the patch was created' do
-    expect(rendered).to(
-      have_content(patch.created_at.strftime("%B %-d, %Y"))
-    )
+    expect(rendered).to have_content(format_date(patch.created_at))
   end
 end

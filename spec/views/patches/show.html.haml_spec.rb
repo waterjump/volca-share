@@ -4,16 +4,29 @@ require 'rails_helper'
 
 RSpec.describe 'patches/show.html.haml', type: :view do
   let!(:user) { FactoryBot.create(:user) }
+  let(:overrides) do
+    { created_at: '2025-06-19' }
+  end
+
   let(:user_patch) do
     VolcaShare::PatchViewModel.wrap(
-      user.patches.create(FactoryBot.attributes_for(:patch))
+      user.patches.create(FactoryBot.attributes_for(:patch, overrides))
     )
   end
+
   let(:anonymous_patch) do
-    VolcaShare::PatchViewModel.wrap(FactoryBot.build(:patch))
+    VolcaShare::PatchViewModel.wrap(FactoryBot.build(:patch, overrides))
+  end
+
+  shared_examples 'creation date' do
+    it 'shows the date created' do
+      expect(rendered).to have_text(format_date(@patch.created_at))
+    end
   end
 
   context 'baseline functionality' do
+    include_examples 'creation date'
+
     before do
       @patch = user_patch
       render
@@ -126,6 +139,8 @@ RSpec.describe 'patches/show.html.haml', type: :view do
         locals: { current_user: FactoryBot.create(:user) }
       )
     end
+
+    include_examples 'creation date'
 
     it 'has h1 for SEO purposes' do
       expect(rendered).to have_selector(
