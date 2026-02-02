@@ -33,7 +33,15 @@ FactoryBot.define do
     amp_eg_on { FFaker::Boolean.maybe }
     secret { false }
     notes { FFaker::Lorem.paragraph }
-    tags { FFaker::Lorem.unique.words(3) }
+
+    tags do
+      words = []
+      while words.uniq.length < 3
+        words = FFaker::Lorem.unique.words(3)
+      end
+      words
+    end
+
     slide_time { midi_range.to_a.sample }
     expression { midi_range.to_a.sample }
     gate_time { midi_range.to_a.sample }

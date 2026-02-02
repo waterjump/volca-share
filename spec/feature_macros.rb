@@ -41,8 +41,12 @@ def fill_out_patch_form(patch, anon = false)
   find('#amp_eg_on_light').click if patch.amp_eg_on
   fill_in 'patch[name]', with: patch.name
   fill_in 'patch[notes]', with: patch.notes
-  find('.bootstrap-tagsinput > input').set(patch.tags.join(', '))
+
+  # TAGS
+  fill_in_tags_field(patch.tags)
+
   return if anon
+
   check 'patch[secret]' if patch.secret?
   fill_in 'patch[audio_sample]', with: patch.audio_sample
 end
@@ -51,6 +55,14 @@ def range_select(name, value)
   selector = %(input[type=range][name=\\"#{name}\\"])
   script = %-$("#{selector}").val(#{value})-
   page.execute_script(script)
+end
+
+def fill_in_tags_field(tags)
+  # Trailing comma and space ensures the tagsinput processes the last tag
+  tags_value = tags.join(', ') + ', '
+  find('.bootstrap-tagsinput > input', visible: :all).set(tags_value)
+  # Use waiting finder to ensure the tags have been processed
+  expect(page).to have_css('.bootstrap-tagsinput .tag', count: tags.length)
 end
 
 def seq_form_light(seq, step, param)
