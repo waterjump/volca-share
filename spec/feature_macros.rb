@@ -251,6 +251,9 @@ def snap_knob_rotation_from_midi(midi)
 end
 
 def reflects_emulator_patch(patch, options = {})
+  # Wait for completion flag to avoid race condition with JS DOM changes
+  expect(page).to have_css('span.completion-flag', text: 'DONE', visible: false)
+
   expect(page.find('span.attack', visible: false).text).to(
     eq(rotation_from_midi(patch.attack).to_s)
   )
@@ -396,7 +399,7 @@ def closest_octave_value(midi_value)
   when 66..87
     77
   when 88..109
-    110
+    99
   when 110..127
     127
   end

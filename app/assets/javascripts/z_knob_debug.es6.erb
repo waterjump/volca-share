@@ -10,5 +10,8 @@ $(function() {
       $(`span.${$(this).attr('id')}`).html(angle);
     }
   });
+
+  // Set flag that capybara will wait for
+  $('span.completion-flag').html('DONE');
 });
 <% end %>
