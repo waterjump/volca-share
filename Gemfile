@@ -21,7 +21,7 @@ gem 'mongoid'
 gem 'mongoid-simple-tags',
     git: 'https://github.com/simplificator/mongoid-simple-tags.git',
     ref: '940c575'
-gem 'nokogiri', '>= 1.12.5'
+gem 'nokogiri', '>= 1.18.9'
 gem 'rails', '7.0.4.2'
 gem 'rack', '~> 2.1'
 gem 'rack-attack'
