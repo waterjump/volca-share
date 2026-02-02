@@ -29,18 +29,18 @@ This application is built on these key frameworks/libraries:
 `git clone git@github.com:waterjump/volca-share.git`
 
 #### 2. Ruby version
-VolcaShare currently runs on ruby 2.7.5 and uses [rbenv](https://github.com/rbenv/rbenv "rbenv") for ruby version management.
-While in the project directory, run `rbenv local` to set the ruby version configured in the repo.  If you don't have this version of ruby, you can install it with `rbenv install 2.7.5`. You will also need the `bundler` gem.
+VolcaShare currently runs on the ruby version specified in the `.ruby_version` file and uses [rbenv](https://github.com/rbenv/rbenv "rbenv") for ruby version management.
+While in the project directory, run `rbenv local` to set the ruby version configured in the repo.  If you don't have this version of ruby, you can install it with `rbenv install`.
 
 #### 3. Node version
-This app requires node 17.6.0 (with npm 8.5.1) and uses [nvm](https://github.com/nvm-sh/nvm "nvm") to manage node versions.
+This app requires node and uses [nvm](https://github.com/nvm-sh/nvm "nvm") to manage node versions.  At time of writing this is node v25.5.0, but you can check the required version in the `.nvmrc` file.
 
-`nvm install 17.6.0`
+`nvm install 25.5.0`
 
 #### 4. Install MongoDB
 `brew tap mongodb/brew`
 
-`brew install mongodb-community@5.0`
+`brew install mongodb-community@8.0`
 
 `brew services start mongodb/brew/mongodb-community`
 
