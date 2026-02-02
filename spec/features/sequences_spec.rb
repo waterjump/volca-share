@@ -25,7 +25,7 @@ RSpec.describe 'Sequences', type: :feature, js: true do
         'Use the VCO Group selector to change the number of sequences.'
       )
 
-      click_button 'Save'
+      save_and_wait_for_next_page_load
 
       reflects_patch(dummy_patch)
       expect(current_path).to eq("/user/#{user.slug}/patch/#{dummy_patch.slug}")
@@ -55,7 +55,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       page.find('label[for=patch_sequences_attributes_2_step_3_active_step]')
         .click
 
-      click_button 'Save'
+      save_and_wait_for_next_page_load
+
       expect(Patch.first.sequences.count).to eq(3)
       expect(page).to have_selector('.sequence-box', count: 3)
       expect(page).not_to(
@@ -81,7 +82,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       expect(page).not_to have_link 'Add sequences'
       expect(page).to have_link 'Remove sequences'
 
-      click_button 'Save'
+      save_and_wait_for_next_page_load
+
       expect(Patch.first.sequences.count).to eq(2)
       expect(page).to have_selector('.sequence-box', count: 2)
     end
@@ -100,8 +102,11 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       expect(page).not_to have_link 'Add sequences'
       expect(page).to have_link 'Remove sequences'
 
-      click_button 'Save'
-      expect(Patch.first.sequences.count).to eq(1)
+      save_and_wait_for_next_page_load
+
+      id = page.current_path.split('/').last
+
+      expect(Patch.find(id).reload.sequences.count).to eq(1)
       expect(page).to have_selector('.sequence-box', count: 1)
     end
   end
@@ -133,7 +138,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     seq_form_light(0, 11, 'step_mode').click
     seq_form_light(0, 15, 'step_mode').click
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     expect(page).to have_selector('.sequence-show')
     expect(
       page.find('#patch_sequences_attributes_0_step_1_note_display').text
@@ -209,7 +215,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     seq_form_light(0, 1, 'step_mode').click
     seq_form_light(1, 2, 'slide').click
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     expect(page).to have_link('Edit')
 
     click_link 'Edit'
@@ -236,7 +243,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 2)
     find('#vco_group_three_light').click
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     patch = Patch.last
     expect(patch.sequences.count).to eq(1)
     expect(patch.sequences.first.steps.count).to eq(16)
@@ -254,7 +262,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 2)
     find('#vco_group_three_light').click
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     patch = Patch.last
     expect(patch.sequences.count).to eq(1)
     expect(page).to have_selector('.sequence-box', count: 1)
@@ -266,9 +275,12 @@ RSpec.describe 'Sequences', type: :feature, js: true do
 
     dummy_patch = FactoryBot.build(:patch, vco_group: 'two')
     fill_out_patch_form(dummy_patch, true)
-    click_button 'Save'
-    visit edit_patch_path(Patch.last)
 
+    save_and_wait_for_next_page_load
+
+    click_link 'Edit'
+
+    expect(page).to have_current_path(edit_patch_path(Patch.last))
     expect(page).not_to have_selector('.sequence-box')
     expect(page).to have_link('Add sequences')
 
@@ -285,7 +297,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     seq_form_light(0, 16, 'slide').click
     seq_form_light(0, 7, 'step_mode').click
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     find('#patch_sequences_attributes_0_step_1_note_display').hover
     expect(page).to have_css('.note-8.lit')
     expect(page).to have_selector('.sequence-show')
@@ -331,7 +344,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     expect(page).to have_selector('.sequence-box', count: 2)
     click_link 'Remove sequences'
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     patch = Patch.last
     expect(patch.sequences.count).to eq(0)
     expect(page).not_to have_selector('.sequence-box')
@@ -355,8 +369,9 @@ RSpec.describe 'Sequences', type: :feature, js: true do
     click_link 'Add sequences'
     expect(page).to have_selector('.sequence-box', count: 3)
 
-    click_button 'Save'
-    patch = Patch.last
+    save_and_wait_for_next_page_load
+
+    patch.reload
     expect(patch.sequences.count).to eq(3)
     expect(page).to have_selector('.sequence-box', count: 3)
   end
@@ -385,7 +400,8 @@ RSpec.describe 'Sequences', type: :feature, js: true do
       page.all('.sequence-area .remove-sequence', visible: false).last.value
     ).to eq('true')
 
-    click_button 'Save'
+    save_and_wait_for_next_page_load
+
     patch = Patch.last
     expect(patch.sequences.count).to eq(2)
     expect(page).to have_selector('.sequence-box', count: 2)

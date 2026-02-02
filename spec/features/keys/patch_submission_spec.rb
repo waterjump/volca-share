@@ -20,7 +20,7 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     end
 
     it 'persists patch' do
-      click_button 'Save'
+      save_and_wait_for_next_page_load
 
       expect(Keys::Patch.first.attributes).to include(
         dummy_patch.attributes.except('_id')
@@ -28,15 +28,19 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     end
 
     it 'directs user to user patch show page' do
-      click_button 'Save'
+      save_and_wait_for_next_page_load
 
-      expect(current_path).to(
-        eq(user_keys_patch_path(user.slug, Keys::Patch.first.slug))
+      patch = Keys::Patch.last
+      expect(patch).not_to be_nil
+      expect(page).to have_current_path(
+        user_keys_patch_path(user.slug, patch.slug)
       )
     end
 
     it 'reflects the keys patch' do
-      click_button 'Save'
+      save_and_wait_for_next_page_load
+
+      expect(page).to have_content('Patch saved successfully.')
 
       reflects_keys_patch(dummy_patch)
       keys_js_knobs_rotated(dummy_patch)
@@ -47,39 +51,39 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
         it 'accepts valid soundcloud URLS' do
           fill_in 'patch[audio_sample]',
                   with: 'https://soundcloud.com/69bot/take-it-to-the-streets'
-          click_button 'Save'
-          expect(page.body).to have_content('Patch saved successfully.')
+          save_and_wait_for_next_page_load
+          expect(page).to have_content('Patch saved successfully.')
         end
 
         it 'accepts valid youtube URLS' do
           fill_in 'patch[audio_sample]',
                   with: 'https://youtube.com/watch?v=GF60Iuh643I'
-          click_button 'Save'
-          expect(page.body).to have_content('Patch saved successfully.')
+          save_and_wait_for_next_page_load
+          expect(page).to have_content('Patch saved successfully.')
         end
 
         it 'accepts valid freesound URLS' do
           fill_in 'patch[audio_sample]',
                   with: 'https://freesound.org/people/volcashare/sounds/123456'
-          click_button 'Save'
-          expect(page.body).to have_content('Patch saved successfully.')
+          save_and_wait_for_next_page_load
+          expect(page).to have_content('Patch saved successfully.')
         end
       end
+    end
+  end
 
-      describe 'showing audio sample' do
-        context 'when audio sample is from freesound.org' do
-          let!(:patch) do
-            create(
-              :user_keys_patch,
-              audio_sample: 'https://freesound.org/people/volcashare/sounds/123456'
-            )
-          end
+  describe 'showing audio sample' do
+    context 'when audio sample is from freesound.org' do
+      let!(:patch) do
+        create(
+          :user_keys_patch,
+          audio_sample: 'https://freesound.org/people/volcashare/sounds/123456'
+        )
+      end
 
-          it 'shows iframe on patch detail page' do
-            visit keys_patch_path(patch.id)
-            expect(page).to have_selector('iframe')
-          end
-        end
+      it 'shows iframe on patch detail page' do
+        visit keys_patch_path(patch.id)
+        expect(page).to have_selector('iframe')
       end
     end
   end
@@ -95,7 +99,7 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     expect(page).to have_link('randomize')
     click_link 'randomize'
     fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
-    click_button 'Save'
+    save_and_wait_for_next_page_load
 
     random_patch = {
       attack: page.find('#detune')['data-midi'],
@@ -119,7 +123,7 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     before do
       visit new_keys_patch_path
       fill_out_keys_patch_form(dummy_patch, true)
-      click_button 'Save'
+      save_and_wait_for_next_page_load
     end
 
     it 'persists patch' do
@@ -129,7 +133,7 @@ RSpec.describe 'Creating a keys patch', type: :feature, js: true do
     end
 
     it 'directs user to user patch show page' do
-      expect(current_path).to eq(keys_patch_path(Keys::Patch.first.id))
+      expect(page).to have_current_path(keys_patch_path(Keys::Patch.first.id))
     end
 
     it 'reflects the keys patch' do

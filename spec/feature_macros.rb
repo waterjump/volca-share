@@ -7,9 +7,12 @@ def login(usr = user)
     fill_in 'user[password]', with: usr.password
     click_button 'Log in'
   end
+  expect(page).to have_link('Log out')
 end
 
 def fill_out_patch_form(patch, anon = false)
+  expect(page).to have_css('form#patch_form')
+  find("form#patch_form input[name='patch[name]']", visible: :all).set(patch.name)
   range_select 'patch[attack]', patch.attack
   range_select 'patch[decay_release]', patch.decay_release
   range_select 'patch[cutoff_eg_int]', patch.cutoff_eg_int
@@ -39,7 +42,6 @@ def fill_out_patch_form(patch, anon = false)
   find('#vco3_wave_light').click unless patch.vco3_wave
   find('#sustain_on_light').click if patch.sustain_on
   find('#amp_eg_on_light').click if patch.amp_eg_on
-  fill_in 'patch[name]', with: patch.name
   fill_in 'patch[notes]', with: patch.notes
 
   # TAGS
@@ -49,6 +51,16 @@ def fill_out_patch_form(patch, anon = false)
 
   check 'patch[secret]' if patch.secret?
   fill_in 'patch[audio_sample]', with: patch.audio_sample
+end
+
+# NOTE: This is to solve a race condition between the headless browser and
+# the test suite where sometimes the page isn't loaded before subsequent
+# expectations are checked.
+def save_and_wait_for_next_page_load
+  click_button 'Save'
+
+  # This makes capybara wait for the next page load to complete
+  expect(page).not_to have_current_path(/.*\/(edit|new)/)
 end
 
 def range_select(name, value)

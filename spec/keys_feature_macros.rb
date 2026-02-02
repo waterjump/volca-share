@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 def fill_out_keys_patch_form(patch, anon = false)
-  fill_in 'patch[name]', with: patch.name
+  expect(page).to have_css('form#patch_form')
+  find("form#patch_form input[name='patch[name]']", visible: :all).set(patch.name)
   fill_in 'patch[notes]', with: patch.notes
   range_select 'patch[voice]', patch.voice
   range_select 'patch[octave]', patch.octave
@@ -37,53 +38,85 @@ end
 def keys_js_knobs_rotated(patch, options = {})
   interface = page
 
-  expect(interface.find('span.detune', visible: false).text).to(
-    eq(rotation_from_midi(patch.detune).to_s)
+  expect(interface).to have_css(
+    'span.detune',
+    text: rotation_from_midi(patch.detune).to_s,
+    visible: false
   )
-  expect(interface.find('span.portamento', visible: false).text).to(
-    eq(rotation_from_midi(patch.portamento).to_s)
+  expect(interface).to have_css(
+    'span.portamento',
+    text: rotation_from_midi(patch.portamento).to_s,
+    visible: false
   )
-  expect(interface.find('span.vco_eg_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.vco_eg_int).to_s)
+  expect(interface).to have_css(
+    'span.vco_eg_int',
+    text: rotation_from_midi(patch.vco_eg_int).to_s,
+    visible: false
   )
-  expect(interface.find('span.cutoff', visible: false).text).to(
-    eq(rotation_from_midi(patch.cutoff).to_s)
+  expect(interface).to have_css(
+    'span.cutoff',
+    text: rotation_from_midi(patch.cutoff).to_s,
+    visible: false
   )
-  expect(interface.find('span.peak', visible: false).text).to(
-    eq(rotation_from_midi(patch.peak).to_s)
+  expect(interface).to have_css(
+    'span.peak',
+    text: rotation_from_midi(patch.peak).to_s,
+    visible: false
   )
-  expect(interface.find('span.vcf_eg_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.vcf_eg_int).to_s)
+  expect(interface).to have_css(
+    'span.vcf_eg_int',
+    text: rotation_from_midi(patch.vcf_eg_int).to_s,
+    visible: false
   )
-  expect(interface.find('span.lfo_rate', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_rate).to_s)
+  expect(interface).to have_css(
+    'span.lfo_rate',
+    text: rotation_from_midi(patch.lfo_rate).to_s,
+    visible: false
   )
-  expect(interface.find('span.lfo_pitch_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_pitch_int).to_s)
+  expect(interface).to have_css(
+    'span.lfo_pitch_int',
+    text: rotation_from_midi(patch.lfo_pitch_int).to_s,
+    visible: false
   )
-  expect(interface.find('span.lfo_cutoff_int', visible: false).text).to(
-    eq(rotation_from_midi(patch.lfo_cutoff_int).to_s)
+  expect(interface).to have_css(
+    'span.lfo_cutoff_int',
+    text: rotation_from_midi(patch.lfo_cutoff_int).to_s,
+    visible: false
   )
-  expect(interface.find('span.attack', visible: false).text).to(
-    eq(rotation_from_midi(patch.attack).to_s)
+  expect(interface).to have_css(
+    'span.attack',
+    text: rotation_from_midi(patch.attack).to_s,
+    visible: false
   )
-  expect(interface.find('span.decay_release', visible: false).text).to(
-    eq(rotation_from_midi(patch.decay_release).to_s)
+  expect(interface).to have_css(
+    'span.decay_release',
+    text: rotation_from_midi(patch.decay_release).to_s,
+    visible: false
   )
- expect(interface.find('span.sustain', visible: false).text).to(
-    eq(rotation_from_midi(patch.sustain).to_s)
+  expect(interface).to have_css(
+    'span.sustain',
+    text: rotation_from_midi(patch.sustain).to_s,
+    visible: false
   )
-  expect(interface.find('span.voice', visible: false).text).to(
-    eq(snap_knob_rotation_from_midi(patch.voice).to_s)
+  expect(interface).to have_css(
+    'span.voice',
+    text: snap_knob_rotation_from_midi(patch.voice).to_s,
+    visible: false
   )
-  expect(interface.find('span.octave', visible: false).text).to(
-    eq(snap_knob_rotation_from_midi(patch.octave).to_s)
+  expect(interface).to have_css(
+    'span.octave',
+    text: snap_knob_rotation_from_midi(patch.octave).to_s,
+    visible: false
   )
-  expect(interface.find('span.delay_time', visible: false).text).to(
-    eq(rotation_from_midi(patch.delay_time).to_s)
+  expect(interface).to have_css(
+    'span.delay_time',
+    text: rotation_from_midi(patch.delay_time).to_s,
+    visible: false
   )
-  expect(interface.find('span.delay_feedback', visible: false).text).to(
-    eq(rotation_from_midi(patch.delay_feedback).to_s)
+  expect(interface).to have_css(
+    'span.delay_feedback',
+    text: rotation_from_midi(patch.delay_feedback).to_s,
+    visible: false
   )
 end
 

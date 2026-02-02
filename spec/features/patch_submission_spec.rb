@@ -17,7 +17,10 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
       login
       visit new_patch_path
       fill_out_patch_form(dummy_patch)
-      click_button 'Save'
+
+      save_and_wait_for_next_page_load
+
+      expect(page).to have_current_path(user_patch_path(user.slug, dummy_patch.slug))
     end
 
     it 'persists patch' do
@@ -44,7 +47,8 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     before do
       visit new_patch_path
       fill_out_patch_form(dummy_patch, true)
-      click_button 'Save'
+
+      save_and_wait_for_next_page_load
     end
 
     it 'is persisted' do
@@ -75,21 +79,21 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
       it 'accepts valid soundcloud URLS' do
         fill_in 'patch[audio_sample]',
                 with: 'https://soundcloud.com/69bot/take-it-to-the-streets'
-        click_button 'Save'
+        save_and_wait_for_next_page_load
         expect(page.body).to have_content('Patch saved successfully.')
       end
 
       it 'accepts valid youtube URLS' do
         fill_in 'patch[audio_sample]',
                 with: 'https://youtube.com/watch?v=GF60Iuh643I'
-        click_button 'Save'
+        save_and_wait_for_next_page_load
         expect(page.body).to have_content('Patch saved successfully.')
       end
 
       it 'accepts valid freesound URLS' do
         fill_in 'patch[audio_sample]',
                 with: 'https://freesound.org/people/volcashare/sounds/123456'
-        click_button 'Save'
+        save_and_wait_for_next_page_load
         expect(page.body).to have_content('Patch saved successfully.')
       end
     end
@@ -124,7 +128,8 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
     expect(page).to have_link('randomize')
     click_link 'randomize'
     fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
-    click_button 'Save'
+
+    save_and_wait_for_next_page_load
 
     random_patch = {
       attack: page.find('#attack')['data-midi'],
@@ -159,7 +164,8 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
       expect(page).to have_link('randomize')
       click_link 'randomize'
       fill_in 'patch[name]', with: 'Schnackenpfefferhausen'
-      click_button 'Save'
+
+      save_and_wait_for_next_page_load
 
       random_patch = {
         attack: page.find('#attack')['data-midi'],
@@ -193,7 +199,8 @@ RSpec.describe 'Creating a patch', type: :feature, js: true do
       click_link 'Add sequences'
       click_link 'randomize'
       fill_in 'patch[name]', with: 'Joey Joe Joe Junior Shabadoo'
-      click_button 'Save'
+
+      save_and_wait_for_next_page_load
 
       random_patch = {
         attack: page.find('#attack')['data-midi'],

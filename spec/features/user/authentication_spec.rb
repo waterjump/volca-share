@@ -17,11 +17,11 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
         click_button 'Sign up'
       end
 
-      expect(current_path).to eq(root_path)
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content('Welcome! You have signed up successfully.')
     end
 
-    context 'when username is too shorter than two characters' do
+    context 'when username is shorter than two characters' do
       it 'rejects sign up' do
         pw = Devise.friendly_token.first(8)
         within '#new_user' do
@@ -35,7 +35,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
       end
     end
 
-    context 'when email already exists' do
+    context 'when email is already taken' do
       it 'rejects sign up' do
         email = FFaker::Internet.email
         FactoryBot.create(:user, email: email)
@@ -96,7 +96,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
         click_button 'Log in'
       end
 
-      expect(current_path).to eq(root_path)
+      expect(page).to have_current_path(root_path)
       expect(page).to have_content('Signed in successfully.')
     end
 
@@ -109,6 +109,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
           click_button 'Log in'
         end
 
+        expect(page).to have_current_path(new_user_session_path)
         expect(page).to have_content('Invalid Email or password.')
         expect(current_path).to eq(new_user_session_path)
       end

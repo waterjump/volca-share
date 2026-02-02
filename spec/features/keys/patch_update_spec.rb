@@ -39,7 +39,7 @@ RSpec.describe 'Updating a keys patch', js: true do
       page.find('#voice').drag_to(page.find('#octave'))
       page.find('#lfo_trigger_sync_light').click
 
-      click_button 'Save'
+      save_and_wait_for_next_page_load
 
       updated_patch_attributes = patch_to_update.reload.attributes
 

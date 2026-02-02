@@ -34,6 +34,7 @@ end
 
 Capybara.configure do |config|
   config.default_normalize_ws = true
+  config.default_max_wait_time = 2 # seconds
 end
 
 Capybara.register_driver :chrome do |app|
