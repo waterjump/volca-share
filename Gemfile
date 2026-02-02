@@ -50,7 +50,7 @@ end
 group :test do
   gem 'webdrivers'
   gem 'climate_control'
-  gem 'database_cleaner'
+  gem 'database_cleaner-mongoid'
   gem 'fuubar'
   gem 'mongoid-rspec'
   gem 'rails-controller-testing'

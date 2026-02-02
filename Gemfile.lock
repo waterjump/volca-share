@@ -124,7 +124,10 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
-    database_cleaner (1.6.2)
+    database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
+      database_cleaner-core (~> 2.0.0)
+      mongoid
     date (3.3.3)
     debug_inspector (1.2.0)
     devise (4.9.0)
@@ -408,7 +411,7 @@ DEPENDENCIES
   capybara (~> 3.18)
   climate_control
   coffee-rails
-  database_cleaner
+  database_cleaner-mongoid
   devise (~> 4.7)
   dotenv-rails
   factory_bot_rails (~> 4.0)
