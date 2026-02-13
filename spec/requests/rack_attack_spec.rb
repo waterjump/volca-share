@@ -44,11 +44,20 @@ RSpec.xdescribe 'Rack Attack throttling', type: :request do
     end
 
     it 'throttles requests over the limit' do
-     2.times do
+      2.times do
         post '/contacts', params: valid_attributes
       end
       post '/contacts', params: valid_attributes
       expect(response).to have_http_status(:too_many_requests)
+    end
+  end
+
+  context 'when blocking suspicious requests' do
+    context 'when reqest path ends with ".php"' do
+      it 'blocks the request after the second bad request' do
+        get '/wp-login.php'
+        expect(response).to have_http_status(:forbidden)
+      end
     end
   end
 end
