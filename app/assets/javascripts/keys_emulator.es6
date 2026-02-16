@@ -7,8 +7,9 @@ VS.KeysEmulator = function() {
   // components accordingly.
   // ===========================================================================
 
-  const { sequences, emulatorConstants, emulatorParams } = VS;
+  const { sequences, emulatorConstants, emulatorParams, mysteryPatchParams } = VS;
   const patch = emulatorParams;
+  const mysteryParams = mysteryPatchParams;
 
   // initialize sequence object
   const sequence = [];
@@ -152,6 +153,25 @@ VS.KeysEmulator = function() {
 
   const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
+
+  // TEMP: Set some different values for mstery patch manaully:
+  // In the future this should be dynamically passed from BE in an obfuscated way
+  mysteryParams.setcutoff(30);
+  mysteryParams.setpeak(100);
+  mysteryParams.setattack(50);
+  mysteryParams.setvcf_eg_int(100);
+
+  const mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
+  mysteryPatchEngine.init();
+
+  // When a "play myster patch"  button is clicked, play a c3 for 1 second
+  $('#play-mystery-patch').on('click tap', function() {
+    mysteryPatchEngine.activateAudio();
+    mysteryPatchEngine.playNewNote(60);
+    setTimeout(() => {
+      mysteryPatchEngine.triggerSequencerRelease();
+    }, 1000);
+  });
 
   const showPerformanceWarning = () => {
     $('#performance-warning').html(

@@ -19,6 +19,10 @@ $(function() {
     console.log('KEYS emulator code loading!');
     VS.emulatorConstants = new VS.EmulatorConstants;
     VS.emulatorParams = new VS.KeysEmulatorParams;
+
+    // MysteryPatch
+    VS.mysteryPatchParams = new VS.KeysEmulatorParams;
+
     VS.bassEmulator = new VS.KeysEmulator;
   }
 });
