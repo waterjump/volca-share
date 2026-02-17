@@ -1,5 +1,7 @@
-%button#play-mystery-patch.btn
-  Play Mystery Patch
+- # Only show the button if we are on a page with the path /mystery_patch
+- if request.path == mystery_patch_path
+  %button#play-mystery-patch.btn
+    Play Mystery Patch
 #interface.col-lg-9.form
   .stretchy
     .volca.keys.emulator

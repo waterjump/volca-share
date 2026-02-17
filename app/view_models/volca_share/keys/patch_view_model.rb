@@ -45,17 +45,17 @@ module VolcaShare
         # merge some salt values into emulator query string params
         params = emulator_query_string.merge(
           {
-            homer: 'stupid',
-            marge: 'blue hair',
+            homer: 'doh',
+            marge: 'lisa needs braces',
             bart: 'eat my shorts',
-            lisa: 'smart',
-            maggie: 'pacifier',
+            lisa: 'i can see through time',
+            maggie: 'this is indeed a disturbing universe',
+            'IF_YOU_CAN_READ_THIS': 'YOU ARE A DORK'
           }
         )
 
         #shuffle the params to obfuscate them a bit more
         params = params.to_a.shuffle.to_h
-
 
         # encodes to base64 to obfuscate the params a bit
         base64_encoded_params = Base64.strict_encode64(params.to_json)

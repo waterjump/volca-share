@@ -52,10 +52,11 @@ module Keys
 
     describe 'GET /mystery_patch' do
       context 'when calling in html format' do
-        it 'response with bad request' do
+        it 'shows gameplay page' do
           get '/mystery_patch'
 
-          expect(response).to have_http_status(400)
+          expect(response.location).to include('/mystery_patch')
+          expect(response).to have_http_status(200)
         end
       end
 

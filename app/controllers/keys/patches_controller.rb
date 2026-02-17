@@ -64,11 +64,18 @@ module Keys
       end
     end
 
+    # TODO: Move to a separate controller
     def mystery_patch
+      # TODO: Get this from a collection of solution patches
       mystery_patch = FactoryBot.create(:keys_patch)
+
       respond_to do |format|
         format.html do
-          head :bad_request
+          @body_class = :form
+          @body_data_attributes = { :'midi-in' => true }
+          @patch = VolcaShare::Keys::PatchViewModel.wrap(mystery_patch)
+          @title = 'Mystery Patch'
+          render 'emulators/keys/new', location: mystery_patch_url
         end
 
         format.json do

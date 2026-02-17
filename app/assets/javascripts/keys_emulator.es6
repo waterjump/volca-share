@@ -161,49 +161,59 @@ VS.KeysEmulator = function() {
   const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
-  // Call API /mystery_patch to get encrypted params
-  const unrotate = function(rotatedString, rotationAmount) {
-    return Array.from(rotatedString, (ch) => {
-      const code = ch.charCodeAt(0);
+  // =======================
+  // MYSTERY PATCH
+  // =======================
+  // TODO: Extract this to a separate file and clean up the code
+  if (window.location.pathname === '/mystery_patch') {
+    // Call API /mystery_patch to get encrypted params
+    const unrotate = function(rotatedString, rotationAmount) {
+      return Array.from(rotatedString, (ch) => {
+        const code = ch.charCodeAt(0);
 
-      // Ruby rotates within printable ASCII (32..126) using mod 95
-      if (code < 32 || code > 126) return ch;
+        // Ruby rotates within printable ASCII (32..126) using mod 95
+        if (code < 32 || code > 126) return ch;
 
-      const unrot = ((code - 32 - rotationAmount) % 95 + 95) % 95;
-      return String.fromCharCode(unrot + 32);
-    }).join("");
+        const unrot = ((code - 32 - rotationAmount) % 95 + 95) % 95;
+        return String.fromCharCode(unrot + 32);
+      }).join("");
+    }
+
+    let mysteryPatchEngine;
+    let mysteryPatchLoadedFromServer = false;
+
+    $.get('/mystery_patch.json').done(function(encryptedParams) {
+      // Rotate back characters by todays UTC day of month
+      dayOfMonth = new Date().getUTCDate();
+      decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
+
+      // Remove salt
+      // NOTE: Unreliable because clients date could be different
+      salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
+      const base64Salt = btoa(salt);
+
+      // remove base64 salt from end of string, then base64 decode
+      const base64String = decryptedParams.slice(0, -base64Salt.length);
+      const decodedString = atob(base64String);
+      const mysteryParamsArray = JSON.parse(decodedString);
+      mysteryParams.setAllParams(mysteryParamsArray);
+      mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
+      mysteryPatchEngine.init();
+    });
+
+    // When a "play mystery patch"  button is clicked, play a c3 for 1 second
+    $('#play-mystery-patch').on('click tap', function() {
+      mysteryPatchEngine.activateAudio();
+      mysteryPatchEngine.playNewNote(60);
+      setTimeout(() => {
+        mysteryPatchEngine.triggerSequencerRelease();
+      }, 1000);
+    });
   }
+  // =======================
+  // END MYSTERY PATCH
+  // =======================
 
-  let mysteryPatchEngine;
-  let mysteryPatchLoadedFromServer = false;
-
-  $.get('/mystery_patch.json').done(function(encryptedParams) {
-    // Rotate back characters by todays UTC day of month
-    dayOfMonth = new Date().getUTCDate();
-    decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
-
-    // Remove salt
-    // NOTE: Unreliable because clients date could be different
-    salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
-    const base64Salt = btoa(salt);
-
-    // remove base64 salt from end of string, then base64 decode
-    const base64String = decryptedParams.slice(0, -base64Salt.length);
-    const decodedString = atob(base64String);
-    const mysteryParamsArray = JSON.parse(decodedString);
-    mysteryParams.setAllParams(mysteryParamsArray);
-    mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
-    mysteryPatchEngine.init();
-  });
-
-  // When a "play mystery patch"  button is clicked, play a c3 for 1 second
-  $('#play-mystery-patch').on('click tap', function() {
-    mysteryPatchEngine.activateAudio();
-    mysteryPatchEngine.playNewNote(60);
-    setTimeout(() => {
-      mysteryPatchEngine.triggerSequencerRelease();
-    }, 1000);
-  });
 
   const showPerformanceWarning = () => {
     $('#performance-warning').html(
