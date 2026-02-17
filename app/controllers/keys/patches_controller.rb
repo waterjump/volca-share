@@ -64,6 +64,21 @@ module Keys
       end
     end
 
+    def mystery_patch
+      mystery_patch = FactoryBot.create(:keys_patch)
+      respond_to do |format|
+        format.html do
+          head :bad_request
+        end
+
+        format.json do
+          render json: VolcaShare::Keys::PatchViewModel.wrap(
+            mystery_patch
+          ).mystery_patch_params
+        end
+      end
+    end
+
     def edit
       @body_class = :form
       @body_data_attributes = { :'midi-out' => true }

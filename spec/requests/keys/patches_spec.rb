@@ -49,5 +49,24 @@ module Keys
         expect(response.status).to eq(301)
       end
     end
+
+    describe 'GET /mystery_patch' do
+      context 'when calling in html format' do
+        it 'response with bad request' do
+          get '/mystery_patch'
+
+          expect(response).to have_http_status(400)
+        end
+      end
+
+      context 'when calling in json format' do
+        it 'responds with a mystery patch' do
+          get '/mystery_patch.json'
+
+          expect(response).to have_http_status(200)
+          expect(JSON.parse(response.body)).to have_key('patch')
+        end
+      end
+    end
   end
 end

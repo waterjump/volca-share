@@ -33,6 +33,7 @@ VS.EmulatorParams = function() {
   this.getPercentage = function(midiValue) {
     return midiValue / 127.0;
   };
+
   this.settempo = function(midiValue) {
     this.tempo = calculateTempo(midiValue);
   };

@@ -81,7 +81,33 @@ VS.KeysEmulatorParams = function() {
           this.vco[i].shape = 'square';
         }.bind(this));
       }.bind(this),
-    };
+  };
+
+  // Set all paramaters from object
+  this.setAllParams = function(params) {
+    this.setvoice(params.voice);
+    this.settempo(params.tempo || 128);
+    this.setattack(params.attack);
+    this.setdecay_release(params.decay_release);
+    this.setsustain(params.sustain);
+    this.setvcf_eg_int(params.vcf_eg_int);
+    this.setportamento(params.portamento);
+    this.setoctave(params.octave);
+    this.setpeak(params.peak);
+    this.setcutoff(params.cutoff);
+    this.setlfo_rate(params.lfo_rate);
+    this.setlfo_pitch_int(params.lfo_pitch_int);
+    this.setlfo_cutoff_int(params.lfo_cutoff_int);
+    this.setdetune(params.detune);
+    this.setdelay_time(params.delay_time);
+    this.setdelay_feedback(params.delay_feedback);
+    this.setvco_eg_int(params.vco_eg_int);
+    this.setvolume(params.volume);
+    if (['triangle', 'square', 'saw'].indexOf(params.lfo_shape) !== -1) {
+      const adjustedValue = params.lfo_shape === 'saw' ? 'sawtooth' : params.lfo_shape;
+      this.setlfo_wave(adjustedValue);
+    }
+  };
 
   this.setvoice = function(midiValue) {
     const voiceMidiMap = {

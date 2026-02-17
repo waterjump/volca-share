@@ -63,7 +63,8 @@ VS.KeysEmulator = function() {
   // ==================================
   // START QUERY STRING
   // ==================================
-  const processQueryString = function() {
+
+  const normalizeParamsFromQueryString = function() {
     let urlParams;
     try {
       urlParams = new URLSearchParams(window.location.search);
@@ -77,6 +78,12 @@ VS.KeysEmulator = function() {
         }
       };
     }
+
+    return urlParams;
+  };
+
+  const processQueryString = function() {
+    const urlParams = normalizeParamsFromQueryString();
 
     const qsKnobs = [
       'voice', 'detune', 'portamento', 'vco_eg_int', 'attack', 'decay_release',
@@ -154,17 +161,42 @@ VS.KeysEmulator = function() {
   const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
-  // TEMP: Set some different values for mstery patch manaully:
-  // In the future this should be dynamically passed from BE in an obfuscated way
-  mysteryParams.setcutoff(30);
-  mysteryParams.setpeak(100);
-  mysteryParams.setattack(50);
-  mysteryParams.setvcf_eg_int(100);
+  // Call API /mystery_patch to get encrypted params
+  const unrotate = function(rotatedString, rotationAmount) {
+    return Array.from(rotatedString, (ch) => {
+      const code = ch.charCodeAt(0);
 
-  const mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
-  mysteryPatchEngine.init();
+      // Ruby rotates within printable ASCII (32..126) using mod 95
+      if (code < 32 || code > 126) return ch;
 
-  // When a "play myster patch"  button is clicked, play a c3 for 1 second
+      const unrot = ((code - 32 - rotationAmount) % 95 + 95) % 95;
+      return String.fromCharCode(unrot + 32);
+    }).join("");
+  }
+
+  let mysteryPatchEngine;
+  let mysteryPatchLoadedFromServer = false;
+
+  $.get('/mystery_patch.json').done(function(encryptedParams) {
+    // Rotate back characters by todays UTC day of month
+    dayOfMonth = new Date().getUTCDate();
+    decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
+
+    // Remove salt
+    // NOTE: Unreliable because clients date could be different
+    salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
+    const base64Salt = btoa(salt);
+
+    // remove base64 salt from end of string, then base64 decode
+    const base64String = decryptedParams.slice(0, -base64Salt.length);
+    const decodedString = atob(base64String);
+    const mysteryParamsArray = JSON.parse(decodedString);
+    mysteryParams.setAllParams(mysteryParamsArray);
+    mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
+    mysteryPatchEngine.init();
+  });
+
+  // When a "play mystery patch"  button is clicked, play a c3 for 1 second
   $('#play-mystery-patch').on('click tap', function() {
     mysteryPatchEngine.activateAudio();
     mysteryPatchEngine.playNewNote(60);

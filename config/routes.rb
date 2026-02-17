@@ -34,6 +34,8 @@ Rails.application.routes.draw do
   match 'tags/show' => 'tags#show', via: :get
   match 'oembed' => 'patches#oembed', via: :get
 
+  get 'mystery_patch' => 'keys/patches#mystery_patch'
+
   namespace 'keys' do
     resources :patch,
               controller: 'patches',
