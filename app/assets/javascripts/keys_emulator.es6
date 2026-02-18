@@ -209,6 +209,37 @@ VS.KeysEmulator = function() {
         mysteryPatchEngine.triggerSequencerRelease();
       }, 1000);
     });
+
+    // When '#submit-solution' button is clicked, gather patch params from form, POST to /mystery_patch/
+    $('#submit-solution').on('click tap', function() {
+      const solutionParams = {
+        patch: {
+          voice: $('#voice').data('midi'),
+          detune: $('#detune').data('midi'),
+          portamento: $('#portamento').data('midi'),
+          vco_eg_int: $('#vco_eg_int').data('midi'),
+          attack: $('#attack').data('midi'),
+          decay_release: $('#decay_release').data('midi'),
+          vcf_eg_int: $('#vcf_eg_int').data('midi'),
+          peak: $('#peak').data('midi'),
+          cutoff: $('#cutoff').data('midi'),
+          sustain: $('#sustain').data('midi'),
+          lfo_rate: $('#lfo_rate').data('midi'),
+          lfo_pitch_int: $('#lfo_pitch_int').data('midi'),
+          lfo_cutoff_int: $('#lfo_cutoff_int').data('midi'),
+          delay_time: $('#delay_time').data('midi'),
+          delay_feedback: $('#delay_feedback').data('midi'),
+          lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
+          step_trigger: $('input#patch_step_trigger').prop('checked'),
+          lfo_shape: patch.lfo.shape
+        }
+      };
+
+      $.post('/mystery_patch', solutionParams).done(function(response) {
+        // Alert the api response  body for now
+        alert(JSON.stringify(response));
+      });
+    });
   }
   // =======================
   // END MYSTERY PATCH

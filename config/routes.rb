@@ -35,6 +35,7 @@ Rails.application.routes.draw do
   match 'oembed' => 'patches#oembed', via: :get
 
   get 'mystery_patch' => 'keys/patches#mystery_patch'
+  post 'mystery_patch' => 'keys/patches#submit_mystery_patch'
 
   namespace 'keys' do
     resources :patch,
