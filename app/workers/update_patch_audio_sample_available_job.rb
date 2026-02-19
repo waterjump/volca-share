@@ -1,24 +1,39 @@
 # frozen_string_literal: true
 
 class UpdatePatchAudioSampleAvailableJob
+  BATCH_SIZE = 200
+
   def perform
-    all_patches = Patch.all + Keys::Patch.all
-
-    all_patches.each do |patch|
-      next unless patch.audio_sample.present?
-
-      original_availability = patch.audio_sample_available?
-
-      next if original_availability == patch.send(:set_audio_sample_available)
-
-      unless Rails.env.test?
-        puts "Correcting audio sample availibility for '#{patch.name}'"
-      end
-
-      patch.set(audio_sample_available: patch.send(:set_audio_sample_available))
-    end
+    update_scope(Patch)
+    update_scope(Keys::Patch)
 
     nil
+  end
+
+  private
+
+  def update_scope(klass)
+    scope =
+      klass.where(:audio_sample.exists => true)
+           .only(:_id, :name, :audio_sample, :audio_sample_available)
+           .batch_size(BATCH_SIZE)
+
+    scope.each do |patch|
+      current = patch.audio_sample_available?
+      desired = patch.send(:set_audio_sample_available)
+
+      next if current == desired
+
+      log_fix(patch, current, desired)
+      patch.set(audio_sample_available: desired)
+    end
+  end
+
+  def log_fix(patch, current, desired)
+    return if Rails.env.test?
+
+    puts "Correcting audio sample availability for '#{patch.name}': " \
+         "#{current.inspect} -> #{desired.inspect}"
   end
 end
 

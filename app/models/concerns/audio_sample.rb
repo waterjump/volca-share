@@ -9,6 +9,8 @@ module AudioSample
     before_validation :set_audio_sample_available
   end
 
+  # TODO: This should probably be captured in a db field or a cache entry
+  #       to avoid having to hit soundclouds OEmbed endpoint every time
   def audio_sample_code
     return unless audio_sample.present?
 
