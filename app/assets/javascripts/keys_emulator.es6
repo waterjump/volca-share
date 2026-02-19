@@ -210,8 +210,17 @@ VS.KeysEmulator = function() {
       }, 1000);
     });
 
+    const snakeToTitleize = (str) => {
+      return String(str)
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+
     // When '#submit-solution' button is clicked, gather patch params from form, POST to /mystery_patch/
     $('#submit-solution').on('click tap', function() {
+      $(this).hide();
       const solutionParams = {
         patch: {
           voice: $('#voice').data('midi'),
@@ -236,8 +245,51 @@ VS.KeysEmulator = function() {
       };
 
       $.post('/mystery_patch', solutionParams).done(function(response) {
-        // Alert the api response  body for now
-        alert(JSON.stringify(response));
+        $('#results-button').click();
+
+        const entries = Object.entries(response.results.parameter_scores);
+        let $tbody = $("#results-table tbody");
+        $tbody.html('');
+        let i = 0;
+
+        let timer = setInterval(function () {
+          if (i >= entries.length) {
+            $('#kem-x-out').fadeIn('slow');
+            $('#overall-score').html(`<h3>Total score:</h3><div class='percentage'>${response.results.total_score}%</div>`).fadeIn('slow');
+
+            clearInterval(timer);
+            return;
+          }
+
+          let key = snakeToTitleize(entries[i][0]);
+          let value = entries[i][1];
+          let perc = value[3].toFixed(2);
+
+          if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
+
+          let $tr = $("<tr>");
+          $tr.css('display', 'none');
+          $tr.append($("<th scope='row'>").text(key));
+          $tr.append($("<td>").text(value[0]));
+          $tr.append($("<td>").text(value[1]));
+          let $perctd = $('<td>');
+          $perctd.text(perc);
+          if (perc > 80) {
+            $perctd.css('font-weight', 'bold');
+            $perctd.css('color', '#080');
+          } else if (perc < 50) {
+            $perctd.css('font-weight', 'bold');
+            $perctd.css('color', '#800');
+          }
+          $tr.append($perctd);
+
+
+          $tbody.append($tr);
+          $tr.fadeIn();
+
+          i += 1;
+        }, 1500);
+
       });
     });
   }

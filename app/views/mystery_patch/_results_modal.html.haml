@@ -1,0 +1,22 @@
+%button#results-button.hidden{ type: "button", class: "btn btn-primary btn-lg", data: { toggle: "modal", target: "#results-modal" } }
+  Launch demo modal
+
+#results-modal.modal.fade{"aria-labelledby" => "resultsModaLabel", :role => "dialog", :tabindex => "-1", :data => { show: 'true', backdrop: 'static', keyboard: 'false'}}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button#kem-x-out.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button", style: 'display: none'}
+          %span{"aria-hidden" => "true"} ×
+        %h2#resultsModaLabel.modal-title
+          Results
+      #results-modal-body.modal-body.clearfix
+        #overall-score
+        %p
+          %table#results-table.table.table-striped
+            %thead
+              %tr
+                %th{scope: 'col'} Param
+                %th{scope: 'col'} Your value
+                %th{scope: 'col'} Correct value
+                %th{scope: 'col'} Accuracy (%)
+            %tbody
