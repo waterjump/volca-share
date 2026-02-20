@@ -210,13 +210,36 @@ VS.KeysEmulator = function() {
       }, 1000);
     });
 
+    $("#copy-results").on("click", function () {
+      let text = $("#share-text").val();
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text)
+          .then(function () { $("#copy-status").text("Copied!"); })
+          .catch(function () { $("#copy-status").text("Couldn’t copy."); });
+        return;
+      }
+
+      // fallback (works without async)
+      let $ta = $("#share-text");
+      $ta.prop("readonly", false);
+      $ta[0].focus();
+      $ta[0].select();
+      $ta[0].setSelectionRange(0, $ta.val().length);
+
+      let ok = document.execCommand("copy");
+      $ta.prop("readonly", true);
+      window.getSelection().removeAllRanges();
+
+      $("#copy-status").text(ok ? "Copied!" : "Couldn’t copy.");
+    });
+
     const snakeToTitleize = (str) => {
       return String(str)
         .replace(/_/g, " ")
         .toLowerCase()
         .replace(/\b\w/g, (c) => c.toUpperCase());
     }
-
 
     // When '#submit-solution' button is clicked, gather patch params from form, POST to /mystery_patch/
     $('#submit-solution').on('click tap', function() {
@@ -249,13 +272,26 @@ VS.KeysEmulator = function() {
 
         const entries = Object.entries(response.results.parameter_scores);
         let $tbody = $("#results-table tbody");
+        let emojiSummary = '';
         $tbody.html('');
         let i = 0;
 
         let timer = setInterval(function () {
           if (i >= entries.length) {
             $('#kem-x-out').fadeIn('slow');
-            $('#overall-score').html(`<h3>Total score:</h3><div class='percentage'>${response.results.total_score}%</div>`).fadeIn('slow');
+            $('#overall-score').html(
+              [
+                `<h3>Total score:</h3><div class='percentage'>`,
+                `${response.results.total_score}%</div>`
+              ].join('')
+            ).fadeIn('slow');
+            $('#share-text').text([
+              `I guessed today's mystery synth patch with ${response.results.total_score}% `,
+              `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
+              `\n\n#mysterypatch #korgvolcabass`
+            ].join('')
+            );
+            $('#share-results').fadeIn('slow');
 
             clearInterval(timer);
             return;
@@ -269,7 +305,7 @@ VS.KeysEmulator = function() {
 
           let $tr = $("<tr>");
           $tr.css('display', 'none');
-          $tr.append($("<th scope='row'>").text(key));
+          $tr.append($("<th class='result-param' scope='row'>").text(key));
           $tr.append($("<td>").text(value[0]));
           $tr.append($("<td>").text(value[1]));
           let $perctd = $('<td>');
@@ -277,18 +313,24 @@ VS.KeysEmulator = function() {
           if (perc > 80) {
             $perctd.css('font-weight', 'bold');
             $perctd.css('color', '#080');
+            $tr.addClass('table-success');
+            emojiSummary += '🟩';
           } else if (perc < 50) {
             $perctd.css('font-weight', 'bold');
             $perctd.css('color', '#800');
+            $tr.addClass('table-danger');
+            emojiSummary += '🟥';
+          } else {
+            emojiSummary += '🟨';
           }
           $tr.append($perctd);
 
-
           $tbody.append($tr);
-          $tr.fadeIn();
+          $tr.show();
+          $tr.addClass('fade-bg-white');
 
           i += 1;
-        }, 1500);
+        }, 500);
 
       });
     });

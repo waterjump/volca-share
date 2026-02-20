@@ -1,7 +1,10 @@
 .clearfix
   %h1
-    Volca Keys Emulator
-    %span.alpha alpha
+    - if request.path == mystery_patch_path
+      Mystery Patch
+    - else
+      Volca Keys Emulator
+      %span.alpha alpha
   = render 'emulators/keys/form'
 #new_choice_form{:style => "display: none;"}
   = render partial: 'sequences/keys/emulator'
