@@ -18,14 +18,7 @@
     align-items: start;
   }
 
-  #results-summary {
-    // position:relative;
-    // width: 45%;
-  }
-
   #results-table {
-    // width: 45%;
-    // float:left
     th.result-param {
       padding: 1px;
     }
@@ -141,4 +134,13 @@
     font-size: 0.95em;
     opacity: 0.85;
   }
+}
+
+#submit-solution {
+  display: none;
+}
+
+#timer {
+  font-size: 3em;
+  text-align: center;
 }

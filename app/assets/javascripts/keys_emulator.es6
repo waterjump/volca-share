@@ -166,7 +166,7 @@ VS.KeysEmulator = function() {
   // =======================
   // TODO: Extract this to a separate file and clean up the code
   if (window.location.pathname === '/mystery_patch') {
-    // Call API /mystery_patch to get encrypted params
+    // Util function
     const unrotate = function(rotatedString, rotationAmount) {
       return Array.from(rotatedString, (ch) => {
         const code = ch.charCodeAt(0);
@@ -177,37 +177,80 @@ VS.KeysEmulator = function() {
         const unrot = ((code - 32 - rotationAmount) % 95 + 95) % 95;
         return String.fromCharCode(unrot + 32);
       }).join("");
-    }
+    };
 
     let mysteryPatchEngine;
     let mysteryPatchLoadedFromServer = false;
 
-    $.get('/mystery_patch.json').done(function(encryptedParams) {
-      // Rotate back characters by todays UTC day of month
-      dayOfMonth = new Date().getUTCDate();
-      decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
+    // TODO: Get this modal to show without clicking a button
+    $('#pre-game-button').click();
 
-      // Remove salt
-      // NOTE: Unreliable because clients date could be different
-      salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
-      const base64Salt = btoa(salt);
+    let gameHasStarted = false;
+    let intervalId;
+    let timeLeft = 120; // 2 minutes
 
-      // remove base64 salt from end of string, then base64 decode
-      const base64String = decryptedParams.slice(0, -base64Salt.length);
-      const decodedString = atob(base64String);
-      const mysteryParamsArray = JSON.parse(decodedString);
-      mysteryParams.setAllParams(mysteryParamsArray);
-      mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
-      mysteryPatchEngine.init();
-    });
+    const startGame = function() {
+      getMysteryPatch();
+      startTimer();
+      $('#submit-solution').fadeIn('slow');
+      gameHasStarted = true;
+    };
 
-    // When a "play mystery patch"  button is clicked, play a c3 for 1 second
-    $('#play-mystery-patch').on('click tap', function() {
+    const startTimer = function() {
+      timeLeft = 120; // reset timeLeft
+      clearInterval(intervalId); // clear any existing interval
+
+      intervalId = setInterval(function() {
+        if (timeLeft >= 0) {
+          let minutes = Math.floor(timeLeft / 60);
+          let seconds = timeLeft % 60;
+          $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+          timeLeft--;
+        } else {
+          clearInterval(intervalId);
+          $('#timer').text('Time\'s up!');
+          $('#submit-solution').click();
+        }
+      }, 1000); // 1000 milliseconds = 1 second
+    };
+
+    const getMysteryPatch = function() {
+      $.get('/mystery_patch.json').done(function(encryptedParams) {
+        // Rotate back characters by todays UTC day of month
+        dayOfMonth = new Date().getUTCDate();
+        decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
+
+        // Remove salt
+        // NOTE: Unreliable because clients date could be different
+        salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
+        const base64Salt = btoa(salt);
+
+        // remove base64 salt from end of string, then base64 decode
+        const base64String = decryptedParams.slice(0, -base64Salt.length);
+        const decodedString = atob(base64String);
+        const mysteryParamsArray = JSON.parse(decodedString);
+        mysteryParams.setAllParams(mysteryParamsArray);
+        mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
+        mysteryPatchEngine.init();
+        playMysteryNote();
+      });
+    };
+
+    const playMysteryNote = function() {
       mysteryPatchEngine.activateAudio();
-      mysteryPatchEngine.playNewNote(60);
+      mysteryPatchEngine.playNewNote(48);
       setTimeout(() => {
         mysteryPatchEngine.triggerSequencerRelease();
       }, 1000);
+    };
+
+    // When a "play mystery patch"  button is clicked, play a c3 for 1 second
+    $('#play-mystery-patch').on('click tap', function() {
+      if (!gameHasStarted) {
+        startGame();
+     } else {
+       playMysteryNote();
+     }
     });
 
     $("#copy-results").on("click", function () {
@@ -241,9 +284,11 @@ VS.KeysEmulator = function() {
         .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
-    // When '#submit-solution' button is clicked, gather patch params from form, POST to /mystery_patch/
+    // When '#submit-solution' button is clicked, gather patch params
+    // from form, POST to /mystery_patch/
     $('#submit-solution').on('click tap', function() {
       $(this).hide();
+      clearInterval(intervalId);
       const solutionParams = {
         patch: {
           voice: $('#voice').data('midi'),
@@ -267,6 +312,7 @@ VS.KeysEmulator = function() {
         }
       };
 
+      // Submit solution
       $.post('/mystery_patch', solutionParams).done(function(response) {
         $('#results-button').click();
 

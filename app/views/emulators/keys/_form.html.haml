@@ -1,9 +1,3 @@
-- # Only show the button if we are on a page with the path /mystery_patch
-- if request.path == mystery_patch_path
-  %button#play-mystery-patch.btn
-    Play Mystery Patch
-  %button#submit-solution.btn
-    Submit Solution
 #interface.col-lg-9.form
   .stretchy
     .volca.keys.emulator
@@ -154,6 +148,14 @@
     #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
     #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
+  - # Only show the button if we are on a page with the path /mystery_patch
+  - if request.path == mystery_patch_path
+    %button#play-mystery-patch.btn
+      Play Mystery Patch
+    %hr
+    #timer
+    %button#submit-solution.btn.btn-success
+      I'm Done
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     = render 'shared/midi_in'
