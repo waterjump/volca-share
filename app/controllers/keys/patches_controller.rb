@@ -83,7 +83,7 @@ module Keys
         end
 
         format.json do
-          mystery_patch = Keys::Patch.last
+          mystery_patch = MysteryPatch.last
           render json: VolcaShare::Keys::PatchViewModel.wrap(
             mystery_patch
           ).mystery_patch_params

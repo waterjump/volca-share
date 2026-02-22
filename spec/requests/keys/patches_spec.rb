@@ -52,8 +52,7 @@ module Keys
 
     describe 'GET /mystery_patch' do
       before do
-        # create mystery patch
-        create(:keys_patch)
+        MysteryPatch.clone_from(build(:keys_patch))
       end
 
       context 'when calling in html format' do
