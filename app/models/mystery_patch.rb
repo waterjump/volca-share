@@ -62,4 +62,9 @@ class MysteryPatch
 
     Digest::SHA256.hexdigest(JSON.generate(payload))
   end
+
+  def octave
+    # NotImplemented: Just return nil for PatchViewModel compatibility
+    nil
+  end
 end

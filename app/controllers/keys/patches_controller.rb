@@ -64,60 +64,6 @@ module Keys
       end
     end
 
-    # TODO: Move to a separate controller
-    def mystery_patch
-      # TODO: Get this from a collection of solution patches
-      respond_to do |format|
-        format.html do
-          @body_class = :form
-          @body_data_attributes = { :'midi-in' => true }
-          @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
-            voice: 30,
-            attack: 0,
-            decay_release: 0,
-            cutoff: 127,
-            lfo_trigger_sync: false
-          ))
-          @title = 'Mystery Patch'
-          render 'emulators/keys/new', location: mystery_patch_url
-        end
-
-        format.json do
-          mystery_patch = MysteryPatch.last
-          render json: VolcaShare::Keys::PatchViewModel.wrap(
-            mystery_patch
-          ).mystery_patch_params
-        end
-      end
-    end
-
-    def submit_mystery_patch
-      respond_to do |format|
-        format.json do
-          # evaluate submitted solution against mystery patch solution
-          # HACK: Need to make an actual document for this
-          mystery_patch = Keys::Patch.last
-          solution_params = params.require(:patch).permit(
-            :detune, :portamento, :vco_eg_int, :cutoff, :peak, :vcf_eg_int,
-            :lfo_rate, :lfo_pitch_int, :lfo_cutoff_int, :attack, :decay_release,
-            :sustain, :delay_time, :delay_feedback, :lfo_shape, :lfo_trigger_sync,
-            :step_trigger, :voice
-          )
-
-          results =
-            MysteryPatchScorer.new(
-              VolcaShare::Keys::PatchViewModel.wrap(mystery_patch).emulator_query_string,
-              solution_params.to_h
-            ).score
-
-          render json: {
-            message: 'Score submitted',
-            results: results
-          }
-        end
-      end
-    end
-
     def edit
       @body_class = :form
       @body_data_attributes = { :'midi-out' => true }

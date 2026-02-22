@@ -76,7 +76,6 @@ module VolcaShare
           end
         end.join
 
-
         { patch: rotated_string }
       end
     end
