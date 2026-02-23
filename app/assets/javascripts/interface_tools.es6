@@ -40,6 +40,11 @@ $(function() {
   $('[data-toggle="tooltip"]').tooltip();
 });
 
+VS.setCookie = function(name, value, days, path) {
+  let expires = "; max-age=" + (24 * 60 * 60 * days);
+  document.cookie = `${name}=${(value || "")}${expires}; path=${path};`;
+};
+
 VS.autoRotateAllKnobs = function() {
   $('.knob').each(function() {
     let knobInstance;

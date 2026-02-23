@@ -166,7 +166,8 @@ VS.KeysEmulator = function() {
   // =======================
   // TODO: Extract this to a separate file and clean up the code
   if (window.location.pathname === '/mystery_patch') {
-    // Util function
+
+    // Util functions
     const unrotate = function(rotatedString, rotationAmount) {
       return Array.from(rotatedString, (ch) => {
         const code = ch.charCodeAt(0);
@@ -179,6 +180,17 @@ VS.KeysEmulator = function() {
       }).join("");
     };
 
+    const snakeToTitleize = (str) => {
+      return String(str)
+        .replace(/_/g, " ")
+        .toLowerCase()
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+
+    const rightNow = function() {
+      return Math.floor(Date.now() / 1000);
+    }
+
     let mysteryPatchEngine;
     let mysteryPatchLoadedFromServer = false;
 
@@ -188,19 +200,52 @@ VS.KeysEmulator = function() {
     let gameHasStarted = false;
     let mysteryPatchId;
     let digest;
+    let gameData;
+    let resultsData;
     let intervalId;
     let timeLeft = 120; // 2 minutes
 
     const startGame = function() {
       getMysteryPatch();
-      startTimer();
-      $('#submit-solution').fadeIn('slow');
-      gameHasStarted = true;
+    };
+
+    const setGameStartedCookie = function() {
+      if (gameData !== undefined && gameData.mysteryPatchId == mysteryPatchId) {
+        return;
+      }
+
+      let gameStart = rightNow();
+      let gameDeadline = gameStart + 120;
+
+      const cookiePayload = {
+        mysteryPatchId: mysteryPatchId,
+        gameStart: gameStart,
+        gameDeadline: gameDeadline
+      };
+      value = encodeURIComponent(JSON.stringify(cookiePayload));
+      VS.setCookie('gameData', value, 1, '/mystery_patch');
+    };
+
+    const setResultsCookie = function() {
+      const cookiePayload = {
+        mysteryPatchId: mysteryPatchId,
+        timeSubmitted: rightNow(),
+        results: resultsData
+      };
+      value = encodeURIComponent(JSON.stringify(cookiePayload));
+      VS.setCookie('resultsData', value, 1, '/mystery_patch');
     };
 
     const startTimer = function() {
-      timeLeft = 120; // reset timeLeft
-      clearInterval(intervalId); // clear any existing interval
+      $('#timer').html('&nbsp;');
+      let timeLeft;
+      // if gameData is set, calculate remaining time
+      if (gameData !== undefined) {
+        timeLeft = gameData.gameDeadline - rightNow();
+      } else {
+        timeLeft = 120; // otherwise start with a full clock
+      }
+      clearInterval(intervalId);
 
       intervalId = setInterval(function() {
         if (timeLeft >= 0) {
@@ -213,7 +258,7 @@ VS.KeysEmulator = function() {
           $('#timer').text('Time\'s up!');
           $('#submit-solution').click();
         }
-      }, 1000); // 1000 milliseconds = 1 second
+      }, 1000);
     };
 
     const getMysteryPatch = function() {
@@ -226,6 +271,7 @@ VS.KeysEmulator = function() {
 
         // Remove salt
         // NOTE: Unreliable because clients date could be different
+        // TODO: Must address
         salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
         const base64Salt = btoa(salt);
 
@@ -236,6 +282,61 @@ VS.KeysEmulator = function() {
         mysteryParams.setAllParams(mysteryParamsArray);
         mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
         mysteryPatchEngine.init();
+
+        // =====================================
+        // HANDLE GAME ALREADY PLAYED TODAY CASE
+        // =====================================
+        let gameFinished = false;
+        let currentUtcTimestamp = rightNow();
+        let encodedResultsData = getCookieValue('resultsData');
+
+        if (encodedResultsData !== null) {
+          let resultsInfoFromCookie = JSON.parse(decodeURIComponent(encodedResultsData));
+          if (resultsInfoFromCookie.mysteryPatchId = mysteryPatchId) {
+            if (currentUtcTimestamp >= resultsInfoFromCookie.timeSubmitted) {
+              resultsData = resultsInfoFromCookie.results;
+              gameFinished = true;
+            }
+          }
+        }
+
+        let encodedGameData = getCookieValue('gameData');
+        if (encodedGameData !== null) {
+          let payload = JSON.parse(decodeURIComponent(encodedGameData));
+          gameData = payload;
+
+          if (gameData.mysteryPatchId == mysteryPatchId) {
+            if (!gameFinished && currentUtcTimestamp >= payload.gameDeadline) {
+              gameFinished = true;
+            } else {
+              // console.log('Continuing game in progress');
+            }
+          } else {
+            // console.log('Starting new game...');
+          }
+        }
+
+        if (gameFinished) {
+          if (resultsData !== undefined) {
+            // Show previous results
+            $('#results-button').click();
+            printResultsInfo();
+            return;
+          } else {
+            // Show message
+            alert('Come back tomorrow when a new mystery patch will be available');
+            return;
+          }
+        }
+        // =========================================
+        // END HANDLE GAME ALREADY PLAYED TODAY CASE
+        // =========================================
+
+        startTimer();
+        $('#submit-solution').fadeIn('slow');
+        gameHasStarted = true;
+
+        setGameStartedCookie();
         playMysteryNote();
       });
     };
@@ -248,7 +349,7 @@ VS.KeysEmulator = function() {
       }, 1000);
     };
 
-    // When a "play mystery patch"  button is clicked, play a c3 for 1 second
+    // When "play mystery patch"  button is clicked, play a c3 for 1 second
     $('#play-mystery-patch').on('click tap', function() {
       if (!gameHasStarted) {
         startGame();
@@ -281,12 +382,71 @@ VS.KeysEmulator = function() {
       $("#copy-status").text(ok ? "Copied!" : "Couldn’t copy.");
     });
 
-    const snakeToTitleize = (str) => {
-      return String(str)
-        .replace(/_/g, " ")
-        .toLowerCase()
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-    }
+    const printResultsInfo = function() {
+      let $tbody = $("#results-table tbody");
+      let emojiSummary = '';
+      $tbody.html('');
+      let i = 0;
+      let entries = Object.entries(resultsData.parameter_scores);
+
+      let timer = setInterval(function () {
+
+        // When entries are all done being listed
+        if (i >= entries.length) {
+          $('#kem-x-out').fadeIn('slow');
+          $('#overall-score').html(
+            [
+              `<h3>Total score:</h3><div class='percentage'>`,
+              `${resultsData.total_score}%</div>`
+            ].join('')
+          ).fadeIn('slow');
+          $('#share-text').text([
+            `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
+            `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
+            `\n\n#mysterypatch #korgvolcabass`
+          ].join('')
+          );
+          $('#share-results').fadeIn('slow');
+
+          clearInterval(timer);
+          return;
+        }
+
+        let key = snakeToTitleize(entries[i][0]);
+        let value = entries[i][1];
+        let perc = value[3].toFixed(2);
+
+        if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
+
+        let $tr = $("<tr>");
+        $tr.css('display', 'none');
+        $tr.append($("<th class='result-param' scope='row'>").text(key));
+        $tr.append($("<td>").text(value[0]));
+        $tr.append($("<td>").text(value[1]));
+        let $perctd = $('<td>');
+        $perctd.text(perc);
+        if (perc > 80) {
+          $perctd.css('font-weight', 'bold');
+          $perctd.css('color', '#080');
+          $tr.addClass('table-success');
+          emojiSummary += '🟩';
+        } else if (perc < 50) {
+          $perctd.css('font-weight', 'bold');
+          $perctd.css('color', '#800');
+          $tr.addClass('table-danger');
+          emojiSummary += '🟥';
+        } else {
+          emojiSummary += '🟨';
+        }
+        $tr.append($perctd);
+
+        $tbody.append($tr);
+        $tr.show();
+        $tr.addClass('fade-bg-white');
+
+        i += 1;
+      }, 500);
+    };
 
     // When '#submit-solution' button is clicked, gather patch params
     // from knob data attributes, POST to /mystery_patch/
@@ -322,68 +482,9 @@ VS.KeysEmulator = function() {
       $.post('/mystery_patch', solutionParams).done(function(response) {
         $('#results-button').click();
 
-        const entries = Object.entries(response.results.parameter_scores);
-        let $tbody = $("#results-table tbody");
-        let emojiSummary = '';
-        $tbody.html('');
-        let i = 0;
-
-        let timer = setInterval(function () {
-          if (i >= entries.length) {
-            $('#kem-x-out').fadeIn('slow');
-            $('#overall-score').html(
-              [
-                `<h3>Total score:</h3><div class='percentage'>`,
-                `${response.results.total_score}%</div>`
-              ].join('')
-            ).fadeIn('slow');
-            $('#share-text').text([
-              `I guessed today's mystery synth patch with ${response.results.total_score}% `,
-              `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
-              `\n\n#mysterypatch #korgvolcabass`
-            ].join('')
-            );
-            $('#share-results').fadeIn('slow');
-
-            clearInterval(timer);
-            return;
-          }
-
-          let key = snakeToTitleize(entries[i][0]);
-          let value = entries[i][1];
-          let perc = value[3].toFixed(2);
-
-          if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
-
-          let $tr = $("<tr>");
-          $tr.css('display', 'none');
-          $tr.append($("<th class='result-param' scope='row'>").text(key));
-          $tr.append($("<td>").text(value[0]));
-          $tr.append($("<td>").text(value[1]));
-          let $perctd = $('<td>');
-          $perctd.text(perc);
-          if (perc > 80) {
-            $perctd.css('font-weight', 'bold');
-            $perctd.css('color', '#080');
-            $tr.addClass('table-success');
-            emojiSummary += '🟩';
-          } else if (perc < 50) {
-            $perctd.css('font-weight', 'bold');
-            $perctd.css('color', '#800');
-            $tr.addClass('table-danger');
-            emojiSummary += '🟥';
-          } else {
-            emojiSummary += '🟨';
-          }
-          $tr.append($perctd);
-
-          $tbody.append($tr);
-          $tr.show();
-          $tr.addClass('fade-bg-white');
-
-          i += 1;
-        }, 500);
-
+        resultsData = response.results;
+        setResultsCookie();
+        printResultsInfo();
       });
     });
   }
