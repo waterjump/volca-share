@@ -31,6 +31,16 @@ RSpec.describe MysteryPatch, type: :model do
       expect(mystery_patch.lfo_shape).to eq(keys_patch.lfo_shape)
       expect(mystery_patch.lfo_trigger_sync).to eq(keys_patch.lfo_trigger_sync)
     end
+
+    context 'when source patch is marked as secret (private)' do
+      let(:keys_patch) { create(:user_keys_patch, secret: true) }
+
+      it 'raises an error' do
+        expect { described_class.clone_from(keys_patch) }.to(
+          raise_error(MysteryPatch::SecretPatchCloneError)
+        )
+      end
+    end
   end
 
   describe '#params_hash' do

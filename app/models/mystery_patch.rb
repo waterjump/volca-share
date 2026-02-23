@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MysteryPatch
+  class SecretPatchCloneError < StandardError; end
+
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -33,6 +35,8 @@ class MysteryPatch
   field :tempo_delay, type: Boolean
 
   def self.clone_from(record)
+    raise SecretPatchCloneError.new('Cannot clone a secret patch') if record.secret?
+
     create(
       cloned_from: record.id,
       voice: record.voice,
