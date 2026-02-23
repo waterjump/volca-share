@@ -46,26 +46,20 @@
   }
 
   #overall-score {
-    // position: absolute;
-    // top: -26px;
-    // left: 50%;
-    // z-index: 1000;
     display: none;
-    font-size: 5em;
+    font-size: 4em;
     padding: 10px;
     font-weight: bold;
-    // transform-origin: center;
     box-shadow: 0 2px 10px rgba(0,0,0,.15);
     background: rgb(255, 255, 255);
     border-radius: 10px;
     text-align: center;
-    // transform: translate(-50%, 0%);
     h3 {
       margin: 0;
       text-transform: uppercase;
     }
     .percentage {
-      line-height: 75%;
+      line-height: 105%;
     }
   }
   /* Share results box (drop-in) */

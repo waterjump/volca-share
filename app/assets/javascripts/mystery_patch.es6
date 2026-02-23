@@ -172,7 +172,7 @@ $(function() {
         if (resultsData !== undefined) {
           // Show previous results
           $('#results-button').click();
-          printResultsInfo();
+          printResultsInfo(false);
           return;
         } else {
           // Show message
@@ -234,12 +234,21 @@ $(function() {
     $("#copy-status").text(ok ? "Copied!" : "Couldn’t copy.");
   });
 
-  const printResultsInfo = function() {
+  const printResultsInfo = function(animate) {
+    let animateInterval = animate ? 500 : 10;
     let $tbody = $("#results-table tbody");
     let emojiSummary = '';
     $tbody.html('');
     let i = 0;
     let entries = Object.entries(resultsData.parameter_scores);
+    const voiceMidiMap = {
+      10: 'poly',
+      30: 'unison',
+      50: 'octave',
+      70: 'fifth',
+      100: 'unison ring',
+      120: 'poly ring'
+    };
 
     let timer = setInterval(function () {
 
@@ -266,6 +275,16 @@ $(function() {
 
       let key = snakeToTitleize(entries[i][0]);
       let value = entries[i][1];
+
+      let correctVal = value[0];
+      let printableVal = value[1];
+
+      // Map voice midi val to voice name
+      if (key === 'Voice') {
+        printableVal = voiceMidiMap[value[1]];
+        correctVal = voiceMidiMap[value[0]]
+      }
+
       let perc = value[3].toFixed(2);
 
       if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
@@ -273,8 +292,8 @@ $(function() {
       let $tr = $("<tr>");
       $tr.css('display', 'none');
       $tr.append($("<th class='result-param' scope='row'>").text(key));
-      $tr.append($("<td>").text(value[0]));
-      $tr.append($("<td>").text(value[1]));
+      $tr.append($("<td>").text(correctVal));
+      $tr.append($("<td>").text(printableVal));
       let $perctd = $('<td>');
       $perctd.text(perc);
       if (perc > 80) {
@@ -297,7 +316,7 @@ $(function() {
       $tr.addClass('fade-bg-white');
 
       i += 1;
-    }, 500);
+    }, animateInterval);
   };
 
   // When '#submit-solution' button is clicked, gather patch params
@@ -336,7 +355,7 @@ $(function() {
 
       resultsData = response.results;
       setResultsCookie();
-      printResultsInfo();
+      printResultsInfo(true);
     });
   });
 });
