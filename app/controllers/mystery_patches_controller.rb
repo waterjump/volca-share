@@ -31,8 +31,11 @@ class MysteryPatchesController < ApplicationController
   def submit_mystery_patch
     respond_to do |format|
       format.json do
-        # TODO: Fetch mystery patch based on id or hash or something
-        mystery_patch = MysteryPatch.last
+        mystery_patch = MysteryPatch.find(params[:id]);
+
+        if mystery_patch.params_hash != params[:digest]
+          render(json: { message: 'Whoopsy' }, status: :bad_request) and return
+        end
 
         results =
           MysteryPatchScorer.new(
@@ -51,8 +54,11 @@ class MysteryPatchesController < ApplicationController
   private
 
   def solution_params
-    @solution_params ||=
-      params
+    @solution_params ||= begin
+      id = params.require(:id)
+      digest = params.require(:digest)
+
+      guess_params = params
         .require(:patch)
         .permit(
           :voice,
@@ -74,5 +80,8 @@ class MysteryPatchesController < ApplicationController
           :lfo_trigger_sync,
           :step_trigger,
         )
+
+       guess_params.merge(digest: digest, id: id)
+     end
   end
 end

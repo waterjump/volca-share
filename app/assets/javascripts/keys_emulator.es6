@@ -186,6 +186,8 @@ VS.KeysEmulator = function() {
     $('#pre-game-button').click();
 
     let gameHasStarted = false;
+    let mysteryPatchId;
+    let digest;
     let intervalId;
     let timeLeft = 120; // 2 minutes
 
@@ -218,6 +220,8 @@ VS.KeysEmulator = function() {
       $.get('/mystery_patch.json').done(function(encryptedParams) {
         // Rotate back characters by todays UTC day of month
         dayOfMonth = new Date().getUTCDate();
+        mysteryPatchId = encryptedParams.id;
+        digest = encryptedParams.digest;
         decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
 
         // Remove salt
@@ -285,11 +289,13 @@ VS.KeysEmulator = function() {
     }
 
     // When '#submit-solution' button is clicked, gather patch params
-    // from form, POST to /mystery_patch/
+    // from knob data attributes, POST to /mystery_patch/
     $('#submit-solution').on('click tap', function() {
       $(this).hide();
       clearInterval(intervalId);
       const solutionParams = {
+        id: mysteryPatchId,
+        digest: digest,
         patch: {
           voice: $('#voice').data('midi'),
           detune: $('#detune').data('midi'),

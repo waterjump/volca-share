@@ -76,7 +76,11 @@ module VolcaShare
           end
         end.join
 
-        { patch: rotated_string }
+        {
+          id: id.to_s,
+          digest: params_hash,
+          patch: rotated_string
+        }
       end
     end
   end

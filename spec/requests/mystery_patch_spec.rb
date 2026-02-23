@@ -22,15 +22,21 @@ RSpec.describe 'Mystery Patch requests', type: :request do
         get '/mystery_patch.json'
 
         expect(response).to have_http_status(200)
-        expect(JSON.parse(response.body)).to have_key('patch')
+        body = JSON.parse(response.body)
+        expect(body).to have_key('patch')
+        expect(body).to have_key('digest')
       end
     end
   end
 
   describe 'POST /mystery_patch' do
     let!(:mystery_patch) { MysteryPatch.clone_from(build(:keys_patch)) }
+    let(:id) { mystery_patch.id }
+    let(:digest) { mystery_patch.params_hash }
     let(:params) do
       {
+        id: id,
+        digest: digest,
         patch: {
           detune: 0, portamento: 0, voice: 30, attack: 0, decay_release: 0,
           cutoff: 127, lfo_trigger_sync: false, peak: 0, lfo_rate: 0,
@@ -48,6 +54,26 @@ RSpec.describe 'Mystery Patch requests', type: :request do
       expect(JSON.parse(response.body)).to(
         include({ 'message' => 'Score submitted' })
       )
+    end
+
+    context 'when id is not found' do
+      let(:id) { 'some_unfound_id' }
+
+      it 'returns 404 not found' do
+        post '/mystery_patch.json', params: params
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when hash does not match' do
+      let(:digest) { 'some_other_hash' }
+
+      it 'returns 400 bad request' do
+        post '/mystery_patch.json', params: params
+
+        expect(response).to have_http_status(:bad_request)
+      end
     end
   end
 end
