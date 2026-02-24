@@ -23,6 +23,9 @@
 
           #results-summary
             #overall-score
+            #button-container
+              %button.btn#keep-playing{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button" } Keep playing your recreation
+              - # %button.btn#load-actual Load the actual mystery patch
             #share-results.share-results{ aria: { live: "polite" } }
               %h3.share-title Share your results
 
@@ -30,7 +33,7 @@
                 Copy this and paste it anywhere (Slack, Discord, email, socials).
 
               .share-box
-                %textarea#share-text.share-text{ rows: 8, readonly: true, spellcheck: "false" }
+                %textarea#share-text.share-text{ rows: 7, readonly: true, spellcheck: "false" }
 
                 .share-actions
                   %button#copy-results.share-btn{ type: "button" }

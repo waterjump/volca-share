@@ -44,12 +44,8 @@ $(function() {
   }
 
   let mysteryPatchEngine;
-  let mysteryPatchLoadedFromServer = false;
-
-  // TODO: Get this modal to show without clicking a button
-  $('#pre-game-button').click();
-
   let gameHasStarted = false;
+  let gameFinished = false;
   let mysteryPatchId;
   let digest;
   let gameData;
@@ -58,11 +54,15 @@ $(function() {
   let timeLeft = 120; // 2 minutes
 
   const startGame = function() {
-    getMysteryPatch();
+    startTimer();
+    $('#submit-solution').fadeIn('slow');
+    gameHasStarted = true;
+
+    setGameStartedCookie();
   };
 
   const setGameStartedCookie = function() {
-    if (gameData !== undefined && gameData.mysteryPatchId == mysteryPatchId) {
+    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
       return;
     }
 
@@ -89,12 +89,14 @@ $(function() {
   };
 
   const startTimer = function() {
-    $('#timer').html('&nbsp;');
+    $('#timer').html('2:00');
     let timeLeft;
-    // if gameData is set, calculate remaining time
-    if (gameData !== undefined) {
+
+    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
+      // if gameData is set, calculate remaining time
       timeLeft = gameData.gameDeadline - rightNow();
     } else {
+      // otherwise start with a full clock
       timeLeft = 120; // otherwise start with a full clock
     }
     clearInterval(intervalId);
@@ -108,7 +110,11 @@ $(function() {
       } else {
         clearInterval(intervalId);
         $('#timer').text('Time\'s up!');
-        $('#submit-solution').click();
+        if (!gameFinished) {
+          $('#submit-solution').click();
+          gameFinished = true;
+        }
+
       }
     }, 1000);
   };
@@ -138,13 +144,12 @@ $(function() {
       // =====================================
       // HANDLE GAME ALREADY PLAYED TODAY CASE
       // =====================================
-      let gameFinished = false;
       let currentUtcTimestamp = rightNow();
       let encodedResultsData = getCookieValue('resultsData');
 
       if (encodedResultsData !== null) {
         let resultsInfoFromCookie = JSON.parse(decodeURIComponent(encodedResultsData));
-        if (resultsInfoFromCookie.mysteryPatchId = mysteryPatchId) {
+        if (resultsInfoFromCookie.mysteryPatchId === mysteryPatchId) {
           if (currentUtcTimestamp >= resultsInfoFromCookie.timeSubmitted) {
             resultsData = resultsInfoFromCookie.results;
             gameFinished = true;
@@ -155,13 +160,17 @@ $(function() {
       let encodedGameData = getCookieValue('gameData');
       if (encodedGameData !== null) {
         let payload = JSON.parse(decodeURIComponent(encodedGameData));
-        gameData = payload;
 
-        if (gameData.mysteryPatchId == mysteryPatchId) {
-          if (!gameFinished && currentUtcTimestamp >= payload.gameDeadline) {
-            gameFinished = true;
-          } else {
-            // console.log('Continuing game in progress');
+        if (payload.mysteryPatchId === mysteryPatchId) {
+          gameData = payload;
+          if (!gameFinished) {
+            if (currentUtcTimestamp >= payload.gameDeadline) {
+              gameFinished = true;
+            } else {
+              // console.log('Continuing game in progress');
+              gameHasStarted = true;
+              startGame();
+            }
           }
         } else {
           // console.log('Starting new game...');
@@ -172,6 +181,7 @@ $(function() {
         if (resultsData !== undefined) {
           // Show previous results
           $('#results-button').click();
+          $('#submit-solution').hide();
           printResultsInfo(false);
           return;
         } else {
@@ -179,17 +189,12 @@ $(function() {
           alert('Come back tomorrow when a new mystery patch will be available');
           return;
         }
+      } else if (!gameHasStarted) {
+        $('#pre-game-button').click();
       }
       // =========================================
       // END HANDLE GAME ALREADY PLAYED TODAY CASE
       // =========================================
-
-      startTimer();
-      $('#submit-solution').fadeIn('slow');
-      gameHasStarted = true;
-
-      setGameStartedCookie();
-      playMysteryNote();
     });
   };
 
@@ -203,11 +208,10 @@ $(function() {
 
   // When "play mystery patch"  button is clicked, play a c3 for 1 second
   $('#play-mystery-patch').on('click tap', function() {
-    if (!gameHasStarted) {
+    if (!gameHasStarted && !gameFinished) {
       startGame();
-   } else {
+     }
      playMysteryNote();
-   }
   });
 
   $("#copy-results").on("click", function () {
@@ -235,7 +239,7 @@ $(function() {
   });
 
   const printResultsInfo = function(animate) {
-    let animateInterval = animate ? 500 : 10;
+    let animateInterval = animate ? 500 : 5;
     let $tbody = $("#results-table tbody");
     let emojiSummary = '';
     $tbody.html('');
@@ -264,10 +268,11 @@ $(function() {
         $('#share-text').text([
           `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
           `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
-          `\n\n#mysterypatch #korgvolcabass`
+          `\n\n#VSmysterypatch`
         ].join('')
         );
         $('#share-results').fadeIn('slow');
+        $('#button-container').fadeIn('slow');
 
         clearInterval(timer);
         return;
@@ -358,4 +363,6 @@ $(function() {
       printResultsInfo(true);
     });
   });
+
+  getMysteryPatch();
 });
