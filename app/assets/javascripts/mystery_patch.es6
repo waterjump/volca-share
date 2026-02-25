@@ -5,6 +5,16 @@ $(function() {
   const mysteryParams = mysteryPatchParams;
   const patch = emulatorParams;
 
+  let mysteryPatchEngine;
+  let gameHasStarted = false;
+  let gameFinished = false;
+  let mysteryPatchId;
+  let digest;
+  let gameData;
+  let resultsData;
+  let intervalId;
+  let timeLeft = 120; // 2 minutes
+
   // TODO: Look into making sequences optional argument for audio engine so
   // I can remove this and sequences from the game mode.
   const sequence = [];
@@ -42,16 +52,6 @@ $(function() {
   const rightNow = function() {
     return Math.floor(Date.now() / 1000);
   }
-
-  let mysteryPatchEngine;
-  let gameHasStarted = false;
-  let gameFinished = false;
-  let mysteryPatchId;
-  let digest;
-  let gameData;
-  let resultsData;
-  let intervalId;
-  let timeLeft = 120; // 2 minutes
 
   const startGame = function() {
     startTimer();
@@ -122,7 +122,7 @@ $(function() {
   const getMysteryPatch = function() {
     $.get('/mystery_patch.json').done(function(encryptedParams) {
       // Rotate back characters by todays UTC day of month
-      dayOfMonth = new Date().getUTCDate();
+      const dayOfMonth = new Date().getUTCDate();
       mysteryPatchId = encryptedParams.id;
       digest = encryptedParams.digest;
       decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
@@ -197,6 +197,8 @@ $(function() {
   };
 
   const playMysteryNote = function() {
+    if (!mysteryPatchEngine) return; // return if called before mystery patch loaded
+
     mysteryPatchEngine.activateAudio();
     mysteryPatchEngine.playNewNote(48);
     setTimeout(() => {
