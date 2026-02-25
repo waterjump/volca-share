@@ -136,6 +136,9 @@ $(function() {
       mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
       mysteryPatchEngine.init();
 
+      // early return if cookie with inifinitePlay exists
+      if (!!getCookieValue('testMode')) { return; }
+
       // =====================================
       // HANDLE GAME ALREADY PLAYED TODAY CASE
       // =====================================

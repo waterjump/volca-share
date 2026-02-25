@@ -154,10 +154,6 @@ body#mystery-patch {
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
   }
 
-  label[for="patch_step_trigger"] {
-    display: none;
-  }
-
   #tempo-scrim {
     top: 28%;
     left: 79%;
@@ -167,7 +163,8 @@ body#mystery-patch {
     background-color: #b9a698b2;
   }
 
-  #permalink, #play, #toggle-sequences, #accordion-feedback, #accordion-disclaimer, #tempo {
+  #permalink, #play, #toggle-sequences, #accordion-feedback,
+  #accordion-disclaimer, #tempo, label[for="patch_step_trigger"] {
     display: none;
   }
 
