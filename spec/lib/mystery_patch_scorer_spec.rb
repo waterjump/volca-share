@@ -45,9 +45,9 @@ RSpec.describe MysteryPatchScorer do
         guess[:attack],
         (solution[:attack].to_i - guess[:attack].to_i).abs,
         begin
-          worst_possible_score = 63 + (solution[:attack] - 63).abs
+          worst_possible_score = solution[:attack] >= 63 ? 0 : 127
           error = (guess[:attack].to_i - solution[:attack].to_i).abs
-          score = ((worst_possible_score - error).abs / worst_possible_score.to_f) * 100.0
+          score = (1.0 - (error.to_f / (worst_possible_score - solution[:attack]).abs)) * 100.0
           score.round(2)
         end
       ]
@@ -81,17 +81,52 @@ RSpec.describe MysteryPatchScorer do
     let(:guess) { solution }
 
     it 'returns a total score of 100' do
-      expect(scorer.score[:total_score]).to eq(100)
+      expect(scorer.score[:total_score]).to eq(100.0)
     end
   end
 
-  context 'when the guess is off by 10 for a numeric parameter' do
-    let(:guess) do
-      solution.merge(cutoff: (solution[:cutoff] + 10))
+  context 'when worst possible answer is 100 points off' do
+    let(:solution_overrides) do
+      { peak: 27 } # Worst score is 127 = 100 points off
     end
 
-    it 'returns a total score less than 100' do
-      expect(scorer.score[:total_score]).to be < 100
+    context 'when guess is 10 points off' do
+      let(:guess_overrides) do
+        { peak: 37 }
+      end
+
+      it 'returns accuract of 90 percent' do
+        expect(scorer.score[:parameter_scores][:peak]).to(
+           eq([27, 37, 10, 90.0])
+        )
+      end
+    end
+
+    context 'when guess is -10 points off' do
+      let(:guess_overrides) do
+        { peak: 17 }
+      end
+
+      it 'returns accuract of 90 percent' do
+        expect(scorer.score[:parameter_scores][:peak]).to(
+           eq([27, 17, 10, 90.0])
+        )
+      end
+    end
+  end
+
+  context 'when voice is incorrect by any amount' do
+    let(:solution_overrides) do
+      { voice: 10 } # poly
+    end
+    let(:guess_overrides) do
+      { voice: 30 } # unison
+    end
+
+    it 'reports 100% miss' do
+      expect(scorer.score[:parameter_scores][:voice]).to(
+         eq([10, 30, 127, 0.00])
+      )
     end
   end
 end

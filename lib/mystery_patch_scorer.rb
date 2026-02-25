@@ -21,32 +21,37 @@ class MysteryPatchScorer
   attr_reader :solution, :guess, :parameter_scores
 
   def calculate_total_score
-    worst_possible_score = 0
+    biggest_possible_error = 0
     total_error = 0
+
     parameter_scores.each do |param, (actual, guess, error, accuracy)|
-      if actual.is_a?(Numeric)
-        worst_possible_score += 63 + (actual - 63).abs
+      if actual.is_a?(Numeric) && param != :voice
+        biggest_possible_error += 63 + (actual - 63).abs
       else
-        worst_possible_score += 127
+        biggest_possible_error += 127
       end
       total_error += error
     end
 
     # Convert total error to a score out of 100
-    score = ((worst_possible_score - total_error).abs / worst_possible_score.to_f) * 100.0
+    score = ((biggest_possible_error - total_error).abs / biggest_possible_error.to_f) * 100.0
 
     score.round(2)
   end
 
   def calculate_parameter_scores
     solution.except(:octave).each_with_object({}) do |(param, value), scores|
+      skip_lfo_param =
+        LFO_UNAPPLIED_PARAMS.include?(param) &&
+        solution[:lfo_pitch_int] == 0 &&
+        solution[:lfo_cutoff_int] == 0
 
-      next if LFO_UNAPPLIED_PARAMS.include?(param) && solution[:lfo_pitch_int] == 0 && solution[:lfo_cutoff_int] == 0
+      next if skip_lfo_param
 
-      if value.is_a?(Numeric)
-        worst_possible_score = 63 + (value - 63).abs
+      if value.is_a?(Numeric) && param != :voice
+        worst_possible_score = value >= 63 ? 0 : 127
         error = (guess[param].to_i - value.to_i).abs
-        score = ((worst_possible_score - error).abs / worst_possible_score.to_f) * 100.0
+        score = (1.0 - (error.to_f / (worst_possible_score - value).abs)) * 100.0
         scores[param] = [value, guess[param], error, score.round(2)]
       else
         score = guess[param].to_s == value.to_s ? 100.0 : 0.0

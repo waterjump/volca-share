@@ -61,7 +61,7 @@ module VolcaShare
         base64_encoded_params = Base64.strict_encode64(params.to_json)
 
         # add on some more salt
-        salt_to_add = Base64.strict_encode64('salt' + Time.now.utc.day.to_s)
+        salt_to_add = Base64.strict_encode64('salt489')
 
         combined_string = base64_encoded_params + salt_to_add
 

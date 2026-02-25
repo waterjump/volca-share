@@ -127,12 +127,7 @@ $(function() {
       digest = encryptedParams.digest;
       decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
 
-      // Remove salt
-      // NOTE: Unreliable because clients date could be different
-      // TODO: Must address
-      salt = 'salt' + new Date().getUTCDate(); // e.g. salt15
-      const base64Salt = btoa(salt);
-
+      const base64Salt = btoa('salt489');
       // remove base64 salt from end of string, then base64 decode
       const base64String = decryptedParams.slice(0, -base64Salt.length);
       const decodedString = atob(base64String);
@@ -254,6 +249,11 @@ $(function() {
       120: 'poly ring'
     };
 
+    const boolMap = {
+      'true': 'on',
+      'false': 'off'
+    };
+
     let timer = setInterval(function () {
 
       // When entries are all done being listed
@@ -288,6 +288,9 @@ $(function() {
       if (key === 'Voice') {
         printableVal = voiceMidiMap[value[1]];
         correctVal = voiceMidiMap[value[0]]
+      } else if (key === 'Lfo Trigger Sync') {
+        printableVal = boolMap[value[1]];
+        correctVal = boolMap[value[0]];
       }
 
       let perc = value[3].toFixed(2);
