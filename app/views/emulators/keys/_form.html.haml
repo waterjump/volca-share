@@ -1,3 +1,5 @@
+- if request.path == mystery_patch_path
+  - mystery_patch_view = true
 #interface.col-lg-9.form
   .stretchy
     .volca.keys.emulator
@@ -40,6 +42,8 @@
 
       #play.button.nolight
       #stop.hidden
+      - if mystery_patch_view
+        #tempo-scrim.scrim
       #blackbuttons-scrim.scrim
       #permalink.button.nolight
       .green-check-mark
@@ -148,8 +152,7 @@
     #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
     #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
-  - # Only show the button if we are on a page with the path /mystery_patch
-  - if request.path == mystery_patch_path
+  - if mystery_patch_view
     %button#play-mystery-patch.btn
       Play Mystery Patch
     %hr
@@ -159,7 +162,7 @@
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     = render 'shared/midi_in'
-    .accordion-item
+    .accordion-item#accordion-feedback
       %h4.accordion-header
         Feedback
       .accordion-body.clearfix
@@ -175,7 +178,7 @@
         or open a
         = link_to 'GitHub issue.', 'https://github.com/waterjump/volca-share/issues/new'
 
-    .accordion-item
+    .accordion-item#accordion-usage
       %h4.accordion-header
         Usage
         .collapse-toggle.glyphicon.glyphicon-chevron-down
@@ -188,15 +191,17 @@
           %br
           %p
             'Z' and 'X' can be used to change octave.
-          %p
-            Or try the
-            = link_to 'mobile version', '#', id: 'toggle-mobile'
-        #back-to-desktop.hidden
-          = link_to 'Back to desktop mode', '#'
-        #saving
-          <strong>Saving / sharing a patch</strong><br />
-          To save a patch, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
-    .accordion-item
+          - unless mystery_patch_view
+            %p
+              Or try the
+              = link_to 'mobile version', '#', id: 'toggle-mobile'
+        - unless mystery_patch_view
+          #back-to-desktop.hidden
+            = link_to 'Back to desktop mode', '#'
+          #saving
+            <strong>Saving / sharing a patch</strong><br />
+            To save a patch, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
+    .accordion-item#accordion-disclaimer
       %h4.accordion-header
         Disclaimer
         .collapse-toggle.glyphicon.glyphicon-chevron-down

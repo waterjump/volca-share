@@ -6,6 +6,7 @@ class MysteryPatchesController < ApplicationController
       # NOTE: This renders the page the game is played on
       format.html do
         @body_class = :form
+        @body_id = :'mystery-patch'
         @body_data_attributes = { :'midi-in' => true }
         @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
           voice: 30,

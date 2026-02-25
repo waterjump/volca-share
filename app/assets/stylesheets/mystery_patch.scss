@@ -1,149 +1,178 @@
-#results-modal {
-  .modal_body {
-    position: relative;
-    padding: 0;
-  }
+body#mystery-patch {
 
-  #results-modal-dialog {
-    width: 990px;
-  }
-
-  #results-container {
-    font-family: "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", serif;
-    font-size: 1.2em;
-    position: relative;
-    gap: 15px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-
-  #results-table {
-    th.result-param {
-      padding: 1px;
-    }
-
-    tr {
-      line-height: 84%;
-    }
-    td {
-      text-align: center;
+  #results-modal {
+    .modal_body {
+      position: relative;
       padding: 0;
     }
-  }
 
-  .table-danger {
-    background-color: #f5c6cb;
-  }
-
-  .table-success {
-    background-color: #c3e6cb;
-  }
-
-  .fade-bg-white {
-    transition: background-color 2000ms;
-    background-color: #fff;
-  }
-
-  #overall-score {
-    display: none;
-    font-size: 4em;
-    padding: 10px;
-    font-weight: bold;
-    box-shadow: 0 2px 10px rgba(0,0,0,.15);
-    background: rgb(255, 255, 255);
-    border-radius: 10px;
-    text-align: center;
-    h3 {
-      margin: 0;
-      text-transform: uppercase;
+    #results-modal-dialog {
+      width: 990px;
     }
-    .percentage {
-      line-height: 105%;
+
+    #results-container {
+      font-family: "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", serif;
+      font-size: 1.2em;
+      position: relative;
+      gap: 15px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+    }
+
+    #results-table {
+      th.result-param {
+        padding: 1px;
+      }
+
+      tr {
+        line-height: 84%;
+      }
+      td {
+        text-align: center;
+        padding: 0;
+      }
+    }
+
+    .table-danger {
+      background-color: #f5c6cb;
+    }
+
+    .table-success {
+      background-color: #c3e6cb;
+    }
+
+    .fade-bg-white {
+      transition: background-color 2000ms;
+      background-color: #fff;
+    }
+
+    #overall-score {
+      display: none;
+      font-size: 4em;
+      padding: 10px;
+      font-weight: bold;
+      box-shadow: 0 2px 10px rgba(0,0,0,.15);
+      background: rgb(255, 255, 255);
+      border-radius: 10px;
+      text-align: center;
+      h3 {
+        margin: 0;
+        text-transform: uppercase;
+      }
+      .percentage {
+        line-height: 105%;
+      }
+    }
+
+    #button-container {
+      margin-top: 15px;
+      display: none;
+      #keep-playing, #load-actual {
+        width: 49%;
+      }
+    }
+
+    /* Share results box (drop-in) */
+    .share-results {
+      margin-top: 10px;
+      display: none;
+      padding: 16px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 12px;
+      background: rgba(0,0,0,0.02);
+    }
+
+    .share-title {
+      margin: 0 0 8px 0;
+      text-align: center;
+    }
+
+    .share-subtitle {
+      margin: 0 0 12px 0;
+      text-align: center;
+      opacity: 0.8;
+    }
+
+    .share-box {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .share-text {
+      width: 100%;
+      resize: vertical;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.18);
+      padding: 10px 12px;
+      line-height: 1.35;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      background: #fff;
+    }
+
+    .share-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .share-btn {
+      border: 1px solid rgba(0,0,0,0.18);
+      background: #fff;
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+    }
+
+    .share-btn:hover {
+      background: rgba(0,0,0,0.04);
+    }
+
+    .share-btn:active {
+      transform: translateY(1px);
+    }
+
+    .share-status {
+      min-height: 1em;
+      font-size: 0.95em;
+      opacity: 0.85;
     }
   }
 
-  #button-container {
-    margin-top: 15px;
+  #submit-solution {
     display: none;
-    #keep-playing, #load-actual {
-      width: 49%;
-    }
   }
 
-  /* Share results box (drop-in) */
-  .share-results {
-    margin-top: 10px;
-    display: none;
-    padding: 16px;
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 12px;
-    background: rgba(0,0,0,0.02);
-  }
-
-  .share-title {
-    margin: 0 0 8px 0;
+  #timer {
+    font-size: 3em;
     text-align: center;
   }
 
-  .share-subtitle {
-    margin: 0 0 12px 0;
-    text-align: center;
-    opacity: 0.8;
+  .knob {
+    box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
   }
 
-  .share-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  label[for="patch_step_trigger"] {
+    display: none;
   }
 
-  .share-text {
-    width: 100%;
-    resize: vertical;
-    border-radius: 10px;
-    border: 1px solid rgba(0,0,0,0.18);
-    padding: 10px 12px;
-    line-height: 1.35;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    background: #fff;
+  #tempo-scrim {
+    top: 28%;
+    left: 79%;
+    position: absolute;
+    width: 7%;
+    height: 11%;
+    background-color: #b9a698b2;
   }
 
-  .share-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+  #permalink, #play, #toggle-sequences, #accordion-feedback, #accordion-disclaimer, #tempo {
+    display: none;
   }
 
-  .share-btn {
-    border: 1px solid rgba(0,0,0,0.18);
-    background: #fff;
-    border-radius: 10px;
-    padding: 10px 12px;
-    cursor: pointer;
+  #blackbuttons-scrim {
+    width: 27%;
+    left: 61%;
   }
-
-  .share-btn:hover {
-    background: rgba(0,0,0,0.04);
-  }
-
-  .share-btn:active {
-    transform: translateY(1px);
-  }
-
-  .share-status {
-    min-height: 1em;
-    font-size: 0.95em;
-    opacity: 0.85;
-  }
-}
-
-#submit-solution {
-  display: none;
-}
-
-#timer {
-  font-size: 3em;
-  text-align: center;
 }
