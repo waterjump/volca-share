@@ -11,5 +11,9 @@
           How to play
       #pre-game-modal-body.modal-body.clearfix
         %p.lead
-          Welcome to Mystery Patch, the game where you recreate a synth patch by ear.  To start, click the 'Play Mystery Patch' button.  This will start a two minute timer.  Recreate the patch as closely as you can before the time is up.  You can also click "I'm Done".  Good luck.
+          Welcome to Mystery Patch, the game where you recreate a synth patch by ear.  To start, click the 'Play Mystery Patch' button.  This will start a two minute timer.  Recreate the patch as closely as you can.
+        %ul.lead
+          %li Accuracy is measured by parameter values: octave and musical notes are irrelevant.
+          %li The 'Play Mystery Patch' button plays a C2.
+        %p.lead The game is over when time is up or you click "I'm done".  Good luck!
         %button.btn#start-game{ 'aria-label' => 'Close', 'data-dismiss' => 'modal', type: 'button' } Got it
