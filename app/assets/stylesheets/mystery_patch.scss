@@ -145,6 +145,46 @@ body#mystery-patch {
     display: none;
   }
 
+  #audible-engine-switch {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    margin-bottom: 0;
+
+    > .btn {
+      float: none;
+      flex: 1 1 50%;
+      white-space: normal;
+      margin-left: 0;
+    }
+
+    > .btn + .btn {
+      margin-left: -1px;
+    }
+  }
+
+  #audible-engine-shortcuts {
+    width: 100%;
+    table-layout: fixed;
+    margin-bottom: 10px;
+    border-collapse: collapse;
+
+    td {
+      text-align: center;
+      font-size: 0.8em;
+      color: #555;
+      padding-top: 4px;
+    }
+
+    td:first-child::before {
+      content: "\2190\00A0\00A0";
+    }
+
+    td:last-child::after {
+      content: "\00A0\00A0\2192";
+    }
+  }
+
   #timer {
     font-size: 3em;
     text-align: center;
@@ -171,5 +211,43 @@ body#mystery-patch {
   #blackbuttons-scrim {
     width: 27%;
     left: 61%;
+  }
+
+  .volca.keys.emulator {
+    #mystery-params-scrim {
+      top: 2.4%;
+      left: 1.5%;
+      width: 97.1%;
+      height: 95.0%;
+      z-index: 40;
+      z-index: 40;
+      // background-color: #000000a6;
+      background-color: #004f4f70;
+      border-radius: 1% 1%;
+      mix-blend-mode: hard-light;
+      cursor: help;
+      box-shadow: inset 10px 10px 50px aquamarine, inset -10px -10px 50px aquamarine;
+      overflow: hidden;
+
+      .mystery-mark {
+        position: absolute;
+        color: aquamarine;
+        opacity: 0.5;
+        font-weight: 700;
+        line-height: 1;
+        user-select: none;
+      }
+
+      .m1 { top: 1%; left: 9%; font-size: 93px; }
+      .m2 { top: 10%; left: 30%; font-size: 138px; }
+      .m3 { top: 3%; left: 61%; font-size: 83px; }
+      .m4 { top: 14%; left: 82%; font-size: 115px; }
+      .m5 { top: 36%; left: 11%; font-size: 99px; }
+      .m6 { top: 30%; left: 45%; font-size: 99px; }
+      .m7 { top: 44%; left: 70%; font-size: 126px; }
+      .m8 { top: 59%; left: 23%; font-size: 86px; }
+      .m9 { top: 64%; left: 43%; font-size: 120px; }
+      .m10 { top: 70%; left: 76%; font-size: 95px; }
+    }
   }
 }

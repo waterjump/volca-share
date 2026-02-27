@@ -160,6 +160,54 @@ VS.KeysEmulator = function() {
   const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
 
+  const managedEngines = {
+    primary: { engine: audioEngine, patchParams: patch },
+    mystery: null
+  };
+  let activeAudibleEngine = 'primary';
+
+  const managedEngineList = () => {
+    return Object.values(managedEngines).filter(binding => binding !== null);
+  };
+
+  const mysteryVolume = () => {
+    if (!VS.mysteryPatchParams) { return 1; }
+    if (!Number.isFinite(VS.mysteryPatchParams.volume)) { return 1; }
+    return VS.mysteryPatchParams.volume;
+  };
+
+  const applyEngineOutputState = () => {
+    const primaryVolume = activeAudibleEngine === 'primary' ? patch.volume : 0;
+    audioEngine.setVolume(primaryVolume);
+
+    if (managedEngines.mystery !== null) {
+      const secondaryVolume = activeAudibleEngine === 'mystery' ? mysteryVolume() : 0;
+      managedEngines.mystery.engine.setVolume(secondaryVolume);
+    }
+  };
+
+  const setActiveAudibleEngine = (engineName) => {
+    if (engineName === 'mystery' && managedEngines.mystery === null) { return; }
+    activeAudibleEngine = engineName === 'mystery' ? 'mystery' : 'primary';
+    applyEngineOutputState();
+  };
+
+  VS.keysEmulatorBridge = {
+    registerMysteryEngine: function(engine, patchParams = VS.mysteryPatchParams) {
+      if (!engine) { return; }
+      managedEngines.mystery = { engine: engine, patchParams: patchParams };
+      applyEngineOutputState();
+    },
+    setActiveAudibleEngine: function(engineName) {
+      setActiveAudibleEngine(engineName);
+    },
+    getActiveAudibleEngine: function() {
+      return activeAudibleEngine;
+    }
+  };
+
+  applyEngineOutputState();
+
   const showPerformanceWarning = () => {
     $('#performance-warning').html(
       '<button type="button" class="close" data-dismiss="alert" aria-label="Close">' +
@@ -186,7 +234,8 @@ VS.KeysEmulator = function() {
       // Turn octave knob
       new VS.SnapKnob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
 
-      if (!audioEngine.noteIsPlaying()) { return; } // at init time
+      const aNoteIsPlaying = managedEngineList().some(binding => binding.engine.noteIsPlaying());
+      if (!aNoteIsPlaying) { return; } // at init time
     }
 
     if (keysDown.length === 0) { return; } // when it's amp_eg release
@@ -195,7 +244,9 @@ VS.KeysEmulator = function() {
     const octaveOffset = change * 12;
     keysDown = keysDown.map(key => key + octaveOffset);
 
-    audioEngine.changeOctave(octaveOffset);
+    managedEngineList().forEach(binding => {
+      binding.engine.changeOctave(octaveOffset);
+    });
   }
 
   changeOctave(0);
@@ -204,13 +255,16 @@ VS.KeysEmulator = function() {
   const keyboardDown = function(note){
     keysDown.push(note);
 
-    if (keysDown.length === 1) {
-      audioEngine.playNewNote(note);
-    } else if (patch.voice.includes('poly')){
-      audioEngine.addNote(keysDown);
-    } else {
-      audioEngine.changeCurrentNote(note);
-    }
+    managedEngineList().forEach(binding => {
+      const voice = binding.patchParams.voice;
+      if (keysDown.length === 1) {
+        binding.engine.playNewNote(note);
+      } else if (voice.includes('poly')) {
+        binding.engine.addNote(keysDown);
+      } else {
+        binding.engine.changeCurrentNote(note);
+      }
+    });
   };
 
   // This transposes keycode based on octave
@@ -221,19 +275,22 @@ VS.KeysEmulator = function() {
 
   const keyboardUp = function(noteThatStopped) {
     keysDown = keysDown.filter(key => key !== noteThatStopped);
+    managedEngineList().forEach(binding => {
+      const voice = binding.patchParams.voice;
 
-    if (keysDown.length > 0) {
-      if (patch.voice.includes('poly')) {
-        audioEngine.stopPolyNote(keysDown, noteThatStopped);
-        return;
-      } else {
-        audioEngine.changeCurrentNote(keysDown[keysDown.length - 1]);
-        return;
+      if (keysDown.length > 0) {
+        if (voice.includes('poly')) {
+          binding.engine.stopPolyNote(keysDown, noteThatStopped);
+          return;
+        } else {
+          binding.engine.changeCurrentNote(keysDown[keysDown.length - 1]);
+          return;
+        }
       }
-    }
 
-    audioEngine.stopPolyNote(keysDown, noteThatStopped);
-    audioEngine.stopNote();
+      binding.engine.stopPolyNote(keysDown, noteThatStopped);
+      binding.engine.stopNote();
+    });
   };
 
   $('#play').on('click tap', function() {
@@ -312,7 +369,7 @@ VS.KeysEmulator = function() {
   // Stop audio if user switches browser tab or minimizes window
   document.addEventListener('visibilitychange', function() {
     if (document.hidden && !audioEngine.getSequencerPlaying()) {
-      audioEngine.stopNote();
+      managedEngineList().forEach(binding => binding.engine.stopNote());
     }
   });
 
@@ -426,7 +483,7 @@ VS.KeysEmulator = function() {
 
   $('#volume').on('knobturn', () => {
     patch.setvolume(VS.activeKnob.midi());
-    audioEngine.setVolume(patch.volume);
+    applyEngineOutputState();
   });
 
   $(document).on('midinoteon', function(event) {

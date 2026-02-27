@@ -43,6 +43,17 @@
       #play.button.nolight
       #stop.hidden
       - if mystery_patch_view
+        #mystery-params-scrim.scrim.hidden
+          %span.mystery-mark.m1 ?
+          %span.mystery-mark.m2 ?
+          %span.mystery-mark.m3 ?
+          %span.mystery-mark.m4 ?
+          %span.mystery-mark.m5 ?
+          %span.mystery-mark.m6 ?
+          %span.mystery-mark.m7 ?
+          %span.mystery-mark.m8 ?
+          %span.mystery-mark.m9 ?
+          %span.mystery-mark.m10 ?
         #tempo-scrim.scrim
       #blackbuttons-scrim.scrim
       #permalink.button.nolight
@@ -153,10 +164,20 @@
     #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
   - if mystery_patch_view
-    %button#play-mystery-patch.btn
-      Play Mystery Patch
+    #audible-engine-switch.btn-group{ role: 'group', aria: { label: 'Audible engine switch' } }
+      %button#audible-engine-primary.btn.btn-default.active{ type: 'button' }
+        Hear Your Patch
+      %button#audible-engine-mystery.btn.btn-default{ type: 'button' }
+        Hear Mystery Patch
+    %table#audible-engine-shortcuts
+      %tbody
+        %tr
+          %td Left Arrow
+          %td Right Arrow
     %hr
     #timer
+    %button#clear-mystery-cookies.btn.btn-default{ type: 'button' }
+      Clear Game Cookies (Dev)
     %button#submit-solution.btn.btn-success
       I'm Done
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }

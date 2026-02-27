@@ -15,6 +15,22 @@ $(function() {
   let intervalId;
   let timeLeft = 120; // 2 minutes
 
+  const setAudibleEngineSwitch = function(engineName) {
+    const isMystery = engineName === 'mystery';
+    $('#audible-engine-primary').toggleClass('active', !isMystery);
+    $('#audible-engine-mystery').toggleClass('active', isMystery);
+    $('#mystery-params-scrim').toggleClass('hidden', !isMystery);
+  };
+
+  const syncAudibleEngineSwitch = function(fallbackEngine = 'primary') {
+    if (!VS.keysEmulatorBridge) {
+      setAudibleEngineSwitch(fallbackEngine);
+      return;
+    }
+
+    setAudibleEngineSwitch(VS.keysEmulatorBridge.getActiveAudibleEngine());
+  };
+
   // TODO: Look into making sequences optional argument for audio engine so
   // I can remove this and sequences from the game mode.
   const sequence = [];
@@ -54,6 +70,13 @@ $(function() {
   }
 
   const startGame = function() {
+    if (gameHasStarted && !gameFinished) {
+      startTimer();
+      $('#submit-solution').fadeIn('slow');
+    }
+
+    // if (gameHasStarted || gameFinished) { return; }
+
     startTimer();
     $('#submit-solution').fadeIn('slow');
     gameHasStarted = true;
@@ -89,7 +112,7 @@ $(function() {
   };
 
   const startTimer = function() {
-    $('#timer').html('2:00');
+    $('#timer').html('...');
     let timeLeft;
 
     if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
@@ -135,9 +158,10 @@ $(function() {
       mysteryParams.setAllParams(mysteryParamsArray);
       mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
       mysteryPatchEngine.init();
-
-      // early return if cookie with inifinitePlay exists
-      if (!!getCookieValue('testMode')) { return; }
+      if (VS.keysEmulatorBridge) {
+        VS.keysEmulatorBridge.registerMysteryEngine(mysteryPatchEngine, mysteryParams);
+      }
+      syncAudibleEngineSwitch();
 
       // =====================================
       // HANDLE GAME ALREADY PLAYED TODAY CASE
@@ -196,22 +220,36 @@ $(function() {
     });
   };
 
-  const playMysteryNote = function() {
-    if (!mysteryPatchEngine) return; // return if called before mystery patch loaded
+  $('#audible-engine-primary').on('click tap', function() {
+    if (VS.keysEmulatorBridge) {
+      VS.keysEmulatorBridge.setActiveAudibleEngine('primary');
+    }
+    syncAudibleEngineSwitch('primary');
+  });
 
-    mysteryPatchEngine.activateAudio();
-    mysteryPatchEngine.playNewNote(48);
-    setTimeout(() => {
-      mysteryPatchEngine.triggerSequencerRelease();
-    }, 1000);
-  };
+  $('#audible-engine-mystery').on('click tap', function() {
+    if (VS.keysEmulatorBridge) {
+      VS.keysEmulatorBridge.setActiveAudibleEngine('mystery');
+    }
+    syncAudibleEngineSwitch('primary');
+    if (!gameHasStarted) { startGame(); }
+  });
 
-  // When "play mystery patch"  button is clicked, play a c3 for 1 second
-  $('#play-mystery-patch').on('click tap', function() {
-    if (!gameHasStarted && !gameFinished) {
-      startGame();
-     }
-     playMysteryNote();
+  $(document).on('keydown', function(event) {
+    const targetTag = (event.target && event.target.tagName || '').toLowerCase();
+    if (['input', 'textarea', 'select', 'button'].includes(targetTag)) { return; }
+
+    if (event.keyCode === 37) {
+      $('#audible-engine-primary').trigger('click');
+    } else if (event.keyCode === 39) {
+      $('#audible-engine-mystery').trigger('click');
+    }
+  });
+
+  $('#clear-mystery-cookies').on('click tap', function() {
+    VS.setCookie('gameData', '', -1, '/mystery_patch');
+    VS.setCookie('resultsData', '', -1, '/mystery_patch');
+    window.location.reload();
   });
 
   $("#copy-results").on("click", function () {
@@ -373,4 +411,5 @@ $(function() {
   });
 
   getMysteryPatch();
+  syncAudibleEngineSwitch('primary');
 });
