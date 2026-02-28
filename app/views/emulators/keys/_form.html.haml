@@ -176,8 +176,6 @@
           %td Right Arrow
     %hr
     #timer
-    %button#clear-mystery-cookies.btn.btn-default{ type: 'button' }
-      Clear Game Cookies (Dev)
     %button#submit-solution.btn.btn-success
       I'm Done
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
@@ -229,6 +227,9 @@
       - disclaimerBodyStyle = cookies[:accordionDisclaimer] == 'closed' ? 'display:none;' : ''
       #disclaimer.accordion-body{ style: disclaimerBodyStyle }
         This is a <strong>fan-made emulator</strong>.  It is in no way produced by, associated with, or endorsed by Korg Inc. or any related business entities.  It's made out of appreciation for the actual product, which sounds way better, and I suggest you pick one up and find out for yourself!
+  - if mystery_patch_view
+    %button#clear-mystery-cookies.btn.btn-default{ type: 'button' }
+      Clear Game Cookies (Dev)
 .off-canvas
   =image_tag('numbers.jpg')
   =image_tag('symbols.jpg')

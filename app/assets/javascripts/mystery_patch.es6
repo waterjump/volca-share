@@ -13,7 +13,7 @@ $(function() {
   let gameData;
   let resultsData;
   let intervalId;
-  let timeLeft = 120; // 2 minutes
+  const GAME_DURATION_SECONDS = 120;
 
   const setAudibleEngineSwitch = function(engineName) {
     const isMystery = engineName === 'mystery';
@@ -69,19 +69,36 @@ $(function() {
     return Math.floor(Date.now() / 1000);
   }
 
-  const startGame = function() {
-    if (gameHasStarted && !gameFinished) {
-      startTimer();
-      $('#submit-solution').fadeIn('slow');
+  const showNotStartedState = function() {
+    clearInterval(intervalId);
+    $('#timer').hide().text('');
+    $('#submit-solution').hide();
+  };
+
+  const showStartedState = function() {
+    $('#timer').show();
+    $('#submit-solution').show();
+  };
+
+  const showFinishedState = function() {
+    clearInterval(intervalId);
+    $('#timer').show().text('Time\'s up!');
+    $('#submit-solution').hide();
+  };
+
+  const triggerSubmitSolution = function() {
+    $('#submit-solution').trigger('click');
+  };
+
+  const parseCookieJson = function(key) {
+    const encodedValue = getCookieValue(key);
+    if (encodedValue === null) { return null; }
+
+    try {
+      return JSON.parse(decodeURIComponent(encodedValue));
+    } catch (_) {
+      return null;
     }
-
-    // if (gameHasStarted || gameFinished) { return; }
-
-    startTimer();
-    $('#submit-solution').fadeIn('slow');
-    gameHasStarted = true;
-
-    setGameStartedCookie();
   };
 
   const setGameStartedCookie = function() {
@@ -89,16 +106,17 @@ $(function() {
       return;
     }
 
-    let gameStart = rightNow();
-    let gameDeadline = gameStart + 120;
+    const gameStart = rightNow();
+    const gameDeadline = gameStart + GAME_DURATION_SECONDS;
 
     const cookiePayload = {
       mysteryPatchId: mysteryPatchId,
       gameStart: gameStart,
       gameDeadline: gameDeadline
     };
-    value = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('gameData', value, 1, '/mystery_patch');
+    const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
+    VS.setCookie('gameData', encodedValue, 1, '/mystery_patch');
+    gameData = cookiePayload;
   };
 
   const setResultsCookie = function() {
@@ -107,39 +125,149 @@ $(function() {
       timeSubmitted: rightNow(),
       results: resultsData
     };
-    value = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('resultsData', value, 1, '/mystery_patch');
+    const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
+    VS.setCookie('resultsData', encodedValue, 1, '/mystery_patch');
+  };
+
+  const remainingTimeSeconds = function() {
+    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
+      return gameData.gameDeadline - rightNow();
+    }
+    return GAME_DURATION_SECONDS;
   };
 
   const startTimer = function() {
-    $('#timer').html('...');
-    let timeLeft;
-
-    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
-      // if gameData is set, calculate remaining time
-      timeLeft = gameData.gameDeadline - rightNow();
-    } else {
-      // otherwise start with a full clock
-      timeLeft = 120; // otherwise start with a full clock
-    }
+    let secondsLeft = remainingTimeSeconds();
     clearInterval(intervalId);
 
+    if (secondsLeft <= 0) {
+      gameFinished = true;
+      showFinishedState();
+      return;
+    }
+
+    let minutes = Math.floor(secondsLeft / 60);
+    let seconds = secondsLeft % 60;
+    $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+
     intervalId = setInterval(function() {
-      if (timeLeft >= 0) {
-        let minutes = Math.floor(timeLeft / 60);
-        let seconds = timeLeft % 60;
+      secondsLeft--;
+
+      if (secondsLeft >= 0) {
+        minutes = Math.floor(secondsLeft / 60);
+        seconds = secondsLeft % 60;
         $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
-        timeLeft--;
       } else {
         clearInterval(intervalId);
-        $('#timer').text('Time\'s up!');
         if (!gameFinished) {
-          $('#submit-solution').click();
-          gameFinished = true;
+          triggerSubmitSolution();
+        } else {
+          showFinishedState();
         }
-
       }
     }, 1000);
+  };
+
+  const startGame = function() {
+    if (gameHasStarted || gameFinished) { return; }
+
+    gameHasStarted = true;
+    showStartedState();
+    setGameStartedCookie();
+    startTimer();
+  };
+
+  const resumeGame = function() {
+    if (!gameHasStarted || gameFinished) { return; }
+
+    showStartedState();
+    startTimer();
+  };
+
+  const resolveSessionStateFromCookies = function() {
+    const now = rightNow();
+    const cookieResultsData = parseCookieJson('resultsData');
+    const cookieGameData = parseCookieJson('gameData');
+
+    if (
+      cookieResultsData !== null &&
+      cookieResultsData.mysteryPatchId === mysteryPatchId &&
+      now >= cookieResultsData.timeSubmitted
+    ) {
+      // Game finished in previous session
+      return {
+        status: 'finished',
+        gameData: cookieGameData,
+        resultsData: cookieResultsData.results
+      };
+    }
+
+    if (
+      cookieGameData !== null &&
+      cookieGameData.mysteryPatchId === mysteryPatchId
+    ) {
+      if (now >= cookieGameData.gameDeadline) {
+        // Abandoned
+        return {
+          status: 'expired_unsubmitted',
+          gameData: cookieGameData,
+          resultsData: null
+        };
+      }
+
+      // Continue game
+      return {
+        status: 'active',
+        gameData: cookieGameData,
+        resultsData: null
+      };
+    }
+
+    // New game
+    return {
+      status: 'not_started',
+      gameData: null,
+      resultsData: null
+    };
+  };
+
+  const applySessionState = function(sessionState) {
+    gameData = sessionState.gameData || undefined;
+    resultsData = sessionState.resultsData || undefined;
+
+    // previously finished
+    if (sessionState.status === 'finished') {
+      gameHasStarted = true;
+      gameFinished = true;
+      showFinishedState();
+      $('#results-button').click();
+      printResultsInfo(false);
+
+      return;
+    }
+
+    // abandoned
+    if (sessionState.status === 'expired_unsubmitted') {
+      gameHasStarted = true;
+      gameFinished = true;
+      showFinishedState();
+      triggerSubmitSolution();
+      return;
+    }
+
+    // continue
+    if (sessionState.status === 'active') {
+      gameHasStarted = true;
+      gameFinished = false;
+      resumeGame();
+      return;
+    }
+
+    // new game
+    gameHasStarted = false;
+    gameFinished = false;
+    showNotStartedState();
+    $('#pre-game-button').click();
   };
 
   const getMysteryPatch = function() {
@@ -163,60 +291,9 @@ $(function() {
       }
       syncAudibleEngineSwitch();
 
-      // =====================================
-      // HANDLE GAME ALREADY PLAYED TODAY CASE
-      // =====================================
-      let currentUtcTimestamp = rightNow();
-      let encodedResultsData = getCookieValue('resultsData');
-
-      if (encodedResultsData !== null) {
-        let resultsInfoFromCookie = JSON.parse(decodeURIComponent(encodedResultsData));
-        if (resultsInfoFromCookie.mysteryPatchId === mysteryPatchId) {
-          if (currentUtcTimestamp >= resultsInfoFromCookie.timeSubmitted) {
-            resultsData = resultsInfoFromCookie.results;
-            gameFinished = true;
-          }
-        }
-      }
-
-      let encodedGameData = getCookieValue('gameData');
-      if (encodedGameData !== null) {
-        let payload = JSON.parse(decodeURIComponent(encodedGameData));
-
-        if (payload.mysteryPatchId === mysteryPatchId) {
-          gameData = payload;
-          if (!gameFinished) {
-            if (currentUtcTimestamp >= payload.gameDeadline) {
-              gameFinished = true;
-            } else {
-              // console.log('Continuing game in progress');
-              gameHasStarted = true;
-              startGame();
-            }
-          }
-        } else {
-          // console.log('Starting new game...');
-        }
-      }
-
-      if (gameFinished) {
-        if (resultsData !== undefined) {
-          // Show previous results
-          $('#results-button').click();
-          $('#submit-solution').hide();
-          printResultsInfo(false);
-          return;
-        } else {
-          // Show message
-          alert('Come back tomorrow when a new mystery patch will be available');
-          return;
-        }
-      } else if (!gameHasStarted) {
-        $('#pre-game-button').click();
-      }
-      // =========================================
-      // END HANDLE GAME ALREADY PLAYED TODAY CASE
-      // =========================================
+      // HANDLE COOKIE-RESTORED GAME SESSION
+      const sessionState = resolveSessionStateFromCookies();
+      applySessionState(sessionState);
     });
   };
 
@@ -373,8 +450,9 @@ $(function() {
   // When '#submit-solution' button is clicked, gather patch params
   // from knob data attributes, POST to /mystery_patch/
   $('#submit-solution').on('click tap', function() {
-    $(this).hide();
-    clearInterval(intervalId);
+    gameFinished = true;
+    showFinishedState();
+
     const solutionParams = {
       id: mysteryPatchId,
       digest: digest,
@@ -410,6 +488,7 @@ $(function() {
     });
   });
 
+  showNotStartedState();
   getMysteryPatch();
   syncAudibleEngineSwitch('primary');
 });
