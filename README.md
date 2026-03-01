@@ -3,16 +3,16 @@
 VolcaShare is an online patch database and content management system for the Korg Volca Bass and Korg Volca Keys synthesizers.  It also syncs patches from the browser directly to the synthesizer via WebMIDI.
 
 ## Features
-📝 **Persistence**: Create, read, update, and delete patches for the Bass and Keys.  
-⚡️ **Sync patches via WebMIDI**: Allows your browser to send control messages to your Volca instead of having to manually change each and every parameter.  
-🔐 **Authentication**: Users can log in in order to change or delete their patches.  
-🙈 **Privacy**: Registered users can keep a secret stash of patches that aren’t shared the general public.  
-🔊 **Audio samples**: Users can listen to samples of synth patches on browse and detail pages and provide audio samples for their own patches.  
-🎹 **Sequence support**: VolcaShare allows users to save sequences of notes to accompany their synth patch, just like the Volcas allow you do with their built in sequencer.  
-👀 **Discoverability / Ranking**: Tags can be used to categorize and navigate patches.  A sorting algorithm based on completeness and freshness places more relevant patches higher on browse pages.  
-🔀 **Patch randomization**: Change parameters randomly with the click of a button.  (Especially good mileage using the Keys with MIDI sync up.)  
-🥸 **Emulators**: Tweak knobs and make fun sounds and patterns directly in the browser, while bored at work, or on your phone on the toilet - wherever.  
-&nbsp; &nbsp; &nbsp; &nbsp; **[Volca Bass Emulator](https://www.volcashare.com/bass/emulator)**:   A JavaScript implementation of a three-oscillator monosynth with a 16-step sequencer.  
+📝 **Persistence**: Create, read, update, and delete patches for the Bass and Keys.
+⚡️ **Sync patches via WebMIDI**: Allows your browser to send control messages to your Volca instead of having to manually change each and every parameter.
+🔐 **Authentication**: Users can log in in order to change or delete their patches.
+🙈 **Privacy**: Registered users can keep a secret stash of patches that aren’t shared the general public.
+🔊 **Audio samples**: Users can listen to samples of synth patches on browse and detail pages and provide audio samples for their own patches.
+🎹 **Sequence support**: VolcaShare allows users to save sequences of notes to accompany their synth patch, just like the Volcas allow you do with their built in sequencer.
+👀 **Discoverability / Ranking**: Tags can be used to categorize and navigate patches.  A sorting algorithm based on completeness and freshness places more relevant patches higher on browse pages.
+🔀 **Patch randomization**: Change parameters randomly with the click of a button.  (Especially good mileage using the Keys with MIDI sync up.)
+🥸 **Emulators**: Tweak knobs and make fun sounds and patterns directly in the browser, while bored at work, or on your phone on the toilet - wherever.
+&nbsp; &nbsp; &nbsp; &nbsp; **[Volca Bass Emulator](https://www.volcashare.com/bass/emulator)**:   A JavaScript implementation of a three-oscillator monosynth with a 16-step sequencer.
 &nbsp; &nbsp; &nbsp; &nbsp; **[Volca Keys Emulator](https://www.volcashare.com/keys/emulator)**:   A JavaScript implementation of a three-oscillator polysynth with a single EG and lots of ways to mess with VCO pitch.
 
 ## Under the hood
@@ -83,13 +83,15 @@ Then visit http://127.0.0.1:3000/ in a web browser.
 Please open a [GitHub issue](https://github.com/waterjump/volca-share/issues/new).
 
 ## Timeline
-March 13 2016 - Repository created  
-November 2016 - [VolcaShare.com](https://www.volcashare.com) launched  
-January 25 2017 - Sequence support on bass patches  
-August 8 2018 - Sort by quality  
-February 21 2020 - [Volca Keys](https://www.volcashare.com/keys/patch/new) support  
-August 15 2020 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) launched  
-April 10 2022 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) step sequencer added  
+March 13 2016 - Repository created
+November 2016 - [VolcaShare.com](https://www.volcashare.com) launched
+January 25 2017 - Sequence support on bass patches
+August 8 2018 - Sort by quality
+February 21 2020 - [Volca Keys](https://www.volcashare.com/keys/patch/new) support
+August 15 2020 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) launched
+April 10 2022 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) step sequencer added
+August 19 2024 - [Volca Keys Emulator](https://www.volcashare.com/keys/emulator) launched
+November 17 2024 - [Volca Keys Emulator](https://www.volcashare.com/keys/emulator) sequencer added
 
 ## License
 see LICENSE.md
