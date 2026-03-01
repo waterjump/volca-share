@@ -90,6 +90,8 @@ August 8 2018 - Sort by quality
 February 21 2020 - [Volca Keys](https://www.volcashare.com/keys/patch/new) support  
 August 15 2020 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) launched  
 April 10 2022 - [Volca Bass Emulator](https://www.volcashare.com/bass/emulator) step sequencer added  
+August 19 2024 - [Volca Keys Emulator](https://www.volcashare.com/keys/emulator) launched  
+November 17 2024 - [Volca Keys Emulator](https://www.volcashare.com/keys/emulator) sequencer added  
 
 ## License
 see LICENSE.md
