@@ -62,21 +62,6 @@ RSpec.describe 'Volca Keys Emulator', type: :feature, js: true  do
         eq(rotation_from_midi(127))
       )
     end
-
-    context 'when mobile version link is clicked' do
-      it 'does not reset the patch' do
-        click_link('mobile version')
-
-        expect(page).to(
-          have_current_path(
-            keys_emulator_path(patch.emulator_query_string)
-          )
-        )
-
-        reflects_keys_emulator_patch(patch)
-        expect(page).to have_link('Back to desktop mode')
-      end
-    end
   end
 
   describe 'accordion section', :js do

@@ -560,12 +560,6 @@ VS.KeysEmulator = function() {
     patch.setstep_trigger();
   });
 
-  // MOBILE OCTAVE UP
-  $('#octave-up').on('click tap', function() { macroOctaveUp() });
-
-  // MOBILE OCTAVE DOWN
-  $('#octave-down').on('click tap', function() { macroOctaveDown() });
-
   let funcBlink;
   let funcColor;
 
@@ -683,39 +677,6 @@ VS.KeysEmulator = function() {
       e.preventDefault();
     }
   });
-
-  // MOBILE KEY
-  $('.mobile-control.key').on('mousedown touchstart', function(e) {
-    const note = octaveAdjustedKeyCode($(this).data('keycode'))
-    keyboardDown(note);
-  });
-
-  $('.mobile-control.key').on('mouseup touchend mouseleave', function() {
-    const adjustedKeyUp = octaveAdjustedKeyCode($(this).data('keycode'));
-    keyboardUp(adjustedKeyUp);
-  });
-
-  $('.keyboard-notice').on('mousedown touchstart', () => {
-    $('#keyboard-tip').show();
-  });
-
-  $('.keyboard-notice').on('mouseup touchend', () => {
-    $('#keyboard-tip').fadeOut(3000);
-  });
-
-  $('#toggle-mobile').on('click tap', function(e) {
-    e.preventDefault();
-    $('#mobile-keyboard').removeClass('hidden');
-    $('#back-to-desktop').removeClass('hidden');
-    $('#desktop-instructions').hide();
-  })
-
-  $('#back-to-desktop a').on('click tap', function(e) {
-    e.preventDefault();
-    $('#mobile-keyboard').addClass('hidden');
-    $('#back-to-desktop').addClass('hidden');
-    $('#desktop-instructions').show();
-  })
 
   $('.bottom-row .multi').on('click tap', function() {
     $('.light[data-radio]').each(function() {
