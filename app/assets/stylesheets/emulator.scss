@@ -243,6 +243,8 @@
     top: 58.4%;
     left: 5%;
     z-index: 40;
+    touch-action: none;
+    overscroll-behavior: contain;
 
     .key {
       user-drag: none;

@@ -604,6 +604,10 @@ VS.KeysEmulator = function() {
   });
 
   $('#volca-keyboard .key').on('mousedown touchstart', function(e) {
+    if (e.type === 'touchstart') {
+      e.preventDefault();
+    }
+
     keyboardPlaying = true;
     // TODO: Need to adjust for current octave and support octave changes during note
     keyboardDown($(this).data('midinote'));
@@ -623,7 +627,29 @@ VS.KeysEmulator = function() {
     }
   });
 
+  // mobile drag across keys
+  $('#volca-keyboard').on('touchmove', function(e) {
+    if (!keyboardPlaying) return;
+
+    e.preventDefault();
+
+    const touch = e.originalEvent.touches[0];
+    if (!touch) return;
+
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const $key = $(el).closest('#volca-keyboard .key');
+
+    if ($key.length) {
+      // TODO: Need to adjust for current octave and support octave changes during note
+      keyboardDown($key.data('midinote'));
+    }
+  });
+
   $('#volca-keyboard .key').on('mouseup touchend', function(e) {
+    if (e.type === 'touchend') {
+      e.preventDefault();
+    }
+
     keyboardPlaying = false;
     // TODO: Need to adjust for current octave and support octave changes during note
     keyboardUp($(this).data('midinote'));
@@ -632,6 +658,13 @@ VS.KeysEmulator = function() {
   $(document).on('mouseup touchend', function() {
     if (keyboardPlaying) {
       keyboardPlaying = false;
+    }
+  });
+
+  // prevent page scroll while playing on mobile
+  $(document).on('touchmove', function(e) {
+    if (keyboardPlaying) {
+      e.preventDefault();
     }
   });
 
