@@ -232,6 +232,88 @@
     left: 70%;
   }
 
+  #func {
+    left: 88.5%;
+  }
+
+  #volca-keyboard {
+    position: relative;
+    width: 90.6%;
+    height: 30%;
+    top: 58.4%;
+    left: 5%;
+    z-index: 40;
+
+    .key {
+      user-drag: none;
+      -webkit-user-drag: none;
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+
+    #Gb0 {
+      left: 3.1%;
+    }
+
+    #Ab0 {
+      left: 9.4%;
+    }
+
+    #Bb0 {
+      left: 15.7%;
+    }
+
+    #Db0 {
+      left: 28.0%;
+    }
+
+    #Eb0 {
+      left: 34.3%;
+    }
+
+    #Gb1 {
+      left: 46.8%;
+    }
+
+    #Ab1 {
+      left: 53.1%;
+    }
+
+    #Bb1 {
+      left: 59.4%;
+    }
+
+    #Db1 {
+      left: 71.5%;
+    }
+
+    #Eb1 {
+      left: 77.8%;
+    }
+
+    #Gb2 {
+      left: 90.1%;
+    }
+
+    .black-key {
+      position: absolute;
+      height: 45.4%;
+      width: 6.3%;
+      float: left;
+      // background-color: #ffc0cb82;
+    }
+    .white-key {
+      float: left;
+      width: 6.22%;
+      height: 53.7%;
+      top: 45.4%;
+      position: relative;
+      // background-color: #00ff0082;
+    }
+  }
+
   #func-scrim {
     top: 39%;
     height: 16%;

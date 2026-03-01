@@ -156,6 +156,8 @@ VS.KeysEmulator = function() {
   // =======================
 
   let keysDown = [];
+  let functionMode = false;
+  let keyboardPlaying = false;
 
   const audioEngine = new VS.KeysAudioEngine(emulatorParams, sequence);
   audioEngine.init();
@@ -563,6 +565,75 @@ VS.KeysEmulator = function() {
 
   // MOBILE OCTAVE DOWN
   $('#octave-down').on('click tap', function() { macroOctaveDown() });
+
+  let funcBlink;
+  let funcColor;
+
+  const toggleFunctionMode = function() {
+    functionMode = !functionMode;
+
+    if (functionMode) {
+      // Hide onscreen keyboard elements
+      $('#volca-keyboard').hide();
+      funcBlink = setInterval(
+        function() {
+          if (funcColor !== 'pink') {
+            $('#func').css('border-color', 'pink')
+            $('#func').css('background-color', '#666666')
+            funcColor = 'pink';
+          } else {
+            $('#func').css('border-color', '#b1b5c4')
+            $('#func').css('background-color', '#000000')
+            funcColor = 'black';
+          }
+        },
+        400
+      );
+    } else {
+      // Show onscreen keyboard elements
+      $('#volca-keyboard').show();
+      clearInterval(funcBlink);
+      $('#func').css('border-color', '#b1b5c4')
+      $('#func').css('background-color', '#000000')
+      funcColor = 'black';
+    }
+  };
+
+  $('#func').on('click tap', function() {
+    toggleFunctionMode();
+  });
+
+  $('#volca-keyboard .key').on('mousedown touchstart', function(e) {
+    keyboardPlaying = true;
+    // TODO: Need to adjust for current octave and support octave changes during note
+    keyboardDown($(this).data('midinote'));
+  });
+
+  $('#volca-keyboard .key').on('mouseenter', function() {
+    if (keyboardPlaying) {
+      // TODO: Need to adjust for current octave and support octave changes during note
+      keyboardDown($(this).data('midinote'));
+    }
+  });
+
+  $('#volca-keyboard .key').on('mouseleave', function() {
+    if (keyboardPlaying) {
+      // TODO: Need to adjust for current octave and support octave changes during note
+      keyboardUp($(this).data('midinote'));
+    }
+  });
+
+  $('#volca-keyboard .key').on('mouseup touchend', function(e) {
+    keyboardPlaying = false;
+    // TODO: Need to adjust for current octave and support octave changes during note
+    keyboardUp($(this).data('midinote'));
+  });
+
+  $(document).on('mouseup touchend', function() {
+    if (keyboardPlaying) {
+      keyboardPlaying = false;
+    }
+  });
 
   // MOBILE KEY
   $('.mobile-control.key').on('mousedown touchstart', function(e) {

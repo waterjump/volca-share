@@ -58,7 +58,10 @@
       #blackbuttons-scrim.scrim
       #permalink.button.nolight
       .green-check-mark
-      #func-scrim.scrim
+      - if mystery_patch_view
+        #func.button.nolight
+      - else
+        #func-scrim.scrim
       .cooltip
       #led
         .digit#thousands
@@ -67,10 +70,40 @@
         .digit#ones
         #decimal.hidden
 
-      #black-keys.keyboard-notice
-      #white-keys-left.keyboard-notice
-      #white-keys-right.keyboard-notice
-      #keyboard-tip Use the computer keyboard to play notes
+      - if !mystery_patch_view
+        #black-keys.keyboard-notice
+        #white-keys-left.keyboard-notice
+        #white-keys-right.keyboard-notice
+        #keyboard-tip Use the computer keyboard to play notes
+      - else
+        #volca-keyboard
+          #F0.key.white-key{ data: { midiNote: 41 } }
+          #Gb0.key.black-key{ data: { midiNote: 42 } }
+          #G0.key.white-key{ data: { midiNote: 43 } }
+          #Ab0.key.black-key{ data: { midiNote: 44 } }
+          #A0.key.white-key{ data: { midiNote: 45 } }
+          #Bb0.key.black-key{ data: { midiNote: 46 } }
+          #B0.key.white-key{ data: { midiNote: 47 } }
+          #C0.key.white-key{ data: { midiNote: 48 } }
+          #Db0.key.black-key{ data: { midiNote: 49 } }
+          #D0.key.white-key{ data: { midiNote: 50 } }
+          #Eb0.key.black-key{ data: { midiNote: 51 } }
+          #E0.key.white-key{ data: { midiNote: 52 } }
+          #F1.key.white-key{ data: { midiNote: 53 } }
+          #Gb1.key.black-key{ data: { midiNote: 54 } }
+          #G1.key.white-key{ data: { midiNote: 55 } }
+          #Ab1.key.black-key{ data: { midiNote: 56 } }
+          #A1.key.white-key{ data: { midiNote: 57 } }
+          #Bb1.key.black-key{ data: { midiNote: 58 } }
+          #B1.key.white-key{ data: { midiNote: 59 } }
+          #C1.key.white-key{ data: { midiNote: 60 } }
+          #Db1.key.black-key{ data: { midiNote: 61 } }
+          #D1.key.white-key{ data: { midiNote: 62 } }
+          #Eb1.key.black-key{ data: { midiNote: 63 } }
+          #E1.key.white-key{ data: { midiNote: 64 } }
+          #F2.key.white-key{ data: { midiNote: 65 } }
+          #Gb2.key.black-key{ data: { midiNote: 66 } }
+          #G2.key.white-key{ data: { midiNote: 67 } }
       .bottom-row
         .placeholder
         .placeholder
@@ -144,24 +177,25 @@
     .sequence-holder
     = link_to 'Show sequencer', '#', id: 'toggle-sequences', class: 'btn btn-default', data: { hide_text: 'Hide sequencer', show_text: 'Show sequencer' }
 
-  #mobile-keyboard.hidden
-    #octave-up.mobile-control.octave-button.top Oct. ⬆️
-    #octave-down.mobile-control.octave-button.bottom Oct. ⬇️
-    #w.mobile-control.key.top{ data: { keyCode: 87 } }
-    #e.mobile-control.key.top{ data: { keyCode: 69 } }
-    #t.mobile-control.key.top{ data: { keyCode: 84 } }
-    #y.mobile-control.key.top{ data: { keyCode: 89 } }
-    #u.mobile-control.key.top{ data: { keyCode: 85 } }
-    #o.mobile-control.key.top{ data: { keyCode: 79 } }
-    #a.mobile-control.key.bottom{ data: { keyCode: 65 } }
-    #s.mobile-control.key.bottom{ data: { keyCode: 83 } }
-    #d.mobile-control.key.bottom{ data: { keyCode: 68 } }
-    #f.mobile-control.key.bottom{ data: { keyCode: 70 } }
-    #g.mobile-control.key.bottom{ data: { keyCode: 71 } }
-    #h.mobile-control.key.bottom{ data: { keyCode: 72 } }
-    #j.mobile-control.key.bottom{ data: { keyCode: 74 } }
-    #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
-    #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
+  - if !mystery_patch_view
+    #mobile-keyboard.hidden
+      #octave-up.mobile-control.octave-button.top Oct. ⬆️
+      #octave-down.mobile-control.octave-button.bottom Oct. ⬇️
+      #w.mobile-control.key.top{ data: { keyCode: 87 } }
+      #e.mobile-control.key.top{ data: { keyCode: 69 } }
+      #t.mobile-control.key.top{ data: { keyCode: 84 } }
+      #y.mobile-control.key.top{ data: { keyCode: 89 } }
+      #u.mobile-control.key.top{ data: { keyCode: 85 } }
+      #o.mobile-control.key.top{ data: { keyCode: 79 } }
+      #a.mobile-control.key.bottom{ data: { keyCode: 65 } }
+      #s.mobile-control.key.bottom{ data: { keyCode: 83 } }
+      #d.mobile-control.key.bottom{ data: { keyCode: 68 } }
+      #f.mobile-control.key.bottom{ data: { keyCode: 70 } }
+      #g.mobile-control.key.bottom{ data: { keyCode: 71 } }
+      #h.mobile-control.key.bottom{ data: { keyCode: 72 } }
+      #j.mobile-control.key.bottom{ data: { keyCode: 74 } }
+      #k.mobile-control.key.bottom{ data: { keyCode: 75 } }
+      #l.mobile-control.key.bottom{ data: { keyCode: 76 } }
 #patch-metadata.col-md-9.col-lg-3
   - if mystery_patch_view
     #audible-engine-switch.btn-group{ role: 'group', aria: { label: 'Audible engine switch' } }
