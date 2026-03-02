@@ -302,6 +302,7 @@ $(function() {
       VS.keysEmulatorBridge.setActiveAudibleEngine('primary');
     }
     syncAudibleEngineSwitch('primary');
+    this.blur();
   });
 
   $('#audible-engine-mystery').on('click tap', function() {
@@ -310,11 +311,12 @@ $(function() {
     }
     syncAudibleEngineSwitch('primary');
     if (!gameHasStarted) { startGame(); }
+    this.blur();
   });
 
   $(document).on('keydown', function(event) {
     const targetTag = (event.target && event.target.tagName || '').toLowerCase();
-    if (['input', 'textarea', 'select', 'button'].includes(targetTag)) { return; }
+    if (['input', 'textarea', 'select'].includes(targetTag)) { return; }
 
     if (event.keyCode === 37) {
       $('#audible-engine-primary').trigger('click');
