@@ -141,6 +141,14 @@ body#mystery-patch {
     }
   }
 
+  @media (max-width: 1024px) {
+    #results-modal {
+      #results-modal-dialog {
+        width: 96vw;
+      }
+    }
+  }
+
   #submit-solution {
     display: none;
   }
@@ -248,6 +256,215 @@ body#mystery-patch {
       .m8 { top: 59%; left: 23%; font-size: 86px; }
       .m9 { top: 64%; left: 43%; font-size: 120px; }
       .m10 { top: 70%; left: 76%; font-size: 95px; }
+    }
+  }
+
+  @media (max-width: 600px) and (orientation: portrait) {
+    #results-modal {
+      overflow: hidden;
+
+      #results-modal-dialog {
+        width: 96vw;
+        margin: 8px auto;
+      }
+
+      .modal-content {
+        height: auto;
+        max-height: calc(100vh - 16px);
+      }
+
+      .modal-header {
+        padding: 6px 10px;
+      }
+
+      #resultsModaLabel {
+        margin: 0;
+        font-size: 1.4em;
+      }
+
+      #results-modal-body {
+        overflow: hidden;
+        padding: 6px;
+      }
+
+      #results-container {
+        height: auto;
+        gap: 8px;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        align-content: start;
+        font-size: 0.78em;
+      }
+
+      #results-table {
+        overflow: hidden;
+
+        table {
+          margin-bottom: 0;
+        }
+
+        th, td {
+          padding: 1px 2px;
+          line-height: 1.05;
+        }
+
+        tr {
+          line-height: 1.05;
+        }
+      }
+
+      #results-summary {
+        margin-top: 4px;
+        min-height: 0;
+      }
+
+      #overall-score {
+        font-size: 2.3em;
+        padding: 6px;
+      }
+
+      #button-container {
+        margin-top: 8px;
+
+        #keep-playing, #load-actual {
+          width: 100%;
+        }
+      }
+
+      .share-results {
+        margin-top: 8px;
+        padding: 8px;
+      }
+
+      .share-title {
+        margin: 0 0 4px 0;
+        font-size: 1.05em;
+      }
+
+      .share-subtitle {
+        margin: 0 0 6px 0;
+      }
+
+      .share-box {
+        gap: 6px;
+      }
+
+      .share-text {
+        height: 82px;
+        min-height: 82px;
+        resize: none;
+        padding: 6px 8px;
+      }
+
+      .share-actions {
+        gap: 6px;
+      }
+
+      .share-btn {
+        padding: 7px 10px;
+      }
+    }
+  }
+
+  @media (max-width: 900px) and (max-height: 500px) and (orientation: landscape) {
+    #results-modal {
+      overflow: hidden;
+
+      #results-modal-dialog {
+        width: 98vw;
+        margin: 4px auto;
+      }
+
+      .modal-content {
+        height: auto;
+        max-height: calc(100vh - 8px);
+      }
+
+      .modal-header {
+        padding: 4px 10px;
+      }
+
+      #resultsModaLabel {
+        margin: 0;
+        font-size: 1.2em;
+      }
+
+      #results-modal-body {
+        overflow: hidden;
+        padding: 4px 6px;
+      }
+
+      #results-container {
+        height: 100%;
+        gap: 8px;
+        grid-template-columns: 1fr 1fr;
+        font-size: 0.72em;
+      }
+
+      #results-table {
+        overflow: hidden;
+
+        table {
+          margin-bottom: 0;
+        }
+
+        th, td {
+          padding: 0 2px;
+          line-height: 1.0;
+        }
+
+        tr {
+          line-height: 1.0;
+        }
+      }
+
+      #overall-score {
+        font-size: 1.7em;
+        padding: 4px;
+      }
+
+      #button-container {
+        margin-top: 6px;
+
+        #keep-playing, #load-actual {
+          width: 100%;
+          font-size: 0.95em;
+          padding: 6px 8px;
+        }
+      }
+
+      .share-results {
+        margin-top: 6px;
+        padding: 6px;
+      }
+
+      .share-title {
+        margin: 0 0 2px 0;
+        font-size: 1em;
+      }
+
+      .share-subtitle {
+        margin: 0 0 4px 0;
+      }
+
+      .share-box {
+        gap: 4px;
+      }
+
+      .share-text {
+        height: 62px;
+        min-height: 62px;
+        resize: none;
+        padding: 5px 7px;
+      }
+
+      .share-actions {
+        gap: 4px;
+      }
+
+      .share-btn {
+        padding: 5px 8px;
+      }
     }
   }
 }
