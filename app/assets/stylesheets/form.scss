@@ -19,7 +19,12 @@ $pink: #fd9994;
   }
   .knob {
     cursor: ns-resize;
+    touch-action: none;
   }
+}
+
+body.knob-dragging {
+  overscroll-behavior: none;
 }
 
 .stretchy {

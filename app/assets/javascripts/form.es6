@@ -10,6 +10,7 @@ VS.Form = function() {
   const { display } = VS;
   const limit = 140;
   const { sequences } = VS;
+  const touchEventOptions = { passive: false };
 
   //
   // initialize
@@ -169,6 +170,7 @@ VS.Form = function() {
     e.stopPropagation();
     VS.clicked = true;
     VS.dragging = true;
+    $('body').addClass('knob-dragging');
     VS.setActiveKnob(this);
     sequences.activeNote = null;
     const knob = $(VS.activeKnob.element);
@@ -211,6 +213,13 @@ VS.Form = function() {
       sequences.changeSequenceNote(e);
     }
   };
+
+  const preventTouchScroll = function(e) {
+    if (!VS.dragging) { return; }
+    e.preventDefault();
+  };
+
+  document.addEventListener('touchmove', preventTouchScroll, touchEventOptions);
 
   $(document).on('mousemove touchmove', throttle(25, dragStuff()));
 
@@ -324,14 +333,15 @@ VS.Form = function() {
     }
   };
 
-  $(document).on('mouseup touchend', function(e) {
+  $(document).on('mouseup touchend touchcancel', function(e) {
     VS.sequenceDragging = false;
     VS.sequenceDragParam = null;
     VS.clicked = false;
+    $('body').removeClass('knob-dragging');
     if (!VS.dragging) { tapKnob(); }
     if (!VS.dragging) { return; }
     VS.dragging = false;
-    VS.currentPoint = e.pageY || Math.round(e.originalEvent.changedTouches[0].pageY);
+    VS.currentPoint = e.pageY || Math.round((e.originalEvent.changedTouches || [{ pageY: VS.currentPoint }])[0].pageY);
     $('body').css('cursor', 'default');
     endKnobTurn();
     sequences.endNoteChange();
