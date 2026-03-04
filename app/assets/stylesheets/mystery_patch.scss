@@ -158,6 +158,7 @@ body#mystery-patch {
     align-items: stretch;
     width: 100%;
     margin-bottom: 0;
+    overflow: visible;
 
     > .btn {
       float: none;
@@ -168,6 +169,70 @@ body#mystery-patch {
 
     > .btn + .btn {
       margin-left: -1px;
+    }
+  }
+
+  #audible-engine-mystery.start-game-callout {
+    position: relative;
+    animation: mystery-start-pulse 1.2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.45);
+
+    &::before {
+      content: "Start here";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(100% + 14px);
+      padding: 8px 12px;
+      border-radius: 6px;
+      background: #2ea043;
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.2;
+      white-space: nowrap;
+      z-index: 4;
+      animation: mystery-callout-bounce 2s ease-in-out infinite;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: calc(100% + 8px);
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #2ea043;
+      z-index: 4;
+      animation: mystery-callout-bounce 2s ease-in-out infinite;
+    }
+  }
+
+  @keyframes mystery-start-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(46, 160, 67, 0.45);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(46, 160, 67, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(46, 160, 67, 0);
+    }
+  }
+
+  @keyframes mystery-callout-bounce {
+    0%, 70%, 100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    78% {
+      transform: translateX(-50%) translateY(-7px);
+    }
+    86% {
+      transform: translateX(-50%) translateY(0);
+    }
+    92% {
+      transform: translateX(-50%) translateY(-3px);
     }
   }
 

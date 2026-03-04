@@ -73,17 +73,20 @@ $(function() {
     clearInterval(intervalId);
     $('#timer').hide().text('');
     $('#submit-solution').hide();
+    $('#audible-engine-mystery').addClass('start-game-callout');
   };
 
   const showStartedState = function() {
     $('#timer').show();
     $('#submit-solution').show();
+    $('#audible-engine-mystery').removeClass('start-game-callout');
   };
 
   const showFinishedState = function() {
     clearInterval(intervalId);
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
+    $('#audible-engine-mystery').removeClass('start-game-callout');
   };
 
   const triggerSubmitSolution = function() {
