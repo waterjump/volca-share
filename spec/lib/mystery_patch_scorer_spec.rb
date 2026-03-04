@@ -77,6 +77,22 @@ RSpec.describe MysteryPatchScorer do
     end
   end
 
+  context 'when delay feedback is zero' do
+    let(:solution_overrides) do
+      { delay_feedback: 0, delay_time: 45 }
+    end
+
+    let(:guess_overrides) do
+      { delay_feedback: 0, delay_time: 0 }
+    end
+
+    let(:result) { scorer.score }
+
+    it 'does not take delay time into account' do
+      expect(result[:parameter_scores][:delay_time]).to be_nil
+    end
+  end
+
   context 'when the guess is perfectly correct' do
     let(:guess) { solution }
 

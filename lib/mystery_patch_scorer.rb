@@ -46,7 +46,9 @@ class MysteryPatchScorer
         solution[:lfo_pitch_int] == 0 &&
         solution[:lfo_cutoff_int] == 0
 
-      next if skip_lfo_param
+      skip_delay_param = param == :delay_time && solution[:delay_feedback] == 0
+
+      next if skip_lfo_param || skip_delay_param
 
       if value.is_a?(Numeric) && param != :voice
         worst_possible_score = value >= 63 ? 0 : 127
