@@ -43,6 +43,35 @@ RSpec.describe MysteryPatch, type: :model do
     end
   end
 
+  describe '.generate_random' do
+    it 'generates a random myster patch' do
+      10.times do
+        mystery_patch = described_class.generate_random
+
+        expect(mystery_patch).not_to be_persisted
+        expect(mystery_patch.cloned_from).to be_nil
+
+        expect(mystery_patch.cutoff + mystery_patch.vcf_eg_int).to be >= 100
+      end
+    end
+  end
+
+  describe '#random_param' do
+    it 'is consistent with inputs' do
+      generator = described_class
+
+      n = 50_000
+      zeros = n.times.count do
+        generator.send(:random_param, **{preferred_weight: 5, total_weight: 6}) == 0
+      end
+
+      observed = zeros.to_f / n
+      expected = (5.0 / 6.0) + (1.0 / 6.0) * (1.0 / 128.0)
+
+      expect(observed).to be_within(0.01).of(expected)
+    end
+  end
+
   describe '#params_hash' do
     let(:mystery_patch) { described_class.clone_from(keys_patch) }
     it 'creates a hash from param fields' do

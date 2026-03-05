@@ -12,6 +12,8 @@ class MysteryPatch
     delay_feedback lfo_shape lfo_trigger_sync
   ).freeze
 
+  VOICE_MIDI_VALUES = [10, 30, 50, 70, 100, 120].freeze
+
   field :cloned_from, type: BSON::ObjectId
 
   field :voice, type: Integer
@@ -59,6 +61,36 @@ class MysteryPatch
     )
   end
 
+  def self.generate_random
+    cutoff_val = 0
+    vcf_eg_int_val = 0
+
+    while cutoff_val + vcf_eg_int_val < 100 do
+      cutoff_val = rand(128)
+      vcf_eg_int_val = rand(128)
+    end
+
+    new(
+      voice: VOICE_MIDI_VALUES.sample,
+      detune: rand(128),
+      portamento: rand(128),
+      vco_eg_int: random_param(preferred_weight: 5, total_weight: 6),
+      cutoff: cutoff_val,
+      peak: rand(128),
+      vcf_eg_int: vcf_eg_int_val,
+      lfo_rate: rand(128),
+      lfo_pitch_int: random_param(preferred_weight: 5, total_weight: 6),
+      lfo_cutoff_int: random_param(preferred_weight: 5, total_weight: 6),
+      attack: random_param(preferred_weight: 2, total_weight: 3),
+      decay_release: rand(128),
+      sustain: rand(128),
+      delay_time: rand(128),
+      delay_feedback: random_param(preferred_weight: 5, total_weight: 6),
+      lfo_shape: %w(saw triangle square).sample,
+      lfo_trigger_sync: [true, false].sample
+    )
+  end
+
   def params_hash
     payload = PARAM_FIELDS.index_with do |k|
       v = self.send(k)
@@ -70,5 +102,15 @@ class MysteryPatch
   def octave
     # NotImplemented: Just return nil for PatchViewModel compatibility
     nil
+  end
+
+  protected
+
+  def self.random_param(preferred_weight:, total_weight:, rng: Random)
+    if rng.rand(total_weight) < preferred_weight
+      0
+    else
+      rng.rand(128)
+    end
   end
 end

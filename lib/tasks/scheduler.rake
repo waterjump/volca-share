@@ -11,3 +11,10 @@ task :update_patch_audio_sample_availability => :environment do
   UpdatePatchAudioSampleAvailableJob.new.perform
   puts "done."
 end
+
+desc 'Creates a random mystery patch'
+task create_random_mystery_patch: :environment do
+  puts 'Creating random mystery patch...'
+  CreateRandomMysteryPatchJob.new.perform
+  puts 'done.'
+end
