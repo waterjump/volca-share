@@ -65,12 +65,19 @@ body#mystery-patch {
       }
     }
 
-    #button-container {
-      margin-top: 15px;
-      display: none;
-      #keep-playing, #load-actual {
-        width: 49%;
-      }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #resultsModaLabel {
+      margin: 0;
+    }
+
+    #keep-playing {
+      margin-left: auto;
     }
 
     /* Share results box (drop-in) */
@@ -151,6 +158,10 @@ body#mystery-patch {
 
   #submit-solution {
     display: none;
+  }
+
+  .mystery-action-buttons {
+    text-align: right;
   }
 
   #audible-engine-switch {
@@ -275,6 +286,12 @@ body#mystery-patch {
     text-align: center;
   }
 
+  #post-game-message {
+    margin: 8px 35px 20px 35px;
+    text-align: center;
+    font-size: 1.1em;
+  }
+
   .knob {
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
   }
@@ -351,6 +368,7 @@ body#mystery-patch {
 
       .modal-header {
         padding: 6px 10px;
+        gap: 8px;
       }
 
       #resultsModaLabel {
@@ -399,12 +417,9 @@ body#mystery-patch {
         padding: 6px;
       }
 
-      #button-container {
-        margin-top: 8px;
-
-        #keep-playing, #load-actual {
-          width: 100%;
-        }
+      #keep-playing {
+        font-size: 0.95em;
+        padding: 6px 10px;
       }
 
       .share-results {
@@ -458,6 +473,7 @@ body#mystery-patch {
 
       .modal-header {
         padding: 4px 10px;
+        gap: 6px;
       }
 
       #resultsModaLabel {
@@ -499,14 +515,9 @@ body#mystery-patch {
         padding: 4px;
       }
 
-      #button-container {
-        margin-top: 6px;
-
-        #keep-playing, #load-actual {
-          width: 100%;
-          font-size: 0.95em;
-          padding: 6px 8px;
-        }
+      #keep-playing {
+        font-size: 0.9em;
+        padding: 5px 8px;
       }
 
       .share-results {

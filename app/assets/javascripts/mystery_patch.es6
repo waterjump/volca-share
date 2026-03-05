@@ -14,6 +14,23 @@ $(function() {
   let resultsData;
   let intervalId;
   const GAME_DURATION_SECONDS = 120;
+  const updatePostGameMessage = function() {
+    if (gameFinished) {
+      $('#post-game-message').show();
+      return;
+    }
+
+    $('#post-game-message').hide();
+  };
+
+  const updateShowResultsButton = function() {
+    const resultsModalIsOpen = $('#results-modal').hasClass('in');
+    const hasResults = resultsData !== undefined && resultsData !== null;
+    if (gameFinished && hasResults && !resultsModalIsOpen) {
+      $('#show-results').show();
+      return;
+    }
+  };
 
   const setAudibleEngineSwitch = function(engineName) {
     const isMystery = engineName === 'mystery';
@@ -73,14 +90,18 @@ $(function() {
     clearInterval(intervalId);
     $('#timer').hide().text('');
     $('#submit-solution').hide();
+    $('#show-results').hide();
+    $('#post-game-message').hide();
     $('#audible-engine-mystery').addClass('start-game-callout');
   };
 
-  let keyboardHintTimeout;
+  let keyboardHintTimeout = null;
 
   const showStartedState = function() {
     $('#timer').show();
     $('#submit-solution').show();
+    $('#show-results').hide();
+    $('#post-game-message').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
 
     keyboardHintTimeout = setTimeout(function() {
@@ -93,9 +114,12 @@ $(function() {
 
   const showFinishedState = function() {
     clearInterval(intervalId);
+    clearInterval(keyboardHintTimeout);
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
+    updateShowResultsButton();
+    updatePostGameMessage();
   };
 
   const triggerSubmitSolution = function() {
@@ -376,6 +400,17 @@ $(function() {
     $("#copy-status").text(ok ? "Copied!" : "Couldn’t copy.");
   });
 
+  $('#results-modal').on('shown.bs.modal hidden.bs.modal', function() {
+    updateShowResultsButton();
+  });
+
+  $('#show-results').on('click tap', function() {
+    if (resultsData === undefined || resultsData === null) { return; }
+    $('#results-button').trigger('click');
+    printResultsInfo(false);
+    this.blur();
+  });
+
   const printResultsInfo = function(animate) {
     let animateInterval = animate ? 500 : 5;
     let $tbody = $("#results-table tbody");
@@ -408,14 +443,15 @@ $(function() {
             `${resultsData.total_score}%</div>`
           ].join('')
         ).fadeIn('slow');
-        $('#share-text').text([
+        $('#share-text').val([
           `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
           `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
           `\n\n#VSmysterypatch`
         ].join('')
         );
         $('#share-results').fadeIn('slow');
-        $('#button-container').fadeIn('slow');
+        $('#keep-playing').fadeIn('slow');
+        updateShowResultsButton();
 
         clearInterval(timer);
         return;

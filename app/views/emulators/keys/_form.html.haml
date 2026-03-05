@@ -183,8 +183,13 @@
           %td Right Arrow
     %hr
     #timer
-    %button#submit-solution.btn.btn-success
-      I'm Done
+    #post-game-message{ style: 'display: none;' }
+      Come back tomorrow for a new mystery patch.
+    .mystery-action-buttons
+      %button#submit-solution.btn.btn-success
+        I'm Done
+      %button#show-results.btn.btn-default{ type: 'button', style: 'display: none;' }
+        Show Results
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     = render 'shared/midi_in'

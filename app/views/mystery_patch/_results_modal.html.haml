@@ -9,6 +9,7 @@
           %span{"aria-hidden" => "true"} ×
         %h2#resultsModaLabel.modal-title
           Results
+        %button.btn#keep-playing{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button", style: 'display: none'} Keep playing with patch
       #results-modal-body.modal-body.clearfix
         #results-container
           #results-table
@@ -23,9 +24,6 @@
 
           #results-summary
             #overall-score
-            #button-container
-              %button.btn#keep-playing{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button" } Keep playing with patch
-              - # %button.btn#load-actual Load the actual mystery patch
             #share-results.share-results{ aria: { live: "polite" } }
               %h3.share-title Share your results
 
