@@ -236,6 +236,16 @@
     left: 88.5%;
   }
 
+  #keyboard-highlight {
+    border-radius: 15px;
+    top: 58%;
+    position: absolute;
+    left: 5%;
+    width: 90%;
+    height: 29%;
+    z-index: 39;
+  }
+
   #volca-keyboard {
     position: relative;
     width: 90.6%;

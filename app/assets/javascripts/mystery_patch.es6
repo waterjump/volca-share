@@ -76,10 +76,19 @@ $(function() {
     $('#audible-engine-mystery').addClass('start-game-callout');
   };
 
+  let keyboardHintTimeout;
+
   const showStartedState = function() {
     $('#timer').show();
     $('#submit-solution').show();
     $('#audible-engine-mystery').removeClass('start-game-callout');
+
+    keyboardHintTimeout = setTimeout(function() {
+      $('#keyboard-highlight').addClass('start-keyboard-callout');
+      const $usageBody = VS.findAccordionHeaderBySectionName('Usage').siblings('.accordion-body');
+      $usageBody.addClass('start-keyboard-callout');
+      VS.expandAccordionSection('Usage');
+    }, 2000);
   };
 
   const showFinishedState = function() {
@@ -92,6 +101,15 @@ $(function() {
   const triggerSubmitSolution = function() {
     $('#submit-solution').trigger('click');
   };
+
+  $(document).on('hideKeyboardHighlight', function() {
+    if (keyboardHintTimeout) {
+      clearInterval(keyboardHintTimeout);
+    }
+    $('#keyboard-highlight').removeClass('start-keyboard-callout');
+    const $usageBody = VS.findAccordionHeaderBySectionName('Usage').siblings('.accordion-body');
+    $usageBody.removeClass('start-keyboard-callout');
+  })
 
   const parseCookieJson = function(key) {
     const encodedValue = getCookieValue(key);

@@ -255,6 +255,8 @@ VS.KeysEmulator = function() {
   sequences.init();
 
   const keyboardDown = function(note){
+    document.dispatchEvent(new CustomEvent('hideKeyboardHighlight'));
+
     keysDown.push(note);
 
     managedEngineList().forEach(binding => {
