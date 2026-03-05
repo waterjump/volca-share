@@ -370,12 +370,6 @@ $(function() {
     }
   });
 
-  $('#clear-mystery-cookies').on('click tap', function() {
-    VS.setCookie('gameData', '', -1, '/mystery_patch');
-    VS.setCookie('resultsData', '', -1, '/mystery_patch');
-    window.location.reload();
-  });
-
   $("#copy-results").on("click", function () {
     let text = $("#share-text").val();
 
