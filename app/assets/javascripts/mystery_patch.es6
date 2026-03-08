@@ -527,7 +527,7 @@ $(function() {
         delay_feedback: $('#delay_feedback').data('midi'),
         lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
         step_trigger: $('input#patch_step_trigger').prop('checked'),
-        lfo_shape: patch.lfo.shape
+        lfo_shape: patch.lfo.shape === 'sawtooth' ? 'saw' : patch.lfo.shape
       }
     };
 
