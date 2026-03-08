@@ -54,6 +54,30 @@ RSpec.describe 'Home page', type: :feature, js: true do
     expect(page).to have_link('Emulator')
   end
 
+  context 'when mystery patch feature is enabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_MYSTERY_PATCH: 'true' do
+        example.run
+      end
+    end
+
+    it 'shows link in top nav' do
+      expect(page).to have_link('Play Mystery Patch')
+    end
+  end
+
+  context 'when mystery patch feature is disnabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_MYSTERY_PATCH: 'false' do
+        example.run
+      end
+    end
+
+    it 'shows link in top nav' do
+      expect(page).not_to have_link('Play Mystery Patch')
+    end
+  end
+
   it 'show three top patches from volca bass' do
     create_list(:user_patch, 3)
     visit root_path
