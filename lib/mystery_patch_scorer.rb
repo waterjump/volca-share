@@ -34,7 +34,10 @@ class MysteryPatchScorer
     end
 
     # Convert total error to a score out of 100
-    score = ((biggest_possible_error - total_error).abs / biggest_possible_error.to_f) * 100.0
+    score = (
+      (biggest_possible_error - total_error).abs /
+      biggest_possible_error.to_f
+    ) * 100.0
 
     score.round(2)
   end

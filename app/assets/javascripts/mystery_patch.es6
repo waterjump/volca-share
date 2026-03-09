@@ -160,7 +160,7 @@ $(function() {
       gameDeadline: gameDeadline
     };
     const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('gameData', encodedValue, 1, '/mystery_patch');
+    VS.setCookie('gameData', encodedValue, 1, '/');
     gameData = cookiePayload;
   };
 
@@ -171,7 +171,7 @@ $(function() {
       results: resultsData
     };
     const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('resultsData', encodedValue, 1, '/mystery_patch');
+    VS.setCookie('resultsData', encodedValue, 1, '/');
   };
 
   const remainingTimeSeconds = function() {

@@ -35,11 +35,27 @@
             = link_to 'Volca Bass Emulator', bass_emulator_path
         %li
           = link_to 'Volca Keys Emulator', keys_emulator_path
-        - if ENV['FEATURE_ENABLED_MYSTERY_PATCH'] == 'true'
-          %li#emulator_nav_callout
-            = link_to 'Play Mystery Patch', mystery_patch_path
-            .speech.left Brand new
 
+        - # MYSTERY PATCH
+        - if mystery_patch_feature_enabled?
+          - if current_page?(mystery_patch_path)
+            %li#emulator_nav_callout{ class: 'unemphasized' }
+              = link_to 'Play Mystery Patch', '#', class: 'link-like'
+              .speech.left{
+                class: mystery_patch_callout_class,
+                data: { href: mystery_patch_path },
+                role: 'link',
+                tabindex: 0
+                }= mystery_patch_callout_text
+          - else
+            %li#emulator_nav_callout{ class: emphasize_new_mystery_patch? ? 'emphasized' : 'unemphasized' }
+              = link_to 'Play Mystery Patch', mystery_patch_path
+              .speech.left{
+                class: mystery_patch_callout_class,
+                data: { href: mystery_patch_path },
+                role: 'link',
+                tabindex: 0
+                }= mystery_patch_callout_text
 
         - if ENV['FEATURE_ENABLED_PATCH_NAMER'] == 'true'
           - if current_page?(synth_patch_namer_path)

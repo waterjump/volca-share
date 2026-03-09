@@ -141,7 +141,7 @@ RSpec.describe MysteryPatchScorer do
 
     it 'reports 100% miss' do
       expect(scorer.score[:parameter_scores][:voice]).to(
-         eq([10, 30, 127, 0.00])
+        eq([10, 30, 127, 0.00])
       )
     end
   end

@@ -61,19 +61,79 @@ RSpec.describe 'Home page', type: :feature, js: true do
       end
     end
 
-    it 'shows link in top nav' do
+    it 'shows link to Mystery Patch in top nav' do
       expect(page).to have_link('Play Mystery Patch')
+    end
+
+    context 'when user has played today' do
+      let(:cookie_value) do
+        {
+          mysteryPatchId: mystery_patch.id.to_s,
+          timeSubmitted: 1772990357,
+          results: {
+            total_score: 54.66,
+          }
+        }.to_json
+      end
+
+      let(:mystery_patch) do
+        MysteryPatch.generate_random.tap(&:save).reload
+      end
+
+      before do
+        page.driver.browser.manage.add_cookie(name: 'resultsData', value: cookie_value)
+      end
+
+      it 'shows overall score in menu callout' do
+        visit current_path
+        expect(page).to have_css('.speech.left', text: '54.66%')
+      end
+    end
+
+    context 'when user has played but theres a newer mystery patch' do
+      let(:cookie_value) do
+        {
+          mysteryPatchId: mystery_patch.id.to_s, # '69ad1088b6951a0002757a78',
+          timeSubmitted: 1772990357,
+          results: {
+            total_score: 54.66,
+          }
+        }.to_json
+      end
+
+      let(:mystery_patch) do
+        MysteryPatch.generate_random.tap(&:save).reload
+      end
+
+      before do
+        page.driver.browser.manage.add_cookie(name: 'resultsData', value: cookie_value)
+      end
+
+      it 'shows overall score in menu callout' do
+        # create newer mystery patch
+        MysteryPatch.generate_random.save
+
+        visit current_path
+        expect(page).to have_css('.speech.left', text: 'NEW')
+      end
+    end
+
+    context 'when user has not played' do
+      # No cookie setting
+      it 'shows default callout' do
+        expect(page).to have_css('.speech.left', text: 'NEW')
+      end
     end
   end
 
-  context 'when mystery patch feature is disnabled' do
+  context 'when mystery patch feature is disabled' do
     around do |example|
       with_modified_env FEATURE_ENABLED_MYSTERY_PATCH: 'false' do
         example.run
       end
     end
 
-    it 'shows link in top nav' do
+    it 'does not show link in top nav' do
       expect(page).not_to have_link('Play Mystery Patch')
     end
   end

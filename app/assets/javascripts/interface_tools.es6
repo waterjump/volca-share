@@ -1,4 +1,8 @@
 $(function() {
+  $(document).on('click', '#emulator_nav_callout .speech[data-href]', function() {
+    window.location.href = $(this).data('href');
+  });
+
   if (!VS.accordionSectionVisibility) {
     VS.accordionSectionVisibility = {};
   }
