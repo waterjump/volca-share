@@ -232,6 +232,15 @@ VS.KeysEmulator = function() {
   const changeOctave = function(change, keyStroke = true) {
     VS.display.update(emulatorConstants.octaveMap[patch.octave], 'noteString');
 
+    const octaveOffset = change * 12;
+
+    // Transpose midinote data attributes of on-screen keyboard
+    $('#volca-keyboard .key').toArray().forEach(key => {
+      const $key = $(key);
+      const currentVal = $key.data('midinote');
+      $key.data('midinote', currentVal + octaveOffset);
+    });
+
     if (keyStroke) {
       // Turn octave knob
       new VS.SnapKnob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
@@ -243,7 +252,6 @@ VS.KeysEmulator = function() {
     if (keysDown.length === 0) { return; } // when it's amp_eg release
 
     // Transpose all keys held down to new octave
-    const octaveOffset = change * 12;
     keysDown = keysDown.map(key => key + octaveOffset);
 
     managedEngineList().forEach(binding => {
@@ -606,20 +614,17 @@ VS.KeysEmulator = function() {
 
     keyboardPlaying = true;
     currentTouchKey = $(this).attr('id');
-    // TODO: Need to adjust for current octave and support octave changes during note
     keyboardDown($(this).data('midinote'));
   });
 
   $('#volca-keyboard .key').on('mouseenter', function() {
     if (keyboardPlaying) {
-      // TODO: Need to adjust for current octave and support octave changes during note
       keyboardDown($(this).data('midinote'));
     }
   });
 
   $('#volca-keyboard .key').on('mouseleave', function() {
     if (keyboardPlaying) {
-      // TODO: Need to adjust for current octave and support octave changes during note
       keyboardUp($(this).data('midinote'));
     }
   });
@@ -642,7 +647,6 @@ VS.KeysEmulator = function() {
       currentTouchKey = $key.attr('id');
     }
     if ($key.length && currentTouchKey !== lastTouchKey) {
-      // TODO: Need to adjust for current octave and support octave changes during note
       keyboardDown($key.data('midinote'));
       if (lastTouchKey) {
         keyboardUp($(`#${lastTouchKey}`).data('midinote'));
@@ -659,7 +663,6 @@ VS.KeysEmulator = function() {
       currentTouchKey = null;
     }
 
-    // TODO: Need to adjust for current octave and support octave changes during note
     keyboardUp($(this).data('midinote'));
     keyboardPlaying = false;
   });
