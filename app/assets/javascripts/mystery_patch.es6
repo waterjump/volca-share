@@ -98,6 +98,7 @@ $(function() {
   let keyboardHintTimeout = null;
 
   const showStartedState = function() {
+    $('#timer-description').text('Remaining time:');
     $('#timer').show();
     $('#submit-solution').show();
     $('#show-results').hide();
@@ -115,6 +116,7 @@ $(function() {
   const showFinishedState = function() {
     clearInterval(intervalId);
     clearInterval(keyboardHintTimeout);
+    $('#timer-description').hide();
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
@@ -199,6 +201,25 @@ $(function() {
       secondsLeft--;
 
       if (secondsLeft >= 0) {
+
+        // Emphasize countdown clock
+        if (secondsLeft == 60 || secondsLeft == 30 || secondsLeft <= 15) {
+
+          $('#timer')
+            .css({
+              'background-color': 'red',
+              'transition': 'background-color 0s'
+            });
+
+          setTimeout(function() {
+            $('#timer')
+              .css({
+                'background-color': 'white',
+                'transition': 'background-color 1s'
+              });
+          }, 10);
+        }
+
         minutes = Math.floor(secondsLeft / 60);
         seconds = secondsLeft % 60;
         $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);

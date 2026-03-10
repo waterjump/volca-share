@@ -182,6 +182,7 @@
           %td Left Arrow
           %td Right Arrow
     %hr
+    #timer-description
     #timer
     #post-game-message{ style: 'display: none;' }
       Come back tomorrow for a new mystery patch.
@@ -216,6 +217,9 @@
       - usageBodyStyle = cookies[:accordionUsage] == 'closed' ? 'display:none;' : ''
       .accordion-body.clearfix{ style: usageBodyStyle }
         #desktop-instructions
+          - if mystery_patch_view
+            %h4 ⚠️ YOU NEED TO PLAY THE NOTES YOURSELF ⚠️
+            %h4 Play whatever notes you want.  Only timbre (knob settings etc.) is considered for scoring
           Use the on-screen keyboard or your computer keyboard to play notes
           = image_tag('computer-midi-keyboard-small.png', id: 'emulator-keyboard')
           %br
