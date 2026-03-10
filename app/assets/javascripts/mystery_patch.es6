@@ -434,7 +434,8 @@ $(function() {
         $('#overall-score').html(
           [
             `<h3>Total score:</h3><div class='percentage'>`,
-            `${resultsData.total_score}%</div>`
+            `${resultsData.total_score}%</div>`,
+            '<p class="share-subtitle">Come back tomorrow for a new mystery patch.</div>'
           ].join('')
         ).fadeIn('slow');
         $('#share-text').val([
