@@ -5,6 +5,14 @@ Rack::Attack.throttle('req/ip', limit: 2, period: 1.day) do |req|
   req.ip if req.path == '/contacts' && req.post?
 end
 
+# Block repeated POSTs to /users.
+# After 2 requests in 1 day, block all requests from that IP for 1 week.
+Rack::Attack.blocklist('fail2ban users post spam') do |req|
+  Rack::Attack::Fail2Ban.filter("users-post-spam-#{req.ip}", maxretry: 2, findtime: 1.day, bantime: 1.week) do
+    req.path == '/users' && req.post?
+  end
+end
+
 # Block suspicious requests for wordpress specific paths.
 # After 3 blocked requests in 10 minutes, block all requests from that IP for 1 day.
 Rack::Attack.blocklist('fail2ban pentesters') do |req|
