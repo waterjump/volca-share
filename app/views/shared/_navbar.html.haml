@@ -27,14 +27,16 @@
                 %li Patches
               = link_to new_keys_patch_path, class: 'dropdown-item' do
                 %li New patch
-        - if current_page?(bass_emulator_path)
-          %li
-            = link_to 'Volca Bass Emulator', '#', class: 'link-like'
-        - else
-          %li
-            = link_to 'Volca Bass Emulator', bass_emulator_path
+              = link_to keys_emulator_path, class: 'dropdown-item' do
+                %li Emulator
         %li
-          = link_to 'Volca Keys Emulator', keys_emulator_path
+          = link_to 'Emulators', '#', class: 'dropdown-toggle', id: 'dropdownMenuLink', data: { toggle: 'dropdown' }
+          .dropdown-menu{ aria: { labelledby: 'dropdownMenuLink' } }
+            %ul
+              = link_to keys_emulator_path, class: 'dropdown-item' do
+                %li Volca Keys Emulator
+              = link_to bass_emulator_path, class: 'dropdown-item' do
+                %li Volca Bass Emulator
 
         - # MYSTERY PATCH
         - if mystery_patch_feature_enabled?
