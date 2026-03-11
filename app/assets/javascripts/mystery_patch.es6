@@ -86,6 +86,12 @@ $(function() {
     return Math.floor(Date.now() / 1000);
   }
 
+  const sendAnalyticsEvent = function(...args) {
+    if (typeof ga !== 'function') { return; }
+
+    ga('send', 'event', ...args);
+  };
+
   const showNotStartedState = function() {
     clearInterval(intervalId);
     $('#timer').hide().text('');
@@ -238,6 +244,7 @@ $(function() {
     if (gameHasStarted || gameFinished) { return; }
 
     gameHasStarted = true;
+    sendAnalyticsEvent('Mystery Patch', 'start');
     showStartedState();
     setGameStartedCookie();
     startTimer();
@@ -527,6 +534,7 @@ $(function() {
   $('#submit-solution').on('click tap', function() {
     gameFinished = true;
     showFinishedState();
+    const timeLeft = Math.max(remainingTimeSeconds(), 0);
 
     const solutionParams = {
       id: mysteryPatchId,
@@ -558,6 +566,12 @@ $(function() {
       $('#results-button').click();
 
       resultsData = response.results;
+      sendAnalyticsEvent(
+        'Mystery Patch',
+        'results',
+        `total_score_${resultsData.total_score}_time_left_${timeLeft}`,
+        Math.round(resultsData.total_score)
+      );
       setResultsCookie();
       printResultsInfo(true);
     });
