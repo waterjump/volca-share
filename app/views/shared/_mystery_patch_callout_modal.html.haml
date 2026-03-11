@@ -1,0 +1,53 @@
+- mystery_patch_modal_feature_on = ENV['FEATURE_ENABLED_MYSTERY_PATCH_MODAL'] == 'true'
+- cookie_not_set = cookies[:mysteryPatchModalSeen] != 'true'
+- if mystery_patch_modal_feature_on && cookie_not_set
+  %button#mystery-patch-callout-button.hidden{ type: "button", class: "btn btn-primary btn-lg", data: { toggle: "modal", target: "#mystery-patch-callout-modal" } }
+    Launch demo modal
+
+  #mystery-patch-callout-modal.modal.fade{"aria-labelledby" => "mysteryPatchCalloutModaLabel", :role => "dialog", :tabindex => "-1", :data => { show: 'true' }}
+    .modal-dialog{:role => "document"}
+      .modal-content
+        .modal-header
+          %button#mpcm-x-out.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+            %span{"aria-hidden" => "true"} ×
+          %h2#mysteryPatchCalloutModaLabel.modal-title
+            🎉 Ten Years of VolcaShare
+        #mystery-patch-callout-modal-body.modal-body
+          .announcement-hero
+            = link_to mystery_patch_path, id: 'announcement-glyph-link', aria: { label: 'Open Mystery Patch game' } do
+              %svg.music-glyph-card{ viewBox: '0 0 140 140', role: 'img', 'aria-hidden' => 'true' }
+                %defs
+                  %linearGradient#mp-glyph-bg{ x1: '0', y1: '0', x2: '0', y2: '1' }
+                    %stop{ offset: '0%', 'stop-color' => '#000000' }
+                    %stop{ offset: '100%', 'stop-color' => '#249472' }
+                %rect{ x: '8', y: '8', width: '124', height: '124', rx: '24', fill: 'url(#mp-glyph-bg)' }
+                %rect{ x: '18', y: '84', width: '20', height: '38', rx: '2', fill: '#f4fff9' }
+                %rect{ x: '40', y: '84', width: '20', height: '38', rx: '2', fill: '#f4fff9' }
+                %rect{ x: '62', y: '84', width: '20', height: '38', rx: '2', fill: '#f4fff9' }
+                %rect{ x: '84', y: '84', width: '20', height: '38', rx: '2', fill: '#f4fff9' }
+                %rect{ x: '106', y: '84', width: '16', height: '38', rx: '2', fill: '#f4fff9' }
+                %rect{ x: '32', y: '84', width: '14', height: '24', rx: '2', fill: '#111614' }
+                %rect{ x: '54', y: '84', width: '14', height: '24', rx: '2', fill: '#111614' }
+                %rect{ x: '98', y: '84', width: '14', height: '24', rx: '2', fill: '#111614' }
+                %text{ x: '36', y: '43', 'text-anchor' => 'middle', fill: 'aquamarine', 'font-size' => '28', 'font-family' => '"Helvetica Neue", Helvetica, Arial, sans-serif', 'font-weight' => '700' } ?
+                %text{ x: '69', y: '70', 'text-anchor' => 'middle', fill: 'aquamarine', 'font-size' => '44', 'font-family' => '"Helvetica Neue", Helvetica, Arial, sans-serif', 'font-weight' => '700' } ?
+                %text{ x: '103', y: '49', 'text-anchor' => 'middle', fill: 'aquamarine', 'font-size' => '31', 'font-family' => '"Helvetica Neue", Helvetica, Arial, sans-serif', 'font-weight' => '700' } ?
+            %p.announcement-date
+              Thursday, March 12, 2026
+            %hr.announcement-divider
+          %p
+            The VolcaShare code repository was unceremoniously created ten years ago, on March 12, 2016. 
+            Since then, it's grown from an experimental Volca Bass patch database using WebMIDI into a 
+            home for Volca Keys patches and browser-based emulators too.
+          %p
+            To celebrate the ten years, I'm introducing something fun:
+            = link_to mystery_patch_path, class: 'inline-mystery-link' do
+              %strong Mystery Patch,
+            a daily challenge where you recreate a hidden synth patch by ear.
+          %p
+            Thanks for popping in, checking out the patches, sharing your own, and playing with the emulators.
+          %p.signature
+            Sean
+        .modal-footer
+          = link_to 'Play Mystery Patch', mystery_patch_path, class: 'btn btn-primary', id: 'mpcm-play-now'
+          %button#mpcm-close.btn.btn-default{"data-dismiss" => "modal", type: 'button'} Close

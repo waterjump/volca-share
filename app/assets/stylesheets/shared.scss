@@ -223,3 +223,116 @@ a.unstyled {
     font-size: 18px;
   }
 }
+
+#mystery-patch-callout-modal {
+  .modal-content {
+    border: 2px solid #1f6f5f;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    background: linear-gradient(165deg, #f7fffc 0%, #ecf9f4 100%);
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #cde8de;
+    background: linear-gradient(180deg, #ebfff7 0%, #def7ee 100%);
+  }
+
+  .modal-title {
+    font-weight: 700;
+    color: #0c4d40;
+    letter-spacing: 0.2px;
+  }
+
+  #mystery-patch-callout-modal-body.modal-body {
+    padding: 24px;
+
+    .announcement-hero {
+      text-align: center;
+      margin: 0 0 18px;
+    }
+
+    #announcement-glyph-link {
+      display: inline-block;
+      border-radius: 24px;
+      line-height: 0;
+    }
+
+    #announcement-glyph-link:hover,
+    #announcement-glyph-link:focus {
+      text-decoration: none;
+    }
+
+    .music-glyph-card {
+      display: block;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 12px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      border-radius: 26px;
+    }
+
+    .announcement-date {
+      margin: 0 0 2px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: 200;
+      font-size: 18px;
+      line-height: 1.35;
+      letter-spacing: 0.35px;
+      color: #4f6160;
+      text-align: center;
+    }
+
+    .announcement-divider {
+      width: 78%;
+      border-top: 1px solid #d6e3dc;
+      margin: 15px auto 0;
+    }
+
+    p {
+      font-size: 1.13em;
+      line-height: 1.55;
+      color: #1f2a2a;
+      margin-bottom: 12px;
+    }
+
+    a.inline-mystery-link,
+    a.inline-mystery-link:visited {
+      color: #000;
+      text-decoration: none;
+    }
+
+    a.inline-mystery-link:hover,
+    a.inline-mystery-link:focus {
+      color: #666;
+      text-decoration: none;
+    }
+
+    p.signature {
+      margin-top: 22px;
+      margin-bottom: 0;
+      font-size: 16px;
+      line-height: 1.35;
+      font-style: normal;
+      font-weight: 300;
+      letter-spacing: 0.35px;
+      color: #4f6160;
+      text-align: center;
+    }
+  }
+
+  .modal-footer {
+    border-top: 1px solid #cde8de;
+    background-color: #f3fcf8;
+  }
+
+  .btn-primary {
+    font-size: 18px;
+    background-color: #1f7a63;
+    border-color: #1f7a63;
+  }
+
+  .btn-primary:hover,
+  .btn-primary:focus {
+    background-color: #165f4d;
+    border-color: #165f4d;
+  }
+}

@@ -1,0 +1,14 @@
+$(document).ready(function() {
+  const modalSeenCookie = 'mysteryPatchModalSeen';
+  const cookieMaxAgeSeconds = 24 * 60 * 60 * 365 * 2;
+
+  if ($('#mystery-patch-callout-modal').length === 0) { return; }
+
+  if (getCookieValue(modalSeenCookie) !== 'true') {
+    $('#mystery-patch-callout-button').trigger('click');
+  }
+
+  $('#mystery-patch-callout-modal').on('shown.bs.modal', function() {
+    document.cookie = `${modalSeenCookie}=true; max-age=${cookieMaxAgeSeconds}; path=/;`;
+  });
+});

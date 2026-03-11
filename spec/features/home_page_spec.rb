@@ -49,6 +49,35 @@ RSpec.describe 'Home page', type: :feature, js: true do
     end
   end
 
+  context 'when mystery patch callout modal feature is enabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_MYSTERY_PATCH_MODAL: 'true' do
+        example.run
+      end
+    end
+
+    it 'shows the mystery patch callout modal' do
+      page.driver.browser.manage.delete_cookie('mysteryPatchModalSeen')
+      visit current_path
+
+      expect(page).to have_css('#mystery-patch-callout-modal', visible: :all)
+    end
+  end
+
+  context 'when mystery patch callout modal feature is not enabled' do
+    around do |example|
+      with_modified_env FEATURE_ENABLED_MYSTERY_PATCH_MODAL: 'false' do
+        example.run
+      end
+    end
+
+    it 'does not show the mystery patch callout modal' do
+      visit current_path
+
+      expect(page).not_to have_css('#mystery-patch-callout-modal', visible: :all)
+    end
+  end
+
   it 'shows link to bass emulator' do
     click_link('Bass')
     expect(page).to have_link('Emulator')
