@@ -13,6 +13,7 @@ $(function() {
   let gameData;
   let resultsData;
   let intervalId;
+  let submissionInFlight = false;
   const GAME_DURATION_SECONDS = 120;
   const updatePostGameMessage = function() {
     if (gameFinished) {
@@ -132,7 +133,56 @@ $(function() {
   };
 
   const triggerSubmitSolution = function() {
-    $('#submit-solution').trigger('click');
+    $('#submit-confirmation-modal').modal('hide');
+    submitSolution();
+  };
+
+  const submitSolution = function() {
+    if (submissionInFlight) { return; }
+
+    submissionInFlight = true;
+    gameFinished = true;
+    showFinishedState();
+    const timeLeft = Math.max(remainingTimeSeconds(), 0);
+
+    const solutionParams = {
+      id: mysteryPatchId,
+      digest: digest,
+      patch: {
+        voice: $('#voice').data('midi'),
+        detune: $('#detune').data('midi'),
+        portamento: $('#portamento').data('midi'),
+        vco_eg_int: $('#vco_eg_int').data('midi'),
+        attack: $('#attack').data('midi'),
+        decay_release: $('#decay_release').data('midi'),
+        vcf_eg_int: $('#vcf_eg_int').data('midi'),
+        peak: $('#peak').data('midi'),
+        cutoff: $('#cutoff').data('midi'),
+        sustain: $('#sustain').data('midi'),
+        lfo_rate: $('#lfo_rate').data('midi'),
+        lfo_pitch_int: $('#lfo_pitch_int').data('midi'),
+        lfo_cutoff_int: $('#lfo_cutoff_int').data('midi'),
+        delay_time: $('#delay_time').data('midi'),
+        delay_feedback: $('#delay_feedback').data('midi'),
+        lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
+        step_trigger: $('input#patch_step_trigger').prop('checked'),
+        lfo_shape: patch.lfo.shape === 'sawtooth' ? 'saw' : patch.lfo.shape
+      }
+    };
+
+    $.post('/mystery_patch', solutionParams).done(function(response) {
+      $('#results-button').click();
+
+      resultsData = response.results;
+      sendAnalyticsEvent(
+        'Mystery Patch',
+        'results',
+        `total_score_${resultsData.total_score}_time_left_${timeLeft}`,
+        Math.round(resultsData.total_score)
+      );
+      setResultsCookie();
+      printResultsInfo(true);
+    });
   };
 
   $(document).on('hideKeyboardHighlight', function() {
@@ -530,52 +580,17 @@ $(function() {
     }, animateInterval);
   };
 
-  // When '#submit-solution' button is clicked, gather patch params
-  // from knob data attributes, POST to /mystery_patch/
-  $('#submit-solution').on('click tap', function() {
-    gameFinished = true;
-    showFinishedState();
-    const timeLeft = Math.max(remainingTimeSeconds(), 0);
+  $('#submit-solution').on('click tap', function(event) {
+    event.preventDefault();
+    if (gameFinished) { return; }
 
-    const solutionParams = {
-      id: mysteryPatchId,
-      digest: digest,
-      patch: {
-        voice: $('#voice').data('midi'),
-        detune: $('#detune').data('midi'),
-        portamento: $('#portamento').data('midi'),
-        vco_eg_int: $('#vco_eg_int').data('midi'),
-        attack: $('#attack').data('midi'),
-        decay_release: $('#decay_release').data('midi'),
-        vcf_eg_int: $('#vcf_eg_int').data('midi'),
-        peak: $('#peak').data('midi'),
-        cutoff: $('#cutoff').data('midi'),
-        sustain: $('#sustain').data('midi'),
-        lfo_rate: $('#lfo_rate').data('midi'),
-        lfo_pitch_int: $('#lfo_pitch_int').data('midi'),
-        lfo_cutoff_int: $('#lfo_cutoff_int').data('midi'),
-        delay_time: $('#delay_time').data('midi'),
-        delay_feedback: $('#delay_feedback').data('midi'),
-        lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
-        step_trigger: $('input#patch_step_trigger').prop('checked'),
-        lfo_shape: patch.lfo.shape === 'sawtooth' ? 'saw' : patch.lfo.shape
-      }
-    };
+    $('#submit-confirmation-button').trigger('click');
+  });
 
-    // Submit solution
-    $.post('/mystery_patch', solutionParams).done(function(response) {
-      $('#results-button').click();
-
-      resultsData = response.results;
-      sendAnalyticsEvent(
-        'Mystery Patch',
-        'results',
-        `total_score_${resultsData.total_score}_time_left_${timeLeft}`,
-        Math.round(resultsData.total_score)
-      );
-      setResultsCookie();
-      printResultsInfo(true);
-    });
+  $('#confirm-submit-solution').on('click tap', function(event) {
+    event.preventDefault();
+    $('#submit-confirmation-modal').modal('hide');
+    submitSolution();
   });
 
   showNotStartedState();

@@ -1,0 +1,19 @@
+%button#submit-confirmation-button.hidden{ type: "button", class: "btn btn-primary btn-lg", data: { toggle: "modal", target: "#submit-confirmation-modal" } }
+  Launch demo modal
+
+#submit-confirmation-modal.modal.fade{"aria-labelledby" => "submitConfirmationModalLabel", :role => "dialog", :tabindex => "-1", :data => { keyboard: 'true' }}
+  .modal-dialog{:role => "document"}
+    .modal-content
+      .modal-header
+        %button.close{"aria-label" => "Close", "data-dismiss" => "modal", :type => "button"}
+          %span{"aria-hidden" => "true"} ×
+        %h2#submitConfirmationModalLabel.modal-title
+          Confirm Submission
+      .modal-body
+        %p
+          Are you sure?
+      .modal-footer
+        %button#cancel-submit-solution.btn.btn-default{"data-dismiss" => "modal", type: 'button'}
+          Go back
+        %button#confirm-submit-solution.btn.btn-success{ type: 'button' }
+          Yes, I'm done
