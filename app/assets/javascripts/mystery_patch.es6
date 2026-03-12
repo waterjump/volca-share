@@ -126,6 +126,7 @@ $(function() {
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
+    $('#need-practice').show();
     updateShowResultsButton();
     updatePostGameMessage();
   };
