@@ -40,4 +40,11 @@ module ApplicationHelper
       :'red-callout'
     end
   end
+
+  def show_mystery_patch_callout_modal?
+    ENV['FEATURE_ENABLED_MYSTERY_PATCH_MODAL'] == 'true' &&
+      cookies[:mysteryPatchModalSeen] != 'true' &&
+      cookies[:resultsData].blank? &&
+      !current_page?(mystery_patch_path)
+  end
 end

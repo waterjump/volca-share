@@ -1,6 +1,4 @@
-- mystery_patch_modal_feature_on = ENV['FEATURE_ENABLED_MYSTERY_PATCH_MODAL'] == 'true'
-- cookie_not_set = cookies[:mysteryPatchModalSeen] != 'true'
-- if mystery_patch_modal_feature_on && cookie_not_set
+- if show_mystery_patch_callout_modal?
   %button#mystery-patch-callout-button.hidden{ type: "button", class: "btn btn-primary btn-lg", data: { toggle: "modal", target: "#mystery-patch-callout-modal" } }
     Launch demo modal
 
