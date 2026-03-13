@@ -7,7 +7,10 @@ class MysteryPatchesController < ApplicationController
       format.html do
         @body_class = :form
         @body_id = :'mystery-patch'
-        @body_data_attributes = { :'midi-in' => true }
+        @body_data_attributes = {
+          :'midi-in' => true,
+          :'test-env' => Rails.env.test?.to_s
+        }
         @patch = VolcaShare::Keys::PatchViewModel.wrap(Keys::Patch.new(
           voice: 30,
           attack: 0,

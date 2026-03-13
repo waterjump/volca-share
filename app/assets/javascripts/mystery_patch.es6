@@ -14,6 +14,7 @@ $(function() {
   let resultsData;
   let intervalId;
   let submissionInFlight = false;
+  const inTestEnvironment = $('body').attr('data-test-env') === 'true';
   const GAME_DURATION_SECONDS = 120;
   const updatePostGameMessage = function() {
     if (gameFinished) {
@@ -91,6 +92,15 @@ $(function() {
     if (typeof ga !== 'function') { return; }
 
     ga('send', 'event', ...args);
+  };
+
+  const revealElement = function(selector, animate = false) {
+    if (!animate) {
+      $(selector).show();
+      return;
+    }
+
+    $(selector).fadeIn('slow');
   };
 
   const showNotStartedState = function() {
@@ -485,7 +495,8 @@ $(function() {
   });
 
   const printResultsInfo = function(animate) {
-    let animateInterval = animate ? 500 : 5;
+    const animateResults = animate && !inTestEnvironment;
+    let animateInterval = animateResults ? 500 : 5;
     let $tbody = $("#results-table tbody");
     let emojiSummary = '';
     $tbody.html('');
@@ -505,34 +516,30 @@ $(function() {
       'false': 'off'
     };
 
-    let timer = setInterval(function () {
-
-      // When entries are all done being listed
-      if (i >= entries.length) {
-        $('#kem-x-out').fadeIn('slow');
-        $('#overall-score').html(
-          [
-            `<h3>Total score:</h3><div class='percentage'>`,
-            `${resultsData.total_score}%</div>`,
-            '<p class="share-subtitle">Come back tomorrow for a new mystery patch.</div>'
-          ].join('')
-        ).fadeIn('slow');
-        $('#share-text').val([
-          `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
-          `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
-          `\n\n#VSmysterypatch`
+    const renderSummary = function() {
+      revealElement('#kem-x-out', animateResults);
+      $('#overall-score').html(
+        [
+          `<h3>Total score:</h3><div class='percentage'>`,
+          `${resultsData.total_score}%</div>`,
+          '<p class="share-subtitle">Come back tomorrow for a new mystery patch.</div>'
         ].join('')
-        );
-        $('#share-results').fadeIn('slow');
-        $('#keep-playing').fadeIn('slow');
-        updateShowResultsButton();
+      );
+      revealElement('#overall-score', animateResults);
+      $('#share-text').val([
+        `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
+        `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
+        `\n\n#VSmysterypatch`
+      ].join('')
+      );
+      revealElement('#share-results', animateResults);
+      revealElement('#keep-playing', animateResults);
+      updateShowResultsButton();
+    };
 
-        clearInterval(timer);
-        return;
-      }
-
-      let key = snakeToTitleize(entries[i][0]);
-      let value = entries[i][1];
+    const renderEntry = function(entry) {
+      let key = snakeToTitleize(entry[0]);
+      let value = entry[1];
 
       let correctVal = value[0];
       let printableVal = value[1];
@@ -551,7 +558,9 @@ $(function() {
       if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
 
       let $tr = $("<tr>");
-      $tr.css('display', 'none');
+      if (animateResults) {
+        $tr.css('display', 'none');
+      }
       $tr.append($("<th class='result-param' scope='row'>").text(key));
       $tr.append($("<td>").text(correctVal));
       $tr.append($("<td>").text(printableVal));
@@ -573,8 +582,28 @@ $(function() {
       $tr.append($perctd);
 
       $tbody.append($tr);
-      $tr.show();
+      if (animateResults) {
+        $tr.show();
+      }
       $tr.addClass('fade-bg-white');
+    };
+
+    if (!animateResults) {
+      entries.forEach(renderEntry);
+      renderSummary();
+      return;
+    }
+
+    let timer = setInterval(function () {
+
+      // When entries are all done being listed
+      if (i >= entries.length) {
+        renderSummary();
+        clearInterval(timer);
+        return;
+      }
+
+      renderEntry(entries[i]);
 
       i += 1;
     }, animateInterval);
