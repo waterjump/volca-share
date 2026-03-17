@@ -179,4 +179,8 @@ RSpec.describe 'Home page', type: :feature, js: true do
   it 'shows footer' do
     expect(page).to have_css('.footer')
   end
+
+  it 'shows link to discord server' do
+    expect(page).to have_link('Discord')
+  end
 end
