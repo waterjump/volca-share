@@ -31,7 +31,6 @@ gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
 gem 'rubocop', '~> 0.66.0', require: false
 gem 'ruby-oembed'
 gem 'sass-rails'
-gem 'sendgrid-actionmailer'
 gem 'sprockets', '~> 4.0'
 gem 'terser'
 gem 'websocket-extensions', '>= 0.1.5'

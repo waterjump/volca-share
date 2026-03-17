@@ -42,10 +42,17 @@ Rails.application.configure do
   # yet still be able to expire them through the digest params.
   config.assets.digest = true
   config.action_mailer.default_url_options = { host: 'https://www.volcashare.com/' }
-  config.action_mailer.delivery_method = :sendgrid_actionmailer
-  config.action_mailer.sendgrid_actionmailer_settings = {
-    api_key: ENV['SENDGRID_API_KEY'],
-    raise_delivery_errors: true
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address:              ENV.fetch('MAILGUN_SMTP_SERVER'),
+    port:                 ENV.fetch('MAILGUN_SMTP_PORT'),
+    domain:               'volcashare.com',
+    user_name:            ENV.fetch('MAILGUN_SMTP_LOGIN'),
+    password:             ENV.fetch('MAILGUN_SMTP_PASSWORD'),
+    authentication:       :plain,
+    enable_starttls_auto: true
   }
 
   # `config.assets.precompile` and `config.assets.version` have moved to config/initializers/assets.rb
