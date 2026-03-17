@@ -1,10 +1,5 @@
 # frozen_string_literal: true
 
-# Limit contact for submissions to 2 per day per IP
-Rack::Attack.throttle('req/ip', limit: 2, period: 1.day) do |req|
-  req.ip if req.path == '/contacts' && req.post?
-end
-
 # Block repeated POSTs to /users.
 # After 2 requests in 1 day, block all requests from that IP for 1 week.
 unless Rails.env.test?
