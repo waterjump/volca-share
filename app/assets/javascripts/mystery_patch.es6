@@ -9,6 +9,7 @@ $(function() {
   let gameHasStarted = false;
   let gameFinished = false;
   let mysteryPatchId;
+  let mysteryPatchNumber;
   let digest;
   let gameData;
   let resultsData;
@@ -409,6 +410,7 @@ $(function() {
       // Rotate back characters by todays UTC day of month
       const dayOfMonth = new Date().getUTCDate();
       mysteryPatchId = encryptedParams.id;
+      mysteryPatchNumber = encryptedParams.number;
       digest = encryptedParams.digest;
       decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
 
@@ -417,6 +419,7 @@ $(function() {
       const base64String = decryptedParams.slice(0, -base64Salt.length);
       const decodedString = atob(base64String);
       const mysteryParamsArray = JSON.parse(decodedString);
+
       mysteryParams.setAllParams(mysteryParamsArray);
       mysteryPatchEngine = new VS.KeysAudioEngine(mysteryParams, sequence);
       mysteryPatchEngine.init();
@@ -424,6 +427,8 @@ $(function() {
         VS.keysEmulatorBridge.registerMysteryEngine(mysteryPatchEngine, mysteryParams);
       }
       syncAudibleEngineSwitch();
+
+      $('h1').text(`Mystery Patch #${mysteryPatchNumber}`);
 
       // HANDLE COOKIE-RESTORED GAME SESSION
       const sessionState = resolveSessionStateFromCookies();
@@ -528,7 +533,7 @@ $(function() {
       revealElement('#overall-score', animateResults);
       $('#share-text').val([
         `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
-        `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
+        `accuracy. (Mystery Patch #${mysteryPatchNumber})\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
         `\n\n#VSmysterypatch`
       ].join('')
       );

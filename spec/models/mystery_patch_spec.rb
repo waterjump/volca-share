@@ -5,6 +5,52 @@ require 'rails_helper'
 RSpec.describe MysteryPatch, type: :model do
   let(:keys_patch) { create(:keys_patch) }
 
+  describe 'validations' do
+    subject { build(:mystery_patch) }
+
+    it { is_expected.to validate_presence_of(:number) }
+    it { is_expected.to validate_uniqueness_of(:number) }
+  end
+
+  describe 'callbacks' do
+    it 'assigns a number on create' do
+      record = build(:mystery_patch, number: nil)
+
+      record.valid?
+
+      expect(record.number).to eq(1)
+    end
+
+    it 'increments the number for each new record' do
+      first_record = create(:mystery_patch)
+      second_record = create(:mystery_patch)
+      third_record = create(:mystery_patch)
+
+      expect(first_record.number).to eq(1)
+      expect(second_record.number).to eq(2)
+      expect(third_record.number).to eq(3)
+    end
+
+    it 'does not overwrite an explicitly assigned number' do
+      record = build(:mystery_patch, number: 42)
+
+      record.valid?
+
+      expect(record.number).to eq(42)
+    end
+
+    it 'uses the correct counter key' do
+      expect(Counter).to(
+        receive(:next!).with('mystery_patches.number').and_return(123)
+      )
+
+      record = build(:mystery_patch, number: nil)
+      record.valid?
+
+      expect(record.number).to eq(123)
+    end
+  end
+
   describe '.clone_from' do
     it 'creates a mystery patch from an existing keys patch' do
       mystery_patch = described_class.clone_from(keys_patch)

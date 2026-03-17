@@ -3,14 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Mystery Patch game', js: true do
-  before do
-    MysteryPatch.clone_from(build(:keys_patch))
-  end
+  let!(:mystery_patch) { create(:mystery_patch) }
 
   it 'shows pre-game dialog' do
     visit mystery_patch_path
 
-    expect(page).to have_content('Mystery Patch')
+    expect(page).to have_content("Mystery Patch \##{mystery_patch.number}")
   end
 
   it 'shows results modal and stores resultsData cookie after a minimal run-through' do

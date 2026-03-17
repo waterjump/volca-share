@@ -78,6 +78,7 @@ module VolcaShare
 
         {
           id: id.to_s,
+          number: number,
           digest: params_hash,
           patch: rotated_string
         }

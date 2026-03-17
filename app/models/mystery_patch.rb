@@ -16,6 +16,7 @@ class MysteryPatch
 
   field :cloned_from, type: BSON::ObjectId
 
+  field :number, type: Integer
   field :voice, type: Integer
   field :detune, type: Integer
   field :portamento, type: Integer
@@ -35,6 +36,13 @@ class MysteryPatch
   field :lfo_trigger_sync, type: Boolean
   field :step_trigger, type: Boolean
   field :tempo_delay, type: Boolean
+
+  index({ number: 1 }, unique: true)
+
+  before_validation :assign_number, on: :create
+
+  validates :number, presence: true, uniqueness: true
+
 
   def self.clone_from(record)
     raise SecretPatchCloneError.new('Cannot clone a secret patch') if record.secret?
@@ -112,5 +120,11 @@ class MysteryPatch
     else
       rng.rand(128)
     end
+  end
+
+  private
+
+  def assign_number
+    self.number ||= Counter.next!('mystery_patches.number')
   end
 end
