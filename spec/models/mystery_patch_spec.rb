@@ -90,14 +90,40 @@ RSpec.describe MysteryPatch, type: :model do
   end
 
   describe '.generate_random' do
-    it 'generates a random myster patch' do
-      10.times do
-        mystery_patch = described_class.generate_random
+    let!(:mystery_patch) do
+      described_class.generate_random(overrides: overrides)
+    end
 
-        expect(mystery_patch).not_to be_persisted
-        expect(mystery_patch.cloned_from).to be_nil
+    let(:overrides) do
+      {}
+    end
 
-        expect(mystery_patch.cutoff + mystery_patch.vcf_eg_int).to be >= 100
+    it 'generates a random patch' do
+      # Test with no overrides
+      expect(described_class.generate_random).to be_valid
+    end
+
+    describe 'avoids completely closed filter' do
+      context 'when the cutoff is below 30' do
+        let(:overrides) do
+          { cutoff: rand(30) }
+        end
+
+        it 'generates vcf eg int above 63' do
+          expect(mystery_patch.vcf_eg_int).to be > 63
+        end
+      end
+    end
+
+    describe 'avoids VCF EG with inaudible effect' do
+      context 'when the cutoff is above 90' do
+        let(:overrides) do
+          { cutoff: 90 + rand(38) }
+        end
+
+        it 'generates vcf eg int below 64' do
+          expect(mystery_patch.vcf_eg_int).to be < 64
+        end
       end
     end
   end

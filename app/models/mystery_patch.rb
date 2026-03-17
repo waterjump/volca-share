@@ -69,13 +69,16 @@ class MysteryPatch
     )
   end
 
-  def self.generate_random
-    cutoff_val = 0
+  def self.generate_random(overrides: {})
+    cutoff_val = overrides[:cutoff] || 0
     vcf_eg_int_val = 0
 
-    while cutoff_val + vcf_eg_int_val < 100 do
-      cutoff_val = rand(128)
-      vcf_eg_int_val = rand(128)
+    if cutoff_val < 30
+      # Avoid completely closed filter
+      vcf_eg_int_val = 63 + rand(64)
+    elsif cutoff_val > 90
+      # Avoid VCF EG with inaudible effect
+      vcf_eg_int_val = rand(64)
     end
 
     new(
