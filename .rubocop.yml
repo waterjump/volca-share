@@ -3,3 +3,6 @@ Documentation:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*.rb'
+Metrics/MethodLength:
+  CountAsOne:
+    - method_call

@@ -6,11 +6,11 @@ class MysteryPatch
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  PARAM_FIELDS = %i(
+  PARAM_FIELDS = %i[
     voice detune portamento vco_eg_int cutoff peak vcf_eg_int lfo_rate
     lfo_pitch_int lfo_cutoff_int attack decay_release sustain delay_time
     delay_feedback lfo_shape lfo_trigger_sync
-  ).freeze
+  ].freeze
 
   VOICE_MIDI_VALUES = [10, 30, 50, 70, 100, 120].freeze
 
@@ -43,9 +43,8 @@ class MysteryPatch
 
   validates :number, presence: true, uniqueness: true
 
-
   def self.clone_from(record)
-    raise SecretPatchCloneError.new('Cannot clone a secret patch') if record.secret?
+    raise(SecretPatchCloneError, 'Cannot clone a secret patch') if record.secret?
 
     create(
       cloned_from: record.id,
@@ -71,15 +70,7 @@ class MysteryPatch
 
   def self.generate_random(overrides: {})
     cutoff_val = overrides[:cutoff] || weighted_random_0_127
-    vcf_eg_int_val = 0
-
-    if cutoff_val < 30
-      # Avoid completely closed filter
-      vcf_eg_int_val = 63 + rand(64)
-    elsif cutoff_val > 90
-      # Avoid VCF EG with inaudible effect
-      vcf_eg_int_val = rand(64)
-    end
+    vcf_eg_int_val = determine_vcf_eg_int_value(cutoff_val)
 
     new(
       voice: VOICE_MIDI_VALUES.sample,
@@ -97,14 +88,14 @@ class MysteryPatch
       sustain: rand(128),
       delay_time: rand(128),
       delay_feedback: random_param(preferred_weight: 5, total_weight: 6),
-      lfo_shape: %w(saw triangle square).sample,
+      lfo_shape: %w[saw triangle square].sample,
       lfo_trigger_sync: [true, false].sample
     )
   end
 
   def params_hash
     payload = PARAM_FIELDS.index_with do |k|
-      v = self.send(k)
+      send(k)
     end
 
     Digest::SHA256.hexdigest(JSON.generate(payload))
@@ -114,8 +105,6 @@ class MysteryPatch
     # NotImplemented: Just return nil for PatchViewModel compatibility
     nil
   end
-
-  protected
 
   def self.random_param(preferred_weight:, total_weight:, rng: Random)
     if rng.rand(total_weight) < preferred_weight
@@ -128,6 +117,18 @@ class MysteryPatch
   def self.weighted_random_0_127
     pool = (0..127).flat_map { |n| (30..90).cover?(n) ? [n, n, n] : [n] }
     pool.sample
+  end
+
+  def self.determine_vcf_eg_int_value(cutoff)
+    if cutoff < 30
+      # Avoid completely closed filter
+      rand(64..127)
+    elsif cutoff > 90
+      # Avoid VCF EG with inaudible effect
+      rand(0..63)
+    else
+      rand(0..127)
+    end
   end
 
   private
