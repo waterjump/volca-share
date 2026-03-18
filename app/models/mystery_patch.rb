@@ -70,7 +70,7 @@ class MysteryPatch
   end
 
   def self.generate_random(overrides: {})
-    cutoff_val = overrides[:cutoff] || 0
+    cutoff_val = overrides[:cutoff] || weighted_random_0_127
     vcf_eg_int_val = 0
 
     if cutoff_val < 30
@@ -123,6 +123,11 @@ class MysteryPatch
     else
       rng.rand(128)
     end
+  end
+
+  def self.weighted_random_0_127
+    pool = (0..127).flat_map { |n| (30..90).cover?(n) ? [n, n, n] : [n] }
+    pool.sample
   end
 
   private

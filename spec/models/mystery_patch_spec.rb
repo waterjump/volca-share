@@ -128,7 +128,7 @@ RSpec.describe MysteryPatch, type: :model do
     end
   end
 
-  describe '#random_param' do
+  describe '.random_param' do
     it 'is consistent with inputs' do
       generator = described_class
 
@@ -141,6 +141,29 @@ RSpec.describe MysteryPatch, type: :model do
       expected = (5.0 / 6.0) + (1.0 / 6.0) * (1.0 / 128.0)
 
       expect(observed).to be_within(0.01).of(expected)
+    end
+  end
+
+  describe '.weighted_random_0_127' do
+    let(:mystery_patch) { described_class }
+    subject(:results) { Array.new(sample_size) { mystery_patch.weighted_random_0_127 } }
+
+    let(:sample_size) { 50_000 }
+
+    it 'returns integers between 0 and 127 inclusive' do
+      expect(results).to all(be_a(Integer))
+      expect(results).to all(be_between(0, 127).inclusive)
+    end
+
+    it 'favors values between 30 and 90, three to one' do
+      in_range_count = results.count { |n| (30..90).cover?(n) }
+      out_of_range_count = results.count { |n| !(30..90).cover?(n) }
+
+      in_range_bucket_probability  = 61.0 * 3 / (61 * 3 + 67 * 1)
+      expected_in_range_count = sample_size * in_range_bucket_probability
+
+      expect(in_range_count).to be > out_of_range_count
+      expect(in_range_count).to be_within(sample_size * 0.02).of(expected_in_range_count)
     end
   end
 
