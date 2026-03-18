@@ -384,6 +384,11 @@ body#mystery-patch {
     box-shadow: 0 0px 10px rgba(0, 0, 0, 0.4);
   }
 
+  .knob.hint-highlight,
+  .bottom-row .light.hint-highlight {
+    background-color: #d9534f !important;
+  }
+
   #tempo-scrim {
     top: 28%;
     left: 79%;

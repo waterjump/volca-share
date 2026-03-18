@@ -14,16 +14,44 @@ RSpec.describe 'Mystery Patch game', js: true do
   it 'shows results modal and stores resultsData cookie after a minimal run-through' do
     visit mystery_patch_path
 
+    expect(page).to have_no_css('#request-hint', visible: true)
     click_button 'Got it'
     expect(page).to have_no_css('#pre-game-modal.in', visible: :all)
     click_button 'Hear Mystery Patch'
+    expect(page).to have_css('#request-hint', visible: true)
     click_button "I'm Done"
     click_button "Yes, I'm done"
 
     expect(page).to have_css('#results-modal.in', visible: :all)
     expect(page).to have_css('#overall-score', text: 'Total score:', visible: :all)
     expect(page).to have_css('#overall-score', visible: true)
+    expect(page).to have_no_css('#request-hint', visible: true)
     expect(page.evaluate_script('document.cookie')).to include('resultsData=')
+  end
+
+  it 'places hint emojis after the corresponding parameter squares in share text' do
+    visit mystery_patch_path
+
+    page.execute_script(<<~JS)
+      document.cookie = 'resultsData=' + encodeURIComponent(JSON.stringify({
+        mysteryPatchId: "#{mystery_patch.id}",
+        timeSubmitted: Math.floor(Date.now() / 1000),
+        hintsUsed: 2,
+        hintedParams: ['attack', 'cutoff'],
+        results: {
+          total_score: 88.5,
+          parameter_scores: {
+            attack: [64, 64, 0, 100.0],
+            cutoff: [32, 96, 64, 49.61]
+          }
+        }
+      })) + '; path=/';
+    JS
+
+    visit mystery_patch_path
+
+    expect(page).to have_css('#results-modal.in', visible: :all)
+    expect(find('#share-text', visible: :all).value).to include("🟩💡🟥💡")
   end
 
   context 'when mystery patch callout modal feature is enabled' do

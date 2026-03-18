@@ -35,6 +35,7 @@ Rails.application.routes.draw do
 
   get 'mystery_patch' => 'mystery_patches#mystery_patch'
   post 'mystery_patch' => 'mystery_patches#submit_mystery_patch'
+  post 'mystery_patch_hint' => 'mystery_patches#hint'
 
   namespace 'keys' do
     resources :patch,

@@ -76,4 +76,73 @@ RSpec.describe 'Mystery Patch requests', type: :request do
       end
     end
   end
+
+  describe 'POST /mystery_patch_hint' do
+    let!(:mystery_patch) do
+      create(
+        :mystery_patch,
+        attack: 127,
+        peak: 126,
+        cutoff: 12
+      )
+    end
+    let(:params) do
+      {
+        mysteryPatchId: mystery_patch.id.to_s,
+        patch: {
+          detune: mystery_patch.detune,
+          portamento: mystery_patch.portamento,
+          voice: mystery_patch.voice,
+          attack: 0,
+          decay_release: mystery_patch.decay_release,
+          cutoff: 127,
+          lfo_trigger_sync: mystery_patch.lfo_trigger_sync,
+          peak: 0,
+          lfo_rate: mystery_patch.lfo_rate,
+          vco_eg_int: mystery_patch.vco_eg_int,
+          vcf_eg_int: mystery_patch.vcf_eg_int,
+          lfo_pitch_int: mystery_patch.lfo_pitch_int,
+          lfo_cutoff_int: mystery_patch.lfo_cutoff_int,
+          delay_time: mystery_patch.delay_time,
+          delay_feedback: mystery_patch.delay_feedback,
+          lfo_shape: mystery_patch.lfo_shape,
+          step_trigger: mystery_patch.step_trigger,
+          sustain: mystery_patch.sustain
+        }
+      }
+    end
+
+    it 'returns the two furthest-off parameter names' do
+      post '/mystery_patch_hint.json', params: params
+
+      expect(response).to have_http_status(200)
+      expect(JSON.parse(response.body)).to include(
+        'hint_params' => %w[attack peak],
+        'hints_used' => 1,
+        'hints_remaining' => 1
+      )
+    end
+
+    it 'refuses a third hint request for the same game' do
+      2.times do
+        post '/mystery_patch_hint.json', params: params
+        expect(response).to have_http_status(200)
+      end
+
+      post '/mystery_patch_hint.json', params: params
+
+      expect(response).to have_http_status(:too_many_requests)
+      expect(JSON.parse(response.body)).to include(
+        'message' => 'Hint limit reached'
+      )
+    end
+
+    context 'when id is not found' do
+      it 'returns 404 not found' do
+        post '/mystery_patch_hint.json', params: params.merge(mysteryPatchId: 'some_unfound_id')
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

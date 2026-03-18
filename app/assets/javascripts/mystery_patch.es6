@@ -15,8 +15,150 @@ $(function() {
   let resultsData;
   let intervalId;
   let submissionInFlight = false;
+  let hintRequestInFlight = false;
+  let hintsUsed = 0;
+  let hintedParams = new Set();
+  let blinkingHintParams = new Set();
+  let hintBlinkVisible = false;
+  let hintBlinkIntervalId = null;
+  let hintBlinkTimeoutId = null;
   const inTestEnvironment = $('body').attr('data-test-env') === 'true';
   const GAME_DURATION_SECONDS = 120;
+  const MAX_HINTS = 2;
+  const HINT_BLINK_INTERVAL_MS = 500;
+  const HINT_BLINK_DURATION_MS = 5000;
+  const HINT_TARGET_SELECTORS = {
+    voice: ['#voice'],
+    detune: ['#detune'],
+    portamento: ['#portamento'],
+    vco_eg_int: ['#vco_eg_int'],
+    cutoff: ['#cutoff'],
+    peak: ['#peak'],
+    vcf_eg_int: ['#vcf_eg_int'],
+    lfo_rate: ['#lfo_rate'],
+    lfo_pitch_int: ['#lfo_pitch_int'],
+    lfo_cutoff_int: ['#lfo_cutoff_int'],
+    attack: ['#attack'],
+    decay_release: ['#decay_release'],
+    sustain: ['#sustain'],
+    delay_time: ['#delay_time'],
+    delay_feedback: ['#delay_feedback'],
+    lfo_shape: ['#lfo_shape_saw_light', '#lfo_shape_triangle_light', '#lfo_shape_square_light'],
+    lfo_trigger_sync: ['#lfo_trigger_sync_light']
+  };
+
+  const currentGuessParams = function() {
+    return {
+      voice: $('#voice').data('midi'),
+      detune: $('#detune').data('midi'),
+      portamento: $('#portamento').data('midi'),
+      vco_eg_int: $('#vco_eg_int').data('midi'),
+      attack: $('#attack').data('midi'),
+      decay_release: $('#decay_release').data('midi'),
+      vcf_eg_int: $('#vcf_eg_int').data('midi'),
+      peak: $('#peak').data('midi'),
+      cutoff: $('#cutoff').data('midi'),
+      sustain: $('#sustain').data('midi'),
+      lfo_rate: $('#lfo_rate').data('midi'),
+      lfo_pitch_int: $('#lfo_pitch_int').data('midi'),
+      lfo_cutoff_int: $('#lfo_cutoff_int').data('midi'),
+      delay_time: $('#delay_time').data('midi'),
+      delay_feedback: $('#delay_feedback').data('midi'),
+      lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
+      step_trigger: $('input#patch_step_trigger').prop('checked'),
+      lfo_shape: patch.lfo.shape === 'sawtooth' ? 'saw' : patch.lfo.shape
+    };
+  };
+
+  const updateHintButton = function() {
+    const gameIsActive = gameHasStarted && !gameFinished;
+    const hintsRemaining = MAX_HINTS - hintsUsed;
+    const $hintButton = $('#request-hint');
+
+    $hintButton.toggleClass('hidden', !gameIsActive);
+    $hintButton.prop(
+      'disabled',
+      !gameIsActive || hintRequestInFlight || hintsRemaining <= 0
+    );
+
+    const hintLabel = hintsRemaining > 0 ?
+      `Request a hint (${hintsRemaining} left)` :
+      'No hints remaining';
+
+    $hintButton.attr('aria-label', hintLabel);
+    $hintButton.attr('title', hintLabel);
+  };
+
+  const writeGameDataCookie = function(payload) {
+    const encodedValue = encodeURIComponent(JSON.stringify(payload));
+    VS.setCookie('gameData', encodedValue, 1, '/');
+    gameData = payload;
+  };
+
+  const hintTargetsFor = function(paramName) {
+    return HINT_TARGET_SELECTORS[paramName] || [];
+  };
+
+  const setHintHighlightVisible = function(visible) {
+    hintBlinkVisible = visible;
+    blinkingHintParams.forEach(function(paramName) {
+      hintTargetsFor(paramName).forEach(function(selector) {
+        $(selector).toggleClass('hint-highlight', visible);
+      });
+    });
+  };
+
+  const stopBlinkingHintParam = function(paramName) {
+    if (!blinkingHintParams.has(paramName)) { return; }
+
+    blinkingHintParams.delete(paramName);
+    hintTargetsFor(paramName).forEach(function(selector) {
+      $(selector).removeClass('hint-highlight');
+    });
+
+    if (blinkingHintParams.size === 0) {
+      clearInterval(hintBlinkIntervalId);
+      clearTimeout(hintBlinkTimeoutId);
+      hintBlinkIntervalId = null;
+      hintBlinkTimeoutId = null;
+      hintBlinkVisible = false;
+    }
+  };
+
+  const stopAllHintBlinking = function() {
+    Array.from(blinkingHintParams).forEach(stopBlinkingHintParam);
+  };
+
+  const startHintBlinking = function(hintParams) {
+    stopAllHintBlinking();
+
+    blinkingHintParams = new Set((hintParams || []).filter(function(paramName) {
+      return hintTargetsFor(paramName).length > 0;
+    }));
+
+    if (blinkingHintParams.size === 0 || gameFinished || !gameHasStarted) { return; }
+
+    setHintHighlightVisible(true);
+    hintBlinkIntervalId = setInterval(function() {
+      setHintHighlightVisible(!hintBlinkVisible);
+    }, HINT_BLINK_INTERVAL_MS);
+    hintBlinkTimeoutId = setTimeout(function() {
+      stopAllHintBlinking();
+    }, HINT_BLINK_DURATION_MS);
+  };
+
+  const persistGameProgress = function() {
+    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
+
+    writeGameDataCookie({
+      mysteryPatchId: mysteryPatchId,
+      gameStart: gameData.gameStart,
+      gameDeadline: gameData.gameDeadline,
+      hintsUsed: hintsUsed,
+      hintedParams: Array.from(hintedParams)
+    });
+  };
+
   const updatePostGameMessage = function() {
     if (gameFinished) {
       $('#post-game-message').show();
@@ -109,8 +251,11 @@ $(function() {
     $('#timer').hide().text('');
     $('#submit-solution').hide();
     $('#show-results').hide();
+    $('#request-hint').addClass('hidden');
     $('#post-game-message').hide();
     $('#audible-engine-mystery').addClass('start-game-callout');
+    stopAllHintBlinking();
+    updateHintButton();
   };
 
   let keyboardHintTimeout = null;
@@ -122,6 +267,7 @@ $(function() {
     $('#show-results').hide();
     $('#post-game-message').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
+    updateHintButton();
 
     keyboardHintTimeout = setTimeout(function() {
       $('#keyboard-highlight').addClass('start-keyboard-callout');
@@ -137,8 +283,11 @@ $(function() {
     $('#timer-description').hide();
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
+    $('#request-hint').addClass('hidden');
     $('#audible-engine-mystery').removeClass('start-game-callout');
     $('#need-practice').show();
+    stopAllHintBlinking();
+    updateHintButton();
     updateShowResultsButton();
     updatePostGameMessage();
   };
@@ -159,26 +308,7 @@ $(function() {
     const solutionParams = {
       id: mysteryPatchId,
       digest: digest,
-      patch: {
-        voice: $('#voice').data('midi'),
-        detune: $('#detune').data('midi'),
-        portamento: $('#portamento').data('midi'),
-        vco_eg_int: $('#vco_eg_int').data('midi'),
-        attack: $('#attack').data('midi'),
-        decay_release: $('#decay_release').data('midi'),
-        vcf_eg_int: $('#vcf_eg_int').data('midi'),
-        peak: $('#peak').data('midi'),
-        cutoff: $('#cutoff').data('midi'),
-        sustain: $('#sustain').data('midi'),
-        lfo_rate: $('#lfo_rate').data('midi'),
-        lfo_pitch_int: $('#lfo_pitch_int').data('midi'),
-        lfo_cutoff_int: $('#lfo_cutoff_int').data('midi'),
-        delay_time: $('#delay_time').data('midi'),
-        delay_feedback: $('#delay_feedback').data('midi'),
-        lfo_trigger_sync: $('input#patch_lfo_trigger_sync').prop('checked'),
-        step_trigger: $('input#patch_step_trigger').prop('checked'),
-        lfo_shape: patch.lfo.shape === 'sawtooth' ? 'saw' : patch.lfo.shape
-      }
+      patch: currentGuessParams()
     };
 
     $.post('/mystery_patch', solutionParams).done(function(response) {
@@ -224,21 +354,22 @@ $(function() {
     const gameStart = rightNow();
     const gameDeadline = gameStart + GAME_DURATION_SECONDS;
 
-    const cookiePayload = {
+    writeGameDataCookie({
       mysteryPatchId: mysteryPatchId,
       gameStart: gameStart,
-      gameDeadline: gameDeadline
-    };
-    const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('gameData', encodedValue, 1, '/');
-    gameData = cookiePayload;
+      gameDeadline: gameDeadline,
+      hintsUsed: 0,
+      hintedParams: []
+    });
   };
 
   const setResultsCookie = function() {
     const cookiePayload = {
       mysteryPatchId: mysteryPatchId,
       timeSubmitted: rightNow(),
-      results: resultsData
+      results: resultsData,
+      hintsUsed: hintsUsed,
+      hintedParams: Array.from(hintedParams)
     };
     const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
     VS.setCookie('resultsData', encodedValue, 1, '/');
@@ -306,6 +437,9 @@ $(function() {
     if (gameHasStarted || gameFinished) { return; }
 
     gameHasStarted = true;
+    hintsUsed = 0;
+    hintedParams = new Set();
+    stopAllHintBlinking();
     sendAnalyticsEvent('Mystery Patch', 'start');
     showStartedState();
     setGameStartedCookie();
@@ -333,7 +467,9 @@ $(function() {
       return {
         status: 'finished',
         gameData: cookieGameData,
-        resultsData: cookieResultsData.results
+        resultsData: cookieResultsData.results,
+        hintsUsed: cookieResultsData.hintsUsed || 0,
+        hintedParams: cookieResultsData.hintedParams || []
       };
     }
 
@@ -346,7 +482,9 @@ $(function() {
         return {
           status: 'expired_unsubmitted',
           gameData: cookieGameData,
-          resultsData: null
+          resultsData: null,
+          hintsUsed: cookieGameData.hintsUsed || 0,
+          hintedParams: cookieGameData.hintedParams || []
         };
       }
 
@@ -354,7 +492,9 @@ $(function() {
       return {
         status: 'active',
         gameData: cookieGameData,
-        resultsData: null
+        resultsData: null,
+        hintsUsed: cookieGameData.hintsUsed || 0,
+        hintedParams: cookieGameData.hintedParams || []
       };
     }
 
@@ -362,13 +502,18 @@ $(function() {
     return {
       status: 'not_started',
       gameData: null,
-      resultsData: null
+      resultsData: null,
+      hintsUsed: 0,
+      hintedParams: []
     };
   };
 
   const applySessionState = function(sessionState) {
     gameData = sessionState.gameData || undefined;
     resultsData = sessionState.resultsData || undefined;
+    hintsUsed = sessionState.hintsUsed || 0;
+    hintedParams = new Set(sessionState.hintedParams || []);
+    stopAllHintBlinking();
 
     // previously finished
     if (sessionState.status === 'finished') {
@@ -401,6 +546,8 @@ $(function() {
     // new game
     gameHasStarted = false;
     gameFinished = false;
+    hintsUsed = 0;
+    hintedParams = new Set();
     showNotStartedState();
     $('#pre-game-button').click();
   };
@@ -499,6 +646,48 @@ $(function() {
     this.blur();
   });
 
+  $('#request-hint').on('click tap', function(event) {
+    event.preventDefault();
+    if (!gameHasStarted || gameFinished || hintRequestInFlight || hintsUsed >= MAX_HINTS) {
+      return;
+    }
+
+    hintRequestInFlight = true;
+    updateHintButton();
+
+    $.post('/mystery_patch_hint', {
+      mysteryPatchId: mysteryPatchId,
+      patch: currentGuessParams()
+    }).done(function(response) {
+      hintsUsed = response.hints_used;
+      $(document).trigger('mysteryPatchHintReceived', [response.hint_params || []]);
+    }).fail(function(xhr) {
+      if (xhr.status === 429) {
+        hintsUsed = MAX_HINTS;
+        persistGameProgress();
+      }
+    }).always(function() {
+      hintRequestInFlight = false;
+      updateHintButton();
+    });
+  });
+
+  $(document).on('mysteryPatchHintReceived', function(_event, hintParams) {
+    (hintParams || []).forEach(function(paramName) {
+      hintedParams.add(paramName);
+    });
+    startHintBlinking(hintParams);
+    persistGameProgress();
+  });
+
+  Object.entries(HINT_TARGET_SELECTORS).forEach(function([paramName, selectors]) {
+    selectors.forEach(function(selector) {
+      $(document).on('mousedown touchstart pointerdown', selector, function() {
+        stopBlinkingHintParam(paramName);
+      });
+    });
+  });
+
   const printResultsInfo = function(animate) {
     const animateResults = animate && !inTestEnvironment;
     let animateInterval = animateResults ? 500 : 5;
@@ -548,6 +737,7 @@ $(function() {
 
       let correctVal = value[0];
       let printableVal = value[1];
+      const wasHinted = hintedParams.has(entry[0].toString());
 
       // Map voice midi val to voice name
       if (key === 'Voice') {
@@ -568,7 +758,11 @@ $(function() {
       }
       $tr.append($("<th class='result-param' scope='row'>").text(key));
       $tr.append($("<td>").text(correctVal));
-      $tr.append($("<td>").text(printableVal));
+      const $yourValueTd = $("<td>").text(printableVal);
+      if (wasHinted) {
+        $yourValueTd.append(' 💡');
+      }
+      $tr.append($yourValueTd);
       let $perctd = $('<td>');
       $perctd.text(perc);
       if (perc > 80) {
@@ -583,6 +777,9 @@ $(function() {
         emojiSummary += '🟥';
       } else {
         emojiSummary += '🟨';
+      }
+      if (wasHinted) {
+        emojiSummary += '💡';
       }
       $tr.append($perctd);
 

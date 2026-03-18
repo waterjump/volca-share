@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MysteryPatchesController < ApplicationController
+  MAX_HINTS_PER_GAME = 2
+
   def mystery_patch
     respond_to do |format|
       # NOTE: This renders the page the game is played on
@@ -55,37 +57,79 @@ class MysteryPatchesController < ApplicationController
     end
   end
 
+  def hint
+    mystery_patch = MysteryPatch.find(hint_request_params[:mysteryPatchId])
+
+    if hints_used_for(mystery_patch.id.to_s) >= MAX_HINTS_PER_GAME
+      render(
+        json: { message: 'Hint limit reached' },
+        status: :too_many_requests
+      ) and return
+    end
+
+    hint_params = MysteryPatchHintFinder.new(
+      mystery_patch: mystery_patch,
+      guess: guess_params.to_h.symbolize_keys
+    ).hint_params
+
+    increment_hints_used_for(mystery_patch.id.to_s)
+
+    render json: {
+      hint_params: hint_params,
+      hints_used: hints_used_for(mystery_patch.id.to_s),
+      hints_remaining: MAX_HINTS_PER_GAME - hints_used_for(mystery_patch.id.to_s)
+    }
+  end
+
   private
+
+  def hint_request_params
+    @hint_request_params ||= params.permit(:mysteryPatchId)
+  end
+
+  def guess_params
+    @guess_params ||= params
+      .require(:patch)
+      .permit(
+        :voice,
+        :detune,
+        :portamento,
+        :vco_eg_int,
+        :cutoff,
+        :peak,
+        :vcf_eg_int,
+        :lfo_rate,
+        :lfo_pitch_int,
+        :lfo_cutoff_int,
+        :attack,
+        :decay_release,
+        :sustain,
+        :delay_time,
+        :delay_feedback,
+        :lfo_shape,
+        :lfo_trigger_sync,
+        :step_trigger,
+      )
+  end
 
   def solution_params
     @solution_params ||= begin
       id = params.require(:id)
       digest = params.require(:digest)
 
-      guess_params = params
-        .require(:patch)
-        .permit(
-          :voice,
-          :detune,
-          :portamento,
-          :vco_eg_int,
-          :cutoff,
-          :peak,
-          :vcf_eg_int,
-          :lfo_rate,
-          :lfo_pitch_int,
-          :lfo_cutoff_int,
-          :attack,
-          :decay_release,
-          :sustain,
-          :delay_time,
-          :delay_feedback,
-          :lfo_shape,
-          :lfo_trigger_sync,
-          :step_trigger,
-        )
+      guess_params.merge(digest: digest, id: id)
+    end
+  end
 
-       guess_params.merge(digest: digest, id: id)
-     end
+  def hints_used_for(mystery_patch_id)
+    mystery_patch_hint_counts[mystery_patch_id].to_i
+  end
+
+  def increment_hints_used_for(mystery_patch_id)
+    mystery_patch_hint_counts[mystery_patch_id] = hints_used_for(mystery_patch_id) + 1
+  end
+
+  def mystery_patch_hint_counts
+    session[:mystery_patch_hint_counts] ||= {}
   end
 end
