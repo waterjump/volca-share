@@ -9,6 +9,7 @@ module Keys
     include Mongoid::Document::Taggable
     include ActiveModel::Validations
     include AudioSample
+    include DefaultPatchValidation
     include Tags
 
     field :name, type: String
@@ -79,37 +80,24 @@ module Keys
 
     after_save :persist_quality
 
+    DEFAULT_PATCH_FIELDS = %i[
+      voice octave detune portamento vco_eg_int cutoff peak vcf_eg_int
+      lfo_rate lfo_pitch_int lfo_cutoff_int attack decay_release sustain
+      delay_time delay_feedback lfo_shape lfo_trigger_sync step_trigger
+      tempo_delay
+    ].freeze
+
+    DEFAULT_PATCH_BOOLEAN_FIELDS = %i[
+      lfo_trigger_sync step_trigger tempo_delay
+    ].freeze
+
+    DEFAULT_PATCH_STRING_FIELDS = %i[lfo_shape].freeze
+
     def persist_quality
       set(quality: calculate_quality)
     end
 
     private
-
-    def patch_is_not_default
-      not_default =
-        voice_changed_from_default? ||
-        octave_changed_from_default? ||
-        detune_changed_from_default? ||
-        portamento_changed_from_default? ||
-        vco_eg_int_changed_from_default? ||
-        cutoff_changed_from_default? ||
-        peak_changed_from_default? ||
-        vcf_eg_int_changed_from_default? ||
-        lfo_rate_changed_from_default? ||
-        lfo_pitch_int_changed_from_default? ||
-        lfo_cutoff_int_changed_from_default? ||
-        attack_changed_from_default? ||
-        decay_release_changed_from_default? ||
-        sustain_changed_from_default? ||
-        delay_time_changed_from_default? ||
-        delay_feedback_changed_from_default? ||
-        lfo_shape_changed_from_default? ||
-        lfo_trigger_sync_changed_from_default? ||
-        step_trigger_changed_from_default? ||
-        tempo_delay_changed_from_default?
-
-      errors.add(:patch, 'is not valid.') unless not_default
-    end
 
     def calculate_quality
       qual = 1

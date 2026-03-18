@@ -304,30 +304,8 @@ RSpec.describe Keys::Patch do
 
     context 'when patch is all default values' do
       it 'is not valid' do
-        default_patch =
-          FactoryBot.build(
-            :keys_patch,
-            voice: 70,
-            octave: 70,
-            detune: 0,
-            portamento: 0,
-            vco_eg_int: 0,
-            cutoff: 63,
-            peak: 0,
-            vcf_eg_int: 0,
-            lfo_rate: 0,
-            lfo_pitch_int: 0,
-            lfo_cutoff_int: 0,
-            attack: 0,
-            decay_release: 63,
-            sustain: 127,
-            delay_time: 0,
-            delay_feedback: 0,
-            lfo_shape: 'triangle',
-            lfo_trigger_sync: false,
-            step_trigger: false,
-            tempo_delay: true
-          )
+        default_patch = described_class.new(name: 'Default patch', slug: 'default-patch')
+
         expect(default_patch).to be_invalid
       end
     end

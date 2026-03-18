@@ -8,6 +8,7 @@ class Patch
   include Mongoid::Document::Taggable
   include ActiveModel::Validations
   include AudioSample
+  include DefaultPatchValidation
   include Tags
 
   field :name, type: String
@@ -76,35 +77,20 @@ class Patch
 
   after_save :persist_quality
 
-  def patch_is_not_default
-    not_default =
-      attack_changed_from_default? ||
-      decay_release_changed_from_default? ||
-      cutoff_eg_int_changed_from_default? ||
-      octave_changed_from_default? ||
-      peak_changed_from_default? ||
-      cutoff_changed_from_default? ||
-      lfo_rate_changed_from_default? ||
-      lfo_int_changed_from_default? ||
-      vco1_pitch_changed_from_default? ||
-      vco1_active_changed_from_default? ||
-      vco2_pitch_changed_from_default? ||
-      vco2_active_changed_from_default? ||
-      vco3_pitch_changed_from_default? ||
-      vco3_active_changed_from_default? ||
-      vco_group_changed_from_default? ||
-      lfo_target_amp_changed_from_default? ||
-      lfo_target_pitch_changed_from_default? ||
-      lfo_target_cutoff_changed_from_default? ||
-      lfo_wave_changed_from_default? ||
-      vco1_wave_changed_from_default? ||
-      vco2_wave_changed_from_default? ||
-      vco3_wave_changed_from_default? ||
-      sustain_on_changed_from_default? ||
-      amp_eg_on_changed_from_default?
+  DEFAULT_PATCH_FIELDS = %i[
+    attack decay_release cutoff_eg_int octave peak cutoff lfo_rate lfo_int
+    vco1_pitch vco1_active vco2_pitch vco2_active vco3_pitch vco3_active
+    vco_group lfo_target_amp lfo_target_pitch lfo_target_cutoff lfo_wave
+    vco1_wave vco2_wave vco3_wave sustain_on amp_eg_on
+  ].freeze
 
-    errors.add(:patch, 'is not valid.') unless not_default
-  end
+  DEFAULT_PATCH_BOOLEAN_FIELDS = %i[
+    vco1_active vco2_active vco3_active lfo_target_amp lfo_target_pitch
+    lfo_target_cutoff lfo_wave vco1_wave vco2_wave vco3_wave sustain_on
+    amp_eg_on
+  ].freeze
+
+  DEFAULT_PATCH_STRING_FIELDS = %i[vco_group].freeze
 
   def persist_quality
     set(quality: calculate_quality)

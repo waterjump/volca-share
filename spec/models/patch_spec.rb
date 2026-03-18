@@ -29,34 +29,8 @@ RSpec.describe Patch  do
     describe '#patch_is_not_default' do
       context 'when all patch synth paramaters are default' do
         it 'marks the patch as invalid' do
-          default_patch =
-            FactoryBot.build(
-              :patch,
-              attack: 63,
-              decay_release: 63,
-              cutoff_eg_int: 63,
-              octave: 63,
-              peak: 63,
-              cutoff: 63,
-              lfo_rate: 63,
-              lfo_int: 63,
-              vco1_pitch: 63,
-              vco1_active: true,
-              vco2_pitch: 63,
-              vco2_active: true,
-              vco3_pitch: 63,
-              vco3_active: true,
-              vco_group: 'three',
-              lfo_target_amp: false,
-              lfo_target_pitch: false,
-              lfo_target_cutoff: true,
-              lfo_wave: false,
-              vco1_wave: false,
-              vco2_wave: false,
-              vco3_wave: true,
-              sustain_on: false,
-              amp_eg_on: false
-            )
+          default_patch = described_class.new(name: 'Default patch', slug: 'default-patch')
+
           expect(default_patch).to be_invalid
         end
       end
