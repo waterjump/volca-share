@@ -721,8 +721,8 @@ $(function() {
       );
       revealElement('#overall-score', animateResults);
       $('#share-text').val([
-        `I guessed today's mystery synth patch with ${resultsData.total_score}% `,
-        `accuracy. (Mystery Patch #${mysteryPatchNumber})\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
+        `Mystery Patch #${mysteryPatchNumber}: I guessed today's mystery synth patch with ${resultsData.total_score}% `,
+        `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
         `\n\n#VSmysterypatch`
       ].join('')
       );
