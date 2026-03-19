@@ -1,8 +1,9 @@
-VS.AudioEngine = function(patch, sequence) {
+VS.AudioEngine = function(patch, sequence = [], options = {}) {
   // ===================================================================
   // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH TONE.JS
   // ===================================================================
 
+  const sequencerEnabled = options.enableSequencer !== false;
   this.notePlaying = new Tone.Param(new Tone.Gain().gain);
   const attackEndTime = new Tone.Param(new Tone.Gain().gain);
   const masterAmp = new Tone.Gain();
@@ -22,6 +23,25 @@ VS.AudioEngine = function(patch, sequence) {
   const builtInDecay = 0.1;
   let osc = [null, null, null, null];
   let sequencerPlaying = false;
+  let disposed = false;
+  let sequencerEventId = null;
+
+  const toneState = function() {
+    if (Tone.context && Tone.context.state) {
+      return Tone.context.state;
+    }
+
+    try {
+      const context = Tone.getContext && Tone.getContext();
+      if (context && context.rawContext && context.rawContext.state) {
+        return context.rawContext.state;
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    return 'unknown';
+  };
 
   // TODO: Encampsulate this setup script in its own function.
 
@@ -204,12 +224,13 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   const runToneSequencer = function(){
+    if (!sequencerEnabled) { return; }
     setTempo();
 
     let i = 0;
     let previousStep;
 
-    Tone.Transport.scheduleRepeat(function(time) {
+    sequencerEventId = Tone.Transport.scheduleRepeat(function(time) {
       if (!sequencerPlaying) { return; }
 
       while (!sequence[i % 16].activeStep) {
@@ -249,16 +270,57 @@ VS.AudioEngine = function(patch, sequence) {
 
   runToneSequencer();
 
+  const canInteract = () => {
+    return !disposed;
+  };
+
+  const safelyDisposeToneNode = function(node) {
+    if (!node) { return; }
+
+    try {
+      if (typeof node.stop === 'function' && node.state === 'started') {
+        node.stop();
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    try {
+      if (typeof node.disconnect === 'function') {
+        node.disconnect();
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    try {
+      if (typeof node.dispose === 'function') {
+        node.dispose();
+      }
+    } catch (error) {
+      // no-op
+    }
+  };
+
   this.init = () => {
+    if (!canInteract()) { return; }
     Tone.start();
     masterAmp.toDestination();
+
+    if (sequencerEnabled) {
+      Tone.Transport.loop = true;
+      Tone.Transport.loopEnd = 60 / patch.tempo * 4 + 's';
+    }
   };
 
   this.activateAudio = function() {
-    if (Tone.state === 'running') { return; }
+    if (!canInteract()) { return Promise.resolve(false); }
+    if (toneState() === 'running') { return Promise.resolve(true); }
 
-    Tone.context.resume().then(() => {
-      Tone.start();
+    return Tone.context.resume().then(() => {
+      return Tone.start();
+    }).then(() => {
+      return true;
     });
   };
 
@@ -299,7 +361,15 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.playNewNote = function(time = Tone.now()) {
-    this.activateAudio();
+    if (!canInteract()) { return; }
+    if (toneState() !== 'running') {
+      this.activateAudio().then((activated) => {
+        if (!activated || !canInteract()) { return; }
+        this.playNewNote(Tone.now());
+      }).catch(() => {});
+      return;
+    }
+
     let frequency;
 
     // Filter EG reset
@@ -336,6 +406,7 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.changeCurrentNote = function(time = Tone.now()) {
+    if (!canInteract()) { return; }
     let frequency = Tone.Frequency(this.notePlaying.getValueAtTime(time), 'midi').toFrequency();
     let lastFrequency = oscFreqNode.getValueAtTime(time);
 
@@ -344,6 +415,7 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.stopNote = function(time = Tone.now()) {
+    if (!canInteract()) { return; }
     const currentValue = ampEgGainParam.getValueAtTime(time);
 
     // If note is already off, don't bother stopping it.
@@ -390,6 +462,7 @@ VS.AudioEngine = function(patch, sequence) {
 
   // CHANGE OCTAVE
   this.changeOctave = (octaveOffset, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     this.notePlaying.setValueAtTime(
       this.notePlaying.getValueAtTime(time) + octaveOffset,
       time
@@ -402,34 +475,42 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.setPeak = (value) => {
+    if (!canInteract()) { return; }
     filter.Q.value = value;
   };
 
   this.setCutoff = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     filter.frequency.setValueAtTime(value, time);
   };
 
   this.setFilterEgInt = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     filterEgAmp.gain.setValueAtTime(value, time);
   };
 
   this.setVolume = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     masterAmp.gain.setValueAtTime(value, time);
   };
 
   this.setOscMuteAmp = (oscNumber, value) => {
+    if (!canInteract()) { return; }
     oscMuteAmps[oscNumber].gain.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoRate = (value) => {
+    if (!canInteract() || !oscLfo) { return; }
     oscLfo.frequency.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoWave = (value) => {
+    if (!canInteract() || !oscLfo) { return; }
     oscLfo.type = value;
   }
 
   this.setLfoInt = (value) => {
+    if (!canInteract()) { return; }
     // TODO: Think about calling setAmpLfoPitchGain() here maybe.  And for others.
     if (patch.lfo.targetPitch) {
       ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, Tone.now());
@@ -445,45 +526,96 @@ VS.AudioEngine = function(patch, sequence) {
   };
 
   this.setNotePlaying = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     this.notePlaying.setValueAtTime(value, time);
   };
 
   this.getNotePlaying = () => {
+    if (!canInteract()) { return undefined; }
     return this.notePlaying.getValueAtTime(Tone.now());
   };
 
   this.setOscPitch = (index, value) => {
+    if (!canInteract()) { return; }
     osc[index].detune.setValueAtTime(value, Tone.now());
   };
 
   this.setTempo = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     setTempo();
   };
 
   this.startSequencer = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     sequencerPlaying = true;
     Tone.Transport.start('+0');
   };
 
   this.stopSequencer = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     sequencerPlaying = false;
     Tone.Transport.stop();
     this.stopNote(Tone.now() + 0.2);
   };
 
   this.getSequencerPlaying = () => {
-    return sequencerPlaying;
+    return sequencerEnabled ? sequencerPlaying : false;
   };
 
   this.setSequencerPlaying = (value) => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     sequencerPlaying = value;
   };
 
   this.getOsc = (index) => {
+    if (!canInteract()) { return null; }
     return osc[index];
   };
 
   this.setOscShape = (index, value) => {
+    if (!canInteract()) { return; }
     osc[index].type = value;
+  };
+
+  this.dispose = () => {
+    if (disposed) { return; }
+
+    const releaseTime = Tone.now();
+    this.stopSequencer();
+    this.stopNote(releaseTime);
+    this.setVolume(0, releaseTime);
+
+    if (sequencerEnabled && sequencerEventId !== null) {
+      Tone.Transport.clear(sequencerEventId);
+      sequencerEventId = null;
+    }
+
+    disposed = true;
+
+    safelyDisposeToneNode(this.notePlaying);
+    safelyDisposeToneNode(attackEndTime);
+    safelyDisposeToneNode(masterAmp);
+    safelyDisposeToneNode(preAmp);
+    safelyDisposeToneNode(filter);
+    safelyDisposeToneNode(filterEgAmp);
+    safelyDisposeToneNode(filterEg);
+    safelyDisposeToneNode(ampEg);
+    safelyDisposeToneNode(ampEgGainParam);
+    safelyDisposeToneNode(osc1MuteAmp);
+    safelyDisposeToneNode(osc2MuteAmp);
+    safelyDisposeToneNode(osc3MuteAmp);
+    safelyDisposeToneNode(ampLfoPitch);
+    safelyDisposeToneNode(ampLfoCutoff);
+    safelyDisposeToneNode(lfoAmpWaveShaper);
+    safelyDisposeToneNode(ampLfoAmp);
+    safelyDisposeToneNode(oscLfo);
+    safelyDisposeToneNode(oscFreqNode);
+
+    [1, 2, 3].forEach(index => {
+      safelyDisposeToneNode(osc[index]);
+    });
+
+    oscLfo = null;
+    osc = [null, null, null, null];
   };
 };

@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class PatchesController < ApplicationController
-  before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
+  before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed, :emulation]
   before_action :format_tags, only: [:create, :update]
   before_action :authenticate_user!, except: [
     :index,
     :show,
     :new,
     :create,
-    :oembed
+    :oembed,
+    :emulation
   ]
 
   # GET /patches
@@ -138,6 +139,19 @@ class PatchesController < ApplicationController
           audio_sample_code: @patch.audio_sample_code,
           name: @patch.name,
           patch_location: patch_location
+        }
+      end
+    end
+  end
+
+  def emulation
+    respond_to do |format|
+      format.json do
+        render json: {
+          id: @patch.id.to_s,
+          name: @patch.name,
+          patch_location: patch_location,
+          emulator_params: @patch.emulator_query_string
         }
       end
     end

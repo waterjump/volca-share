@@ -100,4 +100,39 @@ RSpec.describe 'shared/_patch_card.html.haml', type: :view do
   it 'shows date the patch was created' do
     expect(rendered).to have_content(format_date(patch.created_at))
   end
+
+  it 'renders a patch emulation control with the emulation URL'\
+     ' and active-state hooks' do
+    emulation_url = emulation_user_patch_path(patch.user.slug, patch.slug)
+    patch_selector =
+      ".patch-holder[data-patch-id='#{patch.id}']" \
+      "[data-emulation-url='#{emulation_url}']" \
+      "[data-emulation-active='false']"
+    toggle_selector =
+      ".bass-emulate-toggle[data-patch-id='#{patch.id}']" \
+      "[data-emulation-url='#{emulation_url}']" \
+      "[data-emulation-active='false']" \
+      "[aria-pressed='false']"
+
+    expect(rendered).to have_css(
+      patch_selector
+    )
+    expect(rendered).to have_css(
+      toggle_selector
+    )
+  end
+
+  context 'when patch has no user' do
+    let(:patch) { create(:patch, user: nil) }
+
+    it 'uses the anonymous emulation URL on the control' do
+      toggle_selector =
+        ".bass-emulate-toggle" \
+        "[data-emulation-url='#{emulation_patch_path(patch.id)}']"
+
+      expect(rendered).to have_css(
+        toggle_selector
+      )
+    end
+  end
 end

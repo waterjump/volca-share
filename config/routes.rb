@@ -14,7 +14,11 @@ Rails.application.routes.draw do
 
   devise_for :users, controllers: { registrations: 'users/registrations' }
   resources :user, user_options do
-    resources :patch, only: [:show], param: :slug, controller: 'patches'
+    resources :patch, only: [:show], param: :slug, controller: 'patches' do
+      member do
+        get :emulation
+      end
+    end
     resources :keys_patch,
               only: [:show, :edit],
               param: :slug,
@@ -26,7 +30,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :patch, param: :id, controller: 'patches', except: [:index]
+  resources :patch, param: :id, controller: 'patches', except: [:index] do
+    member do
+      get :emulation
+    end
+  end
   get 'bass/emulator' => 'emulators#new', as: :bass_emulator
   get 'keys/emulator' => 'emulators#new_keys', as: :keys_emulator
   get 'synth_patch_namer' => 'synth_patch_namers#show'

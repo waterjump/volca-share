@@ -64,6 +64,46 @@ RSpec.describe PatchesController, type: :controller do
     end
   end
 
+  describe 'GET #emulation' do
+    it 'returns the emulator payload as JSON for user-owned patches' do
+      patch = create(:user_patch)
+
+      get :emulation,
+          params: { user_slug: patch.user.slug, slug: patch.slug, format: :json },
+          session: valid_session
+
+      json = JSON.parse(response.body)
+      expect(response.status).to eq(200)
+      expect(json).to include(
+        {
+          'id' => patch.id.to_s,
+          'name' => patch.name,
+          'patch_location' => user_patch_path(patch.user.slug, patch.slug),
+          'emulator_params' => VolcaShare::PatchViewModel.wrap(patch).emulator_query_string.as_json
+        }
+      )
+    end
+
+    it 'returns the emulator payload as JSON for anonymous patches' do
+      patch = create(:patch)
+
+      get :emulation,
+          params: { id: patch.id, format: :json },
+          session: valid_session
+
+      json = JSON.parse(response.body)
+      expect(response.status).to eq(200)
+      expect(json).to include(
+        {
+          'id' => patch.id.to_s,
+          'name' => patch.name,
+          'patch_location' => patch_path(patch.id),
+          'emulator_params' => VolcaShare::PatchViewModel.wrap(patch).emulator_query_string.as_json
+        }
+      )
+    end
+  end
+
   describe 'POST #create' do
     context 'with valid params' do
       it 'creates a new Patch' do

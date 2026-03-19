@@ -1,7 +1,14 @@
 %h1 Bass Patches
 
+- musical_typing_button_aria = { label: 'Toggle Music Typing (m)', pressed: 'false' }
+- musical_typing_button_data = { musical_typing_enabled: 'false', toggle: 'tooltip', placement: 'bottom', delay: '{"show":450,"hide":100}' }
+
 .controls
-  =link_to 'New Patch', new_patch_path, class: 'btn btn-primary'
+  = link_to 'New Patch', new_patch_path, class: 'btn btn-primary'
+  .bass-index-musical-typing.hidden{ data: { musical_typing_visible: 'false' } }
+    = button_tag type: 'button', id: 'bass-musical-typing-toggle', class: 'bass-musical-typing-toggle', title: 'Toggle Music Typing (m)', aria: musical_typing_button_aria, data: musical_typing_button_data, disabled: true do
+      = render 'shared/musical_typing_icon'
+    #bass-musical-typing-status.bass-musical-typing-status{ data: { musical_typing_status: 'inactive' } }
 .patches
   = render '/shared/audio_preview'
   = render 'shared/patches'

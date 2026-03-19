@@ -34,6 +34,10 @@ VS.EmulatorParams = function() {
     return midiValue / 127.0;
   };
 
+  const isTrue = function(value) {
+    return value === true || value === 'true';
+  };
+
   this.settempo = function(midiValue) {
     this.tempo = calculateTempo(midiValue);
   };
@@ -89,7 +93,7 @@ VS.EmulatorParams = function() {
     this.setvco_pitch(3, midiValue);
   };
   this.setvco_active = function(oscNumber, value) {
-    this.vco[oscNumber].amp = value === 'true' ? this.defaultVcoAmp : 0;
+    this.vco[oscNumber].amp = isTrue(value) ? this.defaultVcoAmp : 0;
   };
   this.setvco1_active = function(value) {
     this.setvco_active(1, value);
@@ -104,13 +108,13 @@ VS.EmulatorParams = function() {
     this.volume = this.getPercentage(value);
   };
   this.setlfo_target_amp = function(value) {
-    this.lfo.targetAmp = (value === 'true');
+    this.lfo.targetAmp = isTrue(value);
   };
   this.setlfo_target_pitch = function(value) {
-    this.lfo.targetPitch = (value === 'true');
+    this.lfo.targetPitch = isTrue(value);
   };
   this.setlfo_target_cutoff = function(value) {
-    this.lfo.targetCutoff = (value === 'true');
+    this.lfo.targetCutoff = isTrue(value);
   };
   this.setlfo_wave = function(shape) {
     this.lfo.shape = shape;
@@ -125,13 +129,41 @@ VS.EmulatorParams = function() {
     this.vco[3].shape = shape;
   };
   this.setsustain_on = function(value) {
-    this.sustainOn = (value === 'true');
+    this.sustainOn = isTrue(value);
   };
   this.setamp_eg_on = function(value) {
-    this.ampEgOn = (value === 'true');
+    this.ampEgOn = isTrue(value);
   };
   this.toggleVcoAmp = function(oscNumber) {
     this.vco[oscNumber].amp = this.vco[oscNumber].amp === 0 ? this.defaultVcoAmp : 0;
+  };
+
+  this.setAllParams = function(params) {
+    this.setattack(params.attack);
+    this.setdecay_release(params.decay_release);
+    this.setcutoff_eg_int(params.cutoff_eg_int);
+    this.setoctave(params.octave);
+    this.setpeak(params.peak);
+    this.setcutoff(params.cutoff);
+    this.setlfo_rate(params.lfo_rate);
+    this.setlfo_int(params.lfo_int);
+    this.setvco1_pitch(params.vco1_pitch);
+    this.setvco2_pitch(params.vco2_pitch);
+    this.setvco3_pitch(params.vco3_pitch);
+    this.setvco1_active(params.vco1_active);
+    this.setvco2_active(params.vco2_active);
+    this.setvco3_active(params.vco3_active);
+    this.setvolume(params.volume || 127);
+    this.setlfo_target_amp(params.lfo_target_amp);
+    this.setlfo_target_pitch(params.lfo_target_pitch);
+    this.setlfo_target_cutoff(params.lfo_target_cutoff);
+    this.setlfo_wave(params.lfo_wave);
+    this.setvco1_wave(params.vco1_wave);
+    this.setvco2_wave(params.vco2_wave);
+    this.setvco3_wave(params.vco3_wave);
+    this.setsustain_on(params.sustain_on);
+    this.setamp_eg_on(params.amp_eg_on);
+    this.settempo(params.tempo || 128);
   };
 
   // UTILITY FUNCTIONS

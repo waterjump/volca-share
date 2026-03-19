@@ -403,6 +403,23 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
     return !disposed;
   };
 
+  const toneState = function() {
+    if (Tone.context && Tone.context.state) {
+      return Tone.context.state;
+    }
+
+    try {
+      const context = Tone.getContext && Tone.getContext();
+      if (context && context.rawContext && context.rawContext.state) {
+        return context.rawContext.state;
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    return 'unknown';
+  };
+
   const safelyDisposeToneNode = function(node) {
     if (!node) { return; }
 
@@ -444,11 +461,13 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
   };
 
   this.activateAudio = function() {
-    if (!canInteract()) { return; }
-    if (Tone.state === 'running') { return; }
+    if (!canInteract()) { return Promise.resolve(false); }
+    if (toneState() === 'running') { return Promise.resolve(true); }
 
-    Tone.context.resume().then(() => {
-      Tone.start();
+    return Tone.context.resume().then(() => {
+      return Tone.start();
+    }).then(() => {
+      return true;
     });
   };
 
@@ -521,7 +540,13 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
 
   this.playNewNote = function(note, time = Tone.now()) {
     if (!canInteract()) { return; }
-    this.activateAudio();
+    if (toneState() !== 'running') {
+      this.activateAudio().then((activated) => {
+        if (!activated || !canInteract()) { return; }
+        this.playNewNote(note, Tone.now());
+      }).catch(() => {});
+      return;
+    }
 
     if (!patch.voice.includes('poly')) {
       turnOnAllOscAmps();

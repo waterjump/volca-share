@@ -108,7 +108,8 @@
         }
       }
 
-      .keys-emulate-toggle {
+      .keys-emulate-toggle,
+      .bass-emulate-toggle {
         flex: 0 0 auto;
         padding: 0;
         border: 0;
@@ -117,7 +118,8 @@
         line-height: 1;
       }
 
-      .keys-emulate-symbol {
+      .keys-emulate-symbol,
+      .bass-emulate-symbol {
         display: inline-block;
         font-size: 21px;
         overflow: visible;
@@ -125,7 +127,9 @@
       }
 
       .keys-emulate-toggle:hover,
-      .keys-emulate-toggle:focus {
+      .keys-emulate-toggle:focus,
+      .bass-emulate-toggle:hover,
+      .bass-emulate-toggle:focus {
         color: #000;
       }
       .description {
@@ -154,18 +158,21 @@
   flex-wrap: wrap;
 }
 
-.keys-index-musical-typing {
+.keys-index-musical-typing,
+.bass-index-musical-typing {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-left: auto;
 }
 
-.keys-index-musical-typing.hidden {
+.keys-index-musical-typing.hidden,
+.bass-index-musical-typing.hidden {
   display: none;
 }
 
-.keys-musical-typing-toggle {
+.keys-musical-typing-toggle,
+.bass-musical-typing-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -204,38 +211,50 @@
   fill: #1f1f1f;
 }
 
-.keys-musical-typing-toggle[disabled] {
+.keys-musical-typing-toggle[disabled],
+.bass-musical-typing-toggle[disabled] {
   opacity: 1;
   cursor: not-allowed;
 }
 
 .keys-musical-typing-toggle:not([disabled]):hover,
-.keys-musical-typing-toggle:not([disabled]):focus {
+.keys-musical-typing-toggle:not([disabled]):focus,
+.bass-musical-typing-toggle:not([disabled]):hover,
+.bass-musical-typing-toggle:not([disabled]):focus {
   background: #b2b2b2;
   border-color: #767676;
 }
 
 .keys-musical-typing-toggle[aria-pressed='true'],
-.keys-musical-typing-toggle[data-musical-typing-enabled='true'] {
+.keys-musical-typing-toggle[data-musical-typing-enabled='true'],
+.bass-musical-typing-toggle[aria-pressed='true'],
+.bass-musical-typing-toggle[data-musical-typing-enabled='true'] {
   background: #ffb21c;
   border-color: #cf8c00;
   color: #111;
 }
 
 .keys-musical-typing-toggle[aria-pressed='true'] .keys-musical-typing-icon-white,
-.keys-musical-typing-toggle[data-musical-typing-enabled='true'] .keys-musical-typing-icon-white {
+.keys-musical-typing-toggle[data-musical-typing-enabled='true'] .keys-musical-typing-icon-white,
+.bass-musical-typing-toggle[aria-pressed='true'] .keys-musical-typing-icon-white,
+.bass-musical-typing-toggle[data-musical-typing-enabled='true'] .keys-musical-typing-icon-white {
   fill: #fff7df;
 }
 
 .keys-musical-typing-toggle[aria-pressed='true']:not([disabled]):hover,
 .keys-musical-typing-toggle[data-musical-typing-enabled='true']:not([disabled]):hover,
 .keys-musical-typing-toggle[aria-pressed='true']:not([disabled]):focus,
-.keys-musical-typing-toggle[data-musical-typing-enabled='true']:not([disabled]):focus {
+.keys-musical-typing-toggle[data-musical-typing-enabled='true']:not([disabled]):focus,
+.bass-musical-typing-toggle[aria-pressed='true']:not([disabled]):hover,
+.bass-musical-typing-toggle[data-musical-typing-enabled='true']:not([disabled]):hover,
+.bass-musical-typing-toggle[aria-pressed='true']:not([disabled]):focus,
+.bass-musical-typing-toggle[data-musical-typing-enabled='true']:not([disabled]):focus {
   background: #f3a300;
   border-color: #b97800;
 }
 
-.keys-musical-typing-status {
+.keys-musical-typing-status,
+.bass-musical-typing-status {
   font-size: 12px;
   color: #666;
 }
