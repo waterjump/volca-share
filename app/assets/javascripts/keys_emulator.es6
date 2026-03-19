@@ -11,17 +11,7 @@ VS.KeysEmulator = function() {
   const patch = emulatorParams;
 
   // initialize sequence object
-  const sequence = [];
-  for (let index = 0; index < 16; index++) {
-    sequence.push(
-      {
-        index: index,
-        note: 60,
-        slide: false,
-        activeStep: true
-      }
-    );
-  }
+  const sequence = VS.buildDefaultKeysSequence();
 
   const setSequenceView = function() {
     if (sequence.length !== 16) { return }
@@ -155,7 +145,6 @@ VS.KeysEmulator = function() {
   // END query string params
   // =======================
 
-  let keysDown = [];
   let functionMode = false;
   let keyboardPlaying = false;
 
@@ -244,66 +233,21 @@ VS.KeysEmulator = function() {
     if (keyStroke) {
       // Turn octave knob
       new VS.SnapKnob($('#octave')).setKnob(emulatorConstants.darkOctaveKnobMidiMap[patch.octave]);
-
-      const aNoteIsPlaying = managedEngineList().some(binding => binding.engine.noteIsPlaying());
-      if (!aNoteIsPlaying) { return; } // at init time
     }
-
-    if (keysDown.length === 0) { return; } // when it's amp_eg release
-
-    // Transpose all keys held down to new octave
-    keysDown = keysDown.map(key => key + octaveOffset);
-
-    managedEngineList().forEach(binding => {
-      binding.engine.changeOctave(octaveOffset);
-    });
   }
 
-  changeOctave(0);
+  const musicalTyping = new VS.KeysKeyboardController({
+    patchParams: patch,
+    emulatorConstants: emulatorConstants,
+    getBindings: managedEngineList,
+    onNoteDown: function() {
+      document.dispatchEvent(new CustomEvent('hideKeyboardHighlight'));
+    },
+    onOctaveChange: changeOctave
+  });
+
+  musicalTyping.syncOctave();
   sequences.init();
-
-  const keyboardDown = function(note){
-    document.dispatchEvent(new CustomEvent('hideKeyboardHighlight'));
-
-    keysDown.push(note);
-
-    managedEngineList().forEach(binding => {
-      const voice = binding.patchParams.voice;
-      if (keysDown.length === 1) {
-        binding.engine.playNewNote(note);
-      } else if (voice.includes('poly')) {
-        binding.engine.addNote(keysDown);
-      } else {
-        binding.engine.changeCurrentNote(note);
-      }
-    });
-  };
-
-  // This transposes keycode based on octave
-  const octaveAdjustedKeyCode = (keycode) => {
-    const octaveOffset = (patch.octave - 3) * 12;
-    return emulatorConstants.keyMidiMap[keycode] + octaveOffset;
-  };
-
-  const keyboardUp = function(noteThatStopped) {
-    keysDown = keysDown.filter(key => key !== noteThatStopped);
-    managedEngineList().forEach(binding => {
-      const voice = binding.patchParams.voice;
-
-      if (keysDown.length > 0) {
-        if (voice.includes('poly')) {
-          binding.engine.stopPolyNote(keysDown, noteThatStopped);
-          return;
-        } else {
-          binding.engine.changeCurrentNote(keysDown[keysDown.length - 1]);
-          return;
-        }
-      }
-
-      binding.engine.stopPolyNote(keysDown, noteThatStopped);
-      binding.engine.stopNote();
-    });
-  };
 
   $('#play').on('click tap', function() {
     audioEngine.activateAudio();
@@ -331,41 +275,6 @@ VS.KeysEmulator = function() {
     audioEngine.stopSequencer();
     $('#play').toggleClass('playing');
     $('#stop').toggleClass('hidden');
-  };
-
-  const macroOctaveUp = () => {
-    if (patch.octave >= 9) { return }
-
-    patch.octave += 1;
-    changeOctave(1);
-  };
-
-  const macroOctaveDown = () => {
-    if (patch.octave <= -1) { return }
-
-    patch.octave -= 1;
-    changeOctave(-1);
-  };
-
-  window.onkeydown = function(keyDown) {
-    if (keyDown.repeat) { return; }
-
-    // PLAY NOTES
-    if (emulatorConstants.keyCodes.includes(keyDown.keyCode)) {
-      const adjustedKeyDown = octaveAdjustedKeyCode(keyDown.keyCode);
-      keyboardDown(adjustedKeyDown);
-    }
-
-    // CHANGE OCTAVE
-    if (keyDown.keyCode == emulatorConstants.zKeyCode) { macroOctaveDown() }
-    if (keyDown.keyCode == emulatorConstants.xKeyCode) { macroOctaveUp() }
-  };
-
-  window.onkeyup = function(keyUp) {
-    if (emulatorConstants.keyCodes.includes(keyUp.keyCode)) {
-      const adjustedKeyUp = octaveAdjustedKeyCode(keyUp.keyCode);
-      keyboardUp(adjustedKeyUp);
-    }
   };
 
   const setSequenceNote = function() {
@@ -455,12 +364,12 @@ VS.KeysEmulator = function() {
     }
   });
 
- $('#octave').on('knobturn', () => {
+  $('#octave').on('knobturn', () => {
    const startingOctave = patch.octave;
    patch.setoctave(VS.activeKnob.midi());
 
    const octaveDifference = patch.octave - startingOctave;
-   changeOctave(octaveDifference, false);
+   musicalTyping.applyOctaveChange(octaveDifference, false);
  });
 
   $('#vcf_eg_int').on('knobturn', () => {
@@ -499,11 +408,11 @@ VS.KeysEmulator = function() {
   });
 
   $(document).on('midinoteon', function(event) {
-    keyboardDown(event.detail.number);
+    musicalTyping.noteOn(event.detail.number);
   });
 
   $(document).on('midinoteoff', function(event) {
-    keyboardUp(event.detail.number);
+    musicalTyping.noteOff(event.detail.number);
   });
 
   // handle midi in CC event
@@ -614,18 +523,18 @@ VS.KeysEmulator = function() {
 
     keyboardPlaying = true;
     currentTouchKey = $(this).attr('id');
-    keyboardDown($(this).data('midinote'));
+    musicalTyping.noteOn($(this).data('midinote'));
   });
 
   $('#volca-keyboard .key').on('mouseenter', function() {
     if (keyboardPlaying) {
-      keyboardDown($(this).data('midinote'));
+      musicalTyping.noteOn($(this).data('midinote'));
     }
   });
 
   $('#volca-keyboard .key').on('mouseleave', function() {
     if (keyboardPlaying) {
-      keyboardUp($(this).data('midinote'));
+      musicalTyping.noteOff($(this).data('midinote'));
     }
   });
 
@@ -647,9 +556,9 @@ VS.KeysEmulator = function() {
       currentTouchKey = $key.attr('id');
     }
     if ($key.length && currentTouchKey !== lastTouchKey) {
-      keyboardDown($key.data('midinote'));
+      musicalTyping.noteOn($key.data('midinote'));
       if (lastTouchKey) {
-        keyboardUp($(`#${lastTouchKey}`).data('midinote'));
+        musicalTyping.noteOff($(`#${lastTouchKey}`).data('midinote'));
       }
       lastTouchKey = $key.attr('id');
     }
@@ -658,19 +567,19 @@ VS.KeysEmulator = function() {
   $('#volca-keyboard .key').on('mouseup touchend', function(e) {
     if (e.type === 'touchend') {
       e.preventDefault();
-      keyboardUp($(`#${currentTouchKey}`).data('midinote'));
+      musicalTyping.noteOff($(`#${currentTouchKey}`).data('midinote'));
       lastTouchKey = null;
       currentTouchKey = null;
     }
 
-    keyboardUp($(this).data('midinote'));
+    musicalTyping.noteOff($(this).data('midinote'));
     keyboardPlaying = false;
   });
 
   $(document).on('mouseup touchend', function() {
     if (keyboardPlaying) {
       keyboardPlaying = false;
-      keyboardUp($(`#${currentTouchKey}`).data('midinote'));
+      musicalTyping.noteOff($(`#${currentTouchKey}`).data('midinote'));
       lastTouchKey = null;
       currentTouchKey = null;
     }

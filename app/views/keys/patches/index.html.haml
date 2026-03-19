@@ -1,8 +1,16 @@
 %h1 Keys Patches
 
+- musical_typing_button_aria = { label: 'Toggle Music Typing (m)', pressed: 'false' }
+- musical_typing_button_data = { musical_typing_enabled: 'false', toggle: 'tooltip', placement: 'bottom', delay: '{"show":450,"hide":100}' }
+
 .controls
-  =link_to 'New Patch', new_keys_patch_path, class: 'btn btn-primary'
+  = link_to 'New Patch', new_keys_patch_path, class: 'btn btn-primary'
+  .keys-index-musical-typing.hidden{ data: { musical_typing_visible: 'false' } }
+    = button_tag type: 'button', id: 'keys-musical-typing-toggle', class: 'keys-musical-typing-toggle', title: 'Toggle Music Typing (m)', aria: musical_typing_button_aria, data: musical_typing_button_data, disabled: true do
+      = render 'shared/musical_typing_icon'
+    #keys-musical-typing-status.keys-musical-typing-status{
+      data: { musical_typing_status: 'inactive' }
+    }
 .patches
   = render '/shared/audio_preview'
   = render 'shared/keys_patches'
-

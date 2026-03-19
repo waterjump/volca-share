@@ -79,4 +79,23 @@ RSpec.describe 'shared/_keys_patch_card.html.haml', type: :view do
   it 'shows date the patch was created' do
     expect(rendered).to have_content(format_date(patch.created_at))
   end
+
+  it 'renders a patch emulation control with the emulation URL' do
+    expect(rendered).to have_css(
+      ".patch-holder[data-patch-id='#{patch.id}'][data-emulation-url='#{emulation_user_keys_patch_path(patch.user.slug, patch.slug)}'][data-emulation-active='false']"
+    )
+    expect(rendered).to have_css(
+      ".keys-emulate-toggle[data-patch-id='#{patch.id}'][data-emulation-url='#{emulation_user_keys_patch_path(patch.user.slug, patch.slug)}'][data-emulation-active='false'][aria-pressed='false']"
+    )
+  end
+
+  context 'when patch has no user' do
+    let(:patch) { create(:keys_patch, user: nil) }
+
+    it 'uses the anonymous emulation URL on the control' do
+      expect(rendered).to have_css(
+        ".keys-emulate-toggle[data-emulation-url='#{emulation_keys_patch_path(patch.id)}']"
+      )
+    end
+  end
 end

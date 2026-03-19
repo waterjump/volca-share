@@ -19,7 +19,11 @@ Rails.application.routes.draw do
               only: [:show, :edit],
               param: :slug,
               controller: 'keys/patches',
-              path: 'keys/patch'
+              path: 'keys/patch' do
+      member do
+        get :emulation
+      end
+    end
   end
 
   resources :patch, param: :id, controller: 'patches', except: [:index]
@@ -41,7 +45,11 @@ Rails.application.routes.draw do
     resources :patch,
               controller: 'patches',
               only: [:new, :show, :update, :destroy],
-              param: :id
+              param: :id do
+      member do
+        get :emulation
+      end
+    end
     resources :patches, only: [:index]
     post 'patch' => 'patches#create'
     match 'tags/show' => 'tags#show', via: :get

@@ -3,7 +3,7 @@
 module Keys
   class PatchesController < ApplicationController
     before_action :format_tags, only: [:create, :update]
-    before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed]
+    before_action :set_patch, only: [:show, :edit, :update, :destroy, :oembed, :emulation]
     before_action :authenticate_user!, only: [:edit, :update, :destroy]
 
     def index
@@ -129,6 +129,19 @@ module Keys
       end
     end
 
+    def emulation
+      respond_to do |format|
+        format.json do
+          render json: {
+            id: @patch.id.to_s,
+            name: @patch.name,
+            patch_location: patch_show_location,
+            emulator_params: @patch.emulator_query_string
+          }
+        end
+      end
+    end
+
     private
 
     def set_patch
@@ -197,6 +210,14 @@ module Keys
     def patch_location
       if current_user.present?
         user_keys_patch_path(current_user.slug, @patch.slug)
+      else
+        keys_patch_path(@patch.id)
+      end
+    end
+
+    def patch_show_location
+      if @patch.user.present?
+        user_keys_patch_path(@patch.user.slug, @patch.slug)
       else
         keys_patch_path(@patch.id)
       end

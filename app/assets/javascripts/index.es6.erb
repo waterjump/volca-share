@@ -5,6 +5,258 @@ $('*').on('hide.bs.modal', function() {
 });
 
 $(function() {
+  const keysIndexPage = $('.patches .keys-emulate-toggle').length > 0;
+
+  let activePatchId = null;
+  let activeEngineBinding = null;
+  let musicalTypingController = null;
+  let pendingPatchRequestId = 0;
+
+  const $musicalTypingContainer = $('.keys-index-musical-typing');
+  const $musicalTypingToggle = $('#keys-musical-typing-toggle');
+  const $musicalTypingStatus = $('#keys-musical-typing-status');
+
+  const findPatchCard = (patchId) => {
+    return $(`.patch-holder[data-patch-id='${patchId}']`);
+  };
+
+  const findPatchToggle = (patchId) => {
+    return $(`.keys-emulate-toggle[data-patch-id='${patchId}']`);
+  };
+
+  const patchToggles = () => {
+    return $('.keys-emulate-toggle').toArray();
+  };
+
+  const setPatchActiveState = (patchId, isActive) => {
+    const activeValue = isActive ? 'true' : 'false';
+    const pressedValue = isActive ? 'true' : 'false';
+    const $card = findPatchCard(patchId);
+    const $toggle = findPatchToggle(patchId);
+
+    $card.attr('data-emulation-active', activeValue);
+    $toggle.attr('data-emulation-active', activeValue);
+    $toggle.attr('aria-pressed', pressedValue);
+  };
+
+  const clearPatchActiveState = () => {
+    $('.patch-holder').attr('data-emulation-active', 'false');
+    $('.keys-emulate-toggle')
+      .attr('data-emulation-active', 'false')
+      .attr('aria-pressed', 'false')
+      .prop('disabled', false);
+  };
+
+  const setMusicalTypingStatus = (text = '') => {
+    $musicalTypingStatus.text(text);
+  };
+
+  const showMusicalTypingControl = () => {
+    $musicalTypingContainer.removeClass('hidden');
+    $musicalTypingContainer.attr('data-musical-typing-visible', 'true');
+  };
+
+  const hideMusicalTypingControl = () => {
+    $musicalTypingContainer.addClass('hidden');
+    $musicalTypingContainer.attr('data-musical-typing-visible', 'false');
+  };
+
+  const setMusicalTypingButtonState = (enabled) => {
+    const enabledValue = enabled ? 'true' : 'false';
+    $musicalTypingToggle
+      .attr('aria-pressed', enabledValue)
+      .attr('data-musical-typing-enabled', enabledValue);
+  };
+
+  const stopActiveEngineNotes = () => {
+    if (!activeEngineBinding || !activeEngineBinding.engine) { return; }
+
+    activeEngineBinding.engine.stopPolyNote([], -1);
+    activeEngineBinding.engine.stopNote();
+  };
+
+  const disableMusicalTyping = () => {
+    if (musicalTypingController) {
+      musicalTypingController.disable();
+    }
+
+    setMusicalTypingButtonState(false);
+    setMusicalTypingStatus('');
+  };
+
+  const destroyMusicalTypingController = () => {
+    if (!musicalTypingController) { return; }
+
+    musicalTypingController.destroy();
+    musicalTypingController = null;
+  };
+
+  const mountMusicalTypingController = () => {
+    if (!activeEngineBinding) { return; }
+
+    destroyMusicalTypingController();
+    musicalTypingController = new VS.KeysKeyboardController({
+      patchParams: activeEngineBinding.patchParams,
+      emulatorConstants: VS.emulatorConstants || new VS.EmulatorConstants,
+      enabled: false,
+      getBindings: function() {
+        return activeEngineBinding ? [activeEngineBinding] : [];
+      }
+    });
+  };
+
+  const unloadActivePatch = () => {
+    disableMusicalTyping();
+    destroyMusicalTypingController();
+    stopActiveEngineNotes();
+
+    if (activeEngineBinding && activeEngineBinding.engine) {
+      activeEngineBinding.engine.dispose();
+    }
+
+    activeEngineBinding = null;
+    activePatchId = null;
+    clearPatchActiveState();
+    hideMusicalTypingControl();
+    $musicalTypingToggle.prop('disabled', true);
+  };
+
+  const enableMusicalTyping = () => {
+    if (!musicalTypingController || !activeEngineBinding) { return; }
+
+    musicalTypingController.enable();
+    setMusicalTypingButtonState(true);
+    setMusicalTypingStatus('');
+  };
+
+  const toggleMusicalTyping = () => {
+    if (!activeEngineBinding || !$musicalTypingToggle.length) { return; }
+
+    if (!musicalTypingController) {
+      mountMusicalTypingController();
+    }
+
+    if (musicalTypingController.isEnabled()) {
+      stopActiveEngineNotes();
+      disableMusicalTyping();
+      return;
+    }
+
+    enableMusicalTyping();
+  };
+
+  const emulateAdjacentPatch = (direction) => {
+    if (!activePatchId) { return; }
+
+    const toggles = patchToggles();
+    const currentIndex = toggles.findIndex(toggle => {
+      return String($(toggle).data('patch-id')) === String(activePatchId);
+    });
+
+    if (currentIndex === -1) { return; }
+
+    const nextIndex = currentIndex + direction;
+    if (nextIndex < 0 || nextIndex >= toggles.length) { return; }
+
+    loadPatch($(toggles[nextIndex]));
+  };
+
+  const handleMusicalTypingShortcut = (event) => {
+    if (!activeEngineBinding) { return; }
+    if (event.repeat) { return; }
+    if (event.altKey || event.ctrlKey || event.metaKey) { return; }
+
+    const target = event.target;
+    const isTypingField = target && (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.tagName === 'SELECT' ||
+      target.isContentEditable
+    );
+
+    if (isTypingField) { return; }
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      unloadActivePatch();
+      return;
+    }
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      emulateAdjacentPatch(1);
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      emulateAdjacentPatch(-1);
+      return;
+    }
+    if (String(event.key).toLowerCase() !== 'm') { return; }
+
+    event.preventDefault();
+    toggleMusicalTyping();
+  };
+
+  const mountFetchedPatch = (payload) => {
+    unloadActivePatch();
+
+    const headlessPatch = VS.buildHeadlessKeysPatch(payload);
+    activePatchId = payload.id;
+    activeEngineBinding = {
+      engine: headlessPatch.audioEngine,
+      patchParams: headlessPatch.patchParams
+    };
+
+    mountMusicalTypingController();
+    showMusicalTypingControl();
+    $musicalTypingToggle.prop('disabled', false);
+    setPatchActiveState(activePatchId, true);
+    enableMusicalTyping();
+  };
+
+  const loadPatch = ($toggle) => {
+    const patchId = String($toggle.data('patch-id'));
+    const emulationUrl = $toggle.data('emulation-url');
+
+    if (!emulationUrl) { return; }
+    if (activePatchId === patchId) {
+      unloadActivePatch();
+      return;
+    }
+
+    if (activePatchId !== null) {
+      unloadActivePatch();
+    }
+
+    pendingPatchRequestId += 1;
+    const requestId = pendingPatchRequestId;
+
+    $('.keys-emulate-toggle').prop('disabled', true);
+    clearPatchActiveState();
+    $toggle.prop('disabled', true);
+
+    $.ajax({
+      url: emulationUrl,
+      data: { format: 'json' },
+      error() {
+        if (requestId !== pendingPatchRequestId) { return; }
+        clearPatchActiveState();
+        $('.keys-emulate-toggle').prop('disabled', false);
+      },
+      success(data) {
+        if (requestId !== pendingPatchRequestId) {
+          if (data && data.emulator_params) {
+            const stalePatch = VS.buildHeadlessKeysPatch(data);
+            stalePatch.audioEngine.dispose();
+          }
+          return;
+        }
+
+        mountFetchedPatch(data);
+        $('.keys-emulate-toggle').prop('disabled', false);
+      }
+    });
+  };
+
   $('.speaker').on('click tap', function() {
     $('#preview-modal-body').html("<img class='loading' src='<%= asset_path('loading.gif') %>' alt='Loading' />");
     const url = $(this).data('oembed-url');
@@ -69,4 +321,29 @@ $(function() {
 
     window.location.href = newLocation;
   });
+
+  if (keysIndexPage) {
+    hideMusicalTypingControl();
+    setMusicalTypingButtonState(false);
+    setMusicalTypingStatus('');
+    $musicalTypingToggle.tooltip();
+
+    $(document).on('click tap', '.keys-emulate-toggle', function(event) {
+      event.preventDefault();
+      loadPatch($(this));
+    });
+
+    $musicalTypingToggle.on('click tap', function(event) {
+      event.preventDefault();
+      toggleMusicalTyping();
+    });
+
+    window.addEventListener('keydown', handleMusicalTypingShortcut);
+
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) { return; }
+      stopActiveEngineNotes();
+      disableMusicalTyping();
+    });
+  }
 });

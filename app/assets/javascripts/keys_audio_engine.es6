@@ -1,4 +1,4 @@
-VS.KeysAudioEngine = function(patch, sequence) {
+VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
   // ===================================================================
   // THIS IS THE ONLY COMPONENT THAT SHOULD INTERACT WITH TONE.JS
   // ===================================================================
@@ -14,7 +14,10 @@ VS.KeysAudioEngine = function(patch, sequence) {
   const ampLfoCutoff = new Tone.Gain();
   const gracePeriod = 0.05; // 50ms
   const carrierGain = 0.5; // so ring mod voices aren't super loud
+  const sequencerEnabled = options.enableSequencer !== false;
   let sequencerPlaying = false;
+  let disposed = false;
+  let sequencerEventId = null;
 
   const makeVcoEgShaperCurve = function() {
     const curve = new Float32Array(256);
@@ -339,12 +342,13 @@ VS.KeysAudioEngine = function(patch, sequence) {
   this.currentStepIndex = 0;
 
   const runToneSequencer = function(){
+    if (!sequencerEnabled) { return; }
     setTempo();
 
     // let i = 0;
     let previousStep;
 
-    Tone.Transport.scheduleRepeat(function(time) {
+    sequencerEventId = Tone.Transport.scheduleRepeat(function(time) {
       let i = this.currentStepIndex;
       if (!sequencerPlaying) { return; }
 
@@ -395,15 +399,52 @@ VS.KeysAudioEngine = function(patch, sequence) {
     this.setDelayFeedback();
   }.bind(this);
 
+  const canInteract = function() {
+    return !disposed;
+  };
+
+  const safelyDisposeToneNode = function(node) {
+    if (!node) { return; }
+
+    try {
+      if (typeof node.stop === 'function' && node.state === 'started') {
+        node.stop();
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    try {
+      if (typeof node.disconnect === 'function') {
+        node.disconnect();
+      }
+    } catch (error) {
+      // no-op
+    }
+
+    try {
+      if (typeof node.dispose === 'function') {
+        node.dispose();
+      }
+    } catch (error) {
+      // no-op
+    }
+  };
+
   this.init = () => {
-    Tone.Transport.loop = true;
-    Tone.Transport.loopEnd = 60 / patch.tempo * 4 + 's';
+    if (!canInteract()) { return; }
     Tone.start();
     setInitialEngineValues();
     masterAmp.toDestination();
+
+    if (sequencerEnabled) {
+      Tone.Transport.loop = true;
+      Tone.Transport.loopEnd = 60 / patch.tempo * 4 + 's';
+    }
   };
 
   this.activateAudio = function() {
+    if (!canInteract()) { return; }
     if (Tone.state === 'running') { return; }
 
     Tone.context.resume().then(() => {
@@ -479,6 +520,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.playNewNote = function(note, time = Tone.now()) {
+    if (!canInteract()) { return; }
     this.activateAudio();
 
     if (!patch.voice.includes('poly')) {
@@ -506,6 +548,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   // Only used for unison voices
   this.changeCurrentNote = function(note, time = Tone.now()) {
+    if (!canInteract()) { return; }
     let frequency = Tone.Frequency(note, 'midi').toFrequency();
     let lastFrequency = oscillators[1].oscFreqNode.getValueAtTime(time);
 
@@ -565,6 +608,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
 
   // Poly voices only!
   this.addNote = function(keysDown) {
+    if (!canInteract()) { return; }
     const time = Tone.now();
     const lowestFreeOsc = lowestFreeOscillator();
     const noteToAdd = keysDown[keysDown.length -1];
@@ -644,6 +688,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.stopPolyNote = function(keysDown, noteThatStopped) {
+    if (!canInteract()) { return; }
     if (keysDown.length === 0) {
       // Ring out
       Object.values(oscillators).forEach(osc => osc.setRingModPath(Tone.now(), true));
@@ -670,6 +715,7 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.changeVoice = function() {
+    if (!canInteract()) { return; }
     /*
     TODO: Try to break out the configurations of different voices
           into an object or something.
@@ -743,15 +789,18 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.stopNote = function(time = Tone.now()) {
+    if (!canInteract()) { return; }
     triggerDecayRelease(time);
   };
 
   this.triggerSequencerRelease = function(time = Tone.now()) {
+    if (!canInteract() || !sequencerEnabled) { return; }
     triggerDecayRelease(time, true);
   };
 
   // CHANGE OCTAVE
   this.changeOctave = (octaveOffset, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     Object.values(oscillators).forEach(osc => {
       if (osc.note !== -1) {
         const newNote = osc.note + octaveOffset;
@@ -763,57 +812,70 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.setPeak = (value) => {
+    if (!canInteract()) { return; }
     filter.Q.value = value;
   };
 
   this.setCutoff = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     filter.frequency.setValueAtTime(value, time);
   };
 
   this.setFilterEgInt = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     filterEgAmp.gain.setValueAtTime(value, time);
   };
 
   this.setVolume = (value, time = Tone.now()) => {
+    if (!canInteract()) { return; }
     masterAmp.gain.setValueAtTime(value, time);
   };
 
   this.setLfoRate = (value) => {
+    if (!canInteract() || !oscLfo) { return; }
     oscLfo.frequency.setValueAtTime(value, Tone.now());
   };
 
   this.setLfoWave = () => {
+    if (!canInteract() || !oscLfo) { return; }
     oscLfo.type = patch.lfo.shape;
     retriggerLfo();
   };
 
   this.setSustain = (value) => {
+    if (!canInteract()) { return; }
     // recalculate vcoEg envelope so that sustain always equals 0 (aka not detuned).
     vcoEgShaper.curve = makeVcoEgShaperCurve();
   };
 
   this.setLfoPitchInt = () => {
+    if (!canInteract()) { return; }
     ampLfoPitch.gain.setValueAtTime(patch.lfo.pitchValue, Tone.now());
   };
 
   this.setLfoCutoffInt = () => {
+    if (!canInteract()) { return; }
     ampLfoCutoff.gain.setValueAtTime(patch.lfo.cutoffValue, Tone.now());
   };
 
   this.noteIsPlaying = () => {
+    if (!canInteract()) { return false; }
     return Object.values(oscillators).some(osc => osc.note !== -1);
   };
 
   this.setTempo = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     setTempo();
   };
 
   this.startSequencer = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     sequencerPlaying = true;
     Tone.Transport.start();
   };
 
   this.stopSequencer = () => {
+    if (!canInteract() || !sequencerEnabled) { return; }
     sequencerPlaying = false;
     // set all oscillator notes to -1
     [1, 2, 3].forEach(i => oscillators[i].note = -1);
@@ -824,23 +886,92 @@ VS.KeysAudioEngine = function(patch, sequence) {
   };
 
   this.getSequencerPlaying = () => {
-    return sequencerPlaying;
+    return sequencerEnabled ? sequencerPlaying : false;
   };
 
   this.setDetune = () => {
+    if (!canInteract()) { return; }
     oscillators[2].oscillator.detune.setValueAtTime(patch.vco[2].detune, Tone.now());
     oscillators[3].oscillator.detune.setValueAtTime(patch.vco[3].detune, Tone.now());
   };
 
   this.setVcoEgInt = () => {
+    if (!canInteract()) { return; }
     vcoEgIntAmp.gain.setValueAtTime(patch.vco_eg_int, Tone.now());
   };
 
   this.setDelayTime = () => {
+    if (!canInteract()) { return; }
     delay.delayTime.setValueAtTime(patch.delay.time, Tone.now());
   };
 
   this.setDelayFeedback = () => {
+    if (!canInteract()) { return; }
     delayAmp.gain.setValueAtTime(patch.delay.feedback, Tone.now());
+  };
+
+  this.dispose = () => {
+    if (disposed) { return; }
+
+    const releaseTime = Tone.now();
+    this.stopPolyNote([], -1);
+    this.stopNote(releaseTime);
+    this.setVolume(0, releaseTime);
+
+    if (sequencerEnabled && sequencerPlaying) {
+      this.stopSequencer();
+    }
+
+    if (sequencerEnabled && sequencerEventId !== null) {
+      Tone.Transport.clear(sequencerEventId);
+      sequencerEventId = null;
+    }
+
+    disposed = true;
+
+    Object.values(oscillators).forEach(osc => {
+      safelyDisposeToneNode(osc.oscFreqNode);
+      safelyDisposeToneNode(osc.oscillator);
+      safelyDisposeToneNode(osc.volumeAmp);
+      safelyDisposeToneNode(osc.oscAmp);
+      safelyDisposeToneNode(osc.thruGain);
+      safelyDisposeToneNode(osc.modGainSwitch);
+      safelyDisposeToneNode(osc.modGain2CarrierAmp);
+      safelyDisposeToneNode(osc.modGain2ModAmp);
+      safelyDisposeToneNode(osc.modGain3ModAmp);
+    });
+
+    [
+      masterAmp,
+      filter,
+      filterEgAmp,
+      ampEg,
+      universalEg,
+      vcoEgShaper,
+      vcoEgIntAmp,
+      ampLfoPitch,
+      ampLfoCutoff,
+      delay,
+      delayFilter,
+      delayAmp,
+      oscLfo,
+      lfoWaveShaper,
+      thruGainSwitchController,
+      modGainSwitchController,
+      oneNotePolyRingAmp,
+      twoNotePolyRingAmp,
+      modGain2,
+      modGain3,
+      voiceOscDetuner1,
+      voiceOscDetuner3,
+      unisonNoteAmp2,
+      unisonNoteAmp3,
+      polyNoteAmp2,
+      polyNoteAmp3,
+      unisonNoteSwitchController,
+      polyNoteSwitchController
+    ].forEach(safelyDisposeToneNode);
+
+    oscLfo = null;
   };
 };

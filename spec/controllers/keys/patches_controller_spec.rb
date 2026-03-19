@@ -387,5 +387,48 @@ module Keys
         )
       end
     end
+
+    describe 'GET #emulation' do
+      it 'returns the emulator payload as JSON for user-owned patches' do
+        user = create(:user)
+        patch = create(:user_keys_patch, user: user)
+
+        get :emulation,
+            params: { user_slug: user.slug, slug: patch.slug, format: :json },
+            session: valid_session
+
+        json = JSON.parse(response.body)
+        expect(response.status).to eq(200)
+        expect(json).to include(
+          {
+            'id' => patch.id.to_s,
+            'name' => patch.name,
+            'patch_location' => user_keys_patch_path(user.slug, patch.slug),
+            'emulator_params' =>
+              VolcaShare::Keys::PatchViewModel.wrap(patch).emulator_query_string.as_json
+          }
+        )
+      end
+
+      it 'returns the emulator payload as JSON for anonymous patches' do
+        patch = create(:keys_patch)
+
+        get :emulation,
+            params: { id: patch.id, format: :json },
+            session: valid_session
+
+        json = JSON.parse(response.body)
+        expect(response.status).to eq(200)
+        expect(json).to include(
+          {
+            'id' => patch.id.to_s,
+            'name' => patch.name,
+            'patch_location' => keys_patch_path(patch.id),
+            'emulator_params' =>
+              VolcaShare::Keys::PatchViewModel.wrap(patch).emulator_query_string.as_json
+          }
+        )
+      end
+    end
   end
 end
