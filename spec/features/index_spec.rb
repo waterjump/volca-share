@@ -159,7 +159,7 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
       login
       visit patches_path
 
-      accept_confirm { click_button('Delete') }
+      accept_confirm { find('img.delete.glyph').click }
 
       expect(page).to have_content('No patches to show.')
     end

@@ -38,9 +38,9 @@ RSpec.describe 'shared/_patch_card.html.haml', type: :view do
         )
       end
 
-      it 'does not link to the anonymous patch path' do
+      it 'does not link the patch title to the anonymous patch path' do
         expect(rendered).not_to(
-          have_selector(:css, "a[href='#{patch_path(patch)}']")
+          have_selector(:css, "a[href='#{patch_path(patch)}']", text: patch.name)
         )
       end
 

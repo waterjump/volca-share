@@ -84,7 +84,7 @@ RSpec.describe 'Keys patch index page', type: :feature do
       login
       visit keys_patches_path
 
-      accept_confirm { click_button('Delete') }
+      accept_confirm { find('img.delete.glyph').click }
 
       expect(page).to have_content('No patches to show.')
     end

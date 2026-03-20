@@ -39,10 +39,10 @@
       %span.date= "on #{format_date(patch.created_at)}"
       .icons
         - if current_user.present? && patch.user == current_user
-          = link_to edit_user_keys_patch_path(current_user.slug, patch.slug) do
-            .edit.glyph
-          = form_tag keys_patch_path(patch.id), method: :delete, class: :delete_form, data: { confirm: 'Are you sure you want to delete that patch?' } do
-            = submit_tag 'Delete', class: 'delete glyph'
+          = link_to edit_user_keys_patch_path(current_user.slug, patch.slug), title: 'Edit patch' do
+            = image_tag 'pencil.svg', alt: 'Edit patch', class: 'edit glyph'
+          = link_to keys_patch_path(patch.id), method: :delete, title: 'Delete patch', data: { confirm: 'Are you sure you want to delete that patch?' } do
+            = image_tag 'trash.svg', alt: 'Delete patch', class: 'delete glyph'
     .description= patch.notes
     .tags
       - patch.tags.each do |tag|
