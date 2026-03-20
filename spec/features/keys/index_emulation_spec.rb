@@ -37,6 +37,7 @@ RSpec.describe 'Keys patch index emulation', js: true do
 
   it 'starts with no active emulation and hidden musical typing control' do
     expect(page).to have_css(".patch-holder[data-emulation-active='false']", count: 2)
+    expect(page).to have_css('.keys-emulate-toggle', count: 2)
     expect(musical_typing_container[:class]).to include('hidden')
     expect(musical_typing_toggle[:'aria-pressed']).to eq('false')
   end

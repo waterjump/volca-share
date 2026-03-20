@@ -1,9 +1,10 @@
-- locals ||= {}
+- hide_pagination ||= false
+- show_emulation_controls ||= false
 - if @patches.empty?
   .well No patches to show.
 - else
   .col-sm-12.clearfix
-    - unless locals[:hide_pagination]
+    - unless hide_pagination
       .pagination-holder.col-sm-6
         = paginate @patches
     .sort.col-sm-6
@@ -34,9 +35,9 @@
             Quality
 
   - @patches.each do |patch|
-    = render partial: 'shared/patch_card', locals: { patch: patch, wrapper_class: 'col-md-6' }
+    = render partial: 'shared/patch_card', locals: { patch: patch, wrapper_class: 'col-md-6', show_emulation_control: show_emulation_controls }
 
   .col-sm-12.clearfix
-    - unless locals[:hide_pagination]
+    - unless hide_pagination
       .pagination-holder.col-sm-6
         = paginate @patches

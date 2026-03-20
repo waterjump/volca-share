@@ -46,6 +46,16 @@ RSpec.describe 'User profile page', type: :feature, js: true do
     expect(page).to have_content(keys_patch.name)
   end
 
+  it 'does not show emulation controls on the user profile page' do
+    user.keys_patches.create(attributes_for(:keys_patch))
+    user.patches.create(attributes_for(:patch))
+
+    visit user_path(user.slug)
+
+    expect(page).not_to have_css('.bass-emulate-toggle')
+    expect(page).not_to have_css('.keys-emulate-toggle')
+  end
+
   it 'does not have pagination' do
     bass_patches = create_list(:patch, 40, user_id: user.id)
     keys_patches = create_list(:keys_patch, 40, user_id: user.id)

@@ -7,7 +7,8 @@
       No patches to show.
     - if @patches.any?
       %h3= "Volca Bass Patches (#{@patches.count})"
-      = render 'shared/patches', locals: { hide_pagination: true }
+      = render partial: 'shared/patches', locals: { hide_pagination: true }
     - if @keys_patches.any?
       %h3.col-sm-12= "Volca Keys Patches (#{@keys_patches.count})"
-      = render 'shared/keys_patches', locals: { hide_pagination: true }
+      = render partial: 'shared/keys_patches',
+        locals: { hide_pagination: true }

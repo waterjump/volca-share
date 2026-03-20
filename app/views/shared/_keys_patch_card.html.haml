@@ -1,4 +1,5 @@
 - wrapper_class ||= ''
+- show_emulation_control ||= false
 - emulation_url = patch.user.present? ? emulation_user_keys_patch_path(patch.user.slug, patch.slug) : emulation_keys_patch_path(patch.id)
 
 .wrapper.well.well-sm.patch-holder{
@@ -24,8 +25,9 @@
         .speaker{ data: { oembed_url: "/keys/oembed?user_slug=#{patch.user.slug}&slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
           = image_tag 'speaker.svg', class: 'speaker-icon', alt: ''
 
-      = button_tag type: 'button', class: 'keys-emulate-toggle', title: 'Emulate patch', aria: { label: "Emulate #{patch.name}", pressed: 'false' }, data: { emulation_url: emulation_url, patch_id: patch.id.to_s, emulation_active: 'false' } do
-        %span.keys-emulate-symbol{ 'aria-hidden' => 'true' } ♫
+      - if show_emulation_control
+        = button_tag type: 'button', class: 'keys-emulate-toggle', title: 'Emulate patch', aria: { label: "Emulate #{patch.name}", pressed: 'false' }, data: { emulation_url: emulation_url, patch_id: patch.id.to_s, emulation_active: 'false' } do
+          %span.keys-emulate-symbol{ 'aria-hidden' => 'true' } ♫
       - if patch.user.present?
         = link_to patch.name, user_keys_patch_path(patch.user.slug, patch.slug), { class: :title }
       - else

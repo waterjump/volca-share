@@ -7,6 +7,7 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
   let(:sort) { :quality }
   let(:show_audio_filter) { false }
   let(:params) { {} }
+  let(:patches) { [create(:patch)] }
 
   let(:render_options) do
     {
@@ -76,6 +77,28 @@ RSpec.describe 'shared/_patches.html.haml', type: :view do
           have_css('a[href="/patches"]')
         )
       end
+    end
+  end
+
+  it 'does not enable emulation controls by default' do
+    expect(rendered).not_to have_css('.bass-emulate-toggle')
+  end
+
+  context 'when emulation controls are enabled' do
+    let(:patches) { [create(:patch)] }
+    let(:render_options) do
+      {
+        partial: 'shared/patches',
+        locals: {
+          current_user: nil,
+          params: params,
+          show_emulation_controls: true
+        }
+      }
+    end
+
+    it 'renders emulation controls for the listed patches' do
+      expect(rendered).to have_css('.bass-emulate-toggle', count: 1)
     end
   end
 end

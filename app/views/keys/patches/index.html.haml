@@ -13,4 +13,5 @@
     }
 .patches
   = render '/shared/audio_preview'
-  = render 'shared/keys_patches'
+  = render partial: 'shared/keys_patches',
+    locals: { show_emulation_controls: true }

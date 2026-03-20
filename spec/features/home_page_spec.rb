@@ -176,6 +176,16 @@ RSpec.describe 'Home page', type: :feature, js: true do
 
   it 'show three top patches from volca keys'
 
+  it 'does not show emulation controls on home page patch cards' do
+    create(:user_patch, name: 'Bass Home Patch')
+    create(:user_keys_patch, name: 'Keys Home Patch')
+
+    visit root_path
+
+    expect(page).not_to have_css('.bass-emulate-toggle')
+    expect(page).not_to have_css('.keys-emulate-toggle')
+  end
+
   it 'shows footer' do
     expect(page).to have_css('.footer')
   end

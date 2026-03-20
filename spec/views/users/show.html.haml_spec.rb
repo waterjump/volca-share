@@ -69,4 +69,13 @@ RSpec.describe 'users/show.html.haml', type: :view do
       expect(rendered).to have_content('Volca Keys Patches')
     end
   end
+
+  it 'does not show emulation controls for mixed patch listings' do
+    @keys_patches = keys_patches
+
+    render
+
+    expect(rendered).not_to have_css('.bass-emulate-toggle')
+    expect(rendered).not_to have_css('.keys-emulate-toggle')
+  end
 end

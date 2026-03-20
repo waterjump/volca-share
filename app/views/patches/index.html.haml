@@ -11,4 +11,5 @@
     #bass-musical-typing-status.bass-musical-typing-status{ data: { musical_typing_status: 'inactive' } }
 .patches
   = render '/shared/audio_preview'
-  = render 'shared/patches'
+  = render partial: 'shared/patches',
+    locals: { show_emulation_controls: true }

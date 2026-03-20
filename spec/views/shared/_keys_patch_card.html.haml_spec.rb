@@ -80,22 +80,62 @@ RSpec.describe 'shared/_keys_patch_card.html.haml', type: :view do
     expect(rendered).to have_content(format_date(patch.created_at))
   end
 
-  it 'renders a patch emulation control with the emulation URL' do
-    expect(rendered).to have_css(
-      ".patch-holder[data-patch-id='#{patch.id}'][data-emulation-url='#{emulation_user_keys_patch_path(patch.user.slug, patch.slug)}'][data-emulation-active='false']"
-    )
-    expect(rendered).to have_css(
-      ".keys-emulate-toggle[data-patch-id='#{patch.id}'][data-emulation-url='#{emulation_user_keys_patch_path(patch.user.slug, patch.slug)}'][data-emulation-active='false'][aria-pressed='false']"
-    )
+  it 'does not render a patch emulation control by default' do
+    expect(rendered).not_to have_css('.keys-emulate-toggle')
   end
 
   context 'when patch has no user' do
     let(:patch) { create(:keys_patch, user: nil) }
 
-    it 'uses the anonymous emulation URL on the control' do
+    it 'does not render the anonymous emulation control by default' do
+      expect(rendered).not_to have_css('.keys-emulate-toggle')
+    end
+  end
+
+  context 'when emulation control is enabled' do
+    let(:render_options) do
+      {
+        partial: 'shared/keys_patch_card',
+        locals: {
+          current_user: nil,
+          patch: patch_view_model,
+          show_emulation_control: true
+        }
+      }
+    end
+
+    it 'renders a patch emulation control with the emulation URL' do
+      emulation_url = emulation_user_keys_patch_path(patch.user.slug, patch.slug)
+      patch_selector =
+        ".patch-holder[data-patch-id='#{patch.id}']" \
+        "[data-emulation-url='#{emulation_url}']" \
+        "[data-emulation-active='false']"
+      toggle_selector =
+        ".keys-emulate-toggle[data-patch-id='#{patch.id}']" \
+        "[data-emulation-url='#{emulation_url}']" \
+        "[data-emulation-active='false']" \
+        "[aria-pressed='false']"
+
       expect(rendered).to have_css(
-        ".keys-emulate-toggle[data-emulation-url='#{emulation_keys_patch_path(patch.id)}']"
+        patch_selector
       )
+      expect(rendered).to have_css(
+        toggle_selector
+      )
+    end
+
+    context 'when patch has no user' do
+      let(:patch) { create(:keys_patch, user: nil) }
+
+      it 'uses the anonymous emulation URL on the control' do
+        toggle_selector =
+          ".keys-emulate-toggle" \
+          "[data-emulation-url='#{emulation_keys_patch_path(patch.id)}']"
+
+        expect(rendered).to have_css(
+          toggle_selector
+        )
+      end
     end
   end
 end
