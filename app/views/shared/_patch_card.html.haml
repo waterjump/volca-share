@@ -19,9 +19,10 @@
   .patch
     - if patch.secret?
       .lock.glyph{ title: 'Secret' }
-    - if patch.audio_sample_available?
-      .speaker{ data: { oembed_url: "/oembed?user_slug=#{patch.user.slug}&slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
     .title
+      - if patch.audio_sample_available?
+        .speaker{ data: { oembed_url: "/oembed?user_slug=#{patch.user.slug}&slug=#{patch.slug}", toggle: 'modal', target: '#audio-preview-modal' }, title: 'Preview audio' }
+          = image_tag 'speaker.svg', class: 'speaker-icon', alt: ''
       = button_tag type: 'button', class: 'bass-emulate-toggle', title: 'Emulate patch', aria: { label: "Emulate #{patch.name}", pressed: 'false' }, data: { emulation_url: emulation_url, patch_id: patch.id.to_s, emulation_active: 'false' } do
         %span.bass-emulate-symbol{ 'aria-hidden' => 'true' } ♫
       - if patch.user.present?
