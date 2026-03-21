@@ -29,9 +29,24 @@ RSpec.describe 'Mystery Patch game', js: true do
     expect(page.evaluate_script('document.cookie')).to include('resultsData=')
   end
 
+  it 'requests a hint when the bulb icon is clicked' do
+    visit mystery_patch_path
+
+    click_button 'Got it'
+    click_button 'Hear Mystery Patch'
+
+    hint_icon = find('#request-hint', visible: true)
+    expect(hint_icon['title']).to include('Request a hint')
+
+    hint_icon.click
+
+    expect(page).to have_css('#request-hint[title*="1 left"]', visible: true)
+  end
+
   it 'places hint emojis after the corresponding parameter squares in share text' do
     visit mystery_patch_path
 
+    # Spoof results cookie
     page.execute_script(<<~JS)
       document.cookie = 'resultsData=' + encodeURIComponent(JSON.stringify({
         mysteryPatchId: "#{mystery_patch.id}",

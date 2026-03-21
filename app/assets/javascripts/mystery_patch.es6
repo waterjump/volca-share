@@ -74,12 +74,12 @@ $(function() {
     const gameIsActive = gameHasStarted && !gameFinished;
     const hintsRemaining = MAX_HINTS - hintsUsed;
     const $hintButton = $('#request-hint');
+    const hintDisabled =
+      !gameIsActive || hintRequestInFlight || hintsRemaining <= 0;
 
     $hintButton.toggleClass('hidden', !gameIsActive);
-    $hintButton.prop(
-      'disabled',
-      !gameIsActive || hintRequestInFlight || hintsRemaining <= 0
-    );
+    $hintButton.toggleClass('disabled', hintDisabled);
+    $hintButton.attr('aria-disabled', hintDisabled.toString());
 
     const hintLabel = hintsRemaining > 0 ?
       `Request a hint (${hintsRemaining} left)` :

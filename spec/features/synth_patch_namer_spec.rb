@@ -30,7 +30,7 @@ RSpec.describe 'Synth patch namer', type: :feature, js: true do
 
       find('#synth_name_button').click
 
-      sleep(1)
+      expect(page).to have_no_css('.thinking')
     end
 
     it 'leads to the new bass patch page' do
