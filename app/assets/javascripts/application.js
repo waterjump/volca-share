@@ -24,4 +24,7 @@
 //= require knob
 //= require tone
 //= require emulator_constants
+//= require mystery_patch_session
+//= require mystery_patch_hints
+//= require mystery_patch_results
 //= require_tree .

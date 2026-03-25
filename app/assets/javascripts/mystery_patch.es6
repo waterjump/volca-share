@@ -1,7 +1,7 @@
 $(function() {
   if (window.location.pathname !== '/mystery_patch') { return; }
 
-  const { sequences, emulatorParams, mysteryPatchParams } = VS;
+  const { emulatorParams, mysteryPatchParams } = VS;
   const mysteryParams = mysteryPatchParams;
   const patch = emulatorParams;
 
@@ -13,18 +13,12 @@ $(function() {
   let mysteryPatchNumber;
   let digest;
   let gameData;
-  let resultsData;
   let intervalId;
   let submissionInFlight = false;
-  let hintRequestInFlight = false;
-  let hintsUsed = 0;
-  let hintedParams = new Set();
-  let blinkingHintParams = new Set();
-  let hintBlinkVisible = false;
-  let hintBlinkIntervalId = null;
-  let hintBlinkTimeoutId = null;
+  let keyboardHintTimeout = null;
+  let shouldScheduleKeyboardHint = false;
+
   const inTestEnvironment = $('body').attr('data-test-env') === 'true';
-  const GAME_DATA_STORAGE_KEY = 'mysteryPatchGameData';
   const GAME_DURATION_SECONDS = 180;
   const MAX_HINTS = 2;
   const HINT_BLINK_INTERVAL_MS = 500;
@@ -49,6 +43,11 @@ $(function() {
     lfo_trigger_sync: ['#lfo_trigger_sync_light']
   };
 
+  const session = new VS.MysteryPatchSession({
+    storageKey: 'mysteryPatchGameData',
+    gameDurationSeconds: GAME_DURATION_SECONDS
+  });
+
   const currentGuessParams = function() {
     return {
       voice: $('#voice').data('midi'),
@@ -72,24 +71,45 @@ $(function() {
     };
   };
 
-  const updateHintButton = function() {
-    const gameIsActive = gameHasStarted && !gameFinished && !gameIsPaused;
-    const hintsRemaining = MAX_HINTS - hintsUsed;
-    const $hintButton = $('#request-hint');
-    const hintDisabled =
-      !gameIsActive || hintRequestInFlight || hintsRemaining <= 0;
+  const hints = new VS.MysteryPatchHints({
+    maxHints: MAX_HINTS,
+    blinkIntervalMs: HINT_BLINK_INTERVAL_MS,
+    blinkDurationMs: HINT_BLINK_DURATION_MS,
+    hintTargetSelectors: HINT_TARGET_SELECTORS,
+    getGameState: function() {
+      return {
+        gameHasStarted: gameHasStarted,
+        gameFinished: gameFinished,
+        gameIsPaused: gameIsPaused
+      };
+    },
+    getMysteryPatchId: function() {
+      return mysteryPatchId;
+    },
+    currentGuessParams: currentGuessParams,
+    onProgressChange: function(state) {
+      if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
 
-    $hintButton.toggleClass('hidden', !gameIsActive);
-    $hintButton.toggleClass('disabled', hintDisabled);
-    $hintButton.attr('aria-disabled', hintDisabled.toString());
+      gameData = session.syncGameData(gameData, {}, {
+        mysteryPatchId: mysteryPatchId,
+        hintsUsed: state.hintsUsed,
+        hintedParams: state.hintedParams
+      });
+    }
+  });
 
-    const hintLabel = hintsRemaining > 0 ?
-      `Request a hint (${hintsRemaining} left)` :
-      'No hints remaining';
-
-    $hintButton.attr('aria-label', hintLabel);
-    $hintButton.attr('title', hintLabel);
-  };
+  const results = new VS.MysteryPatchResults({
+    inTestEnvironment: inTestEnvironment,
+    getMysteryPatchNumber: function() {
+      return mysteryPatchNumber;
+    },
+    getHintedParams: function() {
+      return hints.getHintedParams();
+    },
+    getGameFinished: function() {
+      return gameFinished;
+    }
+  });
 
   const updatePauseButton = function() {
     const $pauseButton = $('#toggle-pause');
@@ -117,113 +137,8 @@ $(function() {
     }
   };
 
-  const writeGameData = function(payload) {
-    const encodedValue = encodeURIComponent(JSON.stringify(payload));
-    try {
-      window.localStorage.setItem(GAME_DATA_STORAGE_KEY, JSON.stringify(payload));
-    } catch (_) {
-    }
-    VS.setCookie('gameData', encodedValue, 1, '/');
-    gameData = payload;
-  };
-
-  const readGameData = function() {
-    try {
-      const storedGameData = window.localStorage.getItem(GAME_DATA_STORAGE_KEY);
-      if (storedGameData) {
-        return JSON.parse(storedGameData);
-      }
-    } catch (_) {
-    }
-
-    return parseCookieJson('gameData');
-  };
-
-  const syncGameData = function(attributes = {}) {
-    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
-
-    writeGameData({
-      ...gameData,
-      ...attributes,
-      hintsUsed: hintsUsed,
-      hintedParams: Array.from(hintedParams)
-    });
-  };
-
-  const hintTargetsFor = function(paramName) {
-    return HINT_TARGET_SELECTORS[paramName] || [];
-  };
-
-  const setHintHighlightVisible = function(visible) {
-    hintBlinkVisible = visible;
-    blinkingHintParams.forEach(function(paramName) {
-      hintTargetsFor(paramName).forEach(function(selector) {
-        $(selector).toggleClass('hint-highlight', visible);
-      });
-    });
-  };
-
-  const stopBlinkingHintParam = function(paramName) {
-    if (!blinkingHintParams.has(paramName)) { return; }
-
-    blinkingHintParams.delete(paramName);
-    hintTargetsFor(paramName).forEach(function(selector) {
-      $(selector).removeClass('hint-highlight');
-    });
-
-    if (blinkingHintParams.size === 0) {
-      clearInterval(hintBlinkIntervalId);
-      clearTimeout(hintBlinkTimeoutId);
-      hintBlinkIntervalId = null;
-      hintBlinkTimeoutId = null;
-      hintBlinkVisible = false;
-    }
-  };
-
-  const stopAllHintBlinking = function() {
-    Array.from(blinkingHintParams).forEach(stopBlinkingHintParam);
-  };
-
-  const startHintBlinking = function(hintParams) {
-    stopAllHintBlinking();
-
-    blinkingHintParams = new Set((hintParams || []).filter(function(paramName) {
-      return hintTargetsFor(paramName).length > 0;
-    }));
-
-    if (blinkingHintParams.size === 0 || gameFinished || !gameHasStarted) { return; }
-
-    setHintHighlightVisible(true);
-    hintBlinkIntervalId = setInterval(function() {
-      setHintHighlightVisible(!hintBlinkVisible);
-    }, HINT_BLINK_INTERVAL_MS);
-    hintBlinkTimeoutId = setTimeout(function() {
-      stopAllHintBlinking();
-    }, HINT_BLINK_DURATION_MS);
-  };
-
-  const persistGameProgress = function() {
-    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
-
-    syncGameData();
-  };
-
   const updatePostGameMessage = function() {
-    if (gameFinished) {
-      $('#post-game-message').show();
-      return;
-    }
-
-    $('#post-game-message').hide();
-  };
-
-  const updateShowResultsButton = function() {
-    const resultsModalIsOpen = $('#results-modal').hasClass('in');
-    const hasResults = resultsData !== undefined && resultsData !== null;
-    if (gameFinished && hasResults && !resultsModalIsOpen) {
-      $('#show-results').show();
-      return;
-    }
+    $('#post-game-message').toggle(gameFinished);
   };
 
   const setAudibleEngineSwitch = function(engineName) {
@@ -242,57 +157,50 @@ $(function() {
     setAudibleEngineSwitch(VS.keysEmulatorBridge.getActiveAudibleEngine());
   };
 
-  // TODO: Look into making sequences optional argument for audio engine so
-  // I can remove this and sequences from the game mode.
   const sequence = [];
   for (let index = 0; index < 16; index++) {
-    sequence.push(
-      {
-        index: index,
-        note: 60,
-        slide: false,
-        activeStep: true
-      }
-    );
+    sequence.push({
+      index: index,
+      note: 60,
+      slide: false,
+      activeStep: true
+    });
   }
 
-  // Util functions
   const unrotate = function(rotatedString, rotationAmount) {
-    return Array.from(rotatedString, (ch) => {
+    return Array.from(rotatedString, function(ch) {
       const code = ch.charCodeAt(0);
 
-      // Ruby rotates within printable ASCII (32..126) using mod 95
-      if (code < 32 || code > 126) return ch;
+      if (code < 32 || code > 126) { return ch; }
 
       const unrot = ((code - 32 - rotationAmount) % 95 + 95) % 95;
       return String.fromCharCode(unrot + 32);
     }).join("");
   };
 
-  const snakeToTitleize = (str) => {
-    return String(str)
-      .replace(/_/g, " ")
-      .toLowerCase()
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-  }
-
-  const rightNow = function() {
-    return Math.floor(Date.now() / 1000);
-  }
-
-  const sendAnalyticsEvent = function(...args) {
+  const sendAnalyticsEvent = function() {
     if (typeof ga !== 'function') { return; }
 
-    ga('send', 'event', ...args);
+    ga('send', 'event', ...arguments);
   };
 
-  const revealElement = function(selector, animate = false) {
-    if (!animate) {
-      $(selector).show();
-      return;
-    }
+  const renderTimer = function(secondsLeft) {
+    const minutes = Math.floor(secondsLeft / 60);
+    const seconds = secondsLeft % 60;
+    $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+  };
 
-    $(selector).fadeIn('slow');
+  const remainingTimeSeconds = function() {
+    return session.remainingTimeSeconds(gameData, mysteryPatchId);
+  };
+
+  const settleRunningGameData = function() {
+    gameData = session.settleRunningGameData({
+      gameData: gameData,
+      mysteryPatchId: mysteryPatchId,
+      hintsUsed: hints.getHintsUsed(),
+      hintedParams: hints.getHintedParams()
+    });
   };
 
   const showNotStartedState = function() {
@@ -301,30 +209,32 @@ $(function() {
     $('#timer').hide().text('');
     $('#timer-description').hide();
     $('#submit-solution').hide();
-    $('#show-results').hide();
-    $('#request-hint').addClass('hidden');
     $('#post-game-message').hide();
     $('#audible-engine-mystery').addClass('start-game-callout');
-    stopAllHintBlinking();
-    updateHintButton();
+    $('#need-practice').hide();
+    hints.stopAllBlinking();
+    hints.updateButton();
+    results.updateShowResultsButton();
     updatePauseButton();
     updatePausedInteractionLock();
   };
-
-  let keyboardHintTimeout = null;
 
   const showStartedState = function() {
     clearTimeout(keyboardHintTimeout);
     $('#timer-description').show().text('Remaining time:');
     $('#timer').show();
     $('#submit-solution').show();
-    $('#show-results').hide();
     $('#post-game-message').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
-    updateHintButton();
+    $('#need-practice').hide();
+    hints.updateButton();
+    results.updateShowResultsButton();
     updatePauseButton();
     updatePausedInteractionLock();
 
+    if (!shouldScheduleKeyboardHint) { return; }
+
+    shouldScheduleKeyboardHint = false;
     keyboardHintTimeout = setTimeout(function() {
       $('#keyboard-highlight').addClass('start-keyboard-callout');
       const $usageBody = VS.findAccordionHeaderBySectionName('Usage').siblings('.accordion-body');
@@ -339,11 +249,11 @@ $(function() {
     $('#timer-description').show().text('Remaining time (paused):');
     $('#timer').show();
     $('#submit-solution').show();
-    $('#show-results').hide();
     $('#post-game-message').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
-    stopAllHintBlinking();
-    updateHintButton();
+    hints.stopAllBlinking();
+    hints.updateButton();
+    results.updateShowResultsButton();
     updatePauseButton();
     updatePausedInteractionLock();
   };
@@ -354,12 +264,11 @@ $(function() {
     $('#timer-description').hide();
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
-    $('#request-hint').addClass('hidden');
     $('#audible-engine-mystery').removeClass('start-game-callout');
     $('#need-practice').show();
-    stopAllHintBlinking();
-    updateHintButton();
-    updateShowResultsButton();
+    hints.stopAllBlinking();
+    hints.updateButton();
+    results.updateShowResultsButton();
     updatePostGameMessage();
     updatePauseButton();
     updatePausedInteractionLock();
@@ -378,24 +287,25 @@ $(function() {
     showFinishedState();
     const timeLeft = Math.max(remainingTimeSeconds(), 0);
 
-    const solutionParams = {
+    $.post('/mystery_patch', {
       id: mysteryPatchId,
       digest: digest,
       patch: currentGuessParams()
-    };
-
-    $.post('/mystery_patch', solutionParams).done(function(response) {
-      $('#results-button').click();
-
-      resultsData = response.results;
+    }).done(function(response) {
+      results.setResultsData(response.results);
       sendAnalyticsEvent(
         'Mystery Patch',
         'results',
-        `total_score_${resultsData.total_score}_time_left_${timeLeft}`,
-        Math.round(resultsData.total_score)
+        `total_score_${response.results.total_score}_time_left_${timeLeft}`,
+        Math.round(response.results.total_score)
       );
-      setResultsCookie();
-      printResultsInfo(true);
+      session.setResultsCookie({
+        mysteryPatchId: mysteryPatchId,
+        resultsData: response.results,
+        hintsUsed: hints.getHintsUsed(),
+        hintedParams: hints.getHintedParams()
+      });
+      results.showResults(true);
     });
   };
 
@@ -403,119 +313,11 @@ $(function() {
     if (keyboardHintTimeout) {
       clearTimeout(keyboardHintTimeout);
     }
+    shouldScheduleKeyboardHint = false;
     $('#keyboard-highlight').removeClass('start-keyboard-callout');
     const $usageBody = VS.findAccordionHeaderBySectionName('Usage').siblings('.accordion-body');
     $usageBody.removeClass('start-keyboard-callout');
-  })
-
-  const parseCookieJson = function(key) {
-    const encodedValue = getCookieValue(key);
-    if (encodedValue === null) { return null; }
-
-    try {
-      return JSON.parse(decodeURIComponent(encodedValue));
-    } catch (_) {
-      return null;
-    }
-  };
-
-  const normalizeGameData = function(rawGameData) {
-    if (
-      rawGameData === null ||
-      rawGameData === undefined ||
-      rawGameData.mysteryPatchId !== mysteryPatchId
-    ) {
-      return null;
-    }
-
-    if (rawGameData.remainingSeconds !== undefined) {
-      const status = rawGameData.status || 'paused';
-      return {
-        mysteryPatchId: rawGameData.mysteryPatchId,
-        status: status,
-        remainingSeconds: Math.max(Math.floor(rawGameData.remainingSeconds), 0),
-        lastResumedAt: rawGameData.lastResumedAt || null,
-        pausedAt: rawGameData.pausedAt || null,
-        hintsUsed: rawGameData.hintsUsed || 0,
-        hintedParams: rawGameData.hintedParams || []
-      };
-    }
-
-    if (rawGameData.gameDeadline !== undefined) {
-      return {
-        mysteryPatchId: rawGameData.mysteryPatchId,
-        status: 'running',
-        remainingSeconds: Math.max(rawGameData.gameDeadline - rightNow(), 0),
-        lastResumedAt: rightNow(),
-        pausedAt: null,
-        hintsUsed: rawGameData.hintsUsed || 0,
-        hintedParams: rawGameData.hintedParams || []
-      };
-    }
-
-    return null;
-  };
-
-  const setGameStartedData = function() {
-    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
-      return;
-    }
-
-    const resumedAt = rightNow();
-
-    writeGameData({
-      mysteryPatchId: mysteryPatchId,
-      status: 'running',
-      remainingSeconds: GAME_DURATION_SECONDS,
-      lastResumedAt: resumedAt,
-      pausedAt: null,
-      hintsUsed: 0,
-      hintedParams: []
-    });
-  };
-
-  const setResultsCookie = function() {
-    const cookiePayload = {
-      mysteryPatchId: mysteryPatchId,
-      timeSubmitted: rightNow(),
-      results: resultsData,
-      hintsUsed: hintsUsed,
-      hintedParams: Array.from(hintedParams)
-    };
-    const encodedValue = encodeURIComponent(JSON.stringify(cookiePayload));
-    VS.setCookie('resultsData', encodedValue, 1, '/');
-  };
-
-  const remainingTimeSeconds = function() {
-    if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
-      if (gameData.status === 'running' && gameData.lastResumedAt !== null) {
-        return Math.max(gameData.remainingSeconds - (rightNow() - gameData.lastResumedAt), 0);
-      }
-
-      return Math.max(gameData.remainingSeconds || 0, 0);
-    }
-    return GAME_DURATION_SECONDS;
-  };
-
-  const renderTimer = function(secondsLeft) {
-    const minutes = Math.floor(secondsLeft / 60);
-    const seconds = secondsLeft % 60;
-    $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
-  };
-
-  const settleRunningGameData = function(now = rightNow()) {
-    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId || gameData.status !== 'running') {
-      return;
-    }
-
-    const elapsedSeconds = Math.max(now - (gameData.lastResumedAt || now), 0);
-    const updatedRemainingSeconds = Math.max((gameData.remainingSeconds || 0) - elapsedSeconds, 0);
-
-    syncGameData({
-      remainingSeconds: updatedRemainingSeconds,
-      lastResumedAt: now
-    });
-  };
+  });
 
   const startTimer = function() {
     let secondsLeft = remainingTimeSeconds();
@@ -538,34 +340,31 @@ $(function() {
       secondsLeft--;
 
       if (secondsLeft >= 0) {
-
-        // Emphasize countdown clock
-        if (secondsLeft == 60 || secondsLeft == 30 || secondsLeft <= 15) {
-
-          $('#timer')
-            .css({
-              'background-color': 'red',
-              'transition': 'background-color 0s'
-            });
+        if (secondsLeft === 60 || secondsLeft === 30 || secondsLeft <= 15) {
+          $('#timer').css({
+            'background-color': 'red',
+            'transition': 'background-color 0s'
+          });
 
           setTimeout(function() {
-            $('#timer')
-              .css({
-                'background-color': 'white',
-                'transition': 'background-color 1s'
-              });
+            $('#timer').css({
+              'background-color': 'white',
+              'transition': 'background-color 1s'
+            });
           }, 10);
         }
 
         renderTimer(secondsLeft);
-      } else {
-        clearInterval(intervalId);
-        if (!gameFinished) {
-          triggerSubmitSolution();
-        } else {
-          showFinishedState();
-        }
+        return;
       }
+
+      clearInterval(intervalId);
+      if (!gameFinished) {
+        triggerSubmitSolution();
+        return;
+      }
+
+      showFinishedState();
     }, 1000);
   };
 
@@ -574,25 +373,27 @@ $(function() {
 
     gameHasStarted = true;
     gameIsPaused = false;
-    hintsUsed = 0;
-    hintedParams = new Set();
-    stopAllHintBlinking();
+    shouldScheduleKeyboardHint = true;
+    hints.setState({ hintsUsed: 0, hintedParams: [] });
     sendAnalyticsEvent('Mystery Patch', 'start');
     showStartedState();
-    setGameStartedData();
+    gameData = session.startGameData({
+      mysteryPatchId: mysteryPatchId,
+      hintsUsed: hints.getHintsUsed(),
+      hintedParams: hints.getHintedParams()
+    });
     startTimer();
   };
 
   const resumeGame = function() {
     if (!gameHasStarted || gameFinished) { return; }
 
-    if (gameData && gameData.mysteryPatchId === mysteryPatchId) {
-      syncGameData({
-        status: 'running',
-        lastResumedAt: rightNow(),
-        pausedAt: null
-      });
-    }
+    gameData = session.resumeGameData({
+      gameData: gameData,
+      mysteryPatchId: mysteryPatchId,
+      hintsUsed: hints.getHintsUsed(),
+      hintedParams: hints.getHintedParams()
+    });
 
     gameIsPaused = false;
     showStartedState();
@@ -602,8 +403,12 @@ $(function() {
   const pauseGame = function() {
     if (!gameHasStarted || gameFinished || gameIsPaused) { return; }
 
-    const pausedAt = rightNow();
-    settleRunningGameData(pausedAt);
+    gameData = session.pauseGameData({
+      gameData: gameData,
+      mysteryPatchId: mysteryPatchId,
+      hintsUsed: hints.getHintsUsed(),
+      hintedParams: hints.getHintedParams()
+    });
 
     if (remainingTimeSeconds() <= 0) {
       gameFinished = true;
@@ -611,12 +416,6 @@ $(function() {
       triggerSubmitSolution();
       return;
     }
-
-    syncGameData({
-      status: 'paused',
-      lastResumedAt: null,
-      pausedAt: pausedAt
-    });
 
     gameIsPaused = true;
     if (VS.keysEmulatorBridge && typeof VS.keysEmulatorBridge.stopAllNotes === 'function') {
@@ -626,100 +425,23 @@ $(function() {
     renderTimer(remainingTimeSeconds());
   };
 
-  const resolveSessionState = function() {
-    const now = rightNow();
-    const cookieResultsData = parseCookieJson('resultsData');
-    const storedGameData = normalizeGameData(readGameData());
-
-    if (
-      cookieResultsData !== null &&
-      cookieResultsData.mysteryPatchId === mysteryPatchId &&
-      now >= cookieResultsData.timeSubmitted
-    ) {
-      // Game finished in previous session
-      return {
-        status: 'finished',
-        gameData: storedGameData,
-        resultsData: cookieResultsData.results,
-        hintsUsed: cookieResultsData.hintsUsed || 0,
-        hintedParams: cookieResultsData.hintedParams || []
-      };
-    }
-
-    if (
-      storedGameData !== null &&
-      storedGameData.mysteryPatchId === mysteryPatchId
-    ) {
-      if (storedGameData.status === 'running' && storedGameData.lastResumedAt !== null) {
-        const settledRemainingSeconds =
-          storedGameData.remainingSeconds - (now - storedGameData.lastResumedAt);
-
-        if (settledRemainingSeconds <= 0) {
-          return {
-            status: 'expired_unsubmitted',
-            gameData: {
-              ...storedGameData,
-              remainingSeconds: 0
-            },
-            resultsData: null,
-            hintsUsed: storedGameData.hintsUsed || 0,
-            hintedParams: storedGameData.hintedParams || []
-          };
-        }
-      }
-
-      if (storedGameData.remainingSeconds <= 0) {
-        return {
-          status: 'expired_unsubmitted',
-          gameData: {
-            ...storedGameData,
-            remainingSeconds: 0
-          },
-          resultsData: null,
-          hintsUsed: storedGameData.hintsUsed || 0,
-          hintedParams: storedGameData.hintedParams || []
-        };
-      }
-
-      return {
-        status: storedGameData.status === 'paused' ? 'paused' : 'active',
-        gameData: storedGameData,
-        resultsData: null,
-        hintsUsed: storedGameData.hintsUsed || 0,
-        hintedParams: storedGameData.hintedParams || []
-      };
-    }
-
-    // New game
-    return {
-      status: 'not_started',
-      gameData: null,
-      resultsData: null,
-      hintsUsed: 0,
-      hintedParams: []
-    };
-  };
-
   const applySessionState = function(sessionState) {
     gameData = sessionState.gameData || undefined;
-    resultsData = sessionState.resultsData || undefined;
-    hintsUsed = sessionState.hintsUsed || 0;
-    hintedParams = new Set(sessionState.hintedParams || []);
+    results.setResultsData(sessionState.resultsData || undefined);
+    hints.setState({
+      hintsUsed: sessionState.hintsUsed || 0,
+      hintedParams: sessionState.hintedParams || []
+    });
     gameIsPaused = sessionState.status === 'paused';
-    stopAllHintBlinking();
 
-    // previously finished
     if (sessionState.status === 'finished') {
       gameHasStarted = true;
       gameFinished = true;
       showFinishedState();
-      $('#results-button').click();
-      printResultsInfo(false);
-
+      results.showResults(false);
       return;
     }
 
-    // abandoned
     if (sessionState.status === 'expired_unsubmitted') {
       gameHasStarted = true;
       gameFinished = true;
@@ -729,7 +451,6 @@ $(function() {
       return;
     }
 
-    // continue
     if (sessionState.status === 'active') {
       gameHasStarted = true;
       gameFinished = false;
@@ -748,27 +469,25 @@ $(function() {
       return;
     }
 
-    // new game
     gameHasStarted = false;
     gameFinished = false;
     gameIsPaused = false;
-    hintsUsed = 0;
-    hintedParams = new Set();
+    shouldScheduleKeyboardHint = false;
+    results.setResultsData(undefined);
+    hints.setState({ hintsUsed: 0, hintedParams: [] });
     showNotStartedState();
     $('#pre-game-button').click();
   };
 
   const getMysteryPatch = function() {
     $.get('/mystery_patch.json').done(function(encryptedParams) {
-      // Rotate back characters by todays UTC day of month
       const dayOfMonth = new Date().getUTCDate();
       mysteryPatchId = encryptedParams.id;
       mysteryPatchNumber = encryptedParams.number;
       digest = encryptedParams.digest;
-      decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
+      const decryptedParams = unrotate(encryptedParams.patch, dayOfMonth);
 
       const base64Salt = btoa('salt489');
-      // remove base64 salt from end of string, then base64 decode
       const base64String = decryptedParams.slice(0, -base64Salt.length);
       const decodedString = atob(base64String);
       const mysteryParamsArray = JSON.parse(decodedString);
@@ -783,9 +502,9 @@ $(function() {
 
       $('h1').text(`Mystery Patch #${mysteryPatchNumber}`);
 
-      // HANDLE RESTORED GAME SESSION
-      const sessionState = resolveSessionState();
-      applySessionState(sessionState);
+      applySessionState(session.resolveSessionState({
+        mysteryPatchId: mysteryPatchId
+      }));
     });
   };
 
@@ -844,16 +563,14 @@ $(function() {
   };
 
   window.addEventListener('keydown', function(event) {
-    if (!gameIsPaused) { return; }
-    if (!isPausedGameKey(event)) { return; }
+    if (!gameIsPaused || !isPausedGameKey(event)) { return; }
 
     event.preventDefault();
     event.stopImmediatePropagation();
   }, true);
 
   window.addEventListener('keyup', function(event) {
-    if (!gameIsPaused) { return; }
-    if (!isPausedGameKey(event)) { return; }
+    if (!gameIsPaused || !isPausedGameKey(event)) { return; }
 
     event.preventDefault();
     event.stopImmediatePropagation();
@@ -871,206 +588,6 @@ $(function() {
     }
   });
 
-  $("#copy-results").on("click", function () {
-    let text = $("#share-text").val();
-
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text)
-        .then(function () { $("#copy-status").text("Copied!"); })
-        .catch(function () { $("#copy-status").text("Couldn’t copy."); });
-      return;
-    }
-
-    // fallback (works without async)
-    let $ta = $("#share-text");
-    $ta.prop("readonly", false);
-    $ta[0].focus();
-    $ta[0].select();
-    $ta[0].setSelectionRange(0, $ta.val().length);
-
-    let ok = document.execCommand("copy");
-    $ta.prop("readonly", true);
-    window.getSelection().removeAllRanges();
-
-    $("#copy-status").text(ok ? "Copied!" : "Couldn’t copy.");
-  });
-
-  $('#results-modal').on('shown.bs.modal hidden.bs.modal', function() {
-    updateShowResultsButton();
-  });
-
-  $('#show-results').on('click tap', function() {
-    if (resultsData === undefined || resultsData === null) { return; }
-    $('#results-button').trigger('click');
-    printResultsInfo(false);
-    this.blur();
-  });
-
-  $('#request-hint').on('click tap', function(event) {
-    event.preventDefault();
-    if (!gameHasStarted || gameFinished || gameIsPaused || hintRequestInFlight || hintsUsed >= MAX_HINTS) {
-      return;
-    }
-
-    hintRequestInFlight = true;
-    updateHintButton();
-
-    $.post('/mystery_patch_hint', {
-      mysteryPatchId: mysteryPatchId,
-      patch: currentGuessParams()
-    }).done(function(response) {
-      hintsUsed = response.hints_used;
-      $(document).trigger('mysteryPatchHintReceived', [response.hint_params || []]);
-    }).fail(function(xhr) {
-      if (xhr.status === 429) {
-        hintsUsed = MAX_HINTS;
-        persistGameProgress();
-      }
-    }).always(function() {
-      hintRequestInFlight = false;
-      updateHintButton();
-    });
-  });
-
-  $(document).on('mysteryPatchHintReceived', function(_event, hintParams) {
-    (hintParams || []).forEach(function(paramName) {
-      hintedParams.add(paramName);
-    });
-    startHintBlinking(hintParams);
-    persistGameProgress();
-  });
-
-  Object.entries(HINT_TARGET_SELECTORS).forEach(function([paramName, selectors]) {
-    selectors.forEach(function(selector) {
-      $(document).on('mousedown touchstart pointerdown', selector, function() {
-        stopBlinkingHintParam(paramName);
-      });
-    });
-  });
-
-  const printResultsInfo = function(animate) {
-    const animateResults = animate && !inTestEnvironment;
-    let animateInterval = animateResults ? 500 : 5;
-    let $tbody = $("#results-table tbody");
-    let emojiSummary = '';
-    $tbody.html('');
-    let i = 0;
-    let entries = Object.entries(resultsData.parameter_scores);
-    const voiceMidiMap = {
-      10: 'poly',
-      30: 'unison',
-      50: 'octave',
-      70: 'fifth',
-      100: 'unison ring',
-      120: 'poly ring'
-    };
-
-    const boolMap = {
-      'true': 'on',
-      'false': 'off'
-    };
-
-    const renderSummary = function() {
-      revealElement('#kem-x-out', animateResults);
-      $('#overall-score').html(
-        [
-          `<h3>Total score:</h3><div class='percentage'>`,
-          `${resultsData.total_score}%</div>`,
-          '<p class="share-subtitle">Come back tomorrow for a new mystery patch.</div>'
-        ].join('')
-      );
-      revealElement('#overall-score', animateResults);
-      $('#share-text').val([
-        `Mystery Patch #${mysteryPatchNumber}: I guessed today's mystery synth patch with ${resultsData.total_score}% `,
-        `accuracy.\n${emojiSummary}\n\nvolcashare.com/mystery_patch`,
-        `\n\n#VSmysterypatch`
-      ].join('')
-      );
-      revealElement('#share-results', animateResults);
-      revealElement('#keep-playing', animateResults);
-      updateShowResultsButton();
-    };
-
-    const renderEntry = function(entry) {
-      let key = snakeToTitleize(entry[0]);
-      let value = entry[1];
-
-      let correctVal = value[0];
-      let printableVal = value[1];
-      const wasHinted = hintedParams.has(entry[0].toString());
-
-      // Map voice midi val to voice name
-      if (key === 'Voice') {
-        printableVal = voiceMidiMap[value[1]];
-        correctVal = voiceMidiMap[value[0]]
-      } else if (key === 'Lfo Trigger Sync') {
-        printableVal = boolMap[value[1]];
-        correctVal = boolMap[value[0]];
-      }
-
-      let perc = value[3].toFixed(2);
-
-      if ($tbody.length === 0) $tbody = $("#results-table"); // fallback if no tbody
-
-      let $tr = $("<tr>");
-      if (animateResults) {
-        $tr.css('display', 'none');
-      }
-      $tr.append($("<th class='result-param' scope='row'>").text(key));
-      $tr.append($("<td>").text(correctVal));
-      const $yourValueTd = $("<td>").text(printableVal);
-      if (wasHinted) {
-        $yourValueTd.append(' 💡');
-      }
-      $tr.append($yourValueTd);
-      let $perctd = $('<td>');
-      $perctd.text(perc);
-      if (perc > 80) {
-        $perctd.css('font-weight', 'bold');
-        $perctd.css('color', '#080');
-        $tr.addClass('table-success');
-        emojiSummary += '🟩';
-      } else if (perc < 50) {
-        $perctd.css('font-weight', 'bold');
-        $perctd.css('color', '#800');
-        $tr.addClass('table-danger');
-        emojiSummary += '🟥';
-      } else {
-        emojiSummary += '🟨';
-      }
-      if (wasHinted) {
-        emojiSummary += '💡';
-      }
-      $tr.append($perctd);
-
-      $tbody.append($tr);
-      if (animateResults) {
-        $tr.show();
-      }
-      $tr.addClass('fade-bg-white');
-    };
-
-    if (!animateResults) {
-      entries.forEach(renderEntry);
-      renderSummary();
-      return;
-    }
-
-    let timer = setInterval(function () {
-
-      // When entries are all done being listed
-      if (i >= entries.length) {
-        renderSummary();
-        clearInterval(timer);
-        return;
-      }
-
-      renderEntry(entries[i]);
-
-      i += 1;
-    }, animateInterval);
-  };
-
   $('#submit-solution').on('click tap', function(event) {
     event.preventDefault();
     if (gameFinished || gameIsPaused) { return; }
@@ -1085,6 +602,8 @@ $(function() {
     submitSolution();
   });
 
+  hints.bindEvents();
+  results.bindEvents();
   showNotStartedState();
   getMysteryPatch();
   syncAudibleEngineSwitch('primary');
