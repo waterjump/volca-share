@@ -23,7 +23,7 @@ $(function() {
   let hintBlinkIntervalId = null;
   let hintBlinkTimeoutId = null;
   const inTestEnvironment = $('body').attr('data-test-env') === 'true';
-  const GAME_DURATION_SECONDS = 120;
+  const GAME_DURATION_SECONDS = 180;
   const MAX_HINTS = 2;
   const HINT_BLINK_INTERVAL_MS = 500;
   const HINT_BLINK_DURATION_MS = 5000;
