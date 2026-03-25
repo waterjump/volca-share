@@ -8,6 +8,7 @@ $(function() {
   let mysteryPatchEngine;
   let gameHasStarted = false;
   let gameFinished = false;
+  let gameIsPaused = false;
   let mysteryPatchId;
   let mysteryPatchNumber;
   let digest;
@@ -23,6 +24,7 @@ $(function() {
   let hintBlinkIntervalId = null;
   let hintBlinkTimeoutId = null;
   const inTestEnvironment = $('body').attr('data-test-env') === 'true';
+  const GAME_DATA_STORAGE_KEY = 'mysteryPatchGameData';
   const GAME_DURATION_SECONDS = 180;
   const MAX_HINTS = 2;
   const HINT_BLINK_INTERVAL_MS = 500;
@@ -71,7 +73,7 @@ $(function() {
   };
 
   const updateHintButton = function() {
-    const gameIsActive = gameHasStarted && !gameFinished;
+    const gameIsActive = gameHasStarted && !gameFinished && !gameIsPaused;
     const hintsRemaining = MAX_HINTS - hintsUsed;
     const $hintButton = $('#request-hint');
     const hintDisabled =
@@ -89,10 +91,63 @@ $(function() {
     $hintButton.attr('title', hintLabel);
   };
 
-  const writeGameDataCookie = function(payload) {
+  const updatePauseButton = function() {
+    const $pauseButton = $('#toggle-pause');
+    const shouldShow = gameHasStarted && !gameFinished;
+
+    $pauseButton.css('display', shouldShow ? 'inline-block' : 'none');
+    if (!shouldShow) { return; }
+
+    $pauseButton.text(gameIsPaused ? 'Resume' : 'Pause');
+    $pauseButton.attr('aria-label', gameIsPaused ? 'Resume timer' : 'Pause timer');
+  };
+
+  const updatePausedInteractionLock = function() {
+    const paused = gameHasStarted && !gameFinished && gameIsPaused;
+
+    $('#mystery-game-interface-lock').toggleClass('hidden', !paused);
+    $('#mystery-game-controls-lock').toggleClass('hidden', !paused);
+
+    $('#audible-engine-primary, #audible-engine-mystery, #submit-solution')
+      .prop('disabled', paused)
+      .attr('aria-disabled', paused.toString());
+
+    if (VS.keysEmulatorBridge && typeof VS.keysEmulatorBridge.setInteractionEnabled === 'function') {
+      VS.keysEmulatorBridge.setInteractionEnabled(!paused);
+    }
+  };
+
+  const writeGameData = function(payload) {
     const encodedValue = encodeURIComponent(JSON.stringify(payload));
+    try {
+      window.localStorage.setItem(GAME_DATA_STORAGE_KEY, JSON.stringify(payload));
+    } catch (_) {
+    }
     VS.setCookie('gameData', encodedValue, 1, '/');
     gameData = payload;
+  };
+
+  const readGameData = function() {
+    try {
+      const storedGameData = window.localStorage.getItem(GAME_DATA_STORAGE_KEY);
+      if (storedGameData) {
+        return JSON.parse(storedGameData);
+      }
+    } catch (_) {
+    }
+
+    return parseCookieJson('gameData');
+  };
+
+  const syncGameData = function(attributes = {}) {
+    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
+
+    writeGameData({
+      ...gameData,
+      ...attributes,
+      hintsUsed: hintsUsed,
+      hintedParams: Array.from(hintedParams)
+    });
   };
 
   const hintTargetsFor = function(paramName) {
@@ -150,13 +205,7 @@ $(function() {
   const persistGameProgress = function() {
     if (!gameData || gameData.mysteryPatchId !== mysteryPatchId) { return; }
 
-    writeGameDataCookie({
-      mysteryPatchId: mysteryPatchId,
-      gameStart: gameData.gameStart,
-      gameDeadline: gameData.gameDeadline,
-      hintsUsed: hintsUsed,
-      hintedParams: Array.from(hintedParams)
-    });
+    syncGameData();
   };
 
   const updatePostGameMessage = function() {
@@ -248,7 +297,9 @@ $(function() {
 
   const showNotStartedState = function() {
     clearInterval(intervalId);
+    clearTimeout(keyboardHintTimeout);
     $('#timer').hide().text('');
+    $('#timer-description').hide();
     $('#submit-solution').hide();
     $('#show-results').hide();
     $('#request-hint').addClass('hidden');
@@ -256,18 +307,23 @@ $(function() {
     $('#audible-engine-mystery').addClass('start-game-callout');
     stopAllHintBlinking();
     updateHintButton();
+    updatePauseButton();
+    updatePausedInteractionLock();
   };
 
   let keyboardHintTimeout = null;
 
   const showStartedState = function() {
-    $('#timer-description').text('Remaining time:');
+    clearTimeout(keyboardHintTimeout);
+    $('#timer-description').show().text('Remaining time:');
     $('#timer').show();
     $('#submit-solution').show();
     $('#show-results').hide();
     $('#post-game-message').hide();
     $('#audible-engine-mystery').removeClass('start-game-callout');
     updateHintButton();
+    updatePauseButton();
+    updatePausedInteractionLock();
 
     keyboardHintTimeout = setTimeout(function() {
       $('#keyboard-highlight').addClass('start-keyboard-callout');
@@ -277,9 +333,24 @@ $(function() {
     }, 2000);
   };
 
+  const showPausedState = function() {
+    clearInterval(intervalId);
+    clearTimeout(keyboardHintTimeout);
+    $('#timer-description').show().text('Remaining time (paused):');
+    $('#timer').show();
+    $('#submit-solution').show();
+    $('#show-results').hide();
+    $('#post-game-message').hide();
+    $('#audible-engine-mystery').removeClass('start-game-callout');
+    stopAllHintBlinking();
+    updateHintButton();
+    updatePauseButton();
+    updatePausedInteractionLock();
+  };
+
   const showFinishedState = function() {
     clearInterval(intervalId);
-    clearInterval(keyboardHintTimeout);
+    clearTimeout(keyboardHintTimeout);
     $('#timer-description').hide();
     $('#timer').show().text('Time\'s up!');
     $('#submit-solution').hide();
@@ -290,6 +361,8 @@ $(function() {
     updateHintButton();
     updateShowResultsButton();
     updatePostGameMessage();
+    updatePauseButton();
+    updatePausedInteractionLock();
   };
 
   const triggerSubmitSolution = function() {
@@ -328,7 +401,7 @@ $(function() {
 
   $(document).on('hideKeyboardHighlight', function() {
     if (keyboardHintTimeout) {
-      clearInterval(keyboardHintTimeout);
+      clearTimeout(keyboardHintTimeout);
     }
     $('#keyboard-highlight').removeClass('start-keyboard-callout');
     const $usageBody = VS.findAccordionHeaderBySectionName('Usage').siblings('.accordion-body');
@@ -346,18 +419,56 @@ $(function() {
     }
   };
 
-  const setGameStartedCookie = function() {
+  const normalizeGameData = function(rawGameData) {
+    if (
+      rawGameData === null ||
+      rawGameData === undefined ||
+      rawGameData.mysteryPatchId !== mysteryPatchId
+    ) {
+      return null;
+    }
+
+    if (rawGameData.remainingSeconds !== undefined) {
+      const status = rawGameData.status || 'paused';
+      return {
+        mysteryPatchId: rawGameData.mysteryPatchId,
+        status: status,
+        remainingSeconds: Math.max(Math.floor(rawGameData.remainingSeconds), 0),
+        lastResumedAt: rawGameData.lastResumedAt || null,
+        pausedAt: rawGameData.pausedAt || null,
+        hintsUsed: rawGameData.hintsUsed || 0,
+        hintedParams: rawGameData.hintedParams || []
+      };
+    }
+
+    if (rawGameData.gameDeadline !== undefined) {
+      return {
+        mysteryPatchId: rawGameData.mysteryPatchId,
+        status: 'running',
+        remainingSeconds: Math.max(rawGameData.gameDeadline - rightNow(), 0),
+        lastResumedAt: rightNow(),
+        pausedAt: null,
+        hintsUsed: rawGameData.hintsUsed || 0,
+        hintedParams: rawGameData.hintedParams || []
+      };
+    }
+
+    return null;
+  };
+
+  const setGameStartedData = function() {
     if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
       return;
     }
 
-    const gameStart = rightNow();
-    const gameDeadline = gameStart + GAME_DURATION_SECONDS;
+    const resumedAt = rightNow();
 
-    writeGameDataCookie({
+    writeGameData({
       mysteryPatchId: mysteryPatchId,
-      gameStart: gameStart,
-      gameDeadline: gameDeadline,
+      status: 'running',
+      remainingSeconds: GAME_DURATION_SECONDS,
+      lastResumedAt: resumedAt,
+      pausedAt: null,
       hintsUsed: 0,
       hintedParams: []
     });
@@ -377,9 +488,33 @@ $(function() {
 
   const remainingTimeSeconds = function() {
     if (gameData !== undefined && gameData.mysteryPatchId === mysteryPatchId) {
-      return gameData.gameDeadline - rightNow();
+      if (gameData.status === 'running' && gameData.lastResumedAt !== null) {
+        return Math.max(gameData.remainingSeconds - (rightNow() - gameData.lastResumedAt), 0);
+      }
+
+      return Math.max(gameData.remainingSeconds || 0, 0);
     }
     return GAME_DURATION_SECONDS;
+  };
+
+  const renderTimer = function(secondsLeft) {
+    const minutes = Math.floor(secondsLeft / 60);
+    const seconds = secondsLeft % 60;
+    $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+  };
+
+  const settleRunningGameData = function(now = rightNow()) {
+    if (!gameData || gameData.mysteryPatchId !== mysteryPatchId || gameData.status !== 'running') {
+      return;
+    }
+
+    const elapsedSeconds = Math.max(now - (gameData.lastResumedAt || now), 0);
+    const updatedRemainingSeconds = Math.max((gameData.remainingSeconds || 0) - elapsedSeconds, 0);
+
+    syncGameData({
+      remainingSeconds: updatedRemainingSeconds,
+      lastResumedAt: now
+    });
   };
 
   const startTimer = function() {
@@ -392,11 +527,14 @@ $(function() {
       return;
     }
 
-    let minutes = Math.floor(secondsLeft / 60);
-    let seconds = secondsLeft % 60;
-    $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+    renderTimer(secondsLeft);
 
     intervalId = setInterval(function() {
+      if (gameIsPaused) {
+        clearInterval(intervalId);
+        return;
+      }
+
       secondsLeft--;
 
       if (secondsLeft >= 0) {
@@ -419,9 +557,7 @@ $(function() {
           }, 10);
         }
 
-        minutes = Math.floor(secondsLeft / 60);
-        seconds = secondsLeft % 60;
-        $('#timer').text(`${minutes.toString()}:${seconds.toString().padStart(2, '0')}`);
+        renderTimer(secondsLeft);
       } else {
         clearInterval(intervalId);
         if (!gameFinished) {
@@ -437,26 +573,63 @@ $(function() {
     if (gameHasStarted || gameFinished) { return; }
 
     gameHasStarted = true;
+    gameIsPaused = false;
     hintsUsed = 0;
     hintedParams = new Set();
     stopAllHintBlinking();
     sendAnalyticsEvent('Mystery Patch', 'start');
     showStartedState();
-    setGameStartedCookie();
+    setGameStartedData();
     startTimer();
   };
 
   const resumeGame = function() {
     if (!gameHasStarted || gameFinished) { return; }
 
+    if (gameData && gameData.mysteryPatchId === mysteryPatchId) {
+      syncGameData({
+        status: 'running',
+        lastResumedAt: rightNow(),
+        pausedAt: null
+      });
+    }
+
+    gameIsPaused = false;
     showStartedState();
     startTimer();
   };
 
-  const resolveSessionStateFromCookies = function() {
+  const pauseGame = function() {
+    if (!gameHasStarted || gameFinished || gameIsPaused) { return; }
+
+    const pausedAt = rightNow();
+    settleRunningGameData(pausedAt);
+
+    if (remainingTimeSeconds() <= 0) {
+      gameFinished = true;
+      showFinishedState();
+      triggerSubmitSolution();
+      return;
+    }
+
+    syncGameData({
+      status: 'paused',
+      lastResumedAt: null,
+      pausedAt: pausedAt
+    });
+
+    gameIsPaused = true;
+    if (VS.keysEmulatorBridge && typeof VS.keysEmulatorBridge.stopAllNotes === 'function') {
+      VS.keysEmulatorBridge.stopAllNotes();
+    }
+    showPausedState();
+    renderTimer(remainingTimeSeconds());
+  };
+
+  const resolveSessionState = function() {
     const now = rightNow();
     const cookieResultsData = parseCookieJson('resultsData');
-    const cookieGameData = parseCookieJson('gameData');
+    const storedGameData = normalizeGameData(readGameData());
 
     if (
       cookieResultsData !== null &&
@@ -466,7 +639,7 @@ $(function() {
       // Game finished in previous session
       return {
         status: 'finished',
-        gameData: cookieGameData,
+        gameData: storedGameData,
         resultsData: cookieResultsData.results,
         hintsUsed: cookieResultsData.hintsUsed || 0,
         hintedParams: cookieResultsData.hintedParams || []
@@ -474,27 +647,46 @@ $(function() {
     }
 
     if (
-      cookieGameData !== null &&
-      cookieGameData.mysteryPatchId === mysteryPatchId
+      storedGameData !== null &&
+      storedGameData.mysteryPatchId === mysteryPatchId
     ) {
-      if (now >= cookieGameData.gameDeadline) {
-        // Abandoned
+      if (storedGameData.status === 'running' && storedGameData.lastResumedAt !== null) {
+        const settledRemainingSeconds =
+          storedGameData.remainingSeconds - (now - storedGameData.lastResumedAt);
+
+        if (settledRemainingSeconds <= 0) {
+          return {
+            status: 'expired_unsubmitted',
+            gameData: {
+              ...storedGameData,
+              remainingSeconds: 0
+            },
+            resultsData: null,
+            hintsUsed: storedGameData.hintsUsed || 0,
+            hintedParams: storedGameData.hintedParams || []
+          };
+        }
+      }
+
+      if (storedGameData.remainingSeconds <= 0) {
         return {
           status: 'expired_unsubmitted',
-          gameData: cookieGameData,
+          gameData: {
+            ...storedGameData,
+            remainingSeconds: 0
+          },
           resultsData: null,
-          hintsUsed: cookieGameData.hintsUsed || 0,
-          hintedParams: cookieGameData.hintedParams || []
+          hintsUsed: storedGameData.hintsUsed || 0,
+          hintedParams: storedGameData.hintedParams || []
         };
       }
 
-      // Continue game
       return {
-        status: 'active',
-        gameData: cookieGameData,
+        status: storedGameData.status === 'paused' ? 'paused' : 'active',
+        gameData: storedGameData,
         resultsData: null,
-        hintsUsed: cookieGameData.hintsUsed || 0,
-        hintedParams: cookieGameData.hintedParams || []
+        hintsUsed: storedGameData.hintsUsed || 0,
+        hintedParams: storedGameData.hintedParams || []
       };
     }
 
@@ -513,6 +705,7 @@ $(function() {
     resultsData = sessionState.resultsData || undefined;
     hintsUsed = sessionState.hintsUsed || 0;
     hintedParams = new Set(sessionState.hintedParams || []);
+    gameIsPaused = sessionState.status === 'paused';
     stopAllHintBlinking();
 
     // previously finished
@@ -530,6 +723,7 @@ $(function() {
     if (sessionState.status === 'expired_unsubmitted') {
       gameHasStarted = true;
       gameFinished = true;
+      gameIsPaused = false;
       showFinishedState();
       triggerSubmitSolution();
       return;
@@ -539,13 +733,25 @@ $(function() {
     if (sessionState.status === 'active') {
       gameHasStarted = true;
       gameFinished = false;
+      gameIsPaused = false;
+      settleRunningGameData();
       resumeGame();
+      return;
+    }
+
+    if (sessionState.status === 'paused') {
+      gameHasStarted = true;
+      gameFinished = false;
+      gameIsPaused = true;
+      showPausedState();
+      renderTimer(remainingTimeSeconds());
       return;
     }
 
     // new game
     gameHasStarted = false;
     gameFinished = false;
+    gameIsPaused = false;
     hintsUsed = 0;
     hintedParams = new Set();
     showNotStartedState();
@@ -577,13 +783,14 @@ $(function() {
 
       $('h1').text(`Mystery Patch #${mysteryPatchNumber}`);
 
-      // HANDLE COOKIE-RESTORED GAME SESSION
-      const sessionState = resolveSessionStateFromCookies();
+      // HANDLE RESTORED GAME SESSION
+      const sessionState = resolveSessionState();
       applySessionState(sessionState);
     });
   };
 
   $('#audible-engine-primary').on('click tap', function() {
+    if (gameIsPaused) { return; }
     if (VS.keysEmulatorBridge) {
       VS.keysEmulatorBridge.setActiveAudibleEngine('primary');
     }
@@ -592,6 +799,7 @@ $(function() {
   });
 
   $('#audible-engine-mystery').on('click tap', function() {
+    if (gameIsPaused) { return; }
     if (VS.keysEmulatorBridge) {
       VS.keysEmulatorBridge.setActiveAudibleEngine('mystery');
     }
@@ -600,9 +808,61 @@ $(function() {
     this.blur();
   });
 
+  $('#toggle-pause').on('click tap', function() {
+    if (gameIsPaused) {
+      resumeGame();
+    } else {
+      pauseGame();
+    }
+    this.blur();
+  });
+
+  document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'hidden') {
+      pauseGame();
+    }
+  });
+
+  window.addEventListener('pagehide', function() {
+    pauseGame();
+  });
+
+  const isPausedGameKey = function(event) {
+    if (event.ctrlKey || event.metaKey || event.altKey) { return false; }
+
+    const emulatorConstants = VS.emulatorConstants;
+    const keyCode = event.keyCode;
+    const musicalTypingKeyCodes = emulatorConstants && emulatorConstants.keyCodes || [];
+
+    return (
+      musicalTypingKeyCodes.includes(keyCode) ||
+      keyCode === (emulatorConstants && emulatorConstants.zKeyCode) ||
+      keyCode === (emulatorConstants && emulatorConstants.xKeyCode) ||
+      keyCode === 37 ||
+      keyCode === 39
+    );
+  };
+
+  window.addEventListener('keydown', function(event) {
+    if (!gameIsPaused) { return; }
+    if (!isPausedGameKey(event)) { return; }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+
+  window.addEventListener('keyup', function(event) {
+    if (!gameIsPaused) { return; }
+    if (!isPausedGameKey(event)) { return; }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }, true);
+
   $(document).on('keydown', function(event) {
     const targetTag = (event.target && event.target.tagName || '').toLowerCase();
     if (['input', 'textarea', 'select'].includes(targetTag)) { return; }
+    if (gameIsPaused) { return; }
 
     if (event.keyCode === 37) {
       $('#audible-engine-primary').trigger('click');
@@ -648,7 +908,7 @@ $(function() {
 
   $('#request-hint').on('click tap', function(event) {
     event.preventDefault();
-    if (!gameHasStarted || gameFinished || hintRequestInFlight || hintsUsed >= MAX_HINTS) {
+    if (!gameHasStarted || gameFinished || gameIsPaused || hintRequestInFlight || hintsUsed >= MAX_HINTS) {
       return;
     }
 
@@ -813,13 +1073,14 @@ $(function() {
 
   $('#submit-solution').on('click tap', function(event) {
     event.preventDefault();
-    if (gameFinished) { return; }
+    if (gameFinished || gameIsPaused) { return; }
 
     $('#submit-confirmation-button').trigger('click');
   });
 
   $('#confirm-submit-solution').on('click tap', function(event) {
     event.preventDefault();
+    if (gameIsPaused) { return; }
     $('#submit-confirmation-modal').modal('hide');
     submitSolution();
   });

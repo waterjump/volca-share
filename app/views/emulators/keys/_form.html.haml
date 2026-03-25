@@ -164,6 +164,10 @@
           %span.on-off
             .light{ id: 'step_trigger_light',
                     class: @patch.lit?(:step_trigger) }
+    - if mystery_patch_view
+      #mystery-game-interface-lock.hidden{ role: 'presentation', 'aria-hidden' => 'true' }
+        .lock-message
+          Game paused
 
   .field.sequence-area
     .sequence-holder
@@ -171,43 +175,49 @@
 
 #patch-metadata.col-md-9.col-lg-3
   - if mystery_patch_view
-    #audible-engine-switch.btn-group{ role: 'group', aria: { label: 'Audible engine switch' } }
-      %button#audible-engine-primary.btn.btn-default.active{ type: 'button' }
-        Hear Your Patch
-      %button#audible-engine-mystery.btn.btn-default{ type: 'button' }
-        Hear Mystery Patch
-    %table#audible-engine-shortcuts
-      %tbody
-        %tr
-          %td Left Arrow
-          %td Right Arrow
-    %hr
-    #timer-description
-    #timer
-    #post-game-message{ style: 'display: none;' }
-      Come back tomorrow for a new mystery patch.
-    #need-practice.well{ style: 'display: none' }
-      %h4 Need some practice?
-      You can freely play the
-      =link_to keys_emulator_path, target: '_blank' do
-        %strong Volca Keys Emulator
-      in the meantime
+    %button#toggle-pause.btn.btn-default{ type: 'button', style: 'display: none;' }
+      Pause
+    .mystery-paused-controls-region
+      #audible-engine-switch.btn-group{ role: 'group', aria: { label: 'Audible engine switch' } }
+        %button#audible-engine-primary.btn.btn-default.active{ type: 'button' }
+          Hear Your Patch
+        %button#audible-engine-mystery.btn.btn-default{ type: 'button' }
+          Hear Mystery Patch
+      %table#audible-engine-shortcuts
+        %tbody
+          %tr
+            %td Left Arrow
+            %td Right Arrow
+      %hr
+      #timer-description
+      #timer
+      #post-game-message{ style: 'display: none;' }
+        Come back tomorrow for a new mystery patch.
+      #need-practice.well{ style: 'display: none' }
+        %h4 Need some practice?
+        You can freely play the
+        =link_to keys_emulator_path, target: '_blank' do
+          %strong Volca Keys Emulator
+        in the meantime
 
-    .mystery-action-buttons
-      = image_tag 'bulb.svg',
-        id: 'request-hint',
-        class: 'hidden',
-        alt: '',
-        width: 28,
-        height: 28,
-        role: 'button',
-        tabindex: 0,
-        aria: { label: 'Request a hint', disabled: 'true' },
-        title: 'Request a hint'
-      %button#submit-solution.btn.btn-success
-        I'm Done
-      %button#show-results.btn.btn-default{ type: 'button', style: 'display: none;' }
-        Show Results
+      .mystery-action-buttons
+        = image_tag 'bulb.svg',
+          id: 'request-hint',
+          class: 'hidden',
+          alt: '',
+          width: 28,
+          height: 28,
+          role: 'button',
+          tabindex: 0,
+          aria: { label: 'Request a hint', disabled: 'true' },
+          title: 'Request a hint'
+        %button#submit-solution.btn.btn-success
+          I'm Done
+        %button#show-results.btn.btn-default{ type: 'button', style: 'display: none;' }
+          Show Results
+      #mystery-game-controls-lock.hidden{ role: 'presentation', 'aria-hidden' => 'true' }
+        .lock-message
+          Resume to continue
   #performance-warning.hidden.alert.alert-danger.alert-dismissable{ role: 'alert' }
   .accordion
     = render 'shared/midi_in'

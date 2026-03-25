@@ -183,6 +183,15 @@ VS.KeysEmulator = function() {
     applyEngineOutputState();
   };
 
+  let interactionEnabled = true;
+
+  const stopAllActiveNotes = function() {
+    managedEngineList().forEach(binding => {
+      binding.engine.stopPolyNote([], -1);
+      binding.engine.stopNote();
+    });
+  };
+
   VS.keysEmulatorBridge = {
     registerMysteryEngine: function(engine, patchParams = VS.mysteryPatchParams) {
       if (!engine) { return; }
@@ -194,6 +203,20 @@ VS.KeysEmulator = function() {
     },
     getActiveAudibleEngine: function() {
       return activeAudibleEngine;
+    },
+    setInteractionEnabled: function(enabled) {
+      interactionEnabled = enabled !== false;
+
+      if (interactionEnabled) {
+        musicalTyping.enable();
+        return;
+      }
+
+      musicalTyping.disable();
+      stopAllActiveNotes();
+    },
+    stopAllNotes: function() {
+      stopAllActiveNotes();
     }
   };
 
@@ -250,6 +273,7 @@ VS.KeysEmulator = function() {
   sequences.init();
 
   $('#play').on('click tap', function() {
+    if (!interactionEnabled) { return; }
     audioEngine.activateAudio();
     if (audioEngine.getSequencerPlaying()) {
       // STOP
@@ -408,10 +432,12 @@ VS.KeysEmulator = function() {
   });
 
   $(document).on('midinoteon', function(event) {
+    if (!interactionEnabled) { return; }
     musicalTyping.noteOn(event.detail.number);
   });
 
   $(document).on('midinoteoff', function(event) {
+    if (!interactionEnabled) { return; }
     musicalTyping.noteOff(event.detail.number);
   });
 
@@ -513,10 +539,12 @@ VS.KeysEmulator = function() {
   };
 
   $('#func').on('click tap', function() {
+    if (!interactionEnabled) { return; }
     toggleFunctionMode();
   });
 
   $('#volca-keyboard .key').on('mousedown touchstart', function(e) {
+    if (!interactionEnabled) { return; }
     if (e.type === 'touchstart') {
       e.preventDefault();
     }
@@ -527,6 +555,7 @@ VS.KeysEmulator = function() {
   });
 
   $('#volca-keyboard .key').on('mouseenter', function() {
+    if (!interactionEnabled) { return; }
     if (keyboardPlaying) {
       musicalTyping.noteOn($(this).data('midinote'));
     }
@@ -543,6 +572,7 @@ VS.KeysEmulator = function() {
 
   // mobile drag across keys
   $('#volca-keyboard').on('touchmove', function(e) {
+    if (!interactionEnabled) { return; }
     if (!keyboardPlaying) return;
 
     e.preventDefault();

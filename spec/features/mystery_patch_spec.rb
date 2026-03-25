@@ -43,6 +43,34 @@ RSpec.describe 'Mystery Patch game', js: true do
     expect(page).to have_css('#request-hint[title*="1 left"]', visible: true)
   end
 
+  it 'restores a paused game with the same remaining time after reload' do
+    visit mystery_patch_path
+
+    click_button 'Got it'
+    click_button 'Hear Mystery Patch'
+
+    sleep 2
+
+    click_button 'Pause'
+
+    expect(page).to have_css('#toggle-pause', text: 'Resume', visible: true)
+    expect(page).to have_css('#mystery-game-interface-lock', visible: true)
+    expect(page).to have_css('#mystery-game-controls-lock', visible: true)
+    expect(find('#submit-solution', visible: true)).to be_disabled
+    expect(page).to have_no_css('#request-hint', visible: true)
+
+    paused_time = find('#timer', visible: true).text
+
+    visit current_path
+
+    expect(page).to have_css('#toggle-pause', text: 'Resume', visible: true)
+    expect(page).to have_css('#mystery-game-interface-lock', visible: true)
+    expect(page).to have_css('#mystery-game-controls-lock', visible: true)
+    expect(find('#submit-solution', visible: true)).to be_disabled
+    expect(find('#timer', visible: true).text).to eq(paused_time)
+    expect(page).to have_no_css('#request-hint', visible: true)
+  end
+
   it 'places hint emojis after the corresponding parameter squares in share text' do
     visit mystery_patch_path
 
