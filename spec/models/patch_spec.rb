@@ -63,6 +63,15 @@ RSpec.describe Patch  do
     it_behaves_like 'taggable'
   end
 
+  describe 'associations' do
+    it 'destroys associated editor picks when the patch is destroyed' do
+      patch = create(:patch)
+      create(:editor_pick, pickable: patch)
+
+      expect { patch.destroy }.to change(EditorPick, :count).by(-1)
+    end
+  end
+
   describe 'quality' do
     context 'when a legacy record has audio_sample that is no longer available' do
       it 'has less quality than the same patch with available audio sample' do

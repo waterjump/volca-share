@@ -45,6 +45,10 @@ module Keys
                class_name: 'User',
                inverse_of: :keys_patches,
                optional: true
+    has_many :editor_picks,
+             as: :pickable,
+             class_name: 'EditorPick',
+             dependent: :destroy
 
     midi_validation_options = {
       numericality: {

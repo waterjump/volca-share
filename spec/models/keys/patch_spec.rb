@@ -162,6 +162,15 @@ RSpec.describe Keys::Patch do
     end
   end
 
+  describe 'associations' do
+    it 'destroys associated editor picks when the patch is destroyed' do
+      patch = create(:keys_patch)
+      create(:keys_editor_pick, pickable: patch)
+
+      expect { patch.destroy }.to change(EditorPick, :count).by(-1)
+    end
+  end
+
   describe 'validations' do
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:slug) }

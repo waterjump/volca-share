@@ -51,6 +51,10 @@ class Patch
              class_name: 'User',
              inverse_of: :patches,
              optional: true
+  has_many :editor_picks,
+           as: :pickable,
+           class_name: 'EditorPick',
+           dependent: :destroy
   embeds_many :sequences, class_name: 'Sequence'
   accepts_nested_attributes_for :sequences, allow_destroy: true
 
