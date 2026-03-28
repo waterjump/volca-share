@@ -10,6 +10,14 @@
     emulation_active: 'false'
   }
 }
+  - if patch.editors_pick?
+    .ep
+      .ribbon-badge
+      .text
+        Editor's
+        %br
+        Pick
+
   .image-holder
     - if patch.user.present?
       = link_to user_keys_patch_path(patch.user.slug, patch.slug), { class: :title } do

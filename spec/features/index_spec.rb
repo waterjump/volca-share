@@ -196,6 +196,28 @@ RSpec.describe 'Patch index page', type: :feature, js: true do
     end
   end
 
+  describe "editor's pick ribbon" do
+    it "shows the ribbon on editor's picks only" do
+      picked_patch = create(:patch, name: 'Editors Pick Bass Patch')
+      regular_patch = create(:patch, name: 'Regular Bass Patch')
+      create(:editor_pick, pickable: picked_patch)
+
+      visit patches_path
+
+      picked_patch_card = find('.patch-holder', text: picked_patch.name)
+      regular_patch_card = find('.patch-holder', text: regular_patch.name)
+
+      within picked_patch_card do
+        expect(page).to have_css('.ribbon-badge')
+        expect(page).to have_text("Editor's Pick")
+      end
+
+      within regular_patch_card do
+        expect(page).not_to have_css('.ribbon-badge')
+      end
+    end
+  end
+
   describe 'pagination' do
     let(:first_patch) do
       create(
