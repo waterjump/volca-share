@@ -23,12 +23,17 @@ class PatchesController < ApplicationController
         Patch
           .browsable
           .where(audio_sample_available: true)
-          .includes(:user)
+          .includes(:user, :editor_picks)
           .desc(@sort)
           .desc(:created_at)
       else
-        Patch.browsable.includes(:user).desc(@sort).desc(:created_at)
+        Patch
+          .browsable
+          .includes(:user, :editor_picks)
+          .desc(@sort)
+          .desc(:created_at)
       end
+    patch_models = patch_models.to_a
 
     @patches =
       Kaminari.paginate_array(
@@ -165,9 +170,10 @@ class PatchesController < ApplicationController
         User
           .find_by(slug: params[:user_slug])
           .patches
+          .includes(:editor_picks)
           .find_by(slug: params[:slug])
       else
-        Patch.find(params[:id])
+        Patch.includes(:editor_picks).find(params[:id])
       end
     @patch = VolcaShare::PatchViewModel.wrap(patch_model)
     user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"

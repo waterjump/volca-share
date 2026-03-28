@@ -6,22 +6,30 @@ class UsersController < ApplicationController
     @patches =
       if current_user == @user
         VolcaShare::PatchViewModel.wrap(
-          @user.patches.order_by(created_at: 'desc')
+          @user.patches.includes(:editor_picks).order_by(created_at: 'desc').to_a
         )
       else
         VolcaShare::PatchViewModel.wrap(
-          @user.patches.browsable.order_by(created_at: 'desc')
+          @user.patches
+               .browsable
+               .includes(:editor_picks)
+               .order_by(created_at: 'desc')
+               .to_a
         )
       end
 
     @keys_patches =
       if current_user == @user
         VolcaShare::Keys::PatchViewModel.wrap(
-          @user.keys_patches.order_by(created_at: 'desc')
+          @user.keys_patches.includes(:editor_picks).order_by(created_at: 'desc').to_a
         )
       else
         VolcaShare::Keys::PatchViewModel.wrap(
-          @user.keys_patches.browsable.order_by(created_at: 'desc')
+          @user.keys_patches
+               .browsable
+               .includes(:editor_picks)
+               .order_by(created_at: 'desc')
+               .to_a
         )
       end
     @title = "Patches by #{@user.try(:username)}"

@@ -5,14 +5,15 @@ class TagsController < ApplicationController
   # GET /tags/1.json
   def show
     @tag = tag_params[:tag]
+    patch_models =
+      Patch.where(secret: false)
+           .tagged_with(@tag)
+           .includes(:user, :editor_picks)
+           .order_by(created_at: 'desc')
+           .to_a
     @patches =
       Kaminari.paginate_array(
-        VolcaShare::PatchViewModel.wrap(
-          Patch.where(secret: false)
-               .tagged_with(@tag)
-               .includes(:user)
-               .order_by(created_at: 'desc')
-        )
+        VolcaShare::PatchViewModel.wrap(patch_models)
       ).page(params[:page].to_i)
     @title = "##{@tag} tag"
   end

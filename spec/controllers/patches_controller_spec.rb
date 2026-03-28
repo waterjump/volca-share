@@ -17,12 +17,35 @@ RSpec.describe PatchesController, type: :controller do
       get :index
       expect(assigns(:patches)).to eq([patch])
     end
+
+    it 'annotates editor picks in memory' do
+      picked_patch = create(:patch)
+      unpicked_patch = create(:patch)
+      create(:editor_pick, pickable: picked_patch)
+
+      get :index
+
+      picked_result = assigns(:patches).find { |indexed_patch| indexed_patch == picked_patch }
+      unpicked_result = assigns(:patches).find { |indexed_patch| indexed_patch == unpicked_patch }
+
+      expect(picked_result).to be_editors_pick
+      expect(unpicked_result).not_to be_editors_pick
+    end
   end
 
   describe 'GET #show' do
     it 'assigns the requested patch as @patch' do
       get :show, params: { id: patch.to_param }, session: valid_session
       expect(assigns(:patch)).to eq(patch)
+    end
+
+    it 'annotates the requested patch in memory' do
+      create(:editor_pick, pickable: patch)
+
+      get :show, params: { id: patch.to_param }, session: valid_session
+
+      expect(assigns(:patch)).to be_editors_pick
+      expect(assigns(:patch).model).to eq(patch)
     end
   end
 

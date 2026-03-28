@@ -9,11 +9,16 @@ module Keys
     def index
       @sort = :quality
       @sort = :created_at if params['sort'] == 'newest'
+      patch_models =
+        Keys::Patch
+          .browsable
+          .includes(:user, :editor_picks)
+          .desc(@sort)
+          .desc(:created_at)
+          .to_a
       @keys_patches =
         Kaminari.paginate_array(
-          VolcaShare::Keys::PatchViewModel.wrap(
-            Keys::Patch.browsable.includes(:user).desc(@sort).desc(:created_at)
-          )
+          VolcaShare::Keys::PatchViewModel.wrap(patch_models)
         ).page(params[:page].to_i)
       @title = 'Volca Keys Patches'
     end
@@ -150,9 +155,10 @@ module Keys
           User
             .find_by(slug: params[:user_slug])
             .keys_patches
+            .includes(:editor_picks)
             .find_by(slug: params[:slug])
         else
-          Patch.find(params[:id])
+          Keys::Patch.includes(:editor_picks).find(params[:id])
         end
       @patch = VolcaShare::Keys::PatchViewModel.wrap(patch_model)
       user = " by #{@patch.user.try(:username) || '¯\_(ツ)_/¯'}"

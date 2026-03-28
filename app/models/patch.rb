@@ -96,6 +96,12 @@ class Patch
 
   DEFAULT_PATCH_STRING_FIELDS = %i[vco_group].freeze
 
+  def default_editor_pick
+    editor_picks.detect do |editor_pick|
+      editor_pick.list_key == EditorPick::DEFAULT_LIST_KEY
+    end
+  end
+
   def persist_quality
     set(quality: calculate_quality)
   end

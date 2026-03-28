@@ -60,4 +60,8 @@ class ApplicationViewModel
   def ==(other)
     (other.class == self.class && other.id == id) || other == model
   end
+
+  def editors_pick?
+    model.default_editor_pick.present?
+  end
 end

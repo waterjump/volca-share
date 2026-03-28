@@ -8,6 +8,22 @@ module Keys
     let(:invalid_attributes) { attributes_for(:keys_patch, attack: 'bort') }
     let(:valid_session) { {} }
 
+    describe 'GET #index' do
+      it 'annotates editor picks in memory' do
+        picked_patch = create(:keys_patch)
+        unpicked_patch = create(:keys_patch)
+        create(:keys_editor_pick, pickable: picked_patch)
+
+        get :index, session: valid_session
+
+        picked_result = assigns(:keys_patches).find { |indexed_patch| indexed_patch == picked_patch }
+        unpicked_result = assigns(:keys_patches).find { |indexed_patch| indexed_patch == unpicked_patch }
+
+        expect(picked_result).to be_editors_pick
+        expect(unpicked_result).not_to be_editors_pick
+      end
+    end
+
     describe 'GET #new' do
       it 'assigns a new patch as @patch' do
         get :new, params: {}, session: valid_session
@@ -17,9 +33,19 @@ module Keys
 
     describe 'GET #show' do
       it 'assigns the requested patch as @patch' do
-        patch = Patch.create!(valid_attributes)
+        patch = Keys::Patch.create!(valid_attributes)
         get :show, params: { id: patch.to_param }, session: valid_session
         expect(assigns(:patch)).to eq(patch)
+      end
+
+      it 'annotates the requested patch in memory' do
+        patch = create(:keys_patch)
+        create(:keys_editor_pick, pickable: patch)
+
+        get :show, params: { id: patch.to_param }, session: valid_session
+
+        expect(assigns(:patch)).to be_editors_pick
+        expect(assigns(:patch).model).to eq(patch)
       end
     end
 

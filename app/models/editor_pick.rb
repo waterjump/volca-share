@@ -4,9 +4,10 @@ class EditorPick
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  PICKABLE_TYPES = [Patch, Keys::Patch].freeze
+  DEFAULT_LIST_KEY = 'default'
+  PICKABLE_TYPES = ['Patch', 'Keys::Patch'].freeze
 
-  field :list_key, type: String, default: 'default'
+  field :list_key, type: String, default: DEFAULT_LIST_KEY
 
   belongs_to :pickable, polymorphic: true
 
@@ -21,7 +22,7 @@ class EditorPick
 
   scope :for_list, ->(list_key) { where(list_key: list_key) }
 
-  def self.create_from(pickable, list_key: 'default')
+  def self.create_from(pickable, list_key: DEFAULT_LIST_KEY)
     create(pickable: pickable, list_key: list_key)
   end
 
@@ -29,7 +30,7 @@ class EditorPick
 
   def pickable_type_is_supported
     return if pickable.blank?
-    return if PICKABLE_TYPES.any? { |type| pickable.is_a?(type) }
+    return if PICKABLE_TYPES.include?(pickable.class.name)
 
     errors.add(:pickable, 'must be a Patch or Keys::Patch')
   end
