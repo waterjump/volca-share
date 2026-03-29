@@ -51,6 +51,27 @@ RSpec.describe AudioSample do
           expect(model.audio_sample_code).to be_nil
         end
       end
+
+      context 'when provider response raises parse error (empty string)' do
+        before do
+          allow(OEmbed::Providers::SoundCloud).to receive(:get).and_raise(
+            OEmbed::ParseError, 'some error message'
+          )
+        end
+
+        it 'does not raise an error' do
+          expect { model.audio_sample_code }.not_to raise_error
+          expect(model.audio_sample_code).to be_nil
+        end
+
+        it 'writes error details to log' do
+          expect(Rails.logger).to receive(:error) do |&block|
+            expect(block.call).to match(/OEmbed.*Error/)
+          end
+
+          model.audio_sample_code
+        end
+      end
     end
 
     context 'when audio sample is regular youtube link' do

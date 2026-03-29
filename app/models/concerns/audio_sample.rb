@@ -33,7 +33,11 @@ module AudioSample
           "org/embed/sound/iframe/#{freesound_id}/simple/small/' width='375'"\
           " height='30'></iframe>"
         end
-      rescue OEmbed::NotFound
+      rescue OEmbed::Error => e
+        Rails.logger.error do
+          "OEMBED ERROR: #{e.message} (#{e.class})\n#{e.backtrace.join("\n")}"
+        end
+
         nil
       end
   end
