@@ -52,12 +52,12 @@
 
     .ep {
       position: absolute;
-      left:80%;
+      left:85%;
       top: -1%;
       user-select: none;
       -webkit-user-select: none;
       .text {
-        margin-left: 35px;
+        margin-left: 32px;
         position: absolute;
         font-weight: 600;
         font-style: italic;
@@ -65,6 +65,7 @@
         line-height: 100%;
         top: 5px;
         text-shadow: 0.5px 0.5px 1px rgba(0,0,0,0.2);
+        font-size: 10px;
       }
 
     }
@@ -83,7 +84,8 @@
       border-right: 2px solid #dcd900;
       text-align: center;
       padding-top: 0rem;
-      font-size: 2rem;
+      transform: scale(70%);
+      transform-origin: top;
     }
 
     .speaker {
@@ -118,6 +120,7 @@
         width: 100%;
         height: 100px;
         box-sizing: border-box;
+        image-rendering: pixelated;
       }
       .image.bass {
         background-image: image_url('patch-image-pixel-art.png');
