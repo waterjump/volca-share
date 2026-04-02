@@ -23,7 +23,7 @@ gem 'mongoid-simple-tags',
     ref: '940c575'
 gem 'nokogiri', '>= 1.18.9'
 gem 'rails', '7.0.4.2'
-gem 'rack', '~> 2.1'
+gem 'rack', '~> 2.2'
 gem 'rack-attack'
 gem 'rack-timeout'
 gem 'rails-html-sanitizer', '~> 1.0'
