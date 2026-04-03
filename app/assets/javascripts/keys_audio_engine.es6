@@ -345,14 +345,12 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
     if (!sequencerEnabled) { return; }
     setTempo();
 
-    // let i = 0;
     let previousStep;
 
     sequencerEventId = Tone.Transport.scheduleRepeat(function(time) {
-      let i = this.currentStepIndex;
       if (!sequencerPlaying) { return; }
 
-      while (!sequence[i % 16].activeStep) {
+      while (!sequence[this.currentStepIndex % 16].activeStep) {
         // Bail out if all steps are inactive
         if (!sequence.some(step => { return step.activeStep })) { return; }
         this.currentStepIndex++;
@@ -360,9 +358,9 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
 
       const gateEnd = time + 0.58 * (60 / (patch.tempo * 4));
 
-      let currentStep = sequence[i % 16];
+      let currentStep = sequence[this.currentStepIndex % 16];
 
-      previousSlide = i > 0 && previousStep.slide && !patch.step_trigger
+      previousSlide = this.currentStepIndex > 0 && previousStep.slide && !patch.step_trigger
       currentSlide = currentStep.slide && !patch.step_trigger
 
       if (previousSlide) {
