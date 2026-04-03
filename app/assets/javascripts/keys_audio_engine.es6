@@ -540,6 +540,7 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
 
   this.playNewNote = function(note, time = Tone.now()) {
     if (!canInteract()) { return; }
+
     if (toneState() !== 'running') {
       this.activateAudio().then((activated) => {
         if (!activated || !canInteract()) { return; }
@@ -632,11 +633,10 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
   }
 
   // Poly voices only!
-  this.addNote = function(keysDown) {
+  this.addNote = function(keysDown, noteToAdd, time = Tone.now()) {
     if (!canInteract()) { return; }
-    const time = Tone.now();
+
     const lowestFreeOsc = lowestFreeOscillator();
-    const noteToAdd = keysDown[keysDown.length -1];
     const frequency = Tone.Frequency(noteToAdd, 'midi').toFrequency();
     const closestOscillator = findOscillatorPlayingClosestNote(noteToAdd);
     const closestNote = closestOscillator.note;
@@ -683,10 +683,10 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
     });
   };
 
-  const swapPolyNote = function(keysDown, noteThatStopped, oscAffected) {
+  const swapPolyNote = function(keysDown, noteThatStopped, oscAffected, time = Tone.now()) {
     if (oscAffected === null) { return; }
+
     // find notes that aren't playing
-    const time = Tone.now();
     const notesStillPlaying = Object.values(oscillators).map(osc => osc.note);
     const notesNotPlaying = keysDown.filter(note => !notesStillPlaying.includes(note));
 
@@ -712,12 +712,13 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
     });
   };
 
-  this.stopPolyNote = function(keysDown, noteThatStopped) {
+  this.stopPolyNote = function(keysDown, noteThatStopped, time = Tone.now()) {
     if (!canInteract()) { return; }
+
     if (keysDown.length === 0) {
       // Ring out
-      Object.values(oscillators).forEach(osc => osc.setRingModPath(Tone.now(), true));
-      adjustPolyRingAlgo(keysDown.length, Tone.now(), true);
+      Object.values(oscillators).forEach(osc => osc.setRingModPath(time, true));
+      adjustPolyRingAlgo(keysDown.length, time, true);
       turnOffAllOscAmps();
       [1, 2, 3].forEach(i => oscillators[i].note = -1);
       return;
@@ -732,7 +733,7 @@ VS.KeysAudioEngine = function(patch, sequence = [], options = {}) {
     } else {
       oscAffected.note = -1;
       // Schedule note removal after 50ms grace period
-      const actionTime = Tone.now() + gracePeriod;
+      const actionTime = time + gracePeriod;
       Object.values(oscillators).forEach(osc => osc.setRingModPath(actionTime));
       adjustPolyRingAlgo(keysDown.length, actionTime);
       oscAffected.turnOffOscAmp(actionTime);

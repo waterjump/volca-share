@@ -34,10 +34,13 @@ VS.KeysKeyboardController = function(options = {}) {
     bindings().forEach(binding => {
       const voice = binding.patchParams.voice;
       if (keysDown.length === 1) {
+        // First note
         binding.engine.playNewNote(note);
       } else if (voice.includes('poly')) {
-        binding.engine.addNote(keysDown);
+        // Add second or third poly note
+        binding.engine.addNote(keysDown, note);
       } else {
+        // Switch monophonic note
         binding.engine.changeCurrentNote(note);
       }
     });
