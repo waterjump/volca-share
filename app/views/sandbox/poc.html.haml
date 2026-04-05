@@ -1,4 +1,4 @@
-- import_map = { 'imports' => { 'wam-sdk' => asset_path('sandbox/poc/vendor/wam-sdk.js'), 'poc-simple-saw-wam' => asset_path('sandbox/poc/simple_saw_wam.js') } }
+- import_map = { 'imports' => { 'wam-sdk' => asset_path('sandbox/poc/vendor/wam-sdk.js'), 'poc-simple-saw-wam' => asset_path('sandbox/poc/simple_saw_wam.js'), 'poc-simple-saw-oscillator-wam' => asset_path('sandbox/poc/simple_saw_oscillator_wam.js') } }
 
 .sandbox-shell
   .sandbox-header
@@ -6,15 +6,20 @@
     %h1 WAM Host POC
     %p.sandbox-copy
       This page is an isolated WAM host. Clicking the button schedules a MIDI note-on and note-off
-      for A4, and the loaded WAM renders a one-second sawtooth note.
+      for A4. Use the selector to swap between a processor-generated saw WAM and a main-thread
+      `OscillatorNode` WAM.
 
   .sandbox-grid
     %section.sandbox-panel
       %h2 Host
       %p.sandbox-label Audio / transport status
       %p#host-status.sandbox-status Booting host...
+      %label.sandbox-label{ for: 'wam-module-select' } Active WAM module
+      %select#wam-module-select.sandbox-select{ disabled: true }
+        %option{ value: 'oscillator', selected: true } OscillatorNode WAM
+        %option{ value: 'processor' } Processor DSP WAM
       %button#play-note-button.sandbox-button{ disabled: true, type: 'button' } Play A4 For 1 Second
-      %p.sandbox-note The host sends real `wam-midi` events to the plugin.
+      %p.sandbox-note The host sends real `wam-midi` events to whichever plugin is currently mounted.
 
     %section.sandbox-panel
       %h2 Plugin
