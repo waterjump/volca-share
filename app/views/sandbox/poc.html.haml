@@ -1,0 +1,25 @@
+- import_map = { 'imports' => { 'wam-sdk' => asset_path('sandbox/poc/vendor/wam-sdk.js'), 'poc-simple-saw-wam' => asset_path('sandbox/poc/simple_saw_wam.js') } }
+
+.sandbox-shell
+  .sandbox-header
+    %p.sandbox-kicker Sandbox
+    %h1 WAM Host POC
+    %p.sandbox-copy
+      This page is an isolated WAM host. Clicking the button schedules a MIDI note-on and note-off
+      for A4, and the loaded WAM renders a one-second sawtooth note.
+
+  .sandbox-grid
+    %section.sandbox-panel
+      %h2 Host
+      %p.sandbox-label Audio / transport status
+      %p#host-status.sandbox-status Booting host...
+      %button#play-note-button.sandbox-button{ disabled: true, type: 'button' } Play A4 For 1 Second
+      %p.sandbox-note The host sends real `wam-midi` events to the plugin.
+
+    %section.sandbox-panel
+      %h2 Plugin
+      %p.sandbox-label Loaded WAM GUI
+      #plugin-mount.sandbox-plugin-mount
+
+%script{ type: 'importmap' }= raw(import_map.to_json)
+%script{ src: asset_path('sandbox/poc/host.js'), type: 'module' }
