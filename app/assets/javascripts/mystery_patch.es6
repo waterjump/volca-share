@@ -23,6 +23,7 @@ $(function() {
   const MAX_HINTS = 2;
   const HINT_BLINK_INTERVAL_MS = 500;
   const HINT_BLINK_DURATION_MS = 5000;
+  const PRE_GAME_MODAL_HIDDEN_STORAGE_KEY = 'mysteryPatchPreGameModalHidden';
   const HINT_TARGET_SELECTORS = {
     voice: ['#voice'],
     detune: ['#detune'],
@@ -47,6 +48,27 @@ $(function() {
     storageKey: 'mysteryPatchGameData',
     gameDurationSeconds: GAME_DURATION_SECONDS
   });
+
+  const preGameModalHidden = function() {
+    try {
+      return window.localStorage.getItem(PRE_GAME_MODAL_HIDDEN_STORAGE_KEY) === 'true';
+    } catch (_) {
+      return false;
+    }
+  };
+
+  const setPreGameModalHidden = function(hidden) {
+    try {
+      window.localStorage.setItem(PRE_GAME_MODAL_HIDDEN_STORAGE_KEY, hidden ? 'true' : 'false');
+    } catch (_) {
+    }
+  };
+
+  const showPreGameModal = function() {
+    if (preGameModalHidden()) { return; }
+
+    $('#pre-game-button').click();
+  };
 
   const currentGuessParams = function() {
     return {
@@ -476,7 +498,7 @@ $(function() {
     results.setResultsData(undefined);
     hints.setState({ hintsUsed: 0, hintedParams: [] });
     showNotStartedState();
-    $('#pre-game-button').click();
+    showPreGameModal();
   };
 
   const getMysteryPatch = function() {
@@ -600,6 +622,14 @@ $(function() {
     if (gameIsPaused) { return; }
     $('#submit-confirmation-modal').modal('hide');
     submitSolution();
+  });
+
+  $('#pre-game-modal').on('show.bs.modal', function() {
+    $('#hide-pre-game-modal').prop('checked', preGameModalHidden());
+  });
+
+  $('#hide-pre-game-modal').on('change', function() {
+    setPreGameModalHidden($(this).prop('checked'));
   });
 
   hints.bindEvents();

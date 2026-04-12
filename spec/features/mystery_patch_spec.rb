@@ -9,6 +9,22 @@ RSpec.describe 'Mystery Patch game', js: true do
     visit mystery_patch_path
 
     expect(page).to have_content("Mystery Patch \##{mystery_patch.number}")
+    expect(page).to have_css('#pre-game-modal.in', visible: :all)
+  end
+
+  it "suppresses the pre-game dialog after don't show this again is checked" do
+    using_session(:pre_game_modal_suppression) do
+      visit mystery_patch_path
+
+      expect(page).to have_css('#pre-game-modal.in', visible: :all)
+      check "Don't show this again"
+      click_button 'Got it'
+
+      visit mystery_patch_path
+
+      expect(page).to have_content("Mystery Patch \##{mystery_patch.number}")
+      expect(page).to have_no_css('#pre-game-modal.in', visible: :all)
+    end
   end
 
   it 'shows results modal and stores resultsData cookie after a minimal run-through' do
