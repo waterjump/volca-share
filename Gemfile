@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '3.2.11'
+ruby '3.4.9'
 
 source 'https://rubygems.org'
 
@@ -40,7 +40,7 @@ group :development, :test do
   gem 'byebug'
   gem 'capybara', '~> 3.18'
   gem 'dotenv-rails'
-  gem 'factory_bot_rails', '~> 4.0'
+  gem 'factory_bot_rails'
   gem 'ffaker'
   gem 'launchy'
   gem 'rspec-rails'
