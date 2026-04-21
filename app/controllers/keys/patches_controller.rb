@@ -35,27 +35,17 @@ module Keys
       @patch = current_user.present? ? current_user.keys_patches.new : Keys::Patch.new
       @patch.attributes = patch_params
 
-      respond_to do |format|
-        if patch_created?
-          format.html do
-            redirect_to(
-              patch_location,
-              notice: 'Patch saved successfully.'
-            )
-          end
+      if patch_created?
+        redirect_to(
+          patch_location,
+          notice: 'Patch saved successfully.'
+        )
+      else
+        @patch = VolcaShare::Keys::PatchViewModel.wrap(@patch)
+        @body_class = :form
+        @title = 'New Keys Patch'
 
-          format.json { :no_content }
-        else
-          @patch = VolcaShare::Keys::PatchViewModel.wrap(@patch)
-          @body_class = :form
-          @title = 'New Keys Patch'
-
-          format.html do
-            render 'keys/patches/new', location: new_keys_patch_url(@patch)
-          end
-
-          format.json { :no_content }
-        end
+        render 'keys/patches/new', location: new_keys_patch_url(@patch)
       end
     end
 

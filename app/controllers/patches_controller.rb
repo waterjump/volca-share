@@ -69,70 +69,44 @@ class PatchesController < ApplicationController
   end
 
   # POST /patches
-  # POST /patches.json
   def create
     @patch_params[:slug] = @patch_params[:name].parameterize
     @patch = current_user.present? ? current_user.patches.new : Patch.new
     @patch.attributes = all_attributes
 
-    respond_to do |format|
-      if patch_created?
-        format.html do
-          redirect_to(
-            patch_location,
-            notice: 'Patch saved successfully.'
-          )
-        end
-        format.json { render :show, status: :created, location: @patch }
-      else
-        @patch = VolcaShare::PatchViewModel.wrap(@patch)
-        @body_class = :form
-        @title = 'New Patch'
-        format.html { render :new, location: @patch }
-        format.json do
-          render json: @patch.errors, status: :unprocessable_entity
-        end
-      end
+    if patch_created?
+      redirect_to(
+        patch_location,
+        notice: 'Patch saved successfully.'
+      )
+    else
+      @patch = VolcaShare::PatchViewModel.wrap(@patch)
+      @body_class = :form
+      @title = 'New Patch'
+      render :new, location: @patch
     end
   end
 
   # PATCH/PUT /patches/1
-  # PATCH/PUT /patches/1.json
   def update
-    respond_to do |format|
-      @patch_params[:slug] = @patch_params[:name].parameterize
-      if @patch.update_attributes(all_attributes)
-        format.html do
-          redirect_to(
-            user_patch_url(@patch.user.slug, @patch.slug),
-            notice: 'Patch saved successfully.'
-          )
-        end
-        format.json { render :show, status: :created, location: @patch }
-      else
-        @body_class = :form
-        format.html { render :edit }
-        format.json do
-          render json: @patch.errors, status: :unprocessable_entity
-        end
-      end
+    @patch_params[:slug] = @patch_params[:name].parameterize
+    if @patch.update_attributes(all_attributes)
+      redirect_to(
+        user_patch_url(@patch.user.slug, @patch.slug),
+        notice: 'Patch saved successfully.'
+      )
+    else
+      @body_class = :form
+      render :edit
     end
   end
 
   # DELETE /patches/1
-  # DELETE /patches/1.json
   def destroy
-    respond_to do |format|
-      if current_user == @patch.user && @patch.destroy
-        format.html do
-          redirect_to patches_url, notice: 'Patch was successfully destroyed.'
-        end
-      else
-        format.html do
-          redirect_to patch_url(@patch), notice: 'You cannot delete that patch.'
-        end
-      end
-      format.json { head :no_content }
+    if current_user == @patch.user && @patch.destroy
+      redirect_to patches_url, notice: 'Patch was successfully destroyed.'
+    else
+      redirect_to patch_url(@patch), notice: 'You cannot delete that patch.'
     end
   end
 
@@ -235,14 +209,22 @@ class PatchesController < ApplicationController
 
   def format_sequence(seq)
     ok_keys = [:id, :index, :note, :step_mode, :slide, :active_step, :_destroy]
+    seq = seq.to_h.with_indifferent_access
     sequence = {}
     sequence[:id] = seq[:id] if seq[:id].present?
     sequence[:_destroy] = seq[:destroy] if seq[:destroy].present?
-    sequence[:steps_attributes] = seq.except(:id, :destroy).each do |step|
-      step.reject do |k, _v|
-        !ok_keys.include?(k)
-      end
-    end.values
+    sequence[:steps_attributes] =
+      seq.except(:id, :destroy)
+         .values
+         .filter_map do |step|
+           next unless step.respond_to?(:to_h)
+
+           attrs = step.to_h.with_indifferent_access.slice(*ok_keys)
+           next if attrs.empty?
+
+           attrs
+         end
+         .sort_by { |step| step[:index].to_i }
     sequence
   end
 end

@@ -15,30 +15,36 @@
             = hidden_field_tag "patch[sequences_attributes][#{seq_num}][id]", sequence.id
           - 16.times do |num|
             - step = VolcaShare::StepViewModel.wrap(sequence.steps[num]) if sequence.present?
+            - step_number = num + 1
+            - step_name = "patch[sequences_attributes][#{seq_num}][step_#{step_number}]"
+            - step_id = "patch_sequences_attributes_#{seq_num}_step_#{step_number}"
             - if step.present?
-              = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[id]]]", step.id
-            .step{ class: (num + 1) % 4 == 0 ? 'line' : '' }
+              = hidden_field_tag "#{step_name}[id]", step.id
+            .step{ class: step_number % 4 == 0 ? 'line' : '' }
               .up.arrow
               .note.param
-                = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[index]]]", num + 1
-                = hidden_field_tag "patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]", step.try(:note) || 60
-                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[note]]]") do
-                  %span.note-display{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_note_display", data: { 'starting-note' => step.try(:note) || 60, index: num } }
+                = hidden_field_tag "#{step_name}[index]", step_number
+                = hidden_field_tag "#{step_name}[note]", step.try(:note) || 60
+                = label_tag("#{step_id}_note") do
+                  %span.note-display{ id: "#{step_id}_note_display", data: { 'starting-note' => step.try(:note) || 60, index: num } }
                     C3
               .down.arrow
               .slide.param
-                = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :slide, step.try(:slide_checked) || {}, 'true', 'false'
-                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[slide]]]") do
+                = hidden_field_tag "#{step_name}[slide]", 'false', id: nil
+                = check_box_tag "#{step_name}[slide]", 'true', step&.slide || false, id: "#{step_id}_slide"
+                = label_tag("#{step_id}_slide") do
                   %span
-                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_slide_light",  data: { active: step&.slide&.to_s || 'false', index: num } }
+                    .light.sequence-light{ id: "#{step_id}_slide_light",  data: { active: step&.slide&.to_s || 'false', index: num } }
               .step-mode.param
-                = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :step_mode, step.try(:step_mode_checked) || { checked: true }, 'true', 'false'
-                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[step_mode]]]") do
+                = hidden_field_tag "#{step_name}[step_mode]", 'false', id: nil
+                = check_box_tag "#{step_name}[step_mode]", 'true', step.present? ? step.step_mode : true, id: "#{step_id}_step_mode"
+                = label_tag("#{step_id}_step_mode") do
                   %span
-                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_step_mode_light", data: { active: step&.step_mode&.to_s || 'true', index: num } }
+                    .light.sequence-light{ id: "#{step_id}_step_mode_light", data: { active: step&.step_mode&.to_s || 'true', index: num } }
               .active-step.param
-                = check_box "patch[sequences_attributes][#{seq_num}][step_#{num + 1}", :active_step, step.try(:active_step_checked) || { checked: true }, 'true', 'false'
-                = label_tag("patch[sequences_attributes][#{seq_num}][step_#{num + 1}[active_step]]]") do
+                = hidden_field_tag "#{step_name}[active_step]", 'false', id: nil
+                = check_box_tag "#{step_name}[active_step]", 'true', step.present? ? step.active_step : true, id: "#{step_id}_active_step"
+                = label_tag("#{step_id}_active_step") do
                   %span
-                    .light.sequence-light{ id: "patch_sequences_attributes_#{seq_num}_step_#{num + 1}_active_step_light",  data: { active: step&.active_step&.to_s || 'true', index: num } }
+                    .light.sequence-light{ id: "#{step_id}_active_step_light",  data: { active: step&.active_step&.to_s || 'true', index: num } }
           = hidden_field_tag "patch[sequences_attributes][#{seq_num}][destroy]", false, class: 'remove-sequence'
