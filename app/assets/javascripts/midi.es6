@@ -10,15 +10,21 @@ VS.MidiOut = function() {
   this.playingNote;
 
   this.ready = function() {
-    return (this.output !== undefined) && (this.channel !== undefined);
+    return (
+      this.output &&
+      typeof this.output.sendControlChange === 'function' &&
+      this.channel !== undefined
+    );
   };
 
   this.changeChannel = function(element) {
-    this.channel = $(element).val();
+    const value = $(element).val();
+    this.channel = value === 'Midi Channel' ? undefined : value;
   };
 
   this.changeOutput = function(element) {
-    this.output = WebMidi.getOutputByName($(element).val());
+    const value = $(element).val();
+    this.output = value === 'Midi Device' ? undefined : WebMidi.getOutputByName(value);
   };
 
   this.updateForm = function() {
@@ -87,6 +93,8 @@ VS.MidiOut = function() {
   }.bind(this));
 
   $(document).on('midicontrolchange', function(event) {
+    if (!this.ready()) { return; }
+
     this.output.sendControlChange(
       event.detail.controlNumber,
       event.detail.midiValue,
