@@ -23,8 +23,30 @@ VS.Knob = function(element) {
 
   this.setDisplayStyle();
 
+  const setBevelColor = function(degree) {
+    this.jElement.children('.bevel').css('background-color', grayScaleFromRotation(degree));
+  }.bind(this);
+
+  const grayScaleFromRotation = function(degree) {
+    const clamped = Math.max(-140, Math.min(140, degree));
+    const magnitude = Math.abs(clamped);
+
+    let channel;
+
+    if (magnitude <= 90) {
+      channel = Math.round(220 + (179 - 220) * (magnitude / 90));
+    } else {
+      channel = Math.round(179 + (145 - 179) * ((magnitude - 90) / 50));
+    }
+
+    const hex = channel.toString(16).padStart(2, "0");
+
+    return `#${hex}${hex}${hex}`;
+  };
+
   this.rotate = function(degree) {
     const knob = this.jElement;
+    setBevelColor(degree);
     knob.css('-moz-transform', `rotate(${degree}deg)`);
     knob.css('-moz-transform-origin', '50% 50%');
     knob.css('-webkit-transform', `rotate(${degree}deg)`);
@@ -42,6 +64,7 @@ VS.Knob = function(element) {
     <% else %>
     const currentRotation = parseInt(this.rotation);
     $({deg: currentRotation}).animate({ deg: d }, { step(now, fx) {
+      setBevelColor(now);
       scope.jElement.css({transform: `rotate(${now}deg)`});
     }
   }

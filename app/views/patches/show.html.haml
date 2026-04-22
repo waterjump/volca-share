@@ -25,14 +25,19 @@
         .digit#tens
         .digit#ones
       .medium.knob.midi-enabled#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+        .bevel
         .notch
       .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
+        .bevel
         .notch
       .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
+        .bevel
         .notch
       .medium.knob.lfo.midi-enabled#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
+        .bevel
         .notch
       .medium.knob.lfo.midi-enabled#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
+        .bevel
         .notch
       .small.knob.vco.midi-enabled#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
         .notch

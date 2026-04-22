@@ -175,6 +175,14 @@ body.knob-dragging {
   border-radius: 50%;
   position: absolute;
   overflow: hidden;
+
+  .bevel {
+    position: absolute;
+    width: 100%;
+    background-color: #dcdcdc;
+    height: 25%;
+  }
+
   .notch {
     position: absolute;
     width: 8%;

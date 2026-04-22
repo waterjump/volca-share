@@ -16,14 +16,19 @@
         .digit#ones
         #decimal.hidden
       .medium.knob#octave{ data: { midi: @patch.octave || 63, control_number: 40 } }
+        .bevel
         .notch
       .medium.knob#peak{ data: { midi: @patch.peak || 63, control_number: 0 } }
+        .bevel
         .notch
       .large.knob#cutoff{ data: { midi: @patch.cutoff || 63, control_number: 0 } }
+        .bevel
         .notch
       .medium.knob.lfo#lfo_rate{ data: { midi: @patch.lfo_rate || 63, control_number: 41 } }
+        .bevel
         .notch
       .medium.knob.lfo#lfo_int{ data: { midi: @patch.lfo_int || 63, control_number: 42 } }
+        .bevel
         .notch
       .small.knob.vco#vco1_pitch{ data: { midi: @patch.vco1_pitch || 63, control_number: 43 }, class: @patch.lit?(:vco1_active) }
         .notch
@@ -35,6 +40,7 @@
       .button#vco2_active_button{ data: { active: @patch.vco2_active.to_s || 'true' }, class: @patch.lit?(:vco2_active) }
       .button#vco3_active_button{ data: { active: @patch.vco3_active.to_s || 'true' }, class: @patch.lit?(:vco3_active) }
       .medium.knob#volume{ data: { midi: 127 } }
+        .bevel
         .notch
       .cooltip
       .green-check-mark
