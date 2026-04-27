@@ -27,7 +27,7 @@ gem 'rack-timeout'
 gem 'rails', '~> 8.0'
 gem 'rails-html-sanitizer', '~> 1.0'
 gem 'recaptcha', '4.1.0', require: 'recaptcha/rails'
-gem 'rubocop', '~> 1.85.1', require: false
+gem 'rubocop', '~> 1.86', require: false
 gem 'ruby-oembed'
 gem 'sass-rails'
 gem 'sprockets', '~> 4.0'
