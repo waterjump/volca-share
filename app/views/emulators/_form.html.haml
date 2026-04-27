@@ -173,14 +173,6 @@
           To save a patch and sequence, click the "<span class='interface-text'>permalink</span>" button on the emulator's interface below the cutoff knob.  The URL of this page will be updated to reflect the current patch and sequence settings and then you can bookmark it or send it to a friend, etc.
     .accordion-item
       %h4.accordion-header
-        Changelog
-        .collapse-toggle.glyphicon.glyphicon-menu-down
-      - compatibilityBodyStyle = cookies[:accordionCompatibility] == 'closed' ? 'display:none;' : ''
-      .accordion-body{ style: compatibilityBodyStyle }
-        %b August 2024:
-        The sequencer issue on Chrome has been resolved.  Playback should be consistent and should not stutter or fizzle out.
-    .accordion-item
-      %h4.accordion-header
         Disclaimer
         .collapse-toggle.glyphicon.glyphicon-menu-down
       - disclaimerBodyStyle = cookies[:accordionDisclaimer] == 'closed' ? 'display:none;' : ''
