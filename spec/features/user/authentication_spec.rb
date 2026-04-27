@@ -110,7 +110,7 @@ RSpec.feature 'Authentication process', type: :feature, js: true do
         end
 
         expect(page).to have_current_path(new_user_session_path)
-        expect(page).to have_content('Invalid Email or password.')
+        expect(page).to have_content('Invalid email or password.')
         expect(current_path).to eq(new_user_session_path)
       end
     end
